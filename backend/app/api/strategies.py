@@ -1,0 +1,60 @@
+from __future__ import annotations
+
+import json
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from ..db import get_db
+from ..models import StrategyConfig
+from ..schemas import StrategyUpdate
+from ..strategy.defaults import DEFAULT_STRATEGIES, seed_strategies
+from ..trading.service import TradingService
+
+router = APIRouter(prefix="/strategies", tags=["strategies"])
+
+
+def _strategy_dict(row: StrategyConfig) -> dict:
+    try:
+        params = json.loads(row.params or "{}")
+    except ValueError:
+        params = {}
+    return {
+        "id": row.id,
+        "code": row.code,
+        "name": row.name,
+        "description": row.description,
+        "enabled": bool(row.enabled),
+        "params": params,
+        "updated_at": row.updated_at.isoformat() if row.updated_at else "",
+    }
+
+
+@router.get("")
+def list_strategies(db: Session = Depends(get_db)):
+    seed_strategies(db)
+    rows = db.query(StrategyConfig).order_by(StrategyConfig.id.asc()).all()
+    return {
+        "strategies": [_strategy_dict(row) for row in rows],
+        "defaults": DEFAULT_STRATEGIES,
+    }
+
+
+@router.put("/{code}")
+def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(get_db)):
+    row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
+    if row is None:
+        raise HTTPException(404, "策略不存在")
+    if payload.enabled is not None:
+        row.enabled = 1 if payload.enabled else 0
+    if payload.params is not None:
+        row.params = json.dumps(payload.params, ensure_ascii=False)
+    db.commit()
+    db.refresh(row)
+    return _strategy_dict(row)
+
+
+@router.post("/run-once")
+def run_once(db: Session = Depends(get_db)):
+    result = TradingService(db).run_cycle()
+    return result
