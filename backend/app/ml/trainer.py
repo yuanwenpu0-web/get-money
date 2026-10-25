@@ -5,13 +5,19 @@ import pickle
 from datetime import datetime, timezone
 
 import numpy as np
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from sqlalchemy.orm import Session
 
 from ..config import MODEL_DIR
 from ..features.indicators import FEATURES
 from ..models import ModelRecord
-from .dataset import build_dataset
+from .dataset import build_dataset, purged_split
 
 
 def _build_estimator(algo: str, params: dict | None = None):
@@ -59,7 +65,7 @@ def train_model(
         raise ValueError(f"训练样本不足（{len(data)} 行，至少需要 500 行），请先拉取更多历史K线")
 
     split = int(len(data) * 0.8)
-    train, test = data.iloc[:split], data.iloc[split:]
+    train, test = purged_split(data, split, horizon)
     if len(test) < 100:
         raise ValueError("测试集样本不足，请增加历史数据")
 
@@ -78,6 +84,9 @@ def train_model(
         "test_rows": int(len(test)),
         "up_ratio": float(test["label"].mean()),
         "atr_mean_pct": float(test["atr_pct"].mean()),
+        "purge_bars": horizon,
+        "evaluation_start": str(test.index[0]),
+        "evaluation_end": str(test.index[-1]),
     }
 
     model_path = MODEL_DIR / f"{symbol}_{interval}_{algo}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.pkl"
@@ -93,7 +102,7 @@ def train_model(
         features=json.dumps(FEATURES),
         metrics=json.dumps(metrics, ensure_ascii=False),
         train_start=int(data.index[0].timestamp() * 1000),
-        train_end=int(data.index[-1].timestamp() * 1000),
+        train_end=int(train.index[-1].timestamp() * 1000),
         rows=int(len(data)),
         status="ready",
     )

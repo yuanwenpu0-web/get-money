@@ -5,11 +5,15 @@ INTERVAL_MS = {
     "5m": 300_000,
     "15m": 900_000,
     "1h": 3_600_000,
+    "4h": 14_400_000,
+    "1d": 86_400_000,
 }
 
 
 def interval_ms(interval: str) -> int:
-    return INTERVAL_MS.get(interval, 60_000)
+    if interval not in INTERVAL_MS:
+        raise ValueError(f'不支持的K线周期: {interval}')
+    return INTERVAL_MS[interval]
 
 
 def now_ms() -> int:

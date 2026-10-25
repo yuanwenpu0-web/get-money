@@ -63,7 +63,9 @@ def _rsi(close: pd.Series, length: int) -> pd.Series:
     gain = delta.clip(lower=0).ewm(alpha=1 / length, adjust=False).mean()
     loss = (-delta.clip(upper=0)).ewm(alpha=1 / length, adjust=False).mean()
     rs = gain / loss.replace(0, np.nan)
-    return 100 - 100 / (1 + rs)
+    result = 100 - 100 / (1 + rs)
+    result = result.mask((loss == 0) & (gain > 0), 100.)
+    return result.mask((loss == 0) & (gain == 0), 50.)
 
 
 def _macd(close: pd.Series) -> tuple[pd.Series, pd.Series, pd.Series]:
@@ -159,7 +161,17 @@ def _adx(frame: pd.DataFrame, length: int = 14) -> tuple[pd.Series, pd.Series]:
             dmn_col = next((c for c in result.columns if c.startswith("DMN_")), None)
             if adx_col and dmp_col and dmn_col:
                 return result[adx_col], result[dmp_col] - result[dmn_col]
-    return pd.Series(np.nan, index=frame.index), pd.Series(np.nan, index=frame.index)
+    high, low, close = frame['high'], frame['low'], frame['close']
+    up, down = high.diff(), -low.diff()
+    plus_dm = up.where((up > down) & (up > 0), 0.)
+    minus_dm = down.where((down > up) & (down > 0), 0.)
+    tr = pd.concat([high - low, (high - close.shift()).abs(), (low - close.shift()).abs()], axis=1).max(axis=1)
+    def smooth(values):
+        return values.ewm(alpha=1 / length, adjust=False, min_periods=length).mean()
+    atr = smooth(tr).replace(0, np.nan)
+    plus, minus = 100 * smooth(plus_dm) / atr, 100 * smooth(minus_dm) / atr
+    dx = (100 * (plus - minus).abs() / (plus + minus).replace(0, np.nan)).fillna(0.)
+    return smooth(dx), (plus - minus).fillna(0.)
 
 
 def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int = 5) -> pd.DataFrame:
@@ -198,14 +210,14 @@ def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int =
     mid = close.rolling(20).mean()
     std = close.rolling(20).std()
     data["bb_width"] = (std * 4) / mid
-    data["bb_pos"] = (close - (mid - 2 * std)) / ((std * 4).replace(0, np.nan))
+    data["bb_pos"] = ((close - (mid - 2 * std)) / ((std * 4).replace(0, np.nan))).mask(std == 0, .5)
 
     volume_mean = data["volume"].rolling(50).mean()
-    volume_std = data["volume"].rolling(50).std().replace(0, np.nan)
-    data["volume_z"] = (data["volume"] - volume_mean) / volume_std
+    volume_std = data["volume"].rolling(50).std()
+    data["volume_z"] = ((data["volume"] - volume_mean) / volume_std.replace(0, np.nan)).mask(volume_std == 0, 0.)
 
     data["range_pct"] = (high - low) / close
-    data["close_pos"] = (close - low) / (high - low).replace(0, np.nan)
+    data["close_pos"] = ((close - low) / (high - low).replace(0, np.nan)).mask(high == low, .5)
 
     adx, di_diff = _adx(data, 14)
     data["adx_14"] = adx
@@ -215,8 +227,8 @@ def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int =
         minutes = data.index.hour * 60 + data.index.minute
         data["hour_sin"] = np.sin(2 * np.pi * minutes / 1440)
         data["hour_cos"] = np.cos(2 * np.pi * minutes / 1440)
-        data["dow_sin"] = np.sin(2 * np.pi * data.index.dayofweek / 7)
-        data["dow_cos"] = np.cos(2 * np.pi * data.index.dayofweek / 7)
+        data["dow_sin"] = np.sin(2 * np.pi * data.index.day_of_week / 7)
+        data["dow_cos"] = np.cos(2 * np.pi * data.index.day_of_week / 7)
     else:
         data["hour_sin"] = 0.0
         data["hour_cos"] = 0.0

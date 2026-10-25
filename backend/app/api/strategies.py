@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import StrategyConfig
 from ..schemas import StrategyUpdate
+from ..state import all_state
 from ..strategy.defaults import DEFAULT_STRATEGIES, seed_strategies
+from ..strategy.rules import resolve_params
 from ..trading.service import TradingService
 
 router = APIRouter(prefix="/strategies", tags=["strategies"])
@@ -35,7 +37,7 @@ def list_strategies(db: Session = Depends(get_db)):
     seed_strategies(db)
     rows = db.query(StrategyConfig).order_by(StrategyConfig.id.asc()).all()
     return {
-        "strategies": [_strategy_dict(row) for row in rows],
+        "strategies": [{**_strategy_dict(row), 'effective_params': resolve_params(row.code, all_state(db), json.loads(row.params or '{}'))} for row in rows],
         "defaults": DEFAULT_STRATEGIES,
     }
 
@@ -45,6 +47,11 @@ def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(ge
     row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
     if row is None:
         raise HTTPException(404, "策略不存在")
+    if payload.params is not None:
+        try:
+            resolve_params(code, all_state(db), payload.params)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
     if payload.enabled is not None:
         row.enabled = 1 if payload.enabled else 0
     if payload.params is not None:

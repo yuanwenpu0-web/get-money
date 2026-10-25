@@ -55,11 +55,13 @@ class TradingService:
 
             # 每个币种选评分最高的策略信号
             best_signals = {}
+            strategy_signals = {}
             signal_errors = []
             for symbol in symbols:
                 for code in codes:
                     try:
                         signal = engine.evaluate(symbol, interval, code, save=True)
+                        strategy_signals[(symbol, interval, code)] = signal
                         if signal is None or signal.direction == "FLAT":
                             continue
                         current = best_signals.get(symbol)
@@ -72,11 +74,11 @@ class TradingService:
             managed = []
             closed_symbols = set()
             for order in open_orders(self.db):
-                binding = best_signals.get(order.symbol)
+                binding = strategy_signals.get((order.symbol, order.interval, order.strategy))
                 result = manage_order(self.db, order, binding)
                 if result["actions"]:
                     managed.append(result)
-                if any(action in ("stop_loss", "take_profit", "time_stop", "signal_weak") for action in result["actions"]):
+                if order.status != 'OPEN':
                     closed_symbols.add(order.symbol)
 
             # 无持仓的币种按信号开仓；刚止损/止盈的币种本周期不再追单
@@ -95,7 +97,7 @@ class TradingService:
                     opened.append(order.id)
                     decisions.append(f"{symbol} {signal.direction} open #{order.id} score={signal.score}")
                 else:
-                    decisions.append(f"{symbol} {signal.direction} skipped (资金不足)")
+                    decisions.append(f"{symbol} {signal.direction} skipped (冷却、重复信号或风险/资金限制)")
 
             snapshot_equity(self.db)
             summary = {
@@ -152,7 +154,7 @@ class TradingService:
                 "prob_up": 0.5,
             },
         )()
-        return open_position(self.db, signal)
+        return open_position(self.db, signal, ignore_cooldown=True)
 
     def snapshot(self) -> dict:
         return portfolio_snapshot(self.db)

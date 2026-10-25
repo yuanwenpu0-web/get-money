@@ -8,19 +8,19 @@ DEFAULT_STRATEGIES = [
     {
         "code": "ml_ensemble",
         "name": "ML 趋势共振",
-        "description": "LightGBM/XGBoost 方向概率为主，叠加 SuperTrend、EMA、MACD 顺势确认",
+        "description": "模型方向优势 + 趋势一致性确认，过滤低波动成本损耗，按单笔风险限制仓位",
         "params": {"ml_weight": 0.6, "min_score": 0.55, "require_model": False},
     },
     {
         "code": "trend_follow",
         "name": "SuperTrend 趋势跟随",
-        "description": "SuperTrend 方向 + EMA 排列 + MACD 动量，适合单边行情",
+        "description": "ADX 趋势过滤 + SuperTrend 与快慢 EMA 同向确认，减少震荡追单",
         "params": {"min_score": 0.55, "adx_filter": 18},
     },
     {
         "code": "mean_reversion",
         "name": "RSI 均值回归",
-        "description": "RSI 超买超卖反向入场，适合震荡行情",
+        "description": "震荡环境中的 RSI 极值与布林带确认，强趋势时暂停逆势入场",
         "params": {"rsi_low": 30, "rsi_high": 70, "min_score": 0.55},
     },
 ]

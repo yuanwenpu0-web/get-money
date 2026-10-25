@@ -32,7 +32,10 @@ const form = reactive({
   trailing_atr_mult: 1.2,
   min_hold_bars: 30,
   max_hold_bars: 120,
-  backtest_trailing: false,
+  trailing_enabled: true,
+  risk_pct: 0.5,
+  cooldown_bars: 10,
+  trail_activation_atr: 1.5,
   train_horizon: 5,
   auto_train_days: 40,
   schedule_enabled: true,
@@ -49,8 +52,8 @@ function applySettings(data) {
   form.symbols = data.symbols || ['BTCUSDT', 'ETHUSDT']
   form.interval = data.interval || '1m'
   form.testnet = Boolean(data.testnet)
-  form.fee_pct = Number(((data.fee_rate || 0.0004) * 100).toFixed(4))
-  form.slippage_pct = Number(((data.slippage || 0.0002) * 100).toFixed(4))
+  form.fee_pct = Number(((data.fee_rate ?? 0.0004) * 100).toFixed(4))
+  form.slippage_pct = Number(((data.slippage ?? 0.0002) * 100).toFixed(4))
   form.base_pct = Number(((data.base_position_pct || 0.08) * 100).toFixed(2))
   form.max_pct = Number(((data.max_position_pct || 0.25) * 100).toFixed(2))
   form.min_score = data.min_score ?? 0.55
@@ -63,7 +66,10 @@ function applySettings(data) {
   form.trailing_atr_mult = data.trailing_atr_mult ?? 1.2
   form.min_hold_bars = data.min_hold_bars ?? 30
   form.max_hold_bars = data.max_hold_bars ?? 120
-  form.backtest_trailing = Boolean(data.backtest_trailing)
+  form.trailing_enabled = data.trailing_enabled ?? true
+  form.risk_pct = Number(((data.risk_per_trade_pct ?? 0.005) * 100).toFixed(2))
+  form.cooldown_bars = data.cooldown_bars ?? 10
+  form.trail_activation_atr = data.trail_activation_atr ?? 1.5
   form.train_horizon = data.train_horizon ?? 5
   form.auto_train_days = data.auto_train_days ?? 40
   form.schedule_enabled = Boolean(data.schedule_enabled)
@@ -108,7 +114,10 @@ async function saveSettings() {
       trailing_atr_mult: Number(form.trailing_atr_mult),
       min_hold_bars: Number(form.min_hold_bars),
       max_hold_bars: Number(form.max_hold_bars),
-      backtest_trailing: form.backtest_trailing,
+      trailing_enabled: form.trailing_enabled,
+      risk_per_trade_pct: Number(form.risk_pct) / 100,
+      cooldown_bars: Number(form.cooldown_bars),
+      trail_activation_atr: Number(form.trail_activation_atr),
       train_horizon: Number(form.train_horizon),
       auto_train_days: Number(form.auto_train_days),
       schedule_enabled: form.schedule_enabled,
@@ -304,13 +313,25 @@ onMounted(load)
           <div class="panel-head">
             <div>
               <div class="panel-title">策略风控</div>
-              <div class="panel-sub">评分阈值决定方向；仓位占比达到重仓阈值时按上限开仓</div>
+              <div class="panel-sub">按评分分配仓位，并按止损距离与双边成本限制单笔风险</div>
             </div>
           </div>
           <div class="form-grid">
             <div>
               <div class="muted" style="margin-bottom: 4px">开仓评分阈值</div>
               <el-input-number v-model="form.min_score" :min="0.5" :max="1" :step="0.01" :precision="2" style="width: 100%" />
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom: 4px">单笔止损风险（% 权益，含成本）</div>
+              <el-input-number v-model="form.risk_pct" :min="0.01" :max="5" :step="0.1" :precision="2" style="width: 100%" />
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom: 4px">平仓后冷却K线数</div>
+              <el-input-number v-model="form.cooldown_bars" :min="0" :max="10000" style="width: 100%" />
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom: 4px">移动止损启动盈利（ATR 倍数）</div>
+              <el-input-number v-model="form.trail_activation_atr" :min="0.1" :max="20" :step="0.1" :precision="1" style="width: 100%" />
             </div>
             <div>
               <div class="muted" style="margin-bottom: 4px">重仓评分阈值</div>
@@ -374,9 +395,9 @@ onMounted(load)
             </div>
           </div>
           <div class="row" style="margin-top: 12px">
-            <el-switch v-model="form.backtest_trailing" active-text="回测启用移动止损" inactive-text="回测固定止损" />
+            <el-switch v-model="form.trailing_enabled" active-text="模拟盘与回测启用移动止损" inactive-text="固定止损" />
           </div>
-          <div class="form-hint">评分越接近 1，说明 ML 方向概率与指标共振越强；达到重仓阈值时仓位直接取单仓上限。杠杆按 ATR 波动率反比推荐并受上限约束。</div>
+          <div class="form-hint">评分反映信号强度，不等于胜率。仓位同时受评分、资金和单笔风险限制；跳空时实际损失可能超过预算。策略 JSON 中的同名参数优先于全局设置。</div>
         </div>
 
         <div class="panel">

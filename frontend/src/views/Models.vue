@@ -116,7 +116,7 @@ onMounted(load)
         <div class="kv-grid">
           <div class="kv"><span class="kv-key">TA-Lib</span><span class="kv-value" :class="settings.features?.talib ? 'up' : 'down'">{{ settings.features?.talib ? '可用' : '缺失' }}</span></div>
           <div class="kv"><span class="kv-key">pandas-ta-classic</span><span class="kv-value" :class="settings.features?.pandas_ta ? 'up' : 'down'">{{ settings.features?.pandas_ta ? '可用' : '缺失' }}</span></div>
-          <div class="kv"><span class="kv-key">vectorbt</span><span class="kv-value" :class="settings.features?.vectorbt ? 'up' : 'down'">{{ settings.features?.vectorbt ? '可用' : '回退模式' }}</span></div>
+          <div class="kv"><span class="kv-key">回测引擎</span><span class="kv-value">顺序撮合</span></div>
           <div class="kv"><span class="kv-key">已有模型</span><span class="kv-value">{{ models.length }}</span></div>
           <div class="kv"><span class="kv-key">本地K线</span><span class="kv-value">{{ settings.data_stats?.length || 0 }} 组</span></div>
           <div class="kv"><span class="kv-key">nofx 数据源</span><span class="kv-value" :class="settings.nofx?.available ? 'up' : 'down'">{{ settings.nofx?.available ? '在线' : '不可用' }}</span></div>

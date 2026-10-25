@@ -1,20 +1,23 @@
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from ..backtest.runner import HAS_VBT
 from ..config import SUPPORTED_INTERVALS
 from ..db import get_db
 from ..features.indicators import HAS_PTA, HAS_TALIB
+from ..market.binance import BinanceClient
 from ..market.data_service import MarketDataService
-from ..models import Credential, JobLog, ModelRecord, utcnow
+from ..models import Credential, JobLog, ModelRecord, StrategyConfig, utcnow
 from ..schemas import CapitalAdjust, CredentialsPayload, SettingsUpdate
 from ..security import decrypt, encrypt, mask
 from ..state import all_state, set_state
+from ..strategy.rules import resolve_params
 from ..trading.portfolio import adjust_capital
 from ..trading.scheduler import scheduler, update_schedule
-from ..backtest.runner import HAS_VBT
-from ..market.binance import BinanceClient
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -38,6 +41,11 @@ EDITABLE_KEYS = {
     "backtest_trailing",
     "trailing_atr_mult",
     "max_hold_bars",
+    'risk_per_trade_pct',
+    'cooldown_bars',
+    'trailing_enabled',
+    'trail_activation_atr',
+    'max_signal_age_bars',
     "schedule_enabled",
     "schedule_seconds",
     "train_horizon",
@@ -120,6 +128,17 @@ def read_settings(db: Session = Depends(get_db)):
 def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     data = {key: value for key, value in payload.model_dump(exclude_none=True).items() if key in EDITABLE_KEYS}
     _validate(data)
+    if 'backtest_trailing' in data and 'trailing_enabled' not in data:
+        data['trailing_enabled'] = data['backtest_trailing']
+    merged = {**all_state(db), **data}
+    _validate({key: value for key, value in merged.items() if key in EDITABLE_KEYS})
+    try:
+        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion'):
+            resolve_params(code, merged)
+        for strategy in db.query(StrategyConfig).all():
+            resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
     for key, value in data.items():
         set_state(db, key, value)
     if "schedule_enabled" in data or "schedule_seconds" in data:

@@ -1,5 +1,5 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
@@ -52,6 +52,11 @@ DEFAULT_STATE = {
     "backtest_trailing": False,
     "trailing_atr_mult": 1.2,
     "max_hold_bars": 120,
+    "risk_per_trade_pct": 0.005,
+    "cooldown_bars": 10,
+    "trailing_enabled": True,
+    "trail_activation_atr": 1.5,
+    "max_signal_age_bars": 2,
     "schedule_enabled": True,
     "schedule_seconds": 60,
     "train_horizon": 5,

@@ -62,7 +62,8 @@ class MarketDataService:
         if last == 0:
             start = now_ms() - step * tail_limit
         else:
-            start = last + step
+            # Refresh the previous tail: it may have been imported before closing.
+            start = last
 
         total = 0
         for _ in range(10):

@@ -3,6 +3,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 import { price } from '../utils/format'
+import { signalReason } from '../utils/strategy'
 
 const strategies = ref([])
 const settings = ref({})
@@ -54,7 +55,10 @@ async function toggle(row) {
 function openEdit(row) {
   editCode.value = row.code
   editName.value = row.name
-  editParams.value = JSON.stringify(row.params || {}, null, 2)
+  const editable = { ...(row.effective_params || row.params || {}) }
+  delete editable.fee_rate
+  delete editable.slippage
+  editParams.value = JSON.stringify(editable, null, 2)
   editVisible.value = true
 }
 
@@ -193,6 +197,8 @@ onMounted(load)
             <div class="kv"><span class="kv-key">止损</span><span class="kv-value mono">{{ price(preview.signal.sl) }}</span></div>
             <div class="kv"><span class="kv-key">止盈</span><span class="kv-value mono">{{ price(preview.signal.tp) }}</span></div>
             <div class="kv"><span class="kv-key">ATR 占比</span><span class="kv-value mono">{{ (preview.signal.atr_pct * 100).toFixed(3) }}%</span></div>
+            <div class="kv"><span class="kv-key">预计止损风险（含成本）</span><span class="kv-value mono">{{ ((preview.signal.reason?.risk_pct || 0) * 100).toFixed(2) }}%</span></div>
+            <div class="kv"><span class="kv-key">净盈亏比</span><span class="kv-value mono">{{ preview.signal.reason?.net_reward_risk?.toFixed(2) ?? '—' }}</span></div>
           </div>
         </div>
         <div v-else class="empty-hint">当前数据不足，无法生成信号（需至少 120 根K线）。</div>
@@ -210,7 +216,7 @@ onMounted(load)
           <div class="kv"><span class="kv-key">K线时间</span><span class="kv-value mono">{{ preview.indicators?.time ?? '—' }}</span></div>
         </div>
         <div v-if="preview.signal?.reason" class="form-hint mono" style="margin-top: 10px">
-          {{ JSON.stringify(preview.signal.reason) }}
+          {{ signalReason(preview.signal.reason.block_reason) }}
         </div>
       </div>
     </div>
@@ -240,7 +246,7 @@ onMounted(load)
     </div>
 
     <el-dialog v-model="editVisible" :title="`编辑参数 · ${editName}`" width="560px">
-      <div class="muted" style="margin-bottom: 8px">JSON 参数会覆盖策略默认值与全局风控值，保存后立即生效。</div>
+      <div class="muted" style="margin-bottom: 8px">显示当前生效参数。保存的字段会覆盖全局设置；删除某个字段可恢复继承默认值。risk_per_trade_pct 为单笔权益风险比例，cooldown_bars 为平仓后冷却根数，regime_filter / cost_filter 控制行情与成本过滤。</div>
       <el-input v-model="editParams" type="textarea" :rows="9" class="mono" />
       <template #footer>
         <el-button @click="editVisible = false">取消</el-button>

@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import json
+
 from sqlalchemy.orm import Session
 
-from ..models import Order
-from ..state import all_state, set_state
-from ..utils import round_price
+from ..models import Order, StrategyConfig
+from ..state import all_state, get_state, set_state
+from ..strategy.rules import resolve_params
+from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
+from .risk import position_size
 
 EPS = 1e-12
 
@@ -20,10 +24,23 @@ def _slippage(state: dict) -> float:
     return float(state.get("slippage", 0.0002))
 
 
-def open_position(db: Session, signal, equity: float | None = None) -> Order | None:
+def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
     if signal.direction not in ("LONG", "SHORT"):
         return None
     state = all_state(db)
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == signal.strategy).first()
+    params = resolve_params(signal.strategy, state, json.loads(config.params or '{}') if config else None)
+    timestamp = getattr(signal, 'ts', None)
+    step = interval_ms(signal.interval)
+    if timestamp is not None and (timestamp + step > now_ms() or now_ms() - timestamp - step > params['max_signal_age_bars'] * step):
+        return None
+    last_entry_key = f'last_entry:{signal.symbol}:{signal.interval}'
+    if timestamp is not None and timestamp <= get_state(db, last_entry_key, 0):
+        return None
+    last_close = db.query(Order).filter(Order.symbol == signal.symbol, Order.status == 'CLOSED').order_by(Order.closed_at.desc()).first()
+    if not ignore_cooldown and last_close and last_close.closed_at:
+        if now_ms() - dt_ms(last_close.closed_at) < params['cooldown_bars'] * step:
+            return None
     existing = [o for o in open_orders(db) if o.symbol == signal.symbol]
     if existing:
         return None
@@ -37,26 +54,18 @@ def open_position(db: Session, signal, equity: float | None = None) -> Order | N
     if position_pct <= 0 or equity <= 0:
         return None
 
-    margin = equity * position_pct
     fee_rate = _fee_rate(state)
     slip = _slippage(state)
-    max_cash = cash / (1 + fee_rate)
-    margin = min(margin, max_cash * 0.98)
+    side = 1 if signal.direction == 'LONG' else -1
+    entry = round_price(signal.price * (1 + side * slip))
+    leverage = min(max(1, int(signal.leverage)), int(params['max_leverage']))
+    if (entry - signal.sl) * side <= 0 or (signal.tp - entry) * side <= 0:
+        return None
+    margin, qty = position_size(equity, cash, min(position_pct, params['max_position_pct']), leverage,
+                                entry, signal.sl, side, fee_rate, slip, params['risk_per_trade_pct'])
     if margin < 10:
         return None
-
-    entry = signal.price * (1 + slip) if signal.direction == "LONG" else signal.price * (1 - slip)
-    leverage = max(1, int(signal.leverage))
-    notional = margin * leverage
-    qty = notional / entry
-    fee = notional * fee_rate
-    if cash < margin + fee:
-        margin = (cash - fee) / 1.0
-        if margin < 10:
-            return None
-        notional = margin * leverage
-        qty = notional / entry
-        fee = notional * fee_rate
+    fee = qty * entry * fee_rate
 
     set_state(db, "cash", round(cash - margin - fee, 4))
     order = Order(
@@ -79,6 +88,8 @@ def open_position(db: Session, signal, equity: float | None = None) -> Order | N
     db.add(order)
     db.commit()
     db.refresh(order)
+    if timestamp is not None:
+        set_state(db, last_entry_key, timestamp)
     return order
 
 
