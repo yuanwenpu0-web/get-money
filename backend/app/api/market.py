@@ -77,7 +77,7 @@ def market_funding(symbol: str = Query(...), limit: int = Query(50, ge=1, le=100
 @router.post("/sync")
 def sync_market(payload: SyncRequest, db: Session = Depends(get_db)):
     """同步K线。symbols 为空数组 = 全量 U 本位永续同步（前端"同步全部"），
-    单币种契约不变；全量同步为同步 HTTP，几百个币种可能耗时数十秒，docstring 注明慢。"""
+    单币种契约不变；全量同步使用有界网络并发，HTTP 请求等待同步完成后返回。"""
     source = payload.source.lower()
     if source != "binance":
         raise HTTPException(400, "source 仅支持 binance")
@@ -106,7 +106,7 @@ def sync_market(payload: SyncRequest, db: Session = Depends(get_db)):
     if not symbols:
         raise HTTPException(400, "同步列表为空")
     if payload.funding:
-        # 资金费同步：逐币种拉取（8 小时 1 条，请求量远小于K线）
+        # 资金费按币种并发拉取，调用线程顺序写库。
         funding_result = service.sync_funding_many(symbols, payload.days)
         db.add(JobLog(job="sync", level="info",
                       message=f"{source} 资金费同步 请求 {funding_result['requested']} 个，"

@@ -3,7 +3,7 @@
 Run from the project root:
     .venv/Scripts/python.exe backend/scripts/benchmark_performance.py
 
-No exchange requests, trading database access, orders, or model writes are needed.
+No exchange requests, live account/order changes, or model writes are needed.
 Timings depend on the host; equality assertions, rather than speed, determine
 whether the benchmark succeeds.
 """
