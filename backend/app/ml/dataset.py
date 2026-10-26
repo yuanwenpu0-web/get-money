@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from ..features.indicators import FEATURES, build_features
+from ..features.mtf import add_mtf_trend
 from ..market.data_service import MarketDataService
 from ..utils import interval_ms, now_ms
 
@@ -37,7 +38,7 @@ def build_dataset(
         raise ValueError(f"{symbol} {interval} 本地无K线数据，请先拉取历史数据")
 
     step = interval_ms(interval)
-    frame = frame.loc[(frame.index.asi8 // 1_000_000 + step) <= as_of].copy()
+    frame = frame.loc[(frame.index.as_unit("ms").asi8 + step) <= as_of].copy()
     frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
     valid = np.isfinite(frame[["open", "high", "low", "close", "volume"]]).all(axis=1)
     valid &= (frame[["open", "high", "low", "close"]] > 0).all(axis=1) & frame[
@@ -51,15 +52,19 @@ def build_dataset(
         raise ValueError("没有有效的已收盘K线")
     diffs = frame.index.to_series().diff().dt.total_seconds() * 1000
     gaps = diffs.gt(step)
+    funding = service.load_funding_frame(symbol, start_ms - 90 * 86_400_000, as_of)
     segments = []
     for _, segment in frame.groupby(diffs.ne(step).cumsum()):
         if len(segment) >= 60:
             segments.append(
-                build_features(segment, with_label=with_label, horizon=horizon)
+                build_features(segment, with_label=with_label, horizon=horizon, funding=funding)
             )
     if not segments:
         raise ValueError("连续K线不足 60 根，无法计算指标")
     data = pd.concat(segments).replace([float("inf"), float("-inf")], np.nan)
+    # 多周期趋势共振特征：在已含 DatetimeIndex 的帧上附加 4h/1d 趋势/ADX 列。
+    # 非 mtf_resonance 策略忽略这些列（evaluate_signals 非 mtf 分支不读它们）。
+    data = add_mtf_trend(data)
     if with_label:
         data = data.dropna(subset=FEATURES + ["label", "future_return"])
         data["label"] = data["label"].astype(int)

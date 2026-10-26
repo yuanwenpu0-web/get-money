@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from .api import backtests, market, models_api, settings, strategies, trading
 from .config import BASE_DIR
 from .db import SessionLocal, init_db
-from .market.nofx_source import bootstrap_defaults
+from .ml.auto_trainer import start_auto_train_thread
 from .state import all_state, ensure_default_state
 from .strategy.defaults import seed_strategies
 from .trading.scheduler import scheduler, sync_scheduler_with_state
@@ -57,13 +57,11 @@ async def lifespan(_app: FastAPI):
     try:
         ensure_default_state(db)
         seed_strategies(db)
-        state = all_state(db)
-        if state.get("data_source", "nofx") == "nofx":
-            bootstrap_defaults(db, state.get("symbols") or [], state.get("interval", "1m"))
         sync_scheduler_with_state(db)
     finally:
         db.close()
     threading.Thread(target=_auto_train_missing, daemon=True).start()
+    start_auto_train_thread()  # 持续训练守护线程（节流由 auto_train_interval_hours 控制）
     yield
     scheduler.stop()
 

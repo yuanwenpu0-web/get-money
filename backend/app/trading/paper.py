@@ -12,6 +12,7 @@ from ..strategy.rules import resolve_params
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
 from .risk import position_size
+from .risk_halt import check_after_close
 
 EPS = 1e-12
 
@@ -24,25 +25,31 @@ def _slippage(state: dict) -> float:
     return float(state.get("slippage", 0.0002))
 
 
-def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
+def entry_gates(db: Session, signal, params: dict, ignore_cooldown: bool = False) -> bool:
+    """公共入场闸门：方向、信号时效、重复信号、冷却、已有持仓。paper 与 live 共用。"""
     if signal.direction not in ("LONG", "SHORT"):
-        return None
-    state = all_state(db)
-    config = db.query(StrategyConfig).filter(StrategyConfig.code == signal.strategy).first()
-    params = resolve_params(signal.strategy, state, json.loads(config.params or '{}') if config else None)
+        return False
     timestamp = getattr(signal, 'ts', None)
     step = interval_ms(signal.interval)
     if timestamp is not None and (timestamp + step > now_ms() or now_ms() - timestamp - step > params['max_signal_age_bars'] * step):
-        return None
+        return False
     last_entry_key = f'last_entry:{signal.symbol}:{signal.interval}'
     if timestamp is not None and timestamp <= get_state(db, last_entry_key, 0):
-        return None
+        return False
     last_close = db.query(Order).filter(Order.symbol == signal.symbol, Order.status == 'CLOSED').order_by(Order.closed_at.desc()).first()
     if not ignore_cooldown and last_close and last_close.closed_at:
         if now_ms() - dt_ms(last_close.closed_at) < params['cooldown_bars'] * step:
-            return None
-    existing = [o for o in open_orders(db) if o.symbol == signal.symbol]
-    if existing:
+            return False
+    if any(o.symbol == signal.symbol for o in open_orders(db)):
+        return False
+    return True
+
+
+def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
+    state = all_state(db)
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == signal.strategy).first()
+    params = resolve_params(signal.strategy, state, json.loads(config.params or '{}') if config else None)
+    if not entry_gates(db, signal, params, ignore_cooldown):
         return None
 
     from .portfolio import portfolio_snapshot
@@ -88,16 +95,18 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
     db.add(order)
     db.commit()
     db.refresh(order)
+    timestamp = getattr(signal, 'ts', None)
     if timestamp is not None:
-        set_state(db, last_entry_key, timestamp)
+        set_state(db, f'last_entry:{signal.symbol}:{signal.interval}', timestamp)
     return order
 
 
-def close_position(db: Session, order: Order, price: float, reason: str = "manual") -> Order:
+def close_position(db: Session, order: Order, price: float, reason: str = "manual", slippage_rate: float | None = None) -> Order:
+    """本地记账结算。slippage_rate 默认取全局滑点；live 模式传入 0 用真实成交均价结算。"""
     if order.status != "OPEN":
         return order
     state = all_state(db)
-    slip = _slippage(state)
+    slip = _slippage(state) if slippage_rate is None else float(slippage_rate)
     fee_rate = _fee_rate(state)
     exit_price = price * (1 - slip) if order.side == "LONG" else price * (1 + slip)
     sign = 1 if order.side == "LONG" else -1
@@ -120,6 +129,8 @@ def close_position(db: Session, order: Order, price: float, reason: str = "manua
     order.closed_at = utcnow()
     db.commit()
     db.refresh(order)
+    # 账户级熔断检查：每笔平仓记账后评估回撤/连续亏损，触发即冻结后续开仓
+    check_after_close(db)
     return order
 
 

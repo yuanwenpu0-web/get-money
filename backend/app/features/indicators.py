@@ -6,6 +6,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .funding import FUNDING_FEATURES, attach_funding
+
 try:
     import talib
 
@@ -49,6 +51,7 @@ FEATURES = [
     "hour_cos",
     "dow_sin",
     "dow_cos",
+    *FUNDING_FEATURES,
 ]
 
 
@@ -174,7 +177,8 @@ def _adx(frame: pd.DataFrame, length: int = 14) -> tuple[pd.Series, pd.Series]:
     return smooth(dx), (plus - minus).fillna(0.)
 
 
-def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int = 5) -> pd.DataFrame:
+def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int = 5,
+                   funding: pd.DataFrame | None = None) -> pd.DataFrame:
     if frame.empty:
         return frame
     data = frame.copy()
@@ -222,6 +226,8 @@ def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int =
     adx, di_diff = _adx(data, 14)
     data["adx_14"] = adx
     data["di_diff"] = di_diff
+
+    attach_funding(data, funding)
 
     if isinstance(data.index, pd.DatetimeIndex):
         minutes = data.index.hour * 60 + data.index.minute

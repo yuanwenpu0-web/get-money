@@ -9,7 +9,7 @@ from ..models import EquitySnapshot, JobLog, Order, Signal
 from ..schemas import OrderPatch
 from ..serializers import order_dict, signal_dict
 from ..state import all_state
-from ..trading.paper import modify_order
+from ..trading.dispatch import modify_order
 from ..trading.portfolio import portfolio_snapshot
 from ..trading.scheduler import scheduler
 from ..trading.service import TradingService
@@ -110,7 +110,7 @@ def patch_order(order_id: int, payload: OrderPatch, db: Session = Depends(get_db
             raise HTTPException(400, "多单止盈价必须高于当前价")
         if order.side == "SHORT" and payload.tp >= mark:
             raise HTTPException(400, "空单止盈价必须低于当前价")
-    modify_order(order, sl=payload.sl, tp=payload.tp)
+    modify_order(db, order, sl=payload.sl, tp=payload.tp)
     db.commit()
     db.refresh(order)
     db.add(JobLog(job="order", level="info", message=f"订单 #{order.id} 调整 SL={order.sl} TP={order.tp}"))

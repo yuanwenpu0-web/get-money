@@ -44,6 +44,18 @@ class Kline(Base):
     trades = Column(Integer, nullable=False, default=0)
 
 
+class FundingRate(Base):
+    __tablename__ = "funding_rates"
+    __table_args__ = (UniqueConstraint("symbol", "funding_time", name="uq_funding"),)
+
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String(24), nullable=False, index=True)
+    funding_time = Column(BigInteger, nullable=False, index=True)
+    funding_rate = Column(Float, nullable=False)
+    mark_price = Column(Float, default=0.0)
+    rate_type = Column(String(16), default="")
+
+
 class StrategyConfig(Base):
     __tablename__ = "strategy_configs"
 
@@ -67,6 +79,33 @@ class ModelRecord(Base):
     path = Column(Text, nullable=False)
     features = Column(Text, default="[]")
     metrics = Column(Text, default="{}")
+    train_start = Column(BigInteger, default=0)
+    train_end = Column(BigInteger, default=0)
+    rows = Column(Integer, default=0)
+    status = Column(String(16), default="ready")
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
+class TierModel(Base):
+    """按「规模×波动」分档的共享模型（pooled）：一个模型服务同档多个币种。
+
+    与 models 表（per-symbol 模型）刻意分开：
+    - 语义不同：一条记录对应 N 个币种，ModelRecord.symbol 是 NOT NULL 单值，装不下；
+    - 隔离风险：独立新表不触碰现有训练/晋升/实盘链路，create_all 直接建，无需迁移。
+    """
+
+    __tablename__ = "tier_models"
+
+    id = Column(Integer, primary_key=True)
+    tier = Column(String(32), nullable=False, index=True)
+    interval = Column(String(8), nullable=False)
+    algo = Column(String(24), nullable=False)
+    horizon = Column(Integer, default=5)
+    path = Column(Text, nullable=False)
+    features = Column(Text, default="[]")
+    metrics = Column(Text, default="{}")
+    symbols = Column(Text, default="[]")          # JSON 数组：参与训练的币种
+    n_symbols = Column(Integer, default=0)
     train_start = Column(BigInteger, default=0)
     train_end = Column(BigInteger, default=0)
     rows = Column(Integer, default=0)
@@ -160,3 +199,12 @@ class JobLog(Base):
     level = Column(String(16), default="info")
     message = Column(Text, default="")
     created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
+class CoinMetric(Base):
+    __tablename__ = "coin_metrics"
+
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String(24), nullable=False, index=True)
+    ts = Column(BigInteger, nullable=False, index=True)
+    metrics = Column(Text, default="{}")

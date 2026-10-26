@@ -9,6 +9,9 @@ const settings = ref({})
 const loading = ref(false)
 const filters = reactive({ status: 'OPEN', symbol: '' })
 let timer = null
+let loadPromise = null
+let reloadRequested = false
+let disposed = false
 
 const editVisible = ref(false)
 const editForm = reactive({ id: null, side: '', mark: 0, sl: 0, tp: 0 })
@@ -30,19 +33,29 @@ const symbols = computed(() => {
   return [...list]
 })
 
-async function load() {
+function load() {
+  if (disposed) return Promise.resolve()
+  reloadRequested = true
+  if (loadPromise) return loadPromise
   loading.value = true
-  try {
-    const params = { limit: 300 }
-    if (filters.status) params.status = filters.status
-    if (filters.symbol) params.symbol = filters.symbol
-    const data = await api.getOrders(params)
-    orders.value = data.orders || []
-  } catch (error) {
-    ElMessage.error(error.message)
-  } finally {
+  loadPromise = (async () => {
+    do {
+      reloadRequested = false
+      try {
+        const params = { limit: 300 }
+        if (filters.status) params.status = filters.status
+        if (filters.symbol) params.symbol = filters.symbol
+        const data = await api.getOrders(params)
+        orders.value = data.orders || []
+      } catch (error) {
+        ElMessage.error(error.message)
+      }
+    } while (reloadRequested && !disposed)
+  })().finally(() => {
+    loadPromise = null
     loading.value = false
-  }
+  })
+  return loadPromise
 }
 
 async function loadSettings() {
@@ -107,11 +120,11 @@ async function saveEdit() {
 }
 
 onMounted(async () => {
-  await loadSettings()
-  await load()
-  timer = setInterval(load, 30000)
+  await Promise.all([loadSettings(), load()])
+  if (!disposed) timer = setInterval(load, 30000)
 })
 onBeforeUnmount(() => {
+  disposed = true
   if (timer) clearInterval(timer)
 })
 </script>

@@ -32,6 +32,7 @@ export default {
 
   getKlines: (symbol, interval, limit = 500) => http.get('/market/klines', { params: { symbol, interval, limit } }),
   getMarketSources: () => http.get('/market/sources'),
+  getMarketSymbols: () => http.get('/market/symbols'),
   syncMarket: (payload) => http.post('/market/sync', payload),
   previewSignal: (payload) => http.post('/market/preview', payload),
 

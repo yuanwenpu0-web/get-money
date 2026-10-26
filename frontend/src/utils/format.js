@@ -55,3 +55,11 @@ export const closeReasonLabel = (reason) =>
 
 export const strategyLabel = (code) =>
   ({ ml_ensemble: 'ML 趋势共振', trend_follow: 'SuperTrend 趋势跟随', mean_reversion: 'RSI 均值回归' })[code] || code
+
+export function symbolsLabel(settings, count = 0) {
+  if (settings?.symbol_scope === 'all') {
+    return count > 0 ? `全部永续（${count} 个）` : '全部永续'
+  }
+  const list = settings?.symbols || []
+  return list.length ? list.join(' / ') : '—'
+}

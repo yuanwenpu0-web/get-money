@@ -39,7 +39,10 @@ class TradingScheduler:
                 coalesce=True,
                 next_run_time=datetime.now(timezone.utc),
             )
-            self.scheduler.start()
+            # 暂停仅移除 job、底层 BackgroundScheduler 仍在运行；重复 start 会抛
+            # SchedulerAlreadyRunningError，暂停后恢复必须容忍已运行状态
+            if not self.scheduler.running:
+                self.scheduler.start()
             self._started = True
 
     def stop(self) -> None:

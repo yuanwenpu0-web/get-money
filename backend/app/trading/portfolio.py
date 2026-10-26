@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from ..market.data_service import MarketDataService
@@ -57,9 +58,11 @@ def portfolio_snapshot(db: Session, update_marks: bool = True) -> dict:
 
     cash = float(state.get("cash", 0.0))
     equity = cash + margin_total + unrealized
-    closed = db.query(Order).filter(Order.status == "CLOSED").all()
-    realized = sum(order.realized_pnl for order in closed)
-    wins = sum(1 for order in closed if order.realized_pnl > 0)
+    closed_count, realized, wins = db.query(
+        func.count(Order.id),
+        func.coalesce(func.sum(Order.realized_pnl), 0.0),
+        func.coalesce(func.sum(case((Order.realized_pnl > 0, 1), else_=0)), 0),
+    ).filter(Order.status == "CLOSED").one()
     initial = float(state.get("initial_capital", 0) or 0)
     return {
         "cash": round(cash, 4),
@@ -69,8 +72,8 @@ def portfolio_snapshot(db: Session, update_marks: bool = True) -> dict:
         "realized_pnl": round(realized, 4),
         "total_return_pct": round((equity / initial - 1) * 100, 2) if initial > 0 else 0.0,
         "open_positions": len(orders),
-        "closed_trades": len(closed),
-        "win_rate": round(wins / len(closed) * 100, 2) if closed else 0.0,
+        "closed_trades": closed_count,
+        "win_rate": round(wins / closed_count * 100, 2) if closed_count else 0.0,
         "total_capital": round(float(state.get("total_capital", equity)), 4),
         "initial_capital": round(initial, 4),
         "positions": positions,

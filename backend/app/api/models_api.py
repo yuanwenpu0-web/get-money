@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..db import get_db
+from ..ml import auto_trainer
 from ..ml.trainer import train_model
 from ..models import JobLog, ModelRecord
 from ..schemas import TrainRequest
@@ -18,6 +19,14 @@ router = APIRouter(prefix="/models", tags=["models"])
 def list_models(db: Session = Depends(get_db)):
     rows = db.query(ModelRecord).order_by(ModelRecord.created_at.desc()).limit(100).all()
     return {"models": [model_dict(row) for row in rows]}
+
+
+@router.get("/history")
+def training_history(symbol: str = Query(...), interval: str = Query("1h"),
+                     limit: int = Query(50, ge=1, le=500), db: Session = Depends(get_db)):
+    """某币种某周期的训练历史（按时间升序）。业务在 auto_trainer，路由只做装配。"""
+    history = auto_trainer.list_training_history(db, symbol.upper(), interval, limit=limit)
+    return {"symbol": symbol.upper(), "interval": interval, "history": history}
 
 
 @router.post("/train")

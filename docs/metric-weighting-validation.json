@@ -1,0 +1,637 @@
+{
+  "as_of": "2026-10-25T12:30:00+00:00",
+  "params": {
+    "as_of": "2026-10-25T12:30:00+00:00",
+    "interval": "1h",
+    "strategies": [
+      "trend_follow",
+      "mean_reversion"
+    ],
+    "window_days": 200,
+    "step_days": 30,
+    "windows": 7,
+    "short_window_days": 30,
+    "short_step_days": 5,
+    "short_windows": 4,
+    "rebalance_bars": 24,
+    "fee": 0.0002,
+    "slippage": 0.0002,
+    "initial_cash": 10000.0,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "XRPUSDT",
+      "NEARUSDT",
+      "DOGEUSDT",
+      "JCTUSDT",
+      "ORDERUSDT",
+      "IRYSUSDT",
+      "APRUSDT"
+    ],
+    "output": "D:\\UGit\\get-money\\docs\\metric-weighting-validation.md",
+    "json_output": "D:\\UGit\\get-money\\docs\\metric-weighting-validation.json"
+  },
+  "summaries": {
+    "baseline": {
+      "mean_return_pct": -0.347,
+      "std_return_pct": 0.8992,
+      "positive_windows": 3,
+      "total_windows": 7,
+      "sharpe_positive_windows": 3,
+      "expectancy_positive_windows": 3,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": 1.287
+      },
+      "worst_window": {
+        "index": 5,
+        "end": "2026-05-28",
+        "return_pct": -1.4183
+      }
+    },
+    "plus_b": {
+      "mean_return_pct": -0.3687,
+      "std_return_pct": 0.8661,
+      "positive_windows": 3,
+      "total_windows": 7,
+      "sharpe_positive_windows": 3,
+      "expectancy_positive_windows": 3,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": 1.1301
+      },
+      "worst_window": {
+        "index": 5,
+        "end": "2026-05-28",
+        "return_pct": -1.4197
+      }
+    },
+    "plus_bc": {
+      "mean_return_pct": -0.3608,
+      "std_return_pct": 0.8798,
+      "positive_windows": 3,
+      "total_windows": 7,
+      "sharpe_positive_windows": 3,
+      "expectancy_positive_windows": 3,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": 1.185
+      },
+      "worst_window": {
+        "index": 5,
+        "end": "2026-05-28",
+        "return_pct": -1.4197
+      }
+    }
+  },
+  "windows": {
+    "baseline": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 1.287,
+        "max_drawdown_pct": -0.4427,
+        "sharpe": 3.88,
+        "expectancy": 0.3333,
+        "total_trades": 386,
+        "positive_symbol_pct": 100.0,
+        "metric_coverage_days": 30.5,
+        "metric_coverage_pct": 15.2
+      },
+      {
+        "index": 1,
+        "end_date": "2026-09-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.2028,
+        "max_drawdown_pct": -0.9804,
+        "sharpe": 0.63,
+        "expectancy": 0.0484,
+        "total_trades": 419,
+        "positive_symbol_pct": 60.0,
+        "metric_coverage_days": 0.5,
+        "metric_coverage_pct": 0.2
+      },
+      {
+        "index": 2,
+        "end_date": "2026-08-26",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.3163,
+        "max_drawdown_pct": -0.8411,
+        "sharpe": 1.14,
+        "expectancy": 0.0787,
+        "total_trades": 402,
+        "positive_symbol_pct": 70.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 3,
+        "end_date": "2026-07-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -0.9972,
+        "max_drawdown_pct": -1.4218,
+        "sharpe": -3.14,
+        "expectancy": -0.2192,
+        "total_trades": 455,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 4,
+        "end_date": "2026-06-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -0.7607,
+        "max_drawdown_pct": -1.0457,
+        "sharpe": -2.62,
+        "expectancy": -0.1956,
+        "total_trades": 389,
+        "positive_symbol_pct": 40.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 5,
+        "end_date": "2026-05-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.4183,
+        "max_drawdown_pct": -1.5666,
+        "sharpe": -6.68,
+        "expectancy": -0.3646,
+        "total_trades": 389,
+        "positive_symbol_pct": 0.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 6,
+        "end_date": "2026-04-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.0587,
+        "max_drawdown_pct": -1.5819,
+        "sharpe": -3.69,
+        "expectancy": -0.2764,
+        "total_trades": 383,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      }
+    ],
+    "plus_b": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 1.1301,
+        "max_drawdown_pct": -0.5504,
+        "sharpe": 3.31,
+        "expectancy": 0.3333,
+        "total_trades": 386,
+        "positive_symbol_pct": 100.0,
+        "metric_coverage_days": 30.5,
+        "metric_coverage_pct": 15.2
+      },
+      {
+        "index": 1,
+        "end_date": "2026-09-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.2216,
+        "max_drawdown_pct": -0.9691,
+        "sharpe": 0.68,
+        "expectancy": 0.0484,
+        "total_trades": 419,
+        "positive_symbol_pct": 60.0,
+        "metric_coverage_days": 0.5,
+        "metric_coverage_pct": 0.2
+      },
+      {
+        "index": 2,
+        "end_date": "2026-08-26",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.3363,
+        "max_drawdown_pct": -0.8336,
+        "sharpe": 1.21,
+        "expectancy": 0.0787,
+        "total_trades": 402,
+        "positive_symbol_pct": 70.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 3,
+        "end_date": "2026-07-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.0067,
+        "max_drawdown_pct": -1.4347,
+        "sharpe": -3.17,
+        "expectancy": -0.2192,
+        "total_trades": 455,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 4,
+        "end_date": "2026-06-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -0.784,
+        "max_drawdown_pct": -1.0565,
+        "sharpe": -2.71,
+        "expectancy": -0.1956,
+        "total_trades": 389,
+        "positive_symbol_pct": 40.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 5,
+        "end_date": "2026-05-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.4197,
+        "max_drawdown_pct": -1.5681,
+        "sharpe": -6.63,
+        "expectancy": -0.3646,
+        "total_trades": 389,
+        "positive_symbol_pct": 0.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 6,
+        "end_date": "2026-04-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.0582,
+        "max_drawdown_pct": -1.5819,
+        "sharpe": -3.67,
+        "expectancy": -0.2764,
+        "total_trades": 383,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      }
+    ],
+    "plus_bc": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 1.185,
+        "max_drawdown_pct": -0.6818,
+        "sharpe": 3.17,
+        "expectancy": 0.3333,
+        "total_trades": 386,
+        "positive_symbol_pct": 100.0,
+        "metric_coverage_days": 30.5,
+        "metric_coverage_pct": 15.2
+      },
+      {
+        "index": 1,
+        "end_date": "2026-09-25",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.2216,
+        "max_drawdown_pct": -0.9691,
+        "sharpe": 0.68,
+        "expectancy": 0.0484,
+        "total_trades": 419,
+        "positive_symbol_pct": 60.0,
+        "metric_coverage_days": 0.5,
+        "metric_coverage_pct": 0.2
+      },
+      {
+        "index": 2,
+        "end_date": "2026-08-26",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": 0.3363,
+        "max_drawdown_pct": -0.8336,
+        "sharpe": 1.21,
+        "expectancy": 0.0787,
+        "total_trades": 402,
+        "positive_symbol_pct": 70.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 3,
+        "end_date": "2026-07-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.0067,
+        "max_drawdown_pct": -1.4347,
+        "sharpe": -3.17,
+        "expectancy": -0.2192,
+        "total_trades": 455,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 4,
+        "end_date": "2026-06-27",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -0.784,
+        "max_drawdown_pct": -1.0565,
+        "sharpe": -2.71,
+        "expectancy": -0.1956,
+        "total_trades": 389,
+        "positive_symbol_pct": 40.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 5,
+        "end_date": "2026-05-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.4197,
+        "max_drawdown_pct": -1.5681,
+        "sharpe": -6.63,
+        "expectancy": -0.3646,
+        "total_trades": 389,
+        "positive_symbol_pct": 0.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      },
+      {
+        "index": 6,
+        "end_date": "2026-04-28",
+        "ok": true,
+        "n_symbols": 10,
+        "total_return_pct": -1.0582,
+        "max_drawdown_pct": -1.5819,
+        "sharpe": -3.67,
+        "expectancy": -0.2764,
+        "total_trades": 383,
+        "positive_symbol_pct": 20.0,
+        "metric_coverage_days": 0.0,
+        "metric_coverage_pct": 0.0
+      }
+    ]
+  },
+  "short_summaries": {
+    "baseline": {
+      "mean_return_pct": null,
+      "std_return_pct": 0.0,
+      "positive_windows": 0,
+      "total_windows": 4,
+      "sharpe_positive_windows": 0,
+      "expectancy_positive_windows": 0,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      },
+      "worst_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      }
+    },
+    "plus_b": {
+      "mean_return_pct": null,
+      "std_return_pct": 0.0,
+      "positive_windows": 0,
+      "total_windows": 4,
+      "sharpe_positive_windows": 0,
+      "expectancy_positive_windows": 0,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      },
+      "worst_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      }
+    },
+    "plus_bc": {
+      "mean_return_pct": null,
+      "std_return_pct": 0.0,
+      "positive_windows": 0,
+      "total_windows": 4,
+      "sharpe_positive_windows": 0,
+      "expectancy_positive_windows": 0,
+      "best_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      },
+      "worst_window": {
+        "index": 0,
+        "end": "2026-10-25",
+        "return_pct": null
+      }
+    }
+  },
+  "short_windows": {
+    "baseline": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 30.0,
+        "metric_coverage_pct": 100.0
+      },
+      {
+        "index": 1,
+        "end_date": "2026-10-20",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 25.5,
+        "metric_coverage_pct": 85.0
+      },
+      {
+        "index": 2,
+        "end_date": "2026-10-15",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 20.5,
+        "metric_coverage_pct": 68.3
+      },
+      {
+        "index": 3,
+        "end_date": "2026-10-10",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 15.5,
+        "metric_coverage_pct": 51.7
+      }
+    ],
+    "plus_b": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 30.0,
+        "metric_coverage_pct": 100.0
+      },
+      {
+        "index": 1,
+        "end_date": "2026-10-20",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 25.5,
+        "metric_coverage_pct": 85.0
+      },
+      {
+        "index": 2,
+        "end_date": "2026-10-15",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 20.5,
+        "metric_coverage_pct": 68.3
+      },
+      {
+        "index": 3,
+        "end_date": "2026-10-10",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 15.5,
+        "metric_coverage_pct": 51.7
+      }
+    ],
+    "plus_bc": [
+      {
+        "index": 0,
+        "end_date": "2026-10-25",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 30.0,
+        "metric_coverage_pct": 100.0
+      },
+      {
+        "index": 1,
+        "end_date": "2026-10-20",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 25.5,
+        "metric_coverage_pct": 85.0
+      },
+      {
+        "index": 2,
+        "end_date": "2026-10-15",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 20.5,
+        "metric_coverage_pct": 68.3
+      },
+      {
+        "index": 3,
+        "end_date": "2026-10-10",
+        "ok": false,
+        "n_symbols": 0,
+        "total_return_pct": null,
+        "max_drawdown_pct": null,
+        "sharpe": null,
+        "expectancy": null,
+        "total_trades": null,
+        "positive_symbol_pct": null,
+        "metric_coverage_days": 15.5,
+        "metric_coverage_pct": 51.7
+      }
+    ]
+  },
+  "gates": {
+    "plus_b": {
+      "passed": false,
+      "more_positive": false,
+      "higher_mean": false
+    },
+    "plus_bc": {
+      "passed": false,
+      "more_positive": false,
+      "higher_mean": false
+    }
+  }
+}

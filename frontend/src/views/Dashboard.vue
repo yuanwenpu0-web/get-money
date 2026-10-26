@@ -4,18 +4,33 @@ import { ElMessage } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
 import StatCard from '../components/StatCard.vue'
-import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, strategyLabel, tsLabel } from '../utils/format'
+import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, strategyLabel, symbolsLabel, tsLabel } from '../utils/format'
 
 const dashboard = ref(null)
 const equity = ref([])
+const symbolCount = ref(0)
 const loading = ref(false)
 const running = ref(false)
 let timer = null
+let loadPromise = null
+let reloadRequested = false
+let disposed = false
 
 const portfolio = computed(() => dashboard.value?.portfolio || {})
 const positions = computed(() => dashboard.value?.positions || [])
 const settings = computed(() => dashboard.value?.settings || {})
 const logs = computed(() => dashboard.value?.logs || [])
+
+const executionModeLabel = computed(() => {
+  if (settings.value.execution_mode === 'live') {
+    return settings.value.testnet ? '测试网实盘' : '真实资金实盘'
+  }
+  return '本地模拟'
+})
+
+const executionModeClass = computed(() =>
+  settings.value.execution_mode === 'live' && !settings.value.testnet ? 'down' : '',
+)
 
 const equityOption = computed(() => {
   const points = equity.value
@@ -88,17 +103,37 @@ function logText(message) {
   return String(message || '').slice(0, 240)
 }
 
-async function load() {
-  loading.value = true
+async function loadSymbolCount() {
   try {
-    const [dash, points] = await Promise.all([api.getDashboard(), api.getEquity(1500)])
-    dashboard.value = dash
-    equity.value = points.points || []
+    const data = await api.getMarketSymbols()
+    symbolCount.value = data.symbols?.length || 0
   } catch (error) {
-    ElMessage.error(error.message)
-  } finally {
-    loading.value = false
+    /* 币种数量接口不可用时展示“全部永续”不带数量 */
   }
+}
+
+function load() {
+  if (disposed) return Promise.resolve()
+  reloadRequested = true
+  if (loadPromise) return loadPromise
+  loading.value = true
+  loadPromise = (async () => {
+    do {
+      reloadRequested = false
+      try {
+        const [dash, points] = await Promise.all([api.getDashboard(), api.getEquity(1500)])
+        dashboard.value = dash
+        equity.value = points.points || []
+        if (!disposed) await loadSymbolCount()
+      } catch (error) {
+        ElMessage.error(error.message)
+      }
+    } while (reloadRequested && !disposed)
+  })().finally(() => {
+    loadPromise = null
+    loading.value = false
+  })
+  return loadPromise
 }
 
 async function runNow() {
@@ -123,6 +158,7 @@ onMounted(() => {
   timer = setInterval(load, 30000)
 })
 onBeforeUnmount(() => {
+  disposed = true
   if (timer) clearInterval(timer)
 })
 </script>
@@ -133,7 +169,7 @@ onBeforeUnmount(() => {
       <div>
         <div class="panel-title">账户与收益</div>
         <div class="panel-sub">
-          {{ settings.symbols?.join(' / ') }} · {{ settings.interval }} · 自动巡检
+          {{ symbolsLabel(settings, symbolCount.value) }} · {{ settings.interval }} · 自动巡检
           {{ settings.schedule_enabled ? `${settings.schedule_seconds}s` : '已关闭' }}
         </div>
       </div>
@@ -190,9 +226,9 @@ onBeforeUnmount(() => {
           </el-tag>
         </div>
         <div class="kv-grid">
-          <div class="kv"><span class="kv-key">执行模式</span><span class="kv-value">{{ settings.execution_mode === 'paper' ? '本地模拟' : settings.execution_mode }}</span></div>
+          <div class="kv"><span class="kv-key">执行模式</span><span class="kv-value" :class="executionModeClass">{{ executionModeLabel }}</span></div>
           <div class="kv"><span class="kv-key">定时周期</span><span class="kv-value mono">{{ settings.schedule_seconds }}s</span></div>
-          <div class="kv"><span class="kv-key">交易对</span><span class="kv-value">{{ settings.symbols?.join(' / ') }}</span></div>
+          <div class="kv"><span class="kv-key">交易对</span><span class="kv-value">{{ symbolsLabel(settings, symbolCount.value) }}</span></div>
           <div class="kv"><span class="kv-key">最新信号</span><span class="kv-value">{{ dashboard?.recent_signals?.[0] ? tsLabel(dashboard.recent_signals[0].time) : '—' }}</span></div>
         </div>
         <div class="timeline-log" style="margin-top: 16px">
@@ -274,7 +310,9 @@ onBeforeUnmount(() => {
         <div class="panel-head">
           <div>
             <div class="panel-title">最近订单</div>
-            <div class="panel-sub">全部为本地模拟成交</div>
+            <div class="panel-sub" :class="executionModeClass">
+              {{ executionModeLabel === '本地模拟' ? '全部为本地模拟成交' : `订单按${executionModeLabel}提交至币安${settings.testnet ? '测试网' : '主网'}成交` }}
+            </div>
           </div>
         </div>
         <el-table :data="dashboard?.recent_orders || []" class="table-compact" empty-text="暂无订单">

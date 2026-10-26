@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from app.backtest.execution import simulate
-from app.backtest.runner import _downsample, _metrics_from_equity
+from app.backtest.metrics import downsample, metrics_from_equity
 from app.ml.dataset import purged_split
 from app.strategy.rules import resolve_params
 
@@ -83,11 +83,11 @@ def test_purge_removes_labels_reaching_test_period():
 
 def test_metrics_include_initial_loss_and_undefined_profit_factor():
     index = pd.date_range("2026-01-01", periods=2, freq="1D", tz="UTC")
-    metrics = _metrics_from_equity(
+    metrics = metrics_from_equity(
         pd.Series([90.0, 90.0], index=index), [], 100.0, "1m"
     )
     assert metrics["max_drawdown_pct"] == -10.0
-    metrics = _metrics_from_equity(
+    metrics = metrics_from_equity(
         pd.Series([100.0, 110.0], index=index),
         [{"pnl": 10.0, "fees": 0.0}],
         100.0,
@@ -101,6 +101,57 @@ def test_downsample_includes_exact_last_point():
     equity = pd.Series(
         np.arange(3100.0), index=pd.date_range("2026-01-01", periods=3100, freq="1min")
     )
-    points = _downsample(equity, limit=100)
+    points = downsample(equity, limit=100)
     assert points[-1]["equity"] == 3099.0
     assert len(points) <= 100
+
+
+def test_minimum_sample_trades_scales_with_validation_size():
+    from app.backtest.runner import minimum_sample_trades
+
+    assert minimum_sample_trades(2880) == 57  # 2880 根验证集 → 57 笔门槛
+    assert minimum_sample_trades(1000) == 20
+    assert minimum_sample_trades(100) == 10  # 短验证集退回 10 笔保底
+    assert minimum_sample_trades(0) == 10
+
+
+def _selection(monkeypatch, validation_bars, trades):
+    """用受控成交笔数跑 select_parameters，隔离信号与撮合细节。"""
+    from app.backtest import runner
+
+    validation = pd.DataFrame(
+        index=pd.date_range("2026-01-01", periods=validation_bars, freq="1min", tz="UTC")
+    )
+    equity = pd.Series(10000.0, index=validation.index)
+    monkeypatch.setattr(runner, "evaluate_signals", lambda *a, **k: None)
+    monkeypatch.setattr(runner, "simulate", lambda *a, **k: (equity, trades))
+    base = resolve_params("trend_follow", {})
+    return runner.select_parameters(
+        validation, "trend_follow", base, None, 10000.0, 0.0004, 0.0002, "1m"
+    )
+
+
+def test_select_parameters_rejects_small_sample_candidates(monkeypatch):
+    # 1000 根验证集 → 20 笔门槛；12 笔成交的小样本幸运儿必须被拒
+    trades = [{"pnl": 5.0, "fees": 0.1}] * 12
+    best, selection = _selection(monkeypatch, 1000, trades)
+    assert selection["status"] == "insufficient_trades"
+    assert selection["minimum_trades"] == 20
+    assert all(not candidate["eligible"] for candidate in selection["candidates"])
+    assert best == resolve_params("trend_follow", {})  # 保留当前参数
+
+
+def test_select_parameters_accepts_large_sample_candidates(monkeypatch):
+    trades = [{"pnl": 5.0, "fees": 0.1}] * 25  # 超过 20 笔门槛，正常参与选择
+    best, selection = _selection(monkeypatch, 1000, trades)
+    assert selection["status"] == "selected"
+    assert selection["selected"] == "current"
+    assert all(candidate["eligible"] for candidate in selection["candidates"])
+    assert best["min_score"] == resolve_params("trend_follow", {})["min_score"]
+
+
+def test_select_parameters_zero_trade_variants_do_not_error(monkeypatch):
+    best, selection = _selection(monkeypatch, 1000, [])
+    assert selection["status"] == "insufficient_trades"
+    assert all(candidate["total_trades"] == 0 for candidate in selection["candidates"])
+    assert best == resolve_params("trend_follow", {})

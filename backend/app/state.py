@@ -47,4 +47,5 @@ def all_state(db: Session) -> dict:
     result = dict(DEFAULT_STATE)
     for row in db.query(AppState).all():
         result[row.key] = _loads(row.value, row.value)
+    result["data_source"] = "binance"
     return result

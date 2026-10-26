@@ -8,15 +8,23 @@ import { number, tsLabel } from '../utils/format'
 const settings = ref({})
 const sources = ref(null)
 const bars = ref([])
+const allSymbols = ref([])
 const loading = ref(false)
 const syncing = ref(false)
 
 const query = reactive({ symbol: 'BTCUSDT', interval: '1m', limit: 600 })
-const syncForm = reactive({ source: 'nofx', symbol: 'BTCUSDT', interval: '1m', days: 0 })
+const syncForm = reactive({ source: 'binance', symbols: ['BTCUSDT'], interval: '1m', days: 30 })
 
 const localStats = computed(() => sources.value?.local?.stats || [])
-const nofx = computed(() => sources.value?.nofx || {})
-const nofxItems = computed(() => nofx.value.items || [])
+const symbolOptions = computed(() =>
+  allSymbols.value.length ? allSymbols.value : settings.value.symbols || ['BTCUSDT', 'ETHUSDT'],
+)
+const scopeAll = computed(() => settings.value.symbol_scope !== 'custom')
+const syncHint = computed(() =>
+  scopeAll.value
+    ? `全量同步：所有 U 本位永续合约${allSymbols.value.length ? `（约 ${allSymbols.value.length} 个）` : ''}，耗时较长请耐心等待，期间请勿关闭页面。`
+    : `将同步自定义列表中的 ${syncForm.symbols.length} 个合约的 1m 原始K线，其他周期自动聚合。`,
+)
 
 function timeShort(value) {
   const date = new Date(value)
@@ -129,6 +137,15 @@ const chartOption = computed(() => {
   }
 })
 
+async function loadSymbols() {
+  try {
+    const data = await api.getMarketSymbols()
+    allSymbols.value = data.symbols || []
+  } catch (error) {
+    /* 币种列表接口不可用时回退到设置中的交易对 */
+  }
+}
+
 async function loadSources() {
   try {
     sources.value = await api.getMarketSources()
@@ -152,11 +169,16 @@ async function loadBars() {
 async function sync() {
   syncing.value = true
   try {
-    const payload = { ...syncForm, days: Number(syncForm.days) }
+    const payload = {
+      source: syncForm.source,
+      interval: syncForm.interval,
+      days: Number(syncForm.days),
+      symbols: scopeAll.value ? [] : syncForm.symbols.map((item) => String(item).trim().toUpperCase()),
+    }
     const result = await api.syncMarket(payload)
     const count = result.imported ?? result.inserted ?? 0
-    ElMessage.success(`导入完成：${result.symbol} ${result.interval} ${count} 根`)
-    await Promise.all([loadSources(), loadBars()])
+    ElMessage.success(`导入完成：${result.symbol ? `${result.symbol} · ` : ''}${count} 根K线`)
+    await Promise.all([loadSources(), loadBars(), loadSymbols()])
   } catch (error) {
     ElMessage.error(error.message)
   } finally {
@@ -169,14 +191,13 @@ async function init() {
     settings.value = await api.getSettings()
     query.symbol = settings.value.symbols?.[0] || 'BTCUSDT'
     query.interval = settings.value.interval || '1m'
-    syncForm.symbol = query.symbol
+    syncForm.symbols = settings.value.symbols?.length ? [...settings.value.symbols] : ['BTCUSDT']
     syncForm.interval = query.interval
-    syncForm.source = settings.value.data_source || 'nofx'
+    syncForm.source = settings.value.data_source || 'binance'
   } catch (error) {
     /* 使用默认 */
   }
-  await loadSources()
-  await loadBars()
+  await Promise.all([loadSources(), loadSymbols(), loadBars()])
 }
 
 onMounted(init)
@@ -188,32 +209,22 @@ onMounted(init)
       <div class="panel">
         <div class="panel-head">
           <div>
-            <div class="panel-title">从已有项目导入K线</div>
-            <div class="panel-sub">nofx-new 的 PostgreSQL 只读导入到本地 SQLite，不再依赖币安网络</div>
+            <div class="panel-title">同步币安K线</div>
+            <div class="panel-sub">只获取 1m 原始K线；5m / 15m / 1h / 4h / 1d 在本地聚合</div>
           </div>
-          <el-tag size="small" effect="plain" :type="nofx.available ? 'success' : 'danger'">
-            {{ nofx.available ? 'nofx 在线' : 'nofx 离线' }}
-          </el-tag>
         </div>
-        <div v-if="nofx.available" class="row" style="margin-bottom: 12px">
-          <el-tag v-for="item in nofxItems" :key="`${item.symbol}-${item.interval}`" size="small" effect="plain" type="info">
-            {{ item.symbol }} {{ item.interval }} · {{ item.count }} 根
-          </el-tag>
-          <span class="muted">共 {{ nofx.symbol_count }} 个币种 · {{ (nofx.intervals || []).join(' / ') }}</span>
-        </div>
-        <div v-else class="form-hint">{{ nofx.error || '无法连接 nofx_lite 数据库' }}</div>
         <div class="form-grid">
           <div>
             <div class="muted" style="margin-bottom: 4px">来源</div>
             <el-select v-model="syncForm.source" style="width: 100%">
-              <el-option label="nofx 本地库" value="nofx" />
               <el-option label="币安公共接口" value="binance" />
             </el-select>
           </div>
           <div>
-            <div class="muted" style="margin-bottom: 4px">币种</div>
-            <el-select v-model="syncForm.symbol" style="width: 100%">
-              <el-option v-for="symbol in settings.symbols || ['BTCUSDT', 'ETHUSDT']" :key="symbol" :label="symbol" :value="symbol" />
+            <div class="muted" style="margin-bottom: 4px">币种（自定义列表生效时）</div>
+            <el-select v-model="syncForm.symbols" multiple filterable :disabled="scopeAll" style="width: 100%"
+              :placeholder="scopeAll ? '全量范围：忽略此选择' : '选择要同步的合约'">
+              <el-option v-for="symbol in symbolOptions" :key="symbol" :label="symbol" :value="symbol" />
             </el-select>
           </div>
           <div>
@@ -223,21 +234,21 @@ onMounted(init)
             </el-select>
           </div>
           <div>
-            <div class="muted" style="margin-bottom: 4px">天数（0 = 全部）</div>
-            <el-input-number v-model="syncForm.days" :min="0" :max="365" style="width: 100%" />
+            <div class="muted" style="margin-bottom: 4px">天数</div>
+            <el-input-number v-model="syncForm.days" :min="1" :max="365" style="width: 100%" />
           </div>
         </div>
         <div class="row" style="margin-top: 12px">
           <el-button type="primary" :loading="syncing" @click="sync">导入 / 同步</el-button>
-          <span class="muted">导入按 (symbol, interval, open_time) 幂等覆盖</span>
         </div>
+        <div class="form-hint" style="margin-top: 6px">{{ syncHint }}</div>
       </div>
 
       <div class="panel">
         <div class="panel-head">
           <div>
             <div class="panel-title">本地数据</div>
-            <div class="panel-sub">SQLite · WAL · 唯一索引</div>
+            <div class="panel-sub">1m 原始K线 · 其他周期由原始数据生成</div>
           </div>
           <span class="muted">{{ localStats.length }} 组</span>
         </div>
@@ -262,8 +273,8 @@ onMounted(init)
           <div class="panel-sub">{{ bars.length }} 根K线 · MA20 / MA60 · 成交量</div>
         </div>
         <div class="row">
-          <el-select v-model="query.symbol" size="small" style="width: 130px" @change="loadBars">
-            <el-option v-for="symbol in settings.symbols || ['BTCUSDT', 'ETHUSDT']" :key="symbol" :label="symbol" :value="symbol" />
+          <el-select v-model="query.symbol" size="small" filterable style="width: 150px" @change="loadBars">
+            <el-option v-for="symbol in symbolOptions" :key="symbol" :label="symbol" :value="symbol" />
           </el-select>
           <el-select v-model="query.interval" size="small" style="width: 100px" @change="loadBars">
             <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
@@ -277,7 +288,7 @@ onMounted(init)
         </div>
       </div>
       <EChart v-if="bars.length" :option="chartOption" height="470px" />
-      <div v-else class="empty-hint">还没有K线。使用上方“导入 / 同步”从 nofx 导入。</div>
+      <div v-else class="empty-hint">还没有K线。使用上方“导入 / 同步”从币安同步。</div>
     </div>
   </div>
 </template>

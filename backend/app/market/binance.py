@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import threading
 import time
+from contextlib import ExitStack, contextmanager, nullcontext
 from urllib.parse import urlencode
 
 import httpx
@@ -24,13 +26,54 @@ class BinanceError(RuntimeError):
     pass
 
 
-class BinanceClient:
-    def __init__(self, api_key: str = "", api_secret: str = "", testnet: bool = True, timeout: float = 20.0):
+class PooledHttpClient:
+    """Reuse connections within an explicit scope, including across worker threads."""
+
+    def _init_http_pool(self) -> None:
+        self._pool_lock = threading.RLock()
+        self._pool_users = 0
+        self._pool_clients = {}
+        self._pool_stack = None
+
+    @contextmanager
+    def connection_pool(self):
+        with self._pool_lock:
+            if not self._pool_users:
+                self._pool_stack = ExitStack()
+            self._pool_users += 1
+        try:
+            yield self
+        finally:
+            stack = None
+            with self._pool_lock:
+                self._pool_users -= 1
+                if not self._pool_users:
+                    stack, self._pool_stack = self._pool_stack, None
+                    self._pool_clients = {}
+            if stack is not None:
+                stack.close()
+
+    def _http_client(self, host: str):
+        with self._pool_lock:
+            if self._pool_users:
+                if host not in self._pool_clients:
+                    self._pool_clients[host] = self._pool_stack.enter_context(
+                        httpx.Client(base_url=host, timeout=self.timeout, proxy=self.proxy)
+                    )
+                return nullcontext(self._pool_clients[host])
+        return httpx.Client(base_url=host, timeout=self.timeout, proxy=self.proxy)
+
+
+class BinanceClient(PooledHttpClient):
+    def __init__(self, api_key: str = "", api_secret: str = "", testnet: bool = True, timeout: float = 20.0,
+                 proxy: str | None = None):
         self.api_key = api_key
         self.api_secret = api_secret
         self.base_url = BINANCE_TESTNET_URL if testnet else BINANCE_BASE_URL
         self.hosts = [BINANCE_TESTNET_URL] if testnet else PUBLIC_HOSTS
         self.timeout = timeout
+        self.proxy = proxy or None
+        self._init_http_pool()
 
     def _request(self, method: str, path: str, params: dict | None = None, signed: bool = False) -> dict | list:
         params = dict(params or {})
@@ -49,7 +92,7 @@ class BinanceClient:
         for attempt in range(3):
             for host in self.hosts:
                 try:
-                    with httpx.Client(base_url=host, timeout=self.timeout) as client:
+                    with self._http_client(host) as client:
                         response = client.request(method, path, params=params, headers=headers)
                     if response.status_code >= 400:
                         raise BinanceError(f"币安接口错误 {response.status_code}: {response.text[:300]}")

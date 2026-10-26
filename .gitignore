@@ -10,3 +10,11 @@ frontend/dist/
 *.log
 output/
 .playwright-cli/
+.openidea
+.venv
+.codegraph
+.pytest_cache
+data
+output
+
+.workbuddy

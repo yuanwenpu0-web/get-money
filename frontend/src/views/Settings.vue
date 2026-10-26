@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../api'
 import { money, tsLabel } from '../utils/format'
 
@@ -14,7 +14,10 @@ const testResult = ref(null)
 const capitalLoading = ref(false)
 
 const form = reactive({
-  data_source: 'nofx',
+  execution_mode: 'paper',
+  proxy_url: '',
+  symbol_scope: 'all',
+  data_source: 'binance',
   symbols: ['BTCUSDT', 'ETHUSDT'],
   interval: '1m',
   testnet: true,
@@ -38,6 +41,7 @@ const form = reactive({
   trail_activation_atr: 1.5,
   train_horizon: 5,
   auto_train_days: 40,
+  auto_train_workers: 2,
   schedule_enabled: true,
   schedule_seconds: 60,
 })
@@ -48,7 +52,10 @@ const capitalForm = reactive({ mode: 'add', amount: 1000, note: '' })
 function applySettings(data) {
   settings.value = data
   credentialInfo.value = data.credentials || {}
-  form.data_source = data.data_source || 'nofx'
+  form.execution_mode = data.execution_mode === 'live' ? 'live' : 'paper'
+  form.proxy_url = data.proxy_url || ''
+  form.symbol_scope = data.symbol_scope === 'custom' ? 'custom' : 'all'
+  form.data_source = data.data_source || 'binance'
   form.symbols = data.symbols || ['BTCUSDT', 'ETHUSDT']
   form.interval = data.interval || '1m'
   form.testnet = Boolean(data.testnet)
@@ -72,6 +79,7 @@ function applySettings(data) {
   form.trail_activation_atr = data.trail_activation_atr ?? 1.5
   form.train_horizon = data.train_horizon ?? 5
   form.auto_train_days = data.auto_train_days ?? 40
+  form.auto_train_workers = data.auto_train_workers ?? 2
   form.schedule_enabled = Boolean(data.schedule_enabled)
   form.schedule_seconds = Number(data.schedule_seconds || 60)
   credentialForm.testnet = Boolean(data.testnet)
@@ -89,13 +97,16 @@ async function load() {
 }
 
 async function saveSettings() {
-  if (!form.symbols.length) {
-    ElMessage.error('至少保留一个交易对')
+  if (form.symbol_scope === 'custom' && !form.symbols.length) {
+    ElMessage.error('自定义列表至少保留一个交易对')
     return
   }
   saving.value = true
   try {
     const payload = {
+      execution_mode: form.execution_mode,
+      proxy_url: form.proxy_url.trim(),
+      symbol_scope: form.symbol_scope,
       data_source: form.data_source,
       symbols: form.symbols.map((item) => String(item).trim().toUpperCase()),
       interval: form.interval,
@@ -120,6 +131,7 @@ async function saveSettings() {
       trail_activation_atr: Number(form.trail_activation_atr),
       train_horizon: Number(form.train_horizon),
       auto_train_days: Number(form.auto_train_days),
+      auto_train_workers: Number(form.auto_train_workers),
       schedule_enabled: form.schedule_enabled,
       schedule_seconds: Number(form.schedule_seconds),
     }
@@ -181,6 +193,39 @@ async function adjustCapital() {
   }
 }
 
+async function confirmExecutionMode(value) {
+  if (value !== 'live' || credentialInfo.value.configured) return
+  try {
+    await ElMessageBox.confirm(
+      '尚未配置币安 API Key，实盘下单将无法执行。仍要切换到实盘下单模式吗？',
+      '实盘模式提醒',
+      { confirmButtonText: '仍要切换', cancelButtonText: '返回模拟', type: 'warning' },
+    )
+  } catch {
+    form.execution_mode = 'paper'
+  }
+}
+
+const credentialPanelSub = computed(() =>
+  form.execution_mode === 'live'
+    ? '用于实盘下单与账户校验；密钥加密存储'
+    : '仅用于账户校验；当前为本地模拟模式',
+)
+
+const executionModeAlertType = computed(() => (form.testnet ? 'warning' : 'error'))
+const executionModeAlertText = computed(() =>
+  form.testnet
+    ? '测试网实盘：订单将提交到币安测试网撮合，不涉及真实资金。建议先在测试网验证策略表现后再切主网。'
+    : '真实资金风险：订单将用真实资金在币安主网成交，止损止盈可能因跳空或流动性不足失效。请先在测试网充分验证策略表现。',
+)
+
+watch(
+  () => credentialForm.testnet,
+  (value) => {
+    form.testnet = value
+  },
+)
+
 onMounted(load)
 </script>
 
@@ -200,8 +245,50 @@ onMounted(load)
         <div class="panel">
           <div class="panel-head">
             <div>
+              <div class="panel-title">交易模式</div>
+              <div class="panel-sub">本地模拟仅在系统内记账；实盘下单会真实提交到币安合约</div>
+            </div>
+            <el-tag size="small" effect="plain" :type="form.execution_mode === 'live' ? (form.testnet ? 'warning' : 'danger') : 'info'">
+              {{ form.execution_mode === 'live' ? (form.testnet ? '测试网实盘' : '真实资金实盘') : '本地模拟' }}
+            </el-tag>
+          </div>
+          <el-radio-group v-model="form.execution_mode" @change="confirmExecutionMode">
+            <el-radio-button value="paper">本地模拟</el-radio-button>
+            <el-radio-button value="live">实盘下单</el-radio-button>
+          </el-radio-group>
+          <el-alert
+            v-if="form.execution_mode === 'live'"
+            :type="executionModeAlertType"
+            :closable="false"
+            show-icon
+            style="margin-top: 12px"
+            :title="executionModeAlertText"
+          />
+          <el-alert
+            v-if="form.execution_mode === 'live' && !credentialInfo.configured"
+            type="warning"
+            :closable="false"
+            show-icon
+            style="margin-top: 8px"
+            title="尚未配置币安 API Key，实盘下单将无法执行。请在下方“币安 API”面板完成配置。"
+          />
+          <div class="form-hint">切换后需点击右上角“保存风控与系统设置”才会生效；巡检产生的新订单按此模式执行，已有持仓不受影响。</div>
+          <div style="margin-top: 14px">
+            <div class="muted" style="margin-bottom: 4px">网络代理（proxy_url）</div>
+            <el-input
+              v-model="form.proxy_url"
+              placeholder="http://127.0.0.1:7890（支持 http / https / socks5，留空 = 直连）"
+              clearable
+            />
+            <div class="form-hint">用于访问币安接口（行情、下单与账户请求均走该代理）；本地可直连或留空。国内访问币安建议配置本地代理端口。</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
               <div class="panel-title">币安 API</div>
-              <div class="panel-sub">仅用于账户校验；当前阶段所有订单本地模拟</div>
+              <div class="panel-sub">{{ credentialPanelSub }}</div>
             </div>
             <el-tag size="small" effect="plain" :type="credentialInfo.configured ? 'success' : 'info'">
               {{ credentialInfo.configured ? '已配置' : '未配置' }}
@@ -277,14 +364,13 @@ onMounted(load)
           <div class="panel-head">
             <div>
               <div class="panel-title">数据源与交易对</div>
-              <div class="panel-sub">默认读取 nofx-new 已有K线，导入后存本地 SQLite</div>
+              <div class="panel-sub">通过币安公共接口同步行情</div>
             </div>
           </div>
           <div class="form-grid">
             <div>
               <div class="muted" style="margin-bottom: 4px">行情来源</div>
               <el-radio-group v-model="form.data_source">
-                <el-radio-button value="nofx">nofx 本地库</el-radio-button>
                 <el-radio-button value="binance">币安接口</el-radio-button>
               </el-radio-group>
             </div>
@@ -294,17 +380,30 @@ onMounted(load)
                 <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
               </el-select>
             </div>
-            <div>
-              <div class="muted" style="margin-bottom: 4px">交易对</div>
-              <el-select v-model="form.symbols" multiple filterable allow-create default-first-option style="width: 100%">
+          </div>
+          <div style="margin-top: 12px">
+            <div class="muted" style="margin-bottom: 4px">币种范围</div>
+            <el-radio-group v-model="form.symbol_scope">
+              <el-radio-button value="all">全部 U 本位永续</el-radio-button>
+              <el-radio-button value="custom">自定义列表</el-radio-button>
+            </el-radio-group>
+            <div style="margin-top: 8px">
+              <div class="muted" style="margin-bottom: 4px">交易对（自定义列表）</div>
+              <el-select
+                v-model="form.symbols"
+                multiple
+                filterable
+                allow-create
+                default-first-option
+                :disabled="form.symbol_scope === 'all'"
+                style="width: 100%"
+              >
                 <el-option v-for="item in ['BTCUSDT', 'ETHUSDT']" :key="item" :label="item" :value="item" />
               </el-select>
-            </div>
-            <div>
-              <div class="muted" style="margin-bottom: 4px">nofx 数据源</div>
-              <el-tag size="small" effect="plain" :type="settings.nofx?.available ? 'success' : 'danger'">
-                {{ settings.nofx?.available ? `在线 · ${settings.nofx.symbol_count} 币种` : '不可用' }}
-              </el-tag>
+              <div v-if="form.symbol_scope === 'all'" class="form-hint">
+                全部模式下不启用自定义列表：巡检默认覆盖币安所有 U 本位永续合约（TRADING 状态，排除杠杆代币），单轮巡检耗时随币种数量增加。切到“自定义列表”后可编辑。
+              </div>
+              <div v-else class="form-hint">巡检仅覆盖此处列出的合约；可直接输入任意币种添加。</div>
             </div>
           </div>
         </div>
@@ -392,6 +491,11 @@ onMounted(load)
             <div>
               <div class="muted" style="margin-bottom: 4px">训练数据天数</div>
               <el-input-number v-model="form.auto_train_days" :min="7" :max="365" style="width: 100%" />
+            </div>
+            <div>
+              <div class="muted" style="margin-bottom: 4px">自动训练并发数</div>
+              <el-input-number v-model="form.auto_train_workers" :min="1" :max="8" style="width: 100%" />
+              <div class="form-hint">默认 2；实际并发按 CPU 数量限制，内存较小时可设为 1。</div>
             </div>
           </div>
           <div class="row" style="margin-top: 12px">

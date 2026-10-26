@@ -2,11 +2,12 @@
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
-import { price } from '../utils/format'
+import { price, symbolsLabel } from '../utils/format'
 import { signalReason } from '../utils/strategy'
 
 const strategies = ref([])
 const settings = ref({})
+const symbolCount = ref(0)
 const loading = ref(false)
 const previewing = ref(false)
 const running = ref(false)
@@ -39,6 +40,12 @@ async function load() {
     ElMessage.error(error.message)
   } finally {
     loading.value = false
+  }
+  try {
+    const data = await api.getMarketSymbols()
+    symbolCount.value = data.symbols?.length || 0
+  } catch (error) {
+    /* 币种数量接口不可用时展示“全部永续”不带数量 */
   }
 }
 
@@ -154,7 +161,7 @@ onMounted(load)
         <el-tag size="small" effect="plain" :type="settings.scheduler?.running ? 'success' : 'info'">
           {{ settings.scheduler?.running ? '调度运行中' : '调度已暂停' }}
         </el-tag>
-        <span class="muted">交易对 {{ (settings.symbols || []).join(' / ') }} · 周期 {{ settings.interval }}</span>
+        <span class="muted">交易对 {{ symbolsLabel(settings, symbolCount.value) }} · 周期 {{ settings.interval }}</span>
         <span class="muted">下次运行 {{ settings.scheduler?.next_run || '—' }}</span>
       </div>
     </div>

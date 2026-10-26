@@ -1,0 +1,2636 @@
+{
+  "as_of": "2026-10-26T00:42:26.883178+00:00",
+  "interval": "1h",
+  "symbols": [
+    "1000XECUSDT",
+    "AAVEUSDT",
+    "ADAUSDT",
+    "AGTUSDT",
+    "AKEUSDT",
+    "APRUSDT",
+    "ARBUSDT",
+    "ARIAUSDT",
+    "AVAXUSDT",
+    "BCHUSDT",
+    "BTCUSDT",
+    "BTWUSDT",
+    "BULLAUSDT",
+    "CAPUSDT",
+    "COMPUSDT",
+    "CTUSDT",
+    "DASHUSDT",
+    "DODOXUSDT",
+    "DOGEUSDT",
+    "DOTUSDT",
+    "ENAUSDT",
+    "ERAUSDT",
+    "ETHUSDT",
+    "FILUSDT",
+    "GRASSUSDT",
+    "GTCUSDT",
+    "INJUSDT",
+    "IOSTUSDT",
+    "IRYSUSDT",
+    "JCTUSDT",
+    "LIGHTUSDT",
+    "LINKUSDT",
+    "LTCUSDT",
+    "MAGMAUSDT",
+    "NEARUSDT",
+    "ONDOUSDT",
+    "ORDERUSDT",
+    "PUMPUSDT",
+    "QNTUSDT",
+    "QUSDT",
+    "SOLUSDT",
+    "STRKUSDT",
+    "SUIUSDT",
+    "TAGUSDT",
+    "TAOUSDT",
+    "TIAUSDT",
+    "TRUMPUSDT",
+    "TUSDT",
+    "UNIUSDT",
+    "USELESSUSDT",
+    "WLDUSDT",
+    "XMRUSDT",
+    "XRPUSDT"
+  ],
+  "trained": [
+    {
+      "symbol": "1000XECUSDT",
+      "model_id": 66,
+      "auc": 0.5773554056815859,
+      "accuracy": 0.5616113744075829,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "model_id": 67,
+      "auc": 0.5179029304029305,
+      "accuracy": 0.4928909952606635,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ADAUSDT",
+      "model_id": 68,
+      "auc": 0.5617539026629936,
+      "accuracy": 0.5379146919431279,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "AGTUSDT",
+      "model_id": 69,
+      "auc": 0.5290113889076082,
+      "accuracy": 0.5308056872037915,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "AKEUSDT",
+      "model_id": 70,
+      "auc": 0.511875014069922,
+      "accuracy": 0.4786729857819905,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "APRUSDT",
+      "model_id": 71,
+      "auc": 0.5371619320117174,
+      "accuracy": 0.5355450236966824,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ARBUSDT",
+      "model_id": 72,
+      "auc": 0.4021883812746757,
+      "accuracy": 0.41706161137440756,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "model_id": 73,
+      "auc": 0.43269295584765755,
+      "accuracy": 0.490521327014218,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "model_id": 74,
+      "auc": 0.520741836386392,
+      "accuracy": 0.504739336492891,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "BCHUSDT",
+      "model_id": 75,
+      "auc": 0.4669527318475916,
+      "accuracy": 0.46208530805687204,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "BTCUSDT",
+      "model_id": 76,
+      "auc": 0.5775675675675676,
+      "accuracy": 0.5592417061611374,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "BTWUSDT",
+      "model_id": 77,
+      "auc": 0.582700992641159,
+      "accuracy": 0.580568720379147,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "BULLAUSDT",
+      "model_id": 78,
+      "auc": 0.5703945150050579,
+      "accuracy": 0.533175355450237,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "CAPUSDT",
+      "model_id": 79,
+      "auc": 0.4838965571949866,
+      "accuracy": 0.48104265402843605,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "COMPUSDT",
+      "model_id": 80,
+      "auc": 0.5380267679508048,
+      "accuracy": 0.5071090047393365,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "CTUSDT",
+      "model_id": 81,
+      "auc": 0.4915161466885605,
+      "accuracy": 0.5092592592592593,
+      "test_rows": 108,
+      "rows": 540
+    },
+    {
+      "symbol": "DASHUSDT",
+      "model_id": 82,
+      "auc": 0.5430021787471081,
+      "accuracy": 0.514218009478673,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "DODOXUSDT",
+      "model_id": 83,
+      "auc": 0.5130827067669173,
+      "accuracy": 0.48578199052132703,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "model_id": 84,
+      "auc": 0.5516142159522518,
+      "accuracy": 0.5118483412322274,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "DOTUSDT",
+      "model_id": 85,
+      "auc": 0.5650635208711434,
+      "accuracy": 0.533175355450237,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ENAUSDT",
+      "model_id": 86,
+      "auc": 0.46327493261455527,
+      "accuracy": 0.4597156398104265,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ERAUSDT",
+      "model_id": 87,
+      "auc": 0.490865857283307,
+      "accuracy": 0.4834123222748815,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ETHUSDT",
+      "model_id": 88,
+      "auc": 0.5017748023005033,
+      "accuracy": 0.4976303317535545,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "FILUSDT",
+      "model_id": 89,
+      "auc": 0.4930379312710062,
+      "accuracy": 0.46919431279620855,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "GRASSUSDT",
+      "model_id": 90,
+      "auc": 0.5342699786444869,
+      "accuracy": 0.5071090047393365,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "GTCUSDT",
+      "model_id": 91,
+      "auc": 0.5153714870861305,
+      "accuracy": 0.4834123222748815,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "INJUSDT",
+      "model_id": 92,
+      "auc": 0.53986695826499,
+      "accuracy": 0.5379146919431279,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "IOSTUSDT",
+      "model_id": 93,
+      "auc": 0.5558069552232052,
+      "accuracy": 0.542654028436019,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "IRYSUSDT",
+      "model_id": 94,
+      "auc": 0.48400090009000907,
+      "accuracy": 0.5023696682464455,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "JCTUSDT",
+      "model_id": 95,
+      "auc": 0.517060898083878,
+      "accuracy": 0.514218009478673,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "LIGHTUSDT",
+      "model_id": 96,
+      "auc": 0.576491992542845,
+      "accuracy": 0.542654028436019,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "LINKUSDT",
+      "model_id": 97,
+      "auc": 0.5338371382673033,
+      "accuracy": 0.5,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "LTCUSDT",
+      "model_id": 98,
+      "auc": 0.5395153985507247,
+      "accuracy": 0.5402843601895735,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "MAGMAUSDT",
+      "model_id": 99,
+      "auc": 0.49009146341463417,
+      "accuracy": 0.45260663507109006,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "NEARUSDT",
+      "model_id": 100,
+      "auc": 0.5361111111111112,
+      "accuracy": 0.509478672985782,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ONDOUSDT",
+      "model_id": 101,
+      "auc": 0.4491525423728814,
+      "accuracy": 0.4928909952606635,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "ORDERUSDT",
+      "model_id": 102,
+      "auc": 0.45318555789759973,
+      "accuracy": 0.4431279620853081,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "PUMPUSDT",
+      "model_id": 103,
+      "auc": 0.46261446886446883,
+      "accuracy": 0.43601895734597157,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "QNTUSDT",
+      "model_id": 104,
+      "auc": 0.5582980291029656,
+      "accuracy": 0.514218009478673,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "QUSDT",
+      "model_id": 105,
+      "auc": 0.4959381044487428,
+      "accuracy": 0.48578199052132703,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "SOLUSDT",
+      "model_id": 106,
+      "auc": 0.5668704710144927,
+      "accuracy": 0.542654028436019,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "STRKUSDT",
+      "model_id": 107,
+      "auc": 0.6078697421981004,
+      "accuracy": 0.54739336492891,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "SUIUSDT",
+      "model_id": 108,
+      "auc": 0.5634505110944902,
+      "accuracy": 0.5497630331753555,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "TAGUSDT",
+      "model_id": 109,
+      "auc": 0.5026246719160105,
+      "accuracy": 0.5,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "TAOUSDT",
+      "model_id": 110,
+      "auc": 0.4359217171717172,
+      "accuracy": 0.45260663507109006,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "TIAUSDT",
+      "model_id": 111,
+      "auc": 0.5359800362976407,
+      "accuracy": 0.5213270142180095,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "TRUMPUSDT",
+      "model_id": 112,
+      "auc": 0.539024056861673,
+      "accuracy": 0.5260663507109005,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "TUSDT",
+      "model_id": 113,
+      "auc": 0.5502490942028986,
+      "accuracy": 0.5284360189573459,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "UNIUSDT",
+      "model_id": 114,
+      "auc": 0.5253153153153154,
+      "accuracy": 0.523696682464455,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "USELESSUSDT",
+      "model_id": 115,
+      "auc": 0.5311981948793516,
+      "accuracy": 0.5450236966824644,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "WLDUSDT",
+      "model_id": 116,
+      "auc": 0.5077702702702702,
+      "accuracy": 0.490521327014218,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "XMRUSDT",
+      "model_id": 117,
+      "auc": 0.5882472458009753,
+      "accuracy": 0.6042654028436019,
+      "test_rows": 422,
+      "rows": 2106
+    },
+    {
+      "symbol": "XRPUSDT",
+      "model_id": 118,
+      "auc": 0.5369158028732497,
+      "accuracy": 0.514218009478673,
+      "test_rows": 422,
+      "rows": 2106
+    }
+  ],
+  "skipped": [],
+  "failed": [],
+  "verdicts": [
+    {
+      "symbol": "1000XECUSDT",
+      "interval": "1h",
+      "promotable": true,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5773554056815859,
+        0.5773554056815859
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "连续 2 轮达标（AUC>=0.55、test_rows>=200）"
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5179029304029305,
+        0.5179029304029305
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#67 AUC=0.5179029304029305 未达 0.55"
+    },
+    {
+      "symbol": "ADAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5747100551739669,
+        0.5617539026629936
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#32 测试样本 190 < 200"
+    },
+    {
+      "symbol": "AGTUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5290113889076082,
+        0.5290113889076082
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#69 AUC=0.5290113889076082 未达 0.55"
+    },
+    {
+      "symbol": "AKEUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.511875014069922,
+        0.511875014069922
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#70 AUC=0.511875014069922 未达 0.55"
+    },
+    {
+      "symbol": "APRUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.46234567901234563,
+        0.5371619320117174
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#71 AUC=0.5371619320117174 未达 0.55"
+    },
+    {
+      "symbol": "ARBUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4021883812746757,
+        0.4021883812746757
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#72 AUC=0.4021883812746757 未达 0.55"
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.43269295584765755,
+        0.43269295584765755
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#73 AUC=0.43269295584765755 未达 0.55"
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5956401964307103,
+        0.520741836386392
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#74 AUC=0.520741836386392 未达 0.55"
+    },
+    {
+      "symbol": "BCHUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4669527318475916,
+        0.4669527318475916
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#75 AUC=0.4669527318475916 未达 0.55"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5003396070402015,
+        0.5775675675675676
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#11 AUC=0.5003396070402015 未达 0.55"
+    },
+    {
+      "symbol": "BTWUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5383762200532387,
+        0.582700992641159
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#28 AUC=0.5383762200532387 未达 0.55"
+    },
+    {
+      "symbol": "BULLAUSDT",
+      "interval": "1h",
+      "promotable": true,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5703945150050579,
+        0.5703945150050579
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "连续 2 轮达标（AUC>=0.55、test_rows>=200）"
+    },
+    {
+      "symbol": "CAPUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5517086834733893,
+        0.4838965571949866
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#79 AUC=0.4838965571949866 未达 0.55"
+    },
+    {
+      "symbol": "COMPUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5380267679508048,
+        0.5380267679508048
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#80 AUC=0.5380267679508048 未达 0.55"
+    },
+    {
+      "symbol": "CTUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4915161466885605,
+        0.4915161466885605
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#81 AUC=0.4915161466885605 未达 0.55"
+    },
+    {
+      "symbol": "DASHUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5430021787471081,
+        0.5430021787471081
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#82 AUC=0.5430021787471081 未达 0.55"
+    },
+    {
+      "symbol": "DODOXUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5130827067669173,
+        0.5130827067669173
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#83 AUC=0.5130827067669173 未达 0.55"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.48741406663141196,
+        0.5516142159522518
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#22 AUC=0.48741406663141196 未达 0.55"
+    },
+    {
+      "symbol": "DOTUSDT",
+      "interval": "1h",
+      "promotable": true,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5650635208711434,
+        0.5650635208711434
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "连续 2 轮达标（AUC>=0.55、test_rows>=200）"
+    },
+    {
+      "symbol": "ENAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.45297805642633227,
+        0.46327493261455527
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#86 AUC=0.46327493261455527 未达 0.55"
+    },
+    {
+      "symbol": "ERAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.490865857283307,
+        0.490865857283307
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#87 AUC=0.490865857283307 未达 0.55"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5148221538704209,
+        0.5017748023005033
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#88 AUC=0.5017748023005033 未达 0.55"
+    },
+    {
+      "symbol": "FILUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4664285714285714,
+        0.4930379312710062
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#89 AUC=0.4930379312710062 未达 0.55"
+    },
+    {
+      "symbol": "GRASSUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5342699786444869,
+        0.5342699786444869
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#90 AUC=0.5342699786444869 未达 0.55"
+    },
+    {
+      "symbol": "GTCUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5221288515406162,
+        0.5153714870861305
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#91 AUC=0.5153714870861305 未达 0.55"
+    },
+    {
+      "symbol": "INJUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.53986695826499,
+        0.53986695826499
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#92 AUC=0.53986695826499 未达 0.55"
+    },
+    {
+      "symbol": "IOSTUSDT",
+      "interval": "1h",
+      "promotable": true,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5558069552232052,
+        0.5558069552232052
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "连续 2 轮达标（AUC>=0.55、test_rows>=200）"
+    },
+    {
+      "symbol": "IRYSUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.3598765432098766,
+        0.48400090009000907
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#94 AUC=0.48400090009000907 未达 0.55"
+    },
+    {
+      "symbol": "JCTUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4821472242602102,
+        0.517060898083878
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#95 AUC=0.517060898083878 未达 0.55"
+    },
+    {
+      "symbol": "LIGHTUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5684046345811052,
+        0.576491992542845
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#30 测试样本 190 < 200"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.3567507002801121,
+        0.5338371382673033
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#97 AUC=0.5338371382673033 未达 0.55"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5395153985507247,
+        0.5395153985507247
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#98 AUC=0.5395153985507247 未达 0.55"
+    },
+    {
+      "symbol": "MAGMAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4377657740489599,
+        0.49009146341463417
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#99 AUC=0.49009146341463417 未达 0.55"
+    },
+    {
+      "symbol": "NEARUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.6281889366001515,
+        0.5361111111111112
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#100 AUC=0.5361111111111112 未达 0.55"
+    },
+    {
+      "symbol": "ONDOUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4491525423728814,
+        0.4491525423728814
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#101 AUC=0.4491525423728814 未达 0.55"
+    },
+    {
+      "symbol": "ORDERUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5202372218146246,
+        0.45318555789759973
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#102 AUC=0.45318555789759973 未达 0.55"
+    },
+    {
+      "symbol": "PUMPUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.345679012345679,
+        0.46261446886446883
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#103 AUC=0.46261446886446883 未达 0.55"
+    },
+    {
+      "symbol": "QNTUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5179545454545454,
+        0.5582980291029656
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#41 AUC=0.5179545454545454 未达 0.55"
+    },
+    {
+      "symbol": "QUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.537848158131177,
+        0.4959381044487428
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#105 AUC=0.4959381044487428 未达 0.55"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.44161566707466343,
+        0.5668704710144927
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#13 AUC=0.44161566707466343 未达 0.55"
+    },
+    {
+      "symbol": "STRKUSDT",
+      "interval": "1h",
+      "promotable": true,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.6078697421981004,
+        0.6078697421981004
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "连续 2 轮达标（AUC>=0.55、test_rows>=200）"
+    },
+    {
+      "symbol": "SUIUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.45646324399956945,
+        0.5634505110944902
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#25 AUC=0.45646324399956945 未达 0.55"
+    },
+    {
+      "symbol": "TAGUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5026246719160105,
+        0.5026246719160105
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#109 AUC=0.5026246719160105 未达 0.55"
+    },
+    {
+      "symbol": "TAOUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.45900330710457293,
+        0.4359217171717172
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#110 AUC=0.4359217171717172 未达 0.55"
+    },
+    {
+      "symbol": "TIAUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5359800362976407,
+        0.5359800362976407
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#111 AUC=0.5359800362976407 未达 0.55"
+    },
+    {
+      "symbol": "TRUMPUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.539024056861673,
+        0.539024056861673
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#112 AUC=0.539024056861673 未达 0.55"
+    },
+    {
+      "symbol": "TUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.518796992481203,
+        0.5502490942028986
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#20 AUC=0.518796992481203 未达 0.55"
+    },
+    {
+      "symbol": "UNIUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4605322003577817,
+        0.5253153153153154
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#114 AUC=0.5253153153153154 未达 0.55"
+    },
+    {
+      "symbol": "USELESSUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5311981948793516,
+        0.5311981948793516
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#115 AUC=0.5311981948793516 未达 0.55"
+    },
+    {
+      "symbol": "WLDUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4914534395973154,
+        0.5077702702702702
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#116 AUC=0.5077702702702702 未达 0.55"
+    },
+    {
+      "symbol": "XMRUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.5934959349593496,
+        0.5882472458009753
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#40 测试样本 190 < 200"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "interval": "1h",
+      "promotable": false,
+      "rounds_checked": 2,
+      "rounds_required": 2,
+      "aucs": [
+        0.4238678090575275,
+        0.5369158028732497
+      ],
+      "min_auc": 0.55,
+      "min_test_rows": 200,
+      "reason": "#118 AUC=0.5369158028732497 未达 0.55"
+    }
+  ],
+  "histories": {
+    "1000XECUSDT": [
+      {
+        "id": 42,
+        "created_at": "2026-10-26T00:38:42.981196+00:00",
+        "auc": 0.5773554056815859,
+        "accuracy": 0.5616113744075829,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 66,
+        "created_at": "2026-10-26T00:42:11.312995+00:00",
+        "auc": 0.5773554056815859,
+        "accuracy": 0.5616113744075829,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "AAVEUSDT": [
+      {
+        "id": 43,
+        "created_at": "2026-10-26T00:38:43.144686+00:00",
+        "auc": 0.5179029304029305,
+        "accuracy": 0.4928909952606635,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 67,
+        "created_at": "2026-10-26T00:42:11.476158+00:00",
+        "auc": 0.5179029304029305,
+        "accuracy": 0.4928909952606635,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ADAUSDT": [
+      {
+        "id": 32,
+        "created_at": "2026-10-25T17:14:26.928408+00:00",
+        "auc": 0.5747100551739669,
+        "accuracy": 0.5473684210526316,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 68,
+        "created_at": "2026-10-26T00:42:11.658118+00:00",
+        "auc": 0.5617539026629936,
+        "accuracy": 0.5379146919431279,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "AGTUSDT": [
+      {
+        "id": 44,
+        "created_at": "2026-10-26T00:38:43.300329+00:00",
+        "auc": 0.5290113889076082,
+        "accuracy": 0.5308056872037915,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 69,
+        "created_at": "2026-10-26T00:42:11.891248+00:00",
+        "auc": 0.5290113889076082,
+        "accuracy": 0.5308056872037915,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "AKEUSDT": [
+      {
+        "id": 45,
+        "created_at": "2026-10-26T00:38:43.534422+00:00",
+        "auc": 0.511875014069922,
+        "accuracy": 0.4786729857819905,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 70,
+        "created_at": "2026-10-26T00:42:12.049293+00:00",
+        "auc": 0.511875014069922,
+        "accuracy": 0.4786729857819905,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "APRUSDT": [
+      {
+        "id": 15,
+        "created_at": "2026-10-25T17:06:18.382110+00:00",
+        "auc": 0.46234567901234563,
+        "accuracy": 0.5027624309392266,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 71,
+        "created_at": "2026-10-26T00:42:12.236388+00:00",
+        "auc": 0.5371619320117174,
+        "accuracy": 0.5355450236966824,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ARBUSDT": [
+      {
+        "id": 46,
+        "created_at": "2026-10-26T00:38:43.717174+00:00",
+        "auc": 0.4021883812746757,
+        "accuracy": 0.41706161137440756,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 72,
+        "created_at": "2026-10-26T00:42:12.563571+00:00",
+        "auc": 0.4021883812746757,
+        "accuracy": 0.41706161137440756,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ARIAUSDT": [
+      {
+        "id": 47,
+        "created_at": "2026-10-26T00:38:44.017394+00:00",
+        "auc": 0.43269295584765755,
+        "accuracy": 0.490521327014218,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 73,
+        "created_at": "2026-10-26T00:42:12.896721+00:00",
+        "auc": 0.43269295584765755,
+        "accuracy": 0.490521327014218,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "AVAXUSDT": [
+      {
+        "id": 38,
+        "created_at": "2026-10-25T17:14:28.037331+00:00",
+        "auc": 0.5956401964307103,
+        "accuracy": 0.4789473684210526,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 74,
+        "created_at": "2026-10-26T00:42:13.263562+00:00",
+        "auc": 0.520741836386392,
+        "accuracy": 0.504739336492891,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "BCHUSDT": [
+      {
+        "id": 48,
+        "created_at": "2026-10-26T00:38:44.293503+00:00",
+        "auc": 0.4669527318475916,
+        "accuracy": 0.46208530805687204,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 75,
+        "created_at": "2026-10-26T00:42:13.531657+00:00",
+        "auc": 0.4669527318475916,
+        "accuracy": 0.46208530805687204,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "BTCUSDT": [
+      {
+        "id": 7,
+        "created_at": "2026-10-25T11:23:14.022024+00:00",
+        "auc": 0.5942165942165942,
+        "accuracy": 0.515748031496063,
+        "rows": 1266,
+        "test_rows": 254,
+        "train_start": 1788354000000,
+        "train_end": 1791975600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 11,
+        "created_at": "2026-10-25T12:37:27.226764+00:00",
+        "auc": 0.5003396070402015,
+        "accuracy": 0.5044345898004434,
+        "rows": 4506,
+        "test_rows": 902,
+        "train_start": 1776693600000,
+        "train_end": 1789646400000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 76,
+        "created_at": "2026-10-26T00:42:13.830976+00:00",
+        "auc": 0.5775675675675676,
+        "accuracy": 0.5592417061611374,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "BTWUSDT": [
+      {
+        "id": 28,
+        "created_at": "2026-10-25T17:12:42.903076+00:00",
+        "auc": 0.5383762200532387,
+        "accuracy": 0.48947368421052634,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 77,
+        "created_at": "2026-10-26T00:42:14.101753+00:00",
+        "auc": 0.582700992641159,
+        "accuracy": 0.580568720379147,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "BULLAUSDT": [
+      {
+        "id": 49,
+        "created_at": "2026-10-26T00:38:44.608783+00:00",
+        "auc": 0.5703945150050579,
+        "accuracy": 0.533175355450237,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 78,
+        "created_at": "2026-10-26T00:42:14.364190+00:00",
+        "auc": 0.5703945150050579,
+        "accuracy": 0.533175355450237,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "CAPUSDT": [
+      {
+        "id": 26,
+        "created_at": "2026-10-25T17:12:42.426538+00:00",
+        "auc": 0.5517086834733893,
+        "accuracy": 0.5421052631578948,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 79,
+        "created_at": "2026-10-26T00:42:14.733359+00:00",
+        "auc": 0.4838965571949866,
+        "accuracy": 0.48104265402843605,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "COMPUSDT": [
+      {
+        "id": 50,
+        "created_at": "2026-10-26T00:38:44.994590+00:00",
+        "auc": 0.5380267679508048,
+        "accuracy": 0.5071090047393365,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 80,
+        "created_at": "2026-10-26T00:42:15.048566+00:00",
+        "auc": 0.5380267679508048,
+        "accuracy": 0.5071090047393365,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "CTUSDT": [
+      {
+        "id": 51,
+        "created_at": "2026-10-26T00:38:45.102314+00:00",
+        "auc": 0.4915161466885605,
+        "accuracy": 0.5092592592592593,
+        "rows": 540,
+        "test_rows": 108,
+        "train_start": 1791014400000,
+        "train_end": 1792548000000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 81,
+        "created_at": "2026-10-26T00:42:15.158331+00:00",
+        "auc": 0.4915161466885605,
+        "accuracy": 0.5092592592592593,
+        "rows": 540,
+        "test_rows": 108,
+        "train_start": 1791014400000,
+        "train_end": 1792548000000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "DASHUSDT": [
+      {
+        "id": 52,
+        "created_at": "2026-10-26T00:38:45.358717+00:00",
+        "auc": 0.5430021787471081,
+        "accuracy": 0.514218009478673,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 82,
+        "created_at": "2026-10-26T00:42:15.471082+00:00",
+        "auc": 0.5430021787471081,
+        "accuracy": 0.514218009478673,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "DODOXUSDT": [
+      {
+        "id": 53,
+        "created_at": "2026-10-26T00:38:45.614621+00:00",
+        "auc": 0.5130827067669173,
+        "accuracy": 0.48578199052132703,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 83,
+        "created_at": "2026-10-26T00:42:15.792274+00:00",
+        "auc": 0.5130827067669173,
+        "accuracy": 0.48578199052132703,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "DOGEUSDT": [
+      {
+        "id": 22,
+        "created_at": "2026-10-25T17:10:10.260058+00:00",
+        "auc": 0.48741406663141196,
+        "accuracy": 0.4584837545126354,
+        "rows": 1383,
+        "test_rows": 277,
+        "train_start": 1787943600000,
+        "train_end": 1791903600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 84,
+        "created_at": "2026-10-26T00:42:16.092784+00:00",
+        "auc": 0.5516142159522518,
+        "accuracy": 0.5118483412322274,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "DOTUSDT": [
+      {
+        "id": 54,
+        "created_at": "2026-10-26T00:38:45.894493+00:00",
+        "auc": 0.5650635208711434,
+        "accuracy": 0.533175355450237,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 85,
+        "created_at": "2026-10-26T00:42:16.445375+00:00",
+        "auc": 0.5650635208711434,
+        "accuracy": 0.533175355450237,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ENAUSDT": [
+      {
+        "id": 23,
+        "created_at": "2026-10-25T17:12:41.783679+00:00",
+        "auc": 0.45297805642633227,
+        "accuracy": 0.4693140794223827,
+        "rows": 1383,
+        "test_rows": 277,
+        "train_start": 1787943600000,
+        "train_end": 1791903600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 86,
+        "created_at": "2026-10-26T00:42:16.766792+00:00",
+        "auc": 0.46327493261455527,
+        "accuracy": 0.4597156398104265,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ERAUSDT": [
+      {
+        "id": 55,
+        "created_at": "2026-10-26T00:38:46.198689+00:00",
+        "auc": 0.490865857283307,
+        "accuracy": 0.4834123222748815,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 87,
+        "created_at": "2026-10-26T00:42:17.117200+00:00",
+        "auc": 0.490865857283307,
+        "accuracy": 0.4834123222748815,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ETHUSDT": [
+      {
+        "id": 8,
+        "created_at": "2026-10-25T11:23:14.316036+00:00",
+        "auc": 0.5177186123006268,
+        "accuracy": 0.5039370078740157,
+        "rows": 1266,
+        "test_rows": 254,
+        "train_start": 1788354000000,
+        "train_end": 1791975600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 12,
+        "created_at": "2026-10-25T12:37:27.704368+00:00",
+        "auc": 0.5148221538704209,
+        "accuracy": 0.5299334811529933,
+        "rows": 4506,
+        "test_rows": 902,
+        "train_start": 1776693600000,
+        "train_end": 1789646400000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 88,
+        "created_at": "2026-10-26T00:42:17.439105+00:00",
+        "auc": 0.5017748023005033,
+        "accuracy": 0.4976303317535545,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "FILUSDT": [
+      {
+        "id": 37,
+        "created_at": "2026-10-25T17:14:27.855334+00:00",
+        "auc": 0.4664285714285714,
+        "accuracy": 0.3684210526315789,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 89,
+        "created_at": "2026-10-26T00:42:17.708485+00:00",
+        "auc": 0.4930379312710062,
+        "accuracy": 0.46919431279620855,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "GRASSUSDT": [
+      {
+        "id": 56,
+        "created_at": "2026-10-26T00:38:46.559065+00:00",
+        "auc": 0.5342699786444869,
+        "accuracy": 0.5071090047393365,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 90,
+        "created_at": "2026-10-26T00:42:18.140922+00:00",
+        "auc": 0.5342699786444869,
+        "accuracy": 0.5071090047393365,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "GTCUSDT": [
+      {
+        "id": 34,
+        "created_at": "2026-10-25T17:14:27.301037+00:00",
+        "auc": 0.5221288515406162,
+        "accuracy": 0.5473684210526316,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 91,
+        "created_at": "2026-10-26T00:42:18.424273+00:00",
+        "auc": 0.5153714870861305,
+        "accuracy": 0.4834123222748815,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "INJUSDT": [
+      {
+        "id": 57,
+        "created_at": "2026-10-26T00:38:46.848752+00:00",
+        "auc": 0.53986695826499,
+        "accuracy": 0.5379146919431279,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 92,
+        "created_at": "2026-10-26T00:42:18.682687+00:00",
+        "auc": 0.53986695826499,
+        "accuracy": 0.5379146919431279,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "IOSTUSDT": [
+      {
+        "id": 58,
+        "created_at": "2026-10-26T00:38:47.162557+00:00",
+        "auc": 0.5558069552232052,
+        "accuracy": 0.542654028436019,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 93,
+        "created_at": "2026-10-26T00:42:19.032601+00:00",
+        "auc": 0.5558069552232052,
+        "accuracy": 0.542654028436019,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "IRYSUSDT": [
+      {
+        "id": 18,
+        "created_at": "2026-10-25T17:06:18.862468+00:00",
+        "auc": 0.3598765432098766,
+        "accuracy": 0.4419889502762431,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 94,
+        "created_at": "2026-10-26T00:42:19.314397+00:00",
+        "auc": 0.48400090009000907,
+        "accuracy": 0.5023696682464455,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "JCTUSDT": [
+      {
+        "id": 14,
+        "created_at": "2026-10-25T17:06:18.219248+00:00",
+        "auc": 0.4821472242602102,
+        "accuracy": 0.5082872928176796,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 95,
+        "created_at": "2026-10-26T00:42:19.758331+00:00",
+        "auc": 0.517060898083878,
+        "accuracy": 0.514218009478673,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "LIGHTUSDT": [
+      {
+        "id": 30,
+        "created_at": "2026-10-25T17:12:43.244321+00:00",
+        "auc": 0.5684046345811052,
+        "accuracy": 0.6,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 96,
+        "created_at": "2026-10-26T00:42:20.080562+00:00",
+        "auc": 0.576491992542845,
+        "accuracy": 0.542654028436019,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "LINKUSDT": [
+      {
+        "id": 39,
+        "created_at": "2026-10-25T17:14:28.219795+00:00",
+        "auc": 0.3567507002801121,
+        "accuracy": 0.4421052631578947,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 97,
+        "created_at": "2026-10-26T00:42:20.359430+00:00",
+        "auc": 0.5338371382673033,
+        "accuracy": 0.5,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "LTCUSDT": [
+      {
+        "id": 59,
+        "created_at": "2026-10-26T00:38:47.479679+00:00",
+        "auc": 0.5395153985507247,
+        "accuracy": 0.5402843601895735,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 98,
+        "created_at": "2026-10-26T00:42:20.658656+00:00",
+        "auc": 0.5395153985507247,
+        "accuracy": 0.5402843601895735,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "MAGMAUSDT": [
+      {
+        "id": 35,
+        "created_at": "2026-10-25T17:14:27.484488+00:00",
+        "auc": 0.4377657740489599,
+        "accuracy": 0.43157894736842106,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 99,
+        "created_at": "2026-10-26T00:42:20.953281+00:00",
+        "auc": 0.49009146341463417,
+        "accuracy": 0.45260663507109006,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "NEARUSDT": [
+      {
+        "id": 16,
+        "created_at": "2026-10-25T17:06:18.552618+00:00",
+        "auc": 0.6281889366001515,
+        "accuracy": 0.569060773480663,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 100,
+        "created_at": "2026-10-26T00:42:21.362270+00:00",
+        "auc": 0.5361111111111112,
+        "accuracy": 0.509478672985782,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ONDOUSDT": [
+      {
+        "id": 60,
+        "created_at": "2026-10-26T00:38:47.825523+00:00",
+        "auc": 0.4491525423728814,
+        "accuracy": 0.4928909952606635,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 101,
+        "created_at": "2026-10-26T00:42:21.622535+00:00",
+        "auc": 0.4491525423728814,
+        "accuracy": 0.4928909952606635,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "ORDERUSDT": [
+      {
+        "id": 19,
+        "created_at": "2026-10-25T17:06:19.057370+00:00",
+        "auc": 0.5202372218146246,
+        "accuracy": 0.5303867403314917,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 102,
+        "created_at": "2026-10-26T00:42:21.885684+00:00",
+        "auc": 0.45318555789759973,
+        "accuracy": 0.4431279620853081,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "PUMPUSDT": [
+      {
+        "id": 31,
+        "created_at": "2026-10-25T17:12:43.409612+00:00",
+        "auc": 0.345679012345679,
+        "accuracy": 0.37894736842105264,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 103,
+        "created_at": "2026-10-26T00:42:22.154621+00:00",
+        "auc": 0.46261446886446883,
+        "accuracy": 0.43601895734597157,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "QNTUSDT": [
+      {
+        "id": 41,
+        "created_at": "2026-10-25T17:14:28.543976+00:00",
+        "auc": 0.5179545454545454,
+        "accuracy": 0.5210526315789473,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 104,
+        "created_at": "2026-10-26T00:42:22.412726+00:00",
+        "auc": 0.5582980291029656,
+        "accuracy": 0.514218009478673,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "QUSDT": [
+      {
+        "id": 27,
+        "created_at": "2026-10-25T17:12:42.639929+00:00",
+        "auc": 0.537848158131177,
+        "accuracy": 0.5105263157894737,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 105,
+        "created_at": "2026-10-26T00:42:22.788970+00:00",
+        "auc": 0.4959381044487428,
+        "accuracy": 0.48578199052132703,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "SOLUSDT": [
+      {
+        "id": 13,
+        "created_at": "2026-10-25T17:06:18.034854+00:00",
+        "auc": 0.44161566707466343,
+        "accuracy": 0.46408839779005523,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 106,
+        "created_at": "2026-10-26T00:42:23.074358+00:00",
+        "auc": 0.5668704710144927,
+        "accuracy": 0.542654028436019,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "STRKUSDT": [
+      {
+        "id": 61,
+        "created_at": "2026-10-26T00:38:48.083212+00:00",
+        "auc": 0.6078697421981004,
+        "accuracy": 0.54739336492891,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 107,
+        "created_at": "2026-10-26T00:42:23.386682+00:00",
+        "auc": 0.6078697421981004,
+        "accuracy": 0.54739336492891,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "SUIUSDT": [
+      {
+        "id": 25,
+        "created_at": "2026-10-25T17:12:42.266588+00:00",
+        "auc": 0.45646324399956945,
+        "accuracy": 0.49097472924187724,
+        "rows": 1383,
+        "test_rows": 277,
+        "train_start": 1787943600000,
+        "train_end": 1791903600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 108,
+        "created_at": "2026-10-26T00:42:23.689183+00:00",
+        "auc": 0.5634505110944902,
+        "accuracy": 0.5497630331753555,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "TAGUSDT": [
+      {
+        "id": 62,
+        "created_at": "2026-10-26T00:38:48.468206+00:00",
+        "auc": 0.5026246719160105,
+        "accuracy": 0.5,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 109,
+        "created_at": "2026-10-26T00:42:23.963493+00:00",
+        "auc": 0.5026246719160105,
+        "accuracy": 0.5,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "TAOUSDT": [
+      {
+        "id": 33,
+        "created_at": "2026-10-25T17:14:27.113900+00:00",
+        "auc": 0.45900330710457293,
+        "accuracy": 0.45263157894736844,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 110,
+        "created_at": "2026-10-26T00:42:24.354471+00:00",
+        "auc": 0.4359217171717172,
+        "accuracy": 0.45260663507109006,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "TIAUSDT": [
+      {
+        "id": 63,
+        "created_at": "2026-10-26T00:38:48.770469+00:00",
+        "auc": 0.5359800362976407,
+        "accuracy": 0.5213270142180095,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 111,
+        "created_at": "2026-10-26T00:42:24.642483+00:00",
+        "auc": 0.5359800362976407,
+        "accuracy": 0.5213270142180095,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "TRUMPUSDT": [
+      {
+        "id": 64,
+        "created_at": "2026-10-26T00:38:49.082273+00:00",
+        "auc": 0.539024056861673,
+        "accuracy": 0.5260663507109005,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 112,
+        "created_at": "2026-10-26T00:42:24.961038+00:00",
+        "auc": 0.539024056861673,
+        "accuracy": 0.5260663507109005,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "TUSDT": [
+      {
+        "id": 20,
+        "created_at": "2026-10-25T17:06:19.227190+00:00",
+        "auc": 0.518796992481203,
+        "accuracy": 0.47513812154696133,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 113,
+        "created_at": "2026-10-26T00:42:25.238819+00:00",
+        "auc": 0.5502490942028986,
+        "accuracy": 0.5284360189573459,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "UNIUSDT": [
+      {
+        "id": 29,
+        "created_at": "2026-10-25T17:12:43.062496+00:00",
+        "auc": 0.4605322003577817,
+        "accuracy": 0.46842105263157896,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 114,
+        "created_at": "2026-10-26T00:42:25.500493+00:00",
+        "auc": 0.5253153153153154,
+        "accuracy": 0.523696682464455,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "USELESSUSDT": [
+      {
+        "id": 65,
+        "created_at": "2026-10-26T00:38:49.378574+00:00",
+        "auc": 0.5311981948793516,
+        "accuracy": 0.5450236966824644,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 115,
+        "created_at": "2026-10-26T00:42:25.942875+00:00",
+        "auc": 0.5311981948793516,
+        "accuracy": 0.5450236966824644,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "WLDUSDT": [
+      {
+        "id": 24,
+        "created_at": "2026-10-25T17:12:42.013928+00:00",
+        "auc": 0.4914534395973154,
+        "accuracy": 0.49097472924187724,
+        "rows": 1383,
+        "test_rows": 277,
+        "train_start": 1787943600000,
+        "train_end": 1791903600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 116,
+        "created_at": "2026-10-26T00:42:26.209810+00:00",
+        "auc": 0.5077702702702702,
+        "accuracy": 0.490521327014218,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "XMRUSDT": [
+      {
+        "id": 40,
+        "created_at": "2026-10-25T17:14:28.361804+00:00",
+        "auc": 0.5934959349593496,
+        "accuracy": 0.5578947368421052,
+        "rows": 948,
+        "test_rows": 190,
+        "train_start": 1789509600000,
+        "train_end": 1792216800000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 117,
+        "created_at": "2026-10-26T00:42:26.548909+00:00",
+        "auc": 0.5882472458009753,
+        "accuracy": 0.6042654028436019,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ],
+    "XRPUSDT": [
+      {
+        "id": 17,
+        "created_at": "2026-10-25T17:06:18.711210+00:00",
+        "auc": 0.4238678090575275,
+        "accuracy": 0.47513812154696133,
+        "rows": 903,
+        "test_rows": 181,
+        "train_start": 1789671600000,
+        "train_end": 1792249200000,
+        "status": "ready",
+        "algo": "lightgbm"
+      },
+      {
+        "id": 118,
+        "created_at": "2026-10-26T00:42:26.828447+00:00",
+        "auc": 0.5369158028732497,
+        "accuracy": 0.514218009478673,
+        "rows": 2106,
+        "test_rows": 422,
+        "train_start": 1785376800000,
+        "train_end": 1791417600000,
+        "status": "ready",
+        "algo": "lightgbm"
+      }
+    ]
+  },
+  "ml_ensemble_enabled": false
+}

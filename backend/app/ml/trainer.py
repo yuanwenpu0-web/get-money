@@ -72,8 +72,11 @@ def train_model(
     estimator = _build_estimator(algo)
     estimator.fit(train[FEATURES], train["label"])
 
-    prediction = estimator.predict(test[FEATURES])
-    probability = estimator.predict_proba(test[FEATURES])[:, 1]
+    probabilities = estimator.predict_proba(test[FEATURES])
+    # Both supported classifiers choose the largest class probability. Reuse the
+    # same inference for labels and AUC instead of traversing every tree twice.
+    prediction = estimator.classes_[np.argmax(probabilities, axis=1)]
+    probability = probabilities[:, 1]
     metrics = {
         "accuracy": float(accuracy_score(test["label"], prediction)),
         "precision": float(precision_score(test["label"], prediction, zero_division=0)),
@@ -89,7 +92,7 @@ def train_model(
         "evaluation_end": str(test.index[-1]),
     }
 
-    model_path = MODEL_DIR / f"{symbol}_{interval}_{algo}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.pkl"
+    model_path = MODEL_DIR / f"{symbol}_{interval}_{algo}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}.pkl"
     with model_path.open("wb") as handle:
         pickle.dump({"model": estimator, "features": FEATURES, "metrics": metrics}, handle)
 

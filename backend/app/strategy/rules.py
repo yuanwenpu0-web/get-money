@@ -8,11 +8,13 @@ import numpy as np
 import pandas as pd
 
 from ..config import DEFAULT_STATE
+from ..features.funding import FUNDING_FILTER_Z
 
 RULE_DEFAULTS = {
     "regime_filter": True,
     "cost_filter": True,
     "require_model": False,
+    "funding_filter": False,
     "risk_per_trade_pct": 0.005,
     "cooldown_bars": 10,
     "min_atr_cost_ratio": 0.5,
@@ -27,6 +29,8 @@ STRATEGY_PARAMS = {
     "trend_follow": {"adx_filter": 22.0},
     "mean_reversion": {"rsi_low": 30.0, "rsi_high": 70.0, "max_range_adx": 25.0},
     "ml_ensemble": {"ml_weight": 0.6, "adx_filter": 20.0},
+    "funding_extreme": {"z_threshold": 2.0, "max_adx": 25.0},
+    "mtf_resonance": {"adx_filter": 22.0, "htf_adx_filter": 20.0},
 }
 SHARED_KEYS = (
     "min_score",
@@ -87,13 +91,16 @@ def resolve_params(code: str, state: dict, overrides: dict | None = None) -> dic
         "max_atr_pct": (0.0001, 0.2),
         "min_model_edge": (0, 0.49),
         "adx_filter": (0, 100),
+        "htf_adx_filter": (0, 100),
         "max_range_adx": (0, 100),
+        "max_adx": (0, 100),
+        "z_threshold": (0.1, 10),
         "rsi_low": (1, 49),
         "rsi_high": (51, 99),
         "ml_weight": (0, 1),
     }
     for key, value in params.items():
-        if key in ("regime_filter", "cost_filter", "require_model", "trailing_enabled"):
+        if key in ("regime_filter", "cost_filter", "require_model", "trailing_enabled", "funding_filter"):
             if not isinstance(value, bool):
                 raise ValueError(f"{key} 必须是布尔值")
         else:
@@ -116,9 +123,14 @@ def resolve_params(code: str, state: dict, overrides: dict | None = None) -> dic
 
 
 def evaluate_signals(
-    data: pd.DataFrame, code: str, params: dict, prob_up: pd.Series | None = None
+    data: pd.DataFrame, code: str, params: dict, prob_up: pd.Series | None = None,
+    market_context: dict | None = None,
 ) -> pd.DataFrame:
-    """Only reads each row; feature construction must also be causal."""
+    """Only reads each row; feature construction must also be causal.
+
+    market_context 预留给多源指标加权消费（迭代 7 起采集+存储+观测）。当前默认 None，
+    且即便传入也不改变任何方向/仓位计算——保证 metrics_assist_enabled 关闭时行为与历史一致。
+    """
 
     def column(name):
         return pd.to_numeric(
@@ -131,6 +143,7 @@ def evaluate_signals(
         np.sign(column("macd_hist_norm")),
     )
     rsi, adx, atr = column("rsi_14"), column("adx_14"), column("atr_pct")
+    funding_z = column("funding_zscore")
     rules = 0.5 * st + 0.3 * ema + 0.2 * macd
     if code == "mean_reversion":
         low, high = params["rsi_low"], params["rsi_high"]
@@ -145,6 +158,37 @@ def evaluate_signals(
         probability = 0.5 + signed / 2
     elif code == "trend_follow":
         signed = rules * np.where(adx >= params["adx_filter"], 1.0, 0.5)
+        probability = 0.5 + signed / 2
+    elif code == "mtf_resonance":
+        # 复用 trend_follow 的 1h 方向逻辑：supertrend_dir/ema_ratio/macd 合成 signed，
+        # 用 adx >= adx_filter 缩放（与 trend_follow 完全一致），下面再做多周期共振门控。
+        signed = rules * np.where(adx >= params["adx_filter"], 1.0, 0.5)
+        probability = 0.5 + signed / 2
+        # 共振门控：仅当 1h side 与更高周期（4h/1d）同向且更高周期 ADX 都足够强时保留信号；
+        # 否则 signed=0（不开仓，不反向——避免制造额外交易）。更高周期列由 add_mtf_trend 提供。
+        side_raw = np.sign(signed)
+        mtf_dir_4h = column("mtf_dir_4h")
+        mtf_dir_1d = column("mtf_dir_1d")
+        mtf_adx_4h = column("mtf_adx_4h")
+        mtf_adx_1d = column("mtf_adx_1d")
+        htf_filter = params["htf_adx_filter"]
+        aligned = (
+            (side_raw == mtf_dir_4h)
+            & (side_raw == mtf_dir_1d)
+            & (mtf_adx_4h >= htf_filter)
+            & (mtf_adx_1d >= htf_filter)
+        ).fillna(False)
+        signed = signed.where(aligned, 0.0)
+    elif code == "funding_extreme":
+        # 资金费极值逆向：z <= -z_threshold（负费率、空头付费、拥挤做空）→ 多；
+        # z >= +z_threshold（正费率、多头付费、拥挤做多）→ 空。未达极值不出信号。
+        threshold = params["z_threshold"]
+        magnitude = (funding_z.abs() / threshold).clip(upper=1.0)
+        signed = pd.Series(
+            np.where(funding_z <= -threshold, magnitude,
+                     np.where(funding_z >= threshold, -magnitude, 0.0)),
+            index=data.index,
+        ).fillna(0.0)
         probability = 0.5 + signed / 2
     elif code == "ml_ensemble":
         ml = (
@@ -183,8 +227,15 @@ def evaluate_signals(
         | atr.le(0),
         "invalid_indicators",
     )
+    if code == "funding_extreme":
+        block(column("funding_available").ne(1), "funding_data_missing")
     block(score.lt(params["min_score"]) | side.eq(0), "below_threshold")
     block(atr.gt(params["max_atr_pct"]), "excess_volatility")
+    if params["funding_filter"]:
+        # 资金费极端拥挤时禁止顺费开仓：正极端（多头付费）禁多、负极端（空头付费）禁空；
+        # 无资金费数据（z 为 NaN 或 available=0）时不拦截
+        block(funding_z.ge(FUNDING_FILTER_Z) & side.gt(0), "funding_filter_long")
+        block(funding_z.le(-FUNDING_FILTER_Z) & side.lt(0), "funding_filter_short")
     if code == "ml_ensemble":
         if prob_up is None and params["require_model"]:
             block(pd.Series(True, index=data.index), "model_required")
@@ -203,6 +254,9 @@ def evaluate_signals(
                 ),
                 "band_confirmation",
             )
+        elif code == "funding_extreme":
+            # 均值回归语义：仅在震荡市（低 ADX）执行，强趋势时资金费极值可能延续
+            block(adx.gt(params["max_adx"]), "trending_market")
         else:
             block(adx.lt(params["adx_filter"]), "weak_trend")
             block(

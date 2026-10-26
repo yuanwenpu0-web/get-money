@@ -4,7 +4,6 @@ import importlib.util
 import json
 import math
 
-import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
@@ -14,63 +13,18 @@ from ..ml.trainer import _build_estimator
 from ..models import StrategyConfig
 from ..state import all_state
 from ..strategy.rules import evaluate_signals, resolve_params
-from .execution import simulate
+from .execution import exposure_metrics, randomize_directions, simulate
+from .metrics import downsample, metrics_from_equity
 
 # Dependency information only; all runs use the same explicit execution semantics.
 HAS_VBT = importlib.util.find_spec("vectorbt") is not None
 
 
-def _metrics_from_equity(
-    equity: pd.Series, trades: list[dict], initial: float, interval: str
-) -> dict:
-    equity = equity.dropna()
-    if equity.empty:
-        return {}
-    drawdown = (equity / equity.cummax().clip(lower=initial) - 1) * 100
-    daily = equity.resample("1D").last()
-    daily = (
-        pd.concat(
-            [pd.Series([initial], index=[daily.index[0] - pd.Timedelta(days=1)]), daily]
-        )
-        .pct_change()
-        .dropna()
-    )
-    sharpe = (
-        float(daily.mean() / daily.std() * math.sqrt(365))
-        if len(daily) > 2 and daily.std() > 0
-        else 0.0
-    )
-    wins = [t["pnl"] for t in trades if t["pnl"] > 0]
-    losses = [t["pnl"] for t in trades if t["pnl"] < 0]
-    gross_profit, gross_loss = sum(wins), -sum(losses)
-    return {
-        "initial_cash": round(initial, 2),
-        "final_equity": round(float(equity.iloc[-1]), 2),
-        "total_return_pct": round((float(equity.iloc[-1]) / initial - 1) * 100, 4),
-        "max_drawdown_pct": round(float(drawdown.min()), 4),
-        "sharpe": round(sharpe, 2) if math.isfinite(sharpe) else 0.0,
-        "total_trades": len(trades),
-        "win_rate": round(len(wins) / len(trades) * 100, 2) if trades else 0.0,
-        "profit_factor": round(gross_profit / gross_loss, 3) if gross_loss else None,
-        "profit_factor_infinite": bool(gross_profit > 0 and not gross_loss),
-        "expectancy": round(sum(t["pnl"] for t in trades) / len(trades), 4)
-        if trades
-        else 0.0,
-        "total_fees": round(sum(t["fees"] for t in trades), 2),
-        "bars": len(equity),
-        "start": str(equity.index[0]),
-        "end": str(equity.index[-1]),
-    }
-
-
-def _downsample(equity: pd.Series, limit: int = 1500) -> list[dict]:
-    indices = np.unique(
-        np.linspace(0, len(equity) - 1, min(limit, len(equity)), dtype=int)
-    )
-    return [
-        {"time": str(equity.index[i]), "equity": round(float(equity.iloc[i]), 2)}
-        for i in indices
-    ]
+def minimum_sample_trades(validation_bars: int) -> int:
+    """小样本惩罚：验证集每 50 根K线至少 1 笔成交，下限 10 笔。
+    2880 根验证集 → 57 笔门槛；验证集越短门槛越低，短窗口退回 10 笔保底，
+    防止小样本幸运儿靠一两笔运气成交被选为最优参数。"""
+    return max(10, int(validation_bars) // 50)
 
 
 def select_parameters(
@@ -83,7 +37,11 @@ def select_parameters(
     slippage: float,
     interval: str,
 ) -> tuple[dict, dict]:
-    """Small predeclared search; this function never receives the test partition."""
+    """Small predeclared search; this function never receives the test partition.
+
+    候选参数按 minimum_sample_trades(len(validation)) 设成交笔数门槛，未达标
+    一律不参与选择（零成交变体同样安全，不报错）。
+    """
     variants = [("current", {})]
     variants.extend(
         (f"score_{score:.2f}", {"min_score": max(params["min_score"], score)})
@@ -92,11 +50,16 @@ def select_parameters(
     variants.append(
         ("cost_strict", {"min_atr_cost_ratio": max(0.75, params["min_atr_cost_ratio"])})
     )
-    if strategy != "mean_reversion":
+    if "adx_filter" in params:
         variants.append(
             ("trend_strict", {"adx_filter": max(25.0, params["adx_filter"])})
         )
+    if "z_threshold" in params:
+        variants.append(
+            ("extreme_strict", {"z_threshold": params["z_threshold"] + 0.5})
+        )
     candidates, seen = [], set()
+    min_trades = minimum_sample_trades(len(validation))
     best_params, best_score, chosen = params, -math.inf, "current"
     for name, changes in variants:
         candidate = {**params, **changes}
@@ -108,9 +71,9 @@ def select_parameters(
         equity, trades = simulate(
             validation, signals, candidate, initial, fee, slippage, interval
         )
-        metrics = _metrics_from_equity(equity, trades, initial, interval)
+        metrics = metrics_from_equity(equity, trades, initial, interval)
         objective = metrics["total_return_pct"] + 0.5 * metrics["max_drawdown_pct"]
-        eligible = len(trades) >= 10
+        eligible = len(trades) >= min_trades
         candidates.append(
             {
                 "name": name,
@@ -125,7 +88,7 @@ def select_parameters(
     return best_params, {
         "enabled": True,
         "selected": chosen,
-        "minimum_trades": 10,
+        "minimum_trades": min_trades,
         "status": "selected" if math.isfinite(best_score) else "insufficient_trades",
         "objective": "net_return_pct - 0.5 * abs(max_drawdown_pct)",
         "start": str(validation.index[0]),
@@ -223,8 +186,16 @@ def run_backtest(
     baseline_equity, baseline_trades = simulate(
         test, baseline_signals, baseline_params, initial, fee, slippage, interval
     )
-    baseline = _metrics_from_equity(baseline_equity, baseline_trades, initial, interval)
-    metrics = _metrics_from_equity(equity, trades, initial, interval)
+    baseline = metrics_from_equity(baseline_equity, baseline_trades, initial, interval)
+    baseline.update(exposure_metrics(baseline_equity, baseline_trades, interval))
+    # 随机入场证伪基线：方向 50/50 随机翻转（固定种子），其余与时点/仓位/风控/成本完全一致。
+    # 若优化策略收益不显著高于本组，说明方向判断没有信息量，应淘汰。
+    random_signals = randomize_directions(baseline_signals)
+    random_equity, random_trades = simulate(test, random_signals, baseline_params, initial, fee, slippage, interval)
+    random_baseline = metrics_from_equity(random_equity, random_trades, initial, interval)
+    random_baseline.update(exposure_metrics(random_equity, random_trades, interval))
+    metrics = metrics_from_equity(equity, trades, initial, interval)
+    metrics.update(exposure_metrics(equity, trades, interval))
     quality = data.attrs.get("data_quality", {})
     warnings = []
     if quality.get("gap_count"):
@@ -239,6 +210,8 @@ def run_backtest(
         warnings.append("样本外成交不足 30 笔，收益和胜率的稳定性有限。")
     if optimize and selection["status"] == "insufficient_trades":
         warnings.append("验证集成交不足，保留当前参数。")
+    if random_baseline and metrics.get("total_return_pct", 0) <= random_baseline.get("total_return_pct", 0):
+        warnings.append("策略收益未超过随机入场基线（方向 50/50 随机翻转），方向判断可能没有信息量。")
     metrics.update(
         {
             "engine": "sequential",
@@ -265,6 +238,7 @@ def run_backtest(
             },
             "parameters": params,
             "baseline": baseline,
+            "random_baseline": random_baseline,
             "return_improvement_pct": round(
                 metrics["total_return_pct"] - baseline["total_return_pct"], 4
             ),
@@ -284,6 +258,6 @@ def run_backtest(
     )
     return {
         "metrics": metrics,
-        "equity_curve": _downsample(equity),
+        "equity_curve": downsample(equity),
         "trades": trades[-500:],
     }

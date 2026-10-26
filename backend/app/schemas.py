@@ -20,7 +20,10 @@ class CredentialsPayload(BaseModel):
 class SettingsUpdate(BaseModel):
     data_source: str | None = None
     symbols: list[str] | None = None
+    symbol_scope: str | None = None
     interval: str | None = None
+    execution_mode: str | None = None
+    proxy_url: str | None = None
     testnet: bool | None = None
     fee_rate: float | None = None
     slippage: float | None = None
@@ -42,10 +45,25 @@ class SettingsUpdate(BaseModel):
     trailing_enabled: bool | None = None
     trail_activation_atr: float | None = Field(default=None, ge=.1, le=20, allow_inf_nan=False)
     max_signal_age_bars: int | None = Field(default=None, ge=1, le=10)
+    min_quote_volume_usd: int | None = Field(default=None, ge=0)
+    symbol_blacklist: list[str] | None = None
+    risk_halt: bool | None = None
+    risk_halt_reason: str | None = Field(default=None, max_length=500)
+    max_drawdown_halt_pct: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
+    consecutive_loss_halt: int | None = Field(default=None, ge=0, le=1000)
+    order_type: str | None = None
     schedule_enabled: bool | None = None
     schedule_seconds: int | None = None
     train_horizon: int | None = None
     auto_train_days: int | None = None
+    metrics_assist_enabled: bool | None = None
+    auto_train_enabled: bool | None = None
+    auto_train_interval_hours: int | None = Field(default=None, ge=1, le=720)
+    auto_train_top_n: int | None = Field(default=None, ge=1, le=50)
+    auto_train_workers: int | None = Field(default=None, ge=1, le=8, strict=True)
+    ml_min_auc: float | None = Field(default=None, ge=.5, le=.9, allow_inf_nan=False)
+    ml_promote_rounds: int | None = Field(default=None, ge=1, le=10)
+    ml_auto_enable: bool | None = None
 
 
 class StrategyUpdate(BaseModel):
@@ -54,16 +72,24 @@ class StrategyUpdate(BaseModel):
 
 
 class SyncRequest(BaseModel):
-    symbol: str
+    symbol: str = ""
+    symbols: list[str] | None = None  # 非空=这些币种；空数组=全量 U 本位永续
+    funding: bool = False  # True 时对 symbols 逐个同步资金费历史（天数用 days）
     interval: str = "1m"
     days: int = 30
-    source: str = "nofx"  # nofx / binance
+    source: str = "binance"
 
 
 class PreviewRequest(BaseModel):
     symbol: str
     interval: str = "1m"
     strategy: str = "ml_ensemble"
+
+
+class MetricsSyncRequest(BaseModel):
+    symbols: list[str] | None = None  # 非空=这些币种；空=全量宇宙
+    source: str = "binance"
+    period: str = "5m"  # 多空比/主动买卖量/未平仓量历史聚合周期
 
 
 class TrainRequest(BaseModel):
@@ -78,7 +104,7 @@ class BacktestRequest(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
     symbol: str = Field(min_length=2, max_length=24, pattern=r'^[A-Za-z0-9]+$')
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '1m'
-    strategy: Literal['ml_ensemble', 'trend_follow', 'mean_reversion'] = 'ml_ensemble'
+    strategy: Literal['ml_ensemble', 'trend_follow', 'mean_reversion', 'funding_extreme', 'mtf_resonance'] = 'ml_ensemble'
     algo: Literal['rule', 'lightgbm', 'xgboost'] = 'lightgbm'
     days: int = Field(default=30, ge=1, le=180)
     initial_cash: float | None = Field(default=None, gt=0)

@@ -2,10 +2,43 @@
 
 from __future__ import annotations
 
+import random
+
 import pandas as pd
 
 from ..trading.risk import position_size, stop_exit, trailing_stop
 from ..utils import interval_ms
+
+RANDOM_BASELINE_SEED = 20261025
+
+
+def randomize_directions(signals: pd.DataFrame, seed: int = RANDOM_BASELINE_SEED) -> pd.DataFrame:
+    """证伪基线：固定种子对每个信号方向做 50/50 独立翻转（LONG<->SHORT，0 方向不变）。
+    只改 direction 一列：时点、评分、仓位、杠杆与 sl_pct/tp_pct 全部不变——
+    simulate 按新方向推导止损止盈，天然保持绝对距离不变（镜像），
+    保证"相同入场时点、相同仓位/风控/成本，唯一变量是方向"。"""
+    randomized = signals.copy()
+    rng = random.Random(seed)
+    flipped = []
+    for value in randomized["direction"]:
+        direction = int(value)
+        flipped.append(-direction if direction and rng.random() < 0.5 else direction)
+    randomized["direction"] = flipped
+    return randomized
+
+
+def exposure_metrics(equity: pd.Series, trades: list[dict], interval: str) -> dict:
+    """曝光时间：持仓 bar 数 / 总 bar 数；平均每笔持仓 bar 数。无成交时为 0。"""
+    step = interval_ms(interval)
+    held = [
+        int((pd.Timestamp(trade["exit_time"]) - pd.Timestamp(trade["entry_time"])).total_seconds() * 1000) // step + 1
+        for trade in trades
+    ]
+    total_bars = len(equity)
+    return {
+        "exposure_pct": round(sum(held) / total_bars * 100, 4) if total_bars else 0.0,
+        "avg_bars_held": round(sum(held) / len(held), 2) if held else 0.0,
+    }
 
 
 def simulate(
