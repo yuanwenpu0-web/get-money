@@ -14,7 +14,6 @@ output/
 .venv
 .codegraph
 .pytest_cache
-data
 output
 
 .workbuddy
