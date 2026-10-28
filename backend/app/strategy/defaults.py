@@ -35,6 +35,27 @@ DEFAULT_STRATEGIES = [
         "description": "4h/1d 更高周期趋势给 1h 信号做上下文确认，仅大/中/小周期同向且更高周期 ADX 足够时才开仓，降低震荡市假信号（迭代11实验策略）",
         "params": {"adx_filter": 22.0, "htf_adx_filter": 20.0, "min_score": 0.55},
     },
+    {
+        "code": "strong_pullback",
+        "name": "Martin Luk 强势回调（本地适配）",
+        "description": (
+            "4h 强势趋势（ema21>ema50 且 ADX 达标）下，等 15m 首次回调至 EMA9/锚定 VWAP，"
+            "出现收复 EMA9 的转强确认才做多；只做多 1 倍杠杆，单笔风险 0.5%、名义仓位上限 35%；"
+            "结构止损、移动止损、固定目标和持仓时限控制出场；EMA9 软出场可配置"
+        ),
+        "params": {
+            "htf_adx_filter": 22.0,
+            "pullback_min_bars": 8,
+            "pullback_confirm_bars": 8,
+            "target_r": 10.0,
+            "partial_tp_r": 0.0,  # 2.0 默认经 A/B 验证无 edge，回退 fixed；见 strong-pullback-strategy.md
+            "partial_tp_frac": 0.5,
+            "max_hold_hours": 48.0,
+            "max_leverage": 1,
+            "max_position_pct": 0.35,
+            "risk_per_trade_pct": 0.005,
+        },
+    },
 ]
 
 

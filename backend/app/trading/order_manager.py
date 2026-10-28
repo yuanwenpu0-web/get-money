@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
@@ -28,6 +29,7 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
         order.strategy,
         all_state(db),
         json.loads(config.params or "{}") if config else None,
+        interval=order.interval,
     )
     step, created = interval_ms(order.interval), dt_ms(order.created_at)
     key = f"order_cursor:{order.id}"
@@ -58,6 +60,17 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
                 build_features(segment)["atr_pct"] * segment["close"]
             )
     side = 1 if order.side == "LONG" else -1
+    # 强回调的 EMA9 失守软出场：用上一根收盘与上一根 EMA9 判定，本根开盘平仓（与回测同口径）
+    ema9_prev = pd.Series(np.nan, index=frame.index)
+    if params.get("ema_exit"):
+        ema9 = pd.Series(np.nan, index=frame.index)
+        for _, segment in frame.groupby(groups):
+            if len(segment) >= 30:
+                ema9.loc[segment.index] = (
+                    segment["close"].ewm(span=9, adjust=False).mean()
+                )
+        ema9_prev = ema9.shift(1)
+    close_prev = frame["close"].shift(1)
     # live 订单的固定止损止盈由交易所侧保护单执行，本地不做K线止损回放，
     # 否则会在交易所已触发后重复平仓造成不一致；本地只保留移动止损/超时/信号反转。
     replay_stops = order.source != "live"
@@ -73,6 +86,11 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
                 hit = (row.open, "data_gap")
         if hit is None and params["max_hold_bars"] > 0 and held_bars >= params["max_hold_bars"]:
             hit = (row.open, "time_stop")
+        if hit is None and params.get("ema_exit") and side == 1:
+            previous_ema9 = ema9_prev.loc[row.Index]
+            previous_close = close_prev.loc[row.Index]
+            if pd.notna(previous_ema9) and previous_close < previous_ema9:
+                hit = (row.open, "ema_exit")
         if hit is None and replay_stops:
             hit = stop_exit(
                 side, row.open, row.high, row.low, order.sl or 0.0, order.tp or 0.0

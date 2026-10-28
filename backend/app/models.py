@@ -56,6 +56,26 @@ class FundingRate(Base):
     rate_type = Column(String(16), default="")
 
 
+class Sentiment(Base):
+    """正交衍生品情绪时序（P9）：持仓量 + 多空比 + 主动买卖比，全部免 Key 公开接口。
+
+    数据源 /futures/data/* 端点仅保留最近 ~30 天 1h 历史（500 条上限），
+    因此定位是横截面 IC 探针与近期特征，不做长历史 walk-forward。
+    """
+
+    __tablename__ = "sentiment"
+    __table_args__ = (UniqueConstraint("symbol", "ts", name="uq_sentiment"),)
+
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String(24), nullable=False, index=True)
+    ts = Column(BigInteger, nullable=False, index=True)
+    open_interest = Column(Float, default=0.0)      # 未平仓量（张数）
+    oi_value = Column(Float, default=0.0)            # 未平仓名义价值 USD
+    long_short_ratio = Column(Float, default=0.0)    # 全市场多空账户比（散户情绪）
+    top_long_short = Column(Float, default=0.0)      # 大户持仓多空比（聪明钱）
+    taker_buy_sell = Column(Float, default=0.0)      # taker 主动买卖量比（订单流方向）
+
+
 class StrategyConfig(Base):
     __tablename__ = "strategy_configs"
 

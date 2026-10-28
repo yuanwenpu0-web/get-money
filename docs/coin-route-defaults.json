@@ -1,0 +1,96 @@
+{
+  "coin_types": {
+    "BTCUSDT": "L1",
+    "ETHUSDT": "L1",
+    "BNBUSDT": "L1",
+    "SOLUSDT": "L1",
+    "XRPUSDT": "L1",
+    "ADAUSDT": "L1",
+    "AVAXUSDT": "L1",
+    "DOTUSDT": "L1",
+    "LINKUSDT": "L1",
+    "LTCUSDT": "L1",
+    "BCHUSDT": "L1",
+    "XLMUSDT": "L1",
+    "DOGEUSDT": "Meme",
+    "ARBUSDT": "L2",
+    "OPUSDT": "L2",
+    "BASEUSDT": "L2",
+    "ERAUSDT": "L2",
+    "STRKUSDT": "L2",
+    "TIAUSDT": "L2",
+    "UNIUSDT": "DeFi",
+    "AAVEUSDT": "DeFi",
+    "INJUSDT": "DeFi",
+    "HUMAUSDT": "DeFi",
+    "JCTUSDT": "DeFi",
+    "WLDUSDT": "DeFi",
+    "ENAUSDT": "DeFi",
+    "QNTUSDT": "DeFi",
+    "FILUSDT": "DeFi",
+    "TRUMPUSDT": "Meme",
+    "BULLAUSDT": "Meme",
+    "DOODUSDT": "Meme",
+    "QUSDT": "Alt",
+    "CAPUSDT": "Alt",
+    "PUMPUSDT": "Alt",
+    "BANKUSDT": "Alt",
+    "CHIPUSDT": "Alt",
+    "IRYSUSDT": "Alt",
+    "AINUSDT": "Alt",
+    "BRUSDT": "Alt",
+    "DOSUSDT": "Alt",
+    "LITUSDT": "Alt",
+    "NILUSDT": "Alt",
+    "ORDERUSDT": "Alt",
+    "KATUSDT": "Alt",
+    "PENGUUSDT": "Meme",
+    "AGTUSDT": "Alt",
+    "ASTERUSDT": "Alt",
+    "APRUSDT": "Alt",
+    "ARIAUSDT": "Alt",
+    "ZROUSDT": "Alt",
+    "TAGUSDT": "Alt",
+    "ONDOUSDT": "Alt",
+    "BEATUSDT": "Alt",
+    "SOONUSDT": "Meme",
+    "XMRUSDT": "Privacy",
+    "DASHUSDT": "Privacy",
+    "PAXGUSDT": "Commodity",
+    "XAUTUSDT": "Commodity",
+    "TAOUSDT": "AI",
+    "SUIUSDT": "L1",
+    "APTUSDT": "L1",
+    "NEARUSDT": "L1"
+  },
+  "type_routes": {},
+  "symbol_routes": {
+    "ARIAUSDT": {
+      "strategy": "mtf_resonance",
+      "evidence": "8wf 56coin: train=+0.92%, holdout=+0.61% (pos≥3); Alt 族首选"
+    },
+    "QNTUSDT": {
+      "strategy": "mtf_resonance",
+      "evidence": "8wf 56coin: train=+0.72%, holdout=+1.53% (pos≥3); DeFi"
+    },
+    "JCTUSDT": {
+      "strategy": "mtf_resonance",
+      "evidence": "8wf 56coin: train=+0.05%, holdout=+4.37% (pos≥3); DeFi"
+    },
+    "BRUSDT": {
+      "strategy": "trend_follow",
+      "evidence": "8wf 56coin: train=+0.40%, holdout=+1.49% (pos≥3); Alt"
+    },
+    "SOLUSDT": {
+      "strategy": "strong_pullback",
+      "evidence": "8wf 56coin: train=+0.55%, holdout=+1.49% (pos≥3); L1"
+    }
+  },
+  "blacklist": [
+    "BANKUSDT",
+    "IRYSUSDT",
+    "KATUSDT",
+    "PAXGUSDT",
+    "XAUTUSDT"
+  ]
+}

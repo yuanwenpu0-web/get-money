@@ -91,7 +91,7 @@ def model_dict(record: ModelRecord, include_path: bool = False) -> dict:
     return result
 
 
-def backtest_dict(run: BacktestRun, full: bool = False) -> dict:
+def backtest_dict(run: BacktestRun, full: bool = False, include_trades: bool = True) -> dict:
     def _load(raw: str, default):
         try:
             return json.loads(raw or "null") or default
@@ -112,5 +112,6 @@ def backtest_dict(run: BacktestRun, full: bool = False) -> dict:
     if full:
         result["params"] = _load(run.params, {})
         result["equity_curve"] = _load(run.equity_curve, [])
-        result["trades"] = _load(run.trades, [])
+        if include_trades:
+            result["trades"] = _load(run.trades, [])
     return result

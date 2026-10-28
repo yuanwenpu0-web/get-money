@@ -1,0 +1,228 @@
+{
+  "generated_at": "2026-10-26T17:22:56.286816+00:00",
+  "interval": "1h",
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "interval": "1h",
+      "aggregated_rows": 2190,
+      "native_rows": 9621,
+      "excluded_native_tail": 1,
+      "overlap_rows": 2184,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 8.12911061881698e-16,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 8.109169210429452e-16,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    },
+    {
+      "symbol": "ETHUSDT",
+      "interval": "1h",
+      "aggregated_rows": 2169,
+      "native_rows": 9621,
+      "excluded_native_tail": 1,
+      "overlap_rows": 2163,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 8.594128731530252e-16,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 7.930990961250144e-16,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "interval": "1h",
+      "aggregated_rows": 2163,
+      "native_rows": 9621,
+      "excluded_native_tail": 1,
+      "overlap_rows": 2157,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 1.001914240119807e-15,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    },
+    {
+      "symbol": "SOLUSDT",
+      "interval": "1h",
+      "aggregated_rows": 173,
+      "native_rows": 9621,
+      "excluded_native_tail": 1,
+      "overlap_rows": 167,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 7.046646353221521e-16,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 5.96300086727645e-16,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    },
+    {
+      "symbol": "BNBUSDT",
+      "interval": "1h",
+      "aggregated_rows": 2159,
+      "native_rows": 4800,
+      "excluded_native_tail": 1,
+      "overlap_rows": 2135,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 8.160339279839605e-16,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 8.128077082703509e-16,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "interval": "1h",
+      "aggregated_rows": 2163,
+      "native_rows": 2891,
+      "excluded_native_tail": 1,
+      "overlap_rows": 2157,
+      "fields": {
+        "open": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "high": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "low": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "close": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "volume": {
+          "max_rel_diff": 0.0,
+          "mismatch_rows": 0
+        },
+        "quote_volume": {
+          "max_rel_diff": 7.985478208245469e-16,
+          "mismatch_rows": 0
+        }
+      },
+      "mismatch_rows": 0,
+      "mismatch_ratio": 0.0,
+      "consistent": true
+    }
+  ]
+}

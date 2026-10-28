@@ -7,9 +7,16 @@ import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, 
 const orders = ref([])
 const settings = ref({})
 const loading = ref(false)
+const ordersLoaded = ref(false)
+const ordersError = ref('')
+const settingsLoading = ref(false)
+const settingsError = ref('')
 const filters = reactive({ status: 'OPEN', symbol: '' })
+const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const orderSummary = ref(null)
 let timer = null
 let loadPromise = null
+let settingsPromise = null
 let reloadRequested = false
 let disposed = false
 
@@ -18,6 +25,14 @@ const editForm = reactive({ id: null, side: '', mark: 0, sl: 0, tp: 0 })
 const editSaving = ref(false)
 
 const summary = computed(() => {
+  if (orderSummary.value) {
+    return {
+      open: Number(orderSummary.value.open || 0),
+      closed: Number(orderSummary.value.closed || 0),
+      realized: Number(orderSummary.value.realized_pnl || 0),
+      unrealized: Number(orderSummary.value.unrealized_pnl || 0),
+    }
+  }
   const closed = orders.value.filter((row) => row.status === 'CLOSED')
   return {
     open: orders.value.filter((row) => row.status === 'OPEN').length,
@@ -26,6 +41,17 @@ const summary = computed(() => {
     unrealized: orders.value.filter((row) => row.status === 'OPEN').reduce((total, row) => total + Number(row.unrealized_pnl || 0), 0),
   }
 })
+
+function orderParams() {
+  const params = { page: pagination.page, page_size: pagination.pageSize }
+  if (filters.status) params.status = filters.status
+  if (filters.symbol) params.symbol = filters.symbol
+  return params
+}
+
+function isCurrentQuery(params) {
+  return JSON.stringify(params) === JSON.stringify(orderParams())
+}
 
 const symbols = computed(() => {
   const list = new Set(settings.value.symbols || [])
@@ -41,14 +67,25 @@ function load() {
   loadPromise = (async () => {
     do {
       reloadRequested = false
+      const params = orderParams()
       try {
-        const params = { limit: 300 }
-        if (filters.status) params.status = filters.status
-        if (filters.symbol) params.symbol = filters.symbol
         const data = await api.getOrders(params)
-        orders.value = data.orders || []
+        if (!disposed && isCurrentQuery(params)) {
+          const rows = data.orders || []
+          pagination.total = Number(data.total ?? rows.length)
+          const lastPage = Math.max(1, Math.ceil(pagination.total / pagination.pageSize))
+          if (pagination.page > lastPage) {
+            pagination.page = lastPage
+            reloadRequested = true
+            continue
+          }
+          orders.value = rows
+          orderSummary.value = data.summary || null
+          ordersLoaded.value = true
+          ordersError.value = ''
+        }
       } catch (error) {
-        ElMessage.error(error.message)
+        if (!disposed && isCurrentQuery(params)) ordersError.value = error.message || '加载失败'
       }
     } while (reloadRequested && !disposed)
   })().finally(() => {
@@ -58,12 +95,44 @@ function load() {
   return loadPromise
 }
 
-async function loadSettings() {
-  try {
-    settings.value = await api.getSettings()
-  } catch (error) {
-    /* 忽略 */
-  }
+function changePage(page) {
+  if (page === pagination.page) return Promise.resolve()
+  pagination.page = page
+  return load()
+}
+
+function changePageSize(size) {
+  if (size === pagination.pageSize) return Promise.resolve()
+  pagination.pageSize = size
+  pagination.page = 1
+  return load()
+}
+
+function changeFilters() {
+  pagination.page = 1
+  ordersLoaded.value = false
+  return load()
+}
+
+function loadSettings() {
+  if (disposed) return Promise.resolve()
+  if (settingsPromise) return settingsPromise
+  settingsLoading.value = true
+  settingsPromise = (async () => {
+    try {
+      const data = await api.getSettings()
+      if (!disposed) {
+        settings.value = data
+        settingsError.value = ''
+      }
+    } catch (error) {
+      if (!disposed) settingsError.value = error.message || '加载失败'
+    }
+  })().finally(() => {
+    settingsLoading.value = false
+    settingsPromise = null
+  })
+  return settingsPromise
 }
 
 async function closeOrder(row) {
@@ -84,7 +153,7 @@ async function closeOrder(row) {
 async function reverseOrder(row) {
   try {
     await ElMessageBox.confirm(
-      `先平掉当前 ${sideLabel(row.side)}，再按相反方向开同等保证金仓位？此操作按市价模拟成交。`,
+      `先平掉当前 ${sideLabel(row.side)}，再按相反方向开同等保证金仓位？此操作按市价执行。`,
       '确认反手',
       { type: 'warning', confirmButtonText: '反手', cancelButtonText: '取消' },
     )
@@ -119,9 +188,10 @@ async function saveEdit() {
   }
 }
 
-onMounted(async () => {
-  await Promise.all([loadSettings(), load()])
-  if (!disposed) timer = setInterval(load, 30000)
+onMounted(() => {
+  loadSettings()
+  load()
+  timer = setInterval(load, 30000)
 })
 onBeforeUnmount(() => {
   disposed = true
@@ -130,34 +200,42 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-loading="loading">
+  <div>
     <div class="grid stats-grid" style="margin-bottom: 14px">
-      <div class="stat-card"><div class="stat-label">持仓中</div><div class="stat-value">{{ summary.open }}</div><div class="stat-sub">最多每币种 1 单</div></div>
-      <div class="stat-card"><div class="stat-label">当前筛选已平仓</div><div class="stat-value">{{ summary.closed }}</div><div class="stat-sub">含止损 / 止盈 / 信号反转</div></div>
-      <div class="stat-card"><div class="stat-label">已实现盈亏</div><div class="stat-value" :class="pnlClass(summary.realized)">{{ money(summary.realized) }}</div><div class="stat-sub">已扣手续费</div></div>
-      <div class="stat-card"><div class="stat-label">未实现盈亏</div><div class="stat-value" :class="pnlClass(summary.unrealized)">{{ money(summary.unrealized) }}</div><div class="stat-sub">按最新标记价</div></div>
+      <div class="stat-card"><div class="stat-label">当前筛选持仓</div><div class="stat-value">{{ ordersLoaded ? summary.open : '—' }}</div><div class="stat-sub">符合筛选的全部持仓</div></div>
+      <div class="stat-card"><div class="stat-label">当前筛选已平仓</div><div class="stat-value">{{ ordersLoaded ? summary.closed : '—' }}</div><div class="stat-sub">含止损 / 止盈 / 信号反转</div></div>
+      <div class="stat-card"><div class="stat-label">已实现盈亏</div><div class="stat-value" :class="pnlClass(summary.realized)">{{ ordersLoaded ? money(summary.realized) : '—' }}</div><div class="stat-sub">全部匹配订单，已扣手续费</div></div>
+      <div class="stat-card"><div class="stat-label">未实现盈亏</div><div class="stat-value" :class="pnlClass(summary.unrealized)">{{ ordersLoaded ? money(summary.unrealized) : '—' }}</div><div class="stat-sub">全部匹配持仓，按标记价</div></div>
     </div>
 
     <div class="panel">
       <div class="panel-head">
         <div>
           <div class="panel-title">订单列表</div>
-          <div class="panel-sub">修改止损止盈后由巡检任务继续监控</div>
+          <div class="panel-sub">{{ loading ? '订单加载中…' : '修改止损止盈后由巡检任务继续监控' }}</div>
         </div>
         <div class="row">
-          <el-select v-model="filters.status" size="small" style="width: 130px" @change="load">
+          <el-select v-model="filters.status" size="small" style="width: 130px" @change="changeFilters">
             <el-option label="持仓中" value="OPEN" />
             <el-option label="已平仓" value="CLOSED" />
             <el-option label="全部" value="" />
           </el-select>
-          <el-select v-model="filters.symbol" size="small" clearable placeholder="全部币种" style="width: 130px" @change="load">
+          <el-select v-model="filters.symbol" :loading="settingsLoading" size="small" clearable placeholder="全部币种" style="width: 130px" @change="changeFilters">
             <el-option v-for="symbol in symbols" :key="symbol" :label="symbol" :value="symbol" />
           </el-select>
           <el-button size="small" @click="load">刷新</el-button>
         </div>
       </div>
 
-      <el-table :data="orders" class="table-compact" empty-text="暂无订单">
+      <div v-if="ordersError" class="muted" role="alert" style="margin-bottom: 10px">
+        <span class="down">订单加载失败：{{ ordersError }}</span>
+        <el-button size="small" text type="primary" @click="load">重试</el-button>
+      </div>
+      <div v-if="settingsError" class="muted" role="alert" style="margin-bottom: 10px">
+        币种配置加载失败，仍可查看订单。
+        <el-button size="small" text type="primary" @click="loadSettings">重试</el-button>
+      </div>
+      <el-table v-loading="loading" :data="orders" class="table-compact" :empty-text="loading ? '订单加载中…' : ordersError ? '订单加载失败' : '暂无订单'">
         <el-table-column prop="id" label="#" width="56" />
         <el-table-column prop="symbol" label="币种" width="96" />
         <el-table-column label="方向" width="76">
@@ -204,14 +282,25 @@ onBeforeUnmount(() => {
         <el-table-column label="操作" width="190" fixed="right">
           <template #default="{ row }">
             <template v-if="row.status === 'OPEN'">
-              <el-button size="small" link type="primary" @click="openEdit(row)">改止损止盈</el-button>
-              <el-button size="small" link type="warning" @click="reverseOrder(row)">反手</el-button>
-              <el-button size="small" link type="danger" @click="closeOrder(row)">平仓</el-button>
+              <el-button size="small" link type="primary" :disabled="loading" @click="openEdit(row)">改止损止盈</el-button>
+              <el-button size="small" link type="warning" :disabled="loading" @click="reverseOrder(row)">反手</el-button>
+              <el-button size="small" link type="danger" :disabled="loading" @click="closeOrder(row)">平仓</el-button>
             </template>
             <span v-else class="muted">—</span>
           </template>
         </el-table-column>
       </el-table>
+      <div class="table-pagination">
+        <el-pagination
+          :current-page="pagination.page"
+          :page-size="pagination.pageSize"
+          :total="pagination.total"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="changePage"
+          @size-change="changePageSize"
+        />
+      </div>
     </div>
 
     <el-dialog v-model="editVisible" title="调整止损止盈" width="420px">

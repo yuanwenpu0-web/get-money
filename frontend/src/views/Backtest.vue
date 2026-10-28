@@ -13,7 +13,24 @@ const activeRun = ref(null)
 const result = ref(null)
 const running = ref(false)
 const loadingHistory = ref(false)
+const settingsLoading = ref(false)
+const settingsReady = ref(false)
+const settingsError = ref('')
+const historyError = ref('')
+const loadingRun = ref(false)
+const resultError = ref('')
+const historyPagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const tradeRows = ref([])
+const tradePagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const loadingTrades = ref(false)
+const tradesError = ref('')
 let pollTimer = null
+let disposed = false
+let runRequest = 0
+let historyRequest = 0
+let tradeRequest = 0
+let selectedTradeRunId = null
+const touchedFields = new Set()
 
 const form = reactive({
   symbol: 'BTCUSDT',
@@ -30,7 +47,7 @@ const form = reactive({
 
 const metrics = computed(() => result.value?.metrics || {})
 const equityCurve = computed(() => result.value?.equity_curve || [])
-const trades = computed(() => result.value?.trades || [])
+const trades = computed(() => tradeRows.value)
 const comparison = computed(() => metrics.value.baseline ? [
   { name: '基础信号（相同风控与成本）', ...metrics.value.baseline },
   { name: '优化策略（样本外）', ...metrics.value },
@@ -96,59 +113,160 @@ function shortTime(value) {
   return date.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
-async function loadBase() {
+function touchField(field) {
+  touchedFields.add(field)
+}
+
+async function loadSettings() {
+  if (disposed) return
+  settingsLoading.value = true
+  settingsError.value = ''
   try {
     const config = await api.getSettings()
+    if (disposed) return
     settings.value = config
-    form.symbol = config.symbols?.[0] || 'BTCUSDT'
-    form.interval = config.interval || '1m'
-    form.fee_pct = Number(((config.fee_rate ?? 0.0004) * 100).toFixed(4))
-    form.slippage_pct = Number(((config.slippage ?? 0.0002) * 100).toFixed(4))
+    if (!touchedFields.has('symbol')) form.symbol = config.symbols?.[0] || 'BTCUSDT'
+    if (!touchedFields.has('interval')) form.interval = config.interval || '1m'
+    if (!touchedFields.has('fee_pct')) form.fee_pct = Number(((config.fee_rate ?? 0.0004) * 100).toFixed(4))
+    if (!touchedFields.has('slippage_pct')) form.slippage_pct = Number(((config.slippage ?? 0.0002) * 100).toFixed(4))
+    settingsReady.value = true
   } catch (error) {
-    ElMessage.error(error.message)
+    if (!disposed) settingsError.value = error.message
+  } finally {
+    if (!disposed) settingsLoading.value = false
   }
-  await loadHistory()
+}
+
+function loadBase() {
+  return Promise.allSettled([loadSettings(), loadHistory()])
 }
 
 async function loadHistory() {
+  if (disposed) return
+  const request = ++historyRequest
   loadingHistory.value = true
+  historyError.value = ''
+  const page = historyPagination.page
+  const pageSize = historyPagination.pageSize
   try {
-    const data = await api.listBacktests()
+    const data = await api.listBacktests({ page, page_size: pageSize })
+    if (disposed || request !== historyRequest) return
+    const total = Number(data.total ?? data.backtests?.length ?? 0)
+    historyPagination.total = total
+    const lastPage = Math.max(1, Math.ceil(total / pageSize))
+    if (page > lastPage) {
+      historyPagination.page = lastPage
+      return await loadHistory()
+    }
     history.value = data.backtests || []
   } catch (error) {
-    ElMessage.error(error.message)
+    if (!disposed && request === historyRequest) historyError.value = error.message
   } finally {
-    loadingHistory.value = false
+    if (!disposed && request === historyRequest) loadingHistory.value = false
   }
 }
 
-async function poll(runId) {
+function changeHistoryPage(page) {
+  if (page === historyPagination.page) return
+  historyPagination.page = page
+  return loadHistory()
+}
+
+function changeHistorySize(pageSize) {
+  if (pageSize === historyPagination.pageSize) return
+  historyPagination.pageSize = pageSize
+  historyPagination.page = 1
+  return loadHistory()
+}
+
+function resetTrades(runId = null) {
+  tradeRequest += 1
+  selectedTradeRunId = runId
+  tradeRows.value = []
+  tradePagination.page = 1
+  tradePagination.total = 0
+  loadingTrades.value = false
+  tradesError.value = ''
+}
+
+async function loadTrades() {
+  const runId = selectedTradeRunId
+  if (disposed || runId == null || result.value?.id !== runId || result.value?.status !== 'done') return
+  const request = ++tradeRequest
+  const page = tradePagination.page
+  const pageSize = tradePagination.pageSize
+  loadingTrades.value = true
+  tradesError.value = ''
   try {
-    const data = await api.getBacktest(runId)
+    const data = await api.getBacktestTrades(runId, { page, page_size: pageSize })
+    if (disposed || request !== tradeRequest || selectedTradeRunId !== runId) return
+    const total = Number(data.total ?? data.trades?.length ?? 0)
+    tradePagination.total = total
+    const lastPage = Math.max(1, Math.ceil(total / pageSize))
+    if (page > lastPage) {
+      tradePagination.page = lastPage
+      return await loadTrades()
+    }
+    tradeRows.value = data.trades || []
+  } catch (error) {
+    if (!disposed && request === tradeRequest) tradesError.value = error.message || '成交明细加载失败'
+  } finally {
+    if (!disposed && request === tradeRequest) loadingTrades.value = false
+  }
+}
+
+function changeTradePage(page) {
+  if (page === tradePagination.page) return
+  tradePagination.page = page
+  return loadTrades()
+}
+
+function changeTradeSize(pageSize) {
+  if (pageSize === tradePagination.pageSize) return
+  tradePagination.pageSize = pageSize
+  tradePagination.page = 1
+  return loadTrades()
+}
+
+async function poll(runId, request = runRequest) {
+  if (disposed || request !== runRequest) return
+  try {
+    const data = await api.getBacktest(runId, { include_trades: false })
+    if (disposed || request !== runRequest) return
     activeRun.value = data
     if (data.status === 'done') {
       result.value = data
       running.value = false
+      resetTrades(runId)
+      loadTrades()
       ElMessage.success('回测完成')
-      await loadHistory()
+      loadHistory()
       return
     }
     if (data.status === 'failed') {
       running.value = false
       ElMessage.error(data.error || '回测失败')
-      await loadHistory()
+      loadHistory()
       return
     }
-    pollTimer = setTimeout(() => poll(runId), 1800)
+    pollTimer = setTimeout(() => poll(runId, request), 1800)
   } catch (error) {
+    if (disposed || request !== runRequest) return
     running.value = false
+    resultError.value = error.message
     ElMessage.error(error.message)
   }
 }
 
 async function submit() {
+  if (disposed || !settingsReady.value || running.value) return
+  const request = ++runRequest
+  if (pollTimer) clearTimeout(pollTimer)
+  loadingRun.value = false
   running.value = true
   result.value = null
+  resultError.value = ''
+  resetTrades()
   try {
     const payload = {
       symbol: form.symbol,
@@ -163,26 +281,44 @@ async function submit() {
       optimize: form.optimize,
     }
     const created = await api.createBacktest(payload)
+    if (disposed || request !== runRequest) return
     activeRun.value = { id: created.id, status: 'running' }
-    poll(created.id)
+    poll(created.id, request)
   } catch (error) {
+    if (disposed || request !== runRequest) return
     running.value = false
     ElMessage.error(error.message)
   }
 }
 
 async function loadRun(row) {
+  if (disposed) return
+  const request = ++runRequest
+  if (pollTimer) clearTimeout(pollTimer)
+  loadingRun.value = true
+  running.value = false
+  resultError.value = ''
+  resetTrades(row.id)
   try {
-    result.value = await api.getBacktest(row.id)
-    activeRun.value = result.value
+    const data = await api.getBacktest(row.id, { include_trades: false })
+    if (disposed || request !== runRequest) return
+    result.value = data
+    activeRun.value = data
+    if (data.status === 'done') loadTrades()
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch (error) {
-    ElMessage.error(error.message)
+    if (!disposed && request === runRequest) resultError.value = error.message
+  } finally {
+    if (!disposed && request === runRequest) loadingRun.value = false
   }
 }
 
 onMounted(loadBase)
 onBeforeUnmount(() => {
+  disposed = true
+  runRequest += 1
+  historyRequest += 1
+  tradeRequest += 1
   if (pollTimer) clearTimeout(pollTimer)
 })
 </script>
@@ -198,16 +334,21 @@ onBeforeUnmount(() => {
         <el-tag size="small" effect="plain" type="info">统一顺序撮合</el-tag>
       </div>
 
+      <div v-if="settingsLoading" class="muted" role="status">正在加载回测设置，回测历史可独立查看…</div>
+      <div v-else-if="settingsError" class="form-hint" role="alert">
+        回测设置加载失败：{{ settingsError }}
+        <el-button size="small" text @click="loadSettings">重试</el-button>
+      </div>
       <div class="form-grid">
         <div>
           <div class="muted" style="margin-bottom: 4px">币种</div>
-          <el-select v-model="form.symbol" style="width: 100%">
+          <el-select v-model="form.symbol" style="width: 100%" @change="touchField('symbol')">
             <el-option v-for="symbol in settings.symbols || ['BTCUSDT', 'ETHUSDT']" :key="symbol" :label="symbol" :value="symbol" />
           </el-select>
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">K线周期</div>
-          <el-select v-model="form.interval" style="width: 100%">
+          <el-select v-model="form.interval" style="width: 100%" @change="touchField('interval')">
             <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
           </el-select>
         </div>
@@ -217,6 +358,7 @@ onBeforeUnmount(() => {
             <el-option label="ML 趋势共振" value="ml_ensemble" />
             <el-option label="SuperTrend 趋势跟随" value="trend_follow" />
             <el-option label="RSI 均值回归" value="mean_reversion" />
+            <el-option label="Martin Luk 强势回调" value="strong_pullback" />
           </el-select>
         </div>
         <div>
@@ -237,11 +379,11 @@ onBeforeUnmount(() => {
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">手续费（单边 %）</div>
-          <el-input-number v-model="form.fee_pct" :min="0" :max="1" :step="0.01" :precision="4" style="width: 100%" />
+          <el-input-number v-model="form.fee_pct" :min="0" :max="1" :step="0.01" :precision="4" style="width: 100%" @change="touchField('fee_pct')" />
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">滑点（单边 %）</div>
-          <el-input-number v-model="form.slippage_pct" :min="0" :max="1" :step="0.01" :precision="4" style="width: 100%" />
+          <el-input-number v-model="form.slippage_pct" :min="0" :max="1" :step="0.01" :precision="4" style="width: 100%" @change="touchField('slippage_pct')" />
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">开仓评分阈值（留空使用策略配置）</div>
@@ -251,12 +393,14 @@ onBeforeUnmount(() => {
 
       <div class="row" style="margin-top: 14px">
         <el-switch v-model="form.optimize" active-text="验证集选参" />
-        <el-button type="primary" :loading="running" @click="submit">开始回测</el-button>
+        <el-button type="primary" :loading="running" :disabled="!settingsReady" @click="submit">开始回测</el-button>
         <span class="muted" v-if="running">回测在后台运行，通常需要数秒到一分钟</span>
         <span class="muted" v-else>{{ form.optimize ? '前 60% 训练、15% 验证选参、后 25% 测试；边界隔离预测跨度' : '前 75% 训练、后 25% 测试；边界隔离预测跨度' }}</span>
       </div>
     </div>
 
+    <div v-if="loadingRun" class="panel section-gap muted" role="status">正在加载回测结果，参数与历史列表仍可查看…</div>
+    <div v-if="resultError" class="panel section-gap" role="alert">回测结果加载失败：{{ resultError }}，可点击历史记录重试。</div>
     <template v-if="result">
       <div class="grid stats-grid backtest-stats">
         <StatCard label="总收益" :value="pct(metrics.total_return_pct)" :tone="pnlClass(metrics.total_return_pct)" :sub="`${money(metrics.initial_cash)} → ${money(metrics.final_equity)}`" />
@@ -324,10 +468,15 @@ onBeforeUnmount(() => {
         <div class="panel-head">
           <div>
             <div class="panel-title">成交明细</div>
-            <div class="panel-sub">最多展示 500 笔，含手续费与退出原因</div>
+            <div class="panel-sub">最多保留最近 500 笔，按页加载，含手续费与退出原因</div>
           </div>
+          <el-button size="small" :loading="loadingTrades" @click="loadTrades">刷新</el-button>
         </div>
-        <el-table :data="trades" class="table-compact" max-height="420" empty-text="无成交">
+        <div v-if="tradesError" class="form-hint" role="alert">
+          成交明细加载失败：{{ tradesError }}
+          <el-button size="small" text @click="loadTrades">重试</el-button>
+        </div>
+        <el-table v-loading="loadingTrades" :data="trades" class="table-compact" max-height="420" :empty-text="loadingTrades ? '正在加载成交明细…' : tradesError ? '成交明细加载失败' : '无成交'">
           <el-table-column label="开仓" min-width="140"><template #default="{ row }">{{ tsLabel(row.entry_time) }}</template></el-table-column>
           <el-table-column label="平仓" min-width="140"><template #default="{ row }">{{ tsLabel(row.exit_time) }}</template></el-table-column>
           <el-table-column prop="side" label="方向" width="80" />
@@ -338,6 +487,16 @@ onBeforeUnmount(() => {
           <el-table-column label="手续费" width="90"><template #default="{ row }"><span class="mono">{{ money(row.fees) }}</span></template></el-table-column>
           <el-table-column prop="status" label="退出" min-width="100" />
         </el-table>
+        <el-pagination
+          class="table-pagination"
+          :current-page="tradePagination.page"
+          :page-size="tradePagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="tradePagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="changeTradePage"
+          @size-change="changeTradeSize"
+        />
       </div>
     </template>
 
@@ -349,7 +508,11 @@ onBeforeUnmount(() => {
         </div>
         <el-button size="small" :loading="loadingHistory" @click="loadHistory">刷新</el-button>
       </div>
-      <el-table :data="history" class="table-compact" empty-text="暂无回测记录" @row-click="loadRun">
+      <div v-if="historyError" class="form-hint" role="alert">
+        回测历史加载失败：{{ historyError }}
+        <el-button size="small" text @click="loadHistory">重试</el-button>
+      </div>
+      <el-table :data="history" class="table-compact" :empty-text="loadingHistory ? '正在加载回测历史…' : '暂无回测记录'" @row-click="loadRun">
         <el-table-column prop="id" label="#" width="56" />
         <el-table-column prop="symbol" label="币种" width="96" />
         <el-table-column prop="interval" label="周期" width="70" />
@@ -371,6 +534,16 @@ onBeforeUnmount(() => {
         <el-table-column label="交易数" width="80"><template #default="{ row }">{{ row.metrics?.total_trades ?? '—' }}</template></el-table-column>
         <el-table-column label="创建时间" min-width="150"><template #default="{ row }">{{ tsLabel(row.created_at) }}</template></el-table-column>
       </el-table>
+      <el-pagination
+        class="table-pagination"
+        :current-page="historyPagination.page"
+        :page-size="historyPagination.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="historyPagination.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="changeHistoryPage"
+        @size-change="changeHistorySize"
+      />
     </div>
   </div>
 </template>

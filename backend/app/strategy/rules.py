@@ -9,6 +9,8 @@ import pandas as pd
 
 from ..config import DEFAULT_STATE
 from ..features.funding import FUNDING_FILTER_Z
+from ..features.pullback import PULLBACK_COLUMNS, add_pullback_context
+from ..utils import interval_ms
 
 RULE_DEFAULTS = {
     "regime_filter": True,
@@ -24,6 +26,12 @@ RULE_DEFAULTS = {
     "trailing_enabled": True,
     "trail_activation_atr": 1.5,
     "max_signal_age_bars": 2,
+    # 软出场：信号帧带 exit_long 时由共享撮合在下一根开盘平多（仅强回调用）
+    "ema_exit": False,
+    # 浮盈达标先按比例落袋（0=禁用）：剩余仓位止损移到保本价、取消固定目标，
+    # 交给追踪止损与软出场跑完（仅强回调默认开启，2R 减半）
+    "partial_tp_r": 0.0,
+    "partial_tp_frac": 0.5,
 }
 STRATEGY_PARAMS = {
     "trend_follow": {"adx_filter": 22.0},
@@ -31,6 +39,30 @@ STRATEGY_PARAMS = {
     "ml_ensemble": {"ml_weight": 0.6, "adx_filter": 20.0},
     "funding_extreme": {"z_threshold": 2.0, "max_adx": 25.0},
     "mtf_resonance": {"adx_filter": 22.0, "htf_adx_filter": 20.0},
+    # Martin Luk 强势回调（本地适配）：4h 强势趋势 → 15m 首次回调 EMA9/AVWAP → 转强确认。
+    # 只做多、1 倍杠杆；单笔风险 0.5%，名义仓位上限 35%（max_leverage=1 时仓位比例即名义比例）。
+    # 出场：EMA9 失守软出场 + 结构硬止损 + 最长 48 小时 + 10R 固定目标（原版规格）。
+    # 注：partial_tp_r=0.0 默认禁用分段落袋；A/B 验证（36 币×4 窗口，持仓 2155+）证明
+    #   2R 减半出场并未改善期望值（partial vs fixed 差中位数 = 0，两者 CI 全负，
+    #   根因是入场过滤器本身无 edge，非出场结构）。partial_tp_r > 0 的功能代码保留
+    #   供将来入场优化后重试。
+    "strong_pullback": {
+        "htf_adx_filter": 22.0,
+        "pullback_min_bars": 8,
+        "pullback_confirm_bars": 8,
+        "max_leverage": 1,
+        "max_position_pct": 0.35,
+        "risk_per_trade_pct": 0.005,
+        "sl_atr_mult": 1.5,
+        "target_r": 10.0,
+        "partial_tp_r": 0.0,
+        "partial_tp_frac": 0.5,
+        "stop_buffer_pct": 0.0015,
+        "max_hold_hours": 48.0,
+        "max_hold_bars": 192,  # 15m 下的 48 小时；其他周期由 resolve_params(interval=) 换算
+        "min_hold_bars": 0,
+        "ema_exit": True,
+    },
 }
 SHARED_KEYS = (
     "min_score",
@@ -50,7 +82,14 @@ SHARED_KEYS = (
 )
 
 
-def resolve_params(code: str, state: dict, overrides: dict | None = None) -> dict:
+def resolve_params(
+    code: str, state: dict, overrides: dict | None = None, interval: str | None = None
+) -> dict:
+    """合并全局设置、策略参数与调用方覆盖值。
+
+    interval 非空时把「最长持仓小时数」换算成该周期的 bar 数（强回调的 48 小时硬约束），
+    这样同一套参数在 15m / 1h / 4h 上都表示同样的墙钟时长。
+    """
     if code not in STRATEGY_PARAMS:
         raise ValueError(f"未知策略: {code}")
     params = {key: state.get(key, DEFAULT_STATE[key]) for key in SHARED_KEYS}
@@ -67,6 +106,9 @@ def resolve_params(code: str, state: dict, overrides: dict | None = None) -> dic
         if unknown:
             raise ValueError(f"未知策略参数: {', '.join(sorted(unknown))}")
         params.update(overrides)
+    if interval is not None and "max_hold_hours" in params:
+        hours = float(params["max_hold_hours"])
+        params["max_hold_bars"] = max(1, int(round(hours * 3_600_000 / interval_ms(interval))))
     ranges = {
         "min_score": (0.5, 1),
         "heavy_score": (0.5, 1),
@@ -98,9 +140,19 @@ def resolve_params(code: str, state: dict, overrides: dict | None = None) -> dic
         "rsi_low": (1, 49),
         "rsi_high": (51, 99),
         "ml_weight": (0, 1),
+        "target_r": (1, 50),
+        "partial_tp_r": (0, 50),
+        "partial_tp_frac": (0.05, 0.95),
+        "stop_buffer_pct": (0, 0.05),
+        "max_hold_hours": (0.5, 240),
+        "pullback_min_bars": (0, 200),
+        "pullback_confirm_bars": (1, 200),
     }
     for key, value in params.items():
-        if key in ("regime_filter", "cost_filter", "require_model", "trailing_enabled", "funding_filter"):
+        if key in (
+            "regime_filter", "cost_filter", "require_model", "trailing_enabled",
+            "funding_filter", "ema_exit",
+        ):
             if not isinstance(value, bool):
                 raise ValueError(f"{key} 必须是布尔值")
         else:
@@ -131,6 +183,9 @@ def evaluate_signals(
     market_context 预留给多源指标加权消费（迭代 7 起采集+存储+观测）。当前默认 None，
     且即便传入也不改变任何方向/仓位计算——保证 metrics_assist_enabled 关闭时行为与历史一致。
     """
+    if code == "strong_pullback" and not set(PULLBACK_COLUMNS).issubset(data.columns):
+        # 实盘只传末根已富化帧；回测/训练传整帧，这里补算 4h 上下文与回调状态机（纯因果）
+        data = add_pullback_context(data, params)
 
     def column(name):
         return pd.to_numeric(
@@ -190,6 +245,15 @@ def evaluate_signals(
             index=data.index,
         ).fillna(0.0)
         probability = 0.5 + signed / 2
+    elif code == "strong_pullback":
+        # 只做多：4h 强势趋势下的首次回调转强确认。评分 = 4h 趋势强度（ADX 超出阈值的幅度），
+        # 让 min_score 真正参与筛选，而不是一律满分。
+        htf_strength = (
+            (column("pb_adx_4h") - params["htf_adx_filter"]) / 15.0
+        ).clip(lower=0.0, upper=1.0).fillna(0.0)
+        confirmed = column("pb_confirm").fillna(0).gt(0)
+        signed = (0.25 + 0.75 * htf_strength).where(confirmed, 0.0)
+        probability = 0.5 + signed / 2
     elif code == "ml_ensemble":
         ml = (
             (prob_up.reindex(data.index) - 0.5) * 2
@@ -229,6 +293,15 @@ def evaluate_signals(
     )
     if code == "funding_extreme":
         block(column("funding_available").ne(1), "funding_data_missing")
+    if code == "strong_pullback":
+        # 门控顺序即「先失败先记」：4h 趋势 → 是否出现首次回调 → 是否转强确认 → 结构位置
+        trend_ok = column("pb_trend_ok").fillna(0).gt(0)
+        bars_since = column("pb_bars_since_touch")
+        confirmed = column("pb_confirm").fillna(0).gt(0)
+        block(~trend_ok, "htf_trend_weak")
+        block(trend_ok & bars_since.isna(), "no_pullback")
+        block(trend_ok & bars_since.notna() & ~confirmed, "no_confirmation")
+        block(confirmed & column("close").lt(column("avwap")), "below_avwap")
     block(score.lt(params["min_score"]) | side.eq(0), "below_threshold")
     block(atr.gt(params["max_atr_pct"]), "excess_volatility")
     if params["funding_filter"]:
@@ -257,6 +330,9 @@ def evaluate_signals(
         elif code == "funding_extreme":
             # 均值回归语义：仅在震荡市（低 ADX）执行，强趋势时资金费极值可能延续
             block(adx.gt(params["max_adx"]), "trending_market")
+        elif code == "strong_pullback":
+            # 自带 4h 强势趋势 + 回调结构过滤（见上方 block），不套用 1h SuperTrend/EMA 规则
+            pass
         else:
             block(adx.lt(params["adx_filter"]), "weak_trend")
             block(
@@ -272,8 +348,17 @@ def evaluate_signals(
                 )
 
     cost = 2 * (params["fee_rate"] + params["slippage"])
-    sl_pct = (atr * params["sl_atr_mult"]).clip(lower=params["min_sl_pct"])
-    tp_pct = (atr * params["tp_atr_mult"]).clip(lower=params["min_tp_pct"])
+    if code == "strong_pullback":
+        # 硬止损放回调段低点下方（结构止损），并以 ATR 止损兜底；目标 = target_r 倍风险（10R）
+        close = column("close")
+        structure = ((close - column("pb_stop_ref")) / close.replace(0, np.nan)).clip(lower=0.0)
+        sl_pct = pd.concat(
+            [structure + params["stop_buffer_pct"], atr * params["sl_atr_mult"]], axis=1
+        ).max(axis=1).fillna(atr * params["sl_atr_mult"]).clip(lower=params["min_sl_pct"])
+        tp_pct = (sl_pct * params["target_r"]).clip(lower=params["min_tp_pct"])
+    else:
+        sl_pct = (atr * params["sl_atr_mult"]).clip(lower=params["min_sl_pct"])
+        tp_pct = (atr * params["tp_atr_mult"]).clip(lower=params["min_tp_pct"])
     net_rr = (tp_pct - cost) / (sl_pct + cost)
     if params["cost_filter"]:
         block(
@@ -300,6 +385,11 @@ def evaluate_signals(
     )
     fraction = fraction.where(reason.eq(""), 0.0).fillna(0.0)
     direction = side.where(reason.eq("") & fraction.gt(0), 0).fillna(0).astype(int)
+    exit_long = (
+        column("pb_exit_long").fillna(0).gt(0)
+        if code == "strong_pullback"
+        else pd.Series(False, index=data.index)
+    )
     return pd.DataFrame(
         {
             "signed": signed.fillna(0),
@@ -313,6 +403,8 @@ def evaluate_signals(
             "tp_pct": tp_pct,
             "risk_pct": fraction * leverage * (sl_pct + cost),
             "net_reward_risk": net_rr,
+            # EMA9 失守软出场标记：仅强回调用，其他策略恒 False（共享撮合据此平多）
+            "exit_long": exit_long.astype(int),
         },
         index=data.index,
     )

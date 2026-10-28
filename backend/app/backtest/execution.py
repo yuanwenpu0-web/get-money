@@ -82,6 +82,38 @@ def simulate(
         )
         position = None
 
+    def partial_close(price, timestamp, frac):
+        """浮盈达标先平一部分落袋：现金/数量/保证金/入场费按比例结转，剩余仓位继续持有。"""
+        nonlocal cash
+        p = position
+        fill = price * (1 - p["side"] * slippage)
+        qty = p["qty"] * frac
+        margin = p["margin"] * frac
+        entry_fee = p["entry_fee"] * frac
+        gross = (fill - p["entry"]) * qty * p["side"]
+        exit_fee = fill * qty * fee
+        cash += margin + gross - exit_fee
+        net = gross - entry_fee - exit_fee
+        trades.append(
+            {
+                "entry_time": str(p["time"]),
+                "exit_time": str(timestamp),
+                "side": "long" if p["side"] == 1 else "short",
+                "entry_price": p["entry"],
+                "exit_price": fill,
+                "size": qty,
+                "pnl": net,
+                "return_pct": net / margin * 100,
+                "fees": entry_fee + exit_fee,
+                "status": "partial_tp",
+                "leverage": p["leverage"],
+                "margin": margin,
+            }
+        )
+        p["qty"] -= qty
+        p["margin"] -= margin
+        p["entry_fee"] -= entry_fee
+
     for i, row in enumerate(bars):
         signal = decisions[i - 1] if i else None
         previous = bars[i - 1] if i else None
@@ -97,6 +129,14 @@ def simulate(
                 close_position(row.open, row.Index, "data_gap")
             elif params["max_hold_bars"] > 0 and held >= params["max_hold_bars"]:
                 close_position(row.open, row.Index, "time_stop")
+            elif (
+                params.get("ema_exit")
+                and p["side"] == 1
+                and signal is not None
+                and int(getattr(signal, "exit_long", 0) or 0)
+            ):
+                # 软出场：上一根收盘已失守 EMA9 → 本根开盘平多（与入场同为「收盘信号、次开成交」）
+                close_position(row.open, row.Index, "ema_exit")
             elif held >= params["min_hold_bars"] and signal.direction == -p["side"]:
                 close_position(row.open, row.Index, "signal_reverse")
             exited = position is None
@@ -142,6 +182,8 @@ def simulate(
                         time=row.Index,
                         index=i,
                         leverage=int(signal.leverage),
+                        risk=abs(entry - stop),
+                        partial_done=False,
                     )
 
         if position is not None:
@@ -151,6 +193,22 @@ def simulate(
                 close_position(hit[0], row.Index, hit[1])
                 exited = True
             else:
+                partial_r = float(params.get("partial_tp_r", 0.0))
+                if not p["partial_done"] and partial_r > 0:
+                    partial_price = p["entry"] + p["side"] * partial_r * p["risk"]
+                    if (row.high - partial_price) * p["side"] >= 0:
+                        # 同根 SL/TP 已由上方 stop_exit 先判；到这里才允许落袋。
+                        # 剩余仓位止损移到保本价、取消固定目标，交给追踪止损与软出场跑完。
+                        partial_close(
+                            partial_price, row.Index, float(params.get("partial_tp_frac", 0.5))
+                        )
+                        p["sl"] = (
+                            max(p["sl"], p["entry"])
+                            if p["side"] == 1
+                            else min(p["sl"], p["entry"])
+                        )
+                        p["tp"] = 0.0
+                        p["partial_done"] = True
                 p["sl"] = trailing_stop(
                     p["side"],
                     p["entry"],

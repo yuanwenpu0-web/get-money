@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, defer
 
 from ..db import get_db
 from ..ml import auto_trainer
 from ..ml.trainer import train_model
 from ..models import JobLog, ModelRecord
+from ..pagination import page_metadata
 from ..schemas import TrainRequest
 from ..serializers import model_dict
 
@@ -16,9 +18,17 @@ router = APIRouter(prefix="/models", tags=["models"])
 
 
 @router.get("")
-def list_models(db: Session = Depends(get_db)):
-    rows = db.query(ModelRecord).order_by(ModelRecord.created_at.desc()).limit(100).all()
-    return {"models": [model_dict(row) for row in rows]}
+def list_models(
+    db: Session = Depends(get_db),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+):
+    query = db.query(ModelRecord)
+    total = query.count()
+    rows = (query.options(defer(ModelRecord.path), defer(ModelRecord.features))
+            .order_by(ModelRecord.created_at.desc(), ModelRecord.id.desc())
+            .offset((page - 1) * page_size).limit(page_size).all())
+    return {"models": [model_dict(row) for row in rows], **page_metadata(total, page, page_size)}
 
 
 @router.get("/history")

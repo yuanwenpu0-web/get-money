@@ -13,6 +13,7 @@ from ..market.data_service import MarketDataService
 from ..market.universe import universe_symbols
 from ..models import JobLog, Order, StrategyConfig
 from ..state import all_state
+from ..strategy.coin_router import BLACKLIST as COIN_BLACKLIST, get_coin_type, get_route
 from ..strategy.engine import StrategyEngine
 from ..utils import interval_ms, iso_utc
 from .order_manager import manage_order
@@ -39,6 +40,11 @@ def resolve_symbols(db: Session, state: dict) -> list[str]:
     if state.get("symbol_scope", "all") == "all":
         return universe_symbols(db)
     return list(state.get("symbols") or [])
+
+
+def strategy_interval(code: str, default_interval: str) -> str:
+    """The pullback entry rules use 15m bars; other strategies use the setting."""
+    return "15m" if code == "strong_pullback" else default_interval
 
 
 class TradingService:
@@ -68,6 +74,8 @@ class TradingService:
             # Entry filters and interval changes must not stop updating existing
             # positions: their P&L and protective exits use their own candle series.
             required_intervals = dict.fromkeys(symbols, interval)
+            if "strong_pullback" in codes and interval_ms(interval) < interval_ms("15m"):
+                required_intervals.update(dict.fromkeys(symbols, "15m"))
             for order in open_orders(self.db):
                 existing = required_intervals.get(order.symbol)
                 if existing is None or interval_ms(order.interval) > interval_ms(existing):
@@ -82,20 +90,48 @@ class TradingService:
             synced_at = time.monotonic()
 
             # 每个币种选评分最高的策略信号
+            # --- 币级路由（默认启用；state["use_coin_route"]=False 可关闭）---
+            # 来源：2026-10-27 walk-forward 验证 — 路由层把每窗口均值从 −0.40% 翻到 +0.23%
+            use_route = state.get("use_coin_route", True)
+            # 为每个 symbol 决定要跑哪些策略
+            symbol_strategies: dict[str, list[str]] = {}
+            skipped_route = 0
+            for symbol in symbols:
+                if use_route:
+                    route = get_route(symbol)
+                    is_blacklisted = symbol.upper() in COIN_BLACKLIST
+                    if is_blacklisted:
+                        # 黑名单 → 明确跳过
+                        skipped_route += 1
+                        symbol_strategies[symbol] = []
+                    elif route is not None:
+                        # 有精确/族群路由 → 只跑路由分配的策略
+                        assigned = route["strategy"]
+                        symbol_strategies[symbol] = [assigned] if assigned in codes else []
+                    else:
+                        # 宇宙外（未知）→ fallback 到历史行为（遍历所有 enabled 策略）
+                        symbol_strategies[symbol] = codes
+                else:
+                    symbol_strategies[symbol] = codes
+            if use_route:
+                pass  # 路由详情合并到周期结束的汇总日志（避免额外 JobLog 条目）
+
             best_signals = {}
             strategy_signals = {}
             signal_errors = []
             for symbol in symbols:
-                for code in codes:
+                for code in symbol_strategies.get(symbol, []):
                     try:
-                        signal = engine.evaluate(symbol, interval, code, save=True)
-                        strategy_signals[(symbol, interval, code)] = signal
+                        signal_interval = strategy_interval(code, interval)
+                        signal = engine.evaluate(symbol, signal_interval, code, save=True)
+                        strategy_signals[(symbol, signal_interval, code)] = signal
                         if signal is None or signal.direction == "FLAT":
                             continue
                         current = best_signals.get(symbol)
                         if current is None or signal.score > current.score:
                             best_signals[symbol] = signal
                     except Exception as exc:
+                        self.db.rollback()
                         signal_errors.append(f"{symbol}/{code}: {exc}")
             signaled_at = time.monotonic()
 
@@ -151,6 +187,7 @@ class TradingService:
                 "time": iso_utc(),
                 "symbols": symbols,
                 "symbol_count": len(symbols),
+                "coin_route": {"enabled": use_route, "skipped": skipped_route} if use_route else None,
                 "sync_target_count": sync_target_count,
                 "elapsed_ms": elapsed_ms,
                 "sync_ms": int((synced_at - started) * 1000),
@@ -167,6 +204,7 @@ class TradingService:
             self._log_summary(summary)
             return summary
         except Exception as exc:
+            self.db.rollback()
             self._log("error", f"交易周期异常: {exc}\n{traceback.format_exc(limit=3)}")
             return {"ok": False, "message": str(exc)}
         finally:

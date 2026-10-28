@@ -30,7 +30,8 @@ def test_trend_rejects_chop_and_conflicting_slow_trend():
 
 
 def test_mean_reversion_rejects_falling_trend():
-    params = resolve_params("mean_reversion", {})
+    # 固定开仓阈值，避免与全局默认 min_score 变更耦合（本测试验证策略逻辑本身）
+    params = resolve_params("mean_reversion", {"min_score": 0.5})
     frame = market_row(rsi_14=15, bb_pos=-0.1, adx_14=40)
     assert evaluate_signals(frame, "mean_reversion", params).iloc[0].direction == 0
     frame["adx_14"] = 16

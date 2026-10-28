@@ -1,0 +1,1537 @@
+{
+  "as_of": "2026-10-27T15:20:29+00:00",
+  "fee_rate": 0.0004,
+  "slippage": 0.0002,
+  "groups": {
+    "all": {
+      "count": 20,
+      "pnl": -270.05415,
+      "wins": 8
+    },
+    "reason:stop_loss": {
+      "count": 15,
+      "pnl": -434.054396,
+      "wins": 3
+    },
+    "strategy:ml_ensemble": {
+      "count": 7,
+      "pnl": -173.481065,
+      "wins": 2
+    },
+    "interval:1m": {
+      "count": 7,
+      "pnl": -263.18017000000003,
+      "wins": 1
+    },
+    "strategy:trend_follow": {
+      "count": 13,
+      "pnl": -96.573085,
+      "wins": 6
+    },
+    "interval:1h": {
+      "count": 13,
+      "pnl": -6.873979999999985,
+      "wins": 7
+    },
+    "reason:take_profit": {
+      "count": 5,
+      "pnl": 164.000246,
+      "wins": 5
+    }
+  },
+  "matched_orders": 18,
+  "variants": {
+    "1.5/2.5": {
+      "orders": 18,
+      "pnl": -162.96633732459918,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 18,
+      "censored_at_actual_close": 0
+    },
+    "1/1.5": {
+      "orders": 18,
+      "pnl": -129.60340084581924,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 18,
+      "censored_at_actual_close": 0
+    },
+    "1/2.5": {
+      "orders": 18,
+      "pnl": -99.57174198983374,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 18,
+      "censored_at_actual_close": 0
+    },
+    "1.5/1.5": {
+      "orders": 18,
+      "pnl": -192.9979961805847,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 18,
+      "censored_at_actual_close": 0
+    },
+    "1.5/4": {
+      "orders": 18,
+      "pnl": -152.91900674498308,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 14,
+      "censored_at_actual_close": 4
+    },
+    "2/2.5": {
+      "orders": 18,
+      "pnl": -195.07033395949557,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 13,
+      "censored_at_actual_close": 5
+    },
+    "2/3.5": {
+      "orders": 18,
+      "pnl": -188.37211343881023,
+      "actual_pnl_for_same_orders": -162.966336,
+      "triggered": 9,
+      "censored_at_actual_close": 9
+    }
+  },
+  "variants_by_interval": {
+    "1h": {
+      "1.5/2.5": {
+        "orders": 13,
+        "pnl": -6.873980857024884,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 13,
+        "censored_at_actual_close": 0
+      },
+      "1/1.5": {
+        "orders": 13,
+        "pnl": 26.488955621755064,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 13,
+        "censored_at_actual_close": 0
+      },
+      "1/2.5": {
+        "orders": 13,
+        "pnl": 56.520614477740565,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 13,
+        "censored_at_actual_close": 0
+      },
+      "1.5/1.5": {
+        "orders": 13,
+        "pnl": -36.90563971301038,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 13,
+        "censored_at_actual_close": 0
+      },
+      "1.5/4": {
+        "orders": 13,
+        "pnl": 3.173349722591217,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 9,
+        "censored_at_actual_close": 4
+      },
+      "2/2.5": {
+        "orders": 13,
+        "pnl": -22.419694921103336,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 8,
+        "censored_at_actual_close": 5
+      },
+      "2/3.5": {
+        "orders": 13,
+        "pnl": -15.721474400417991,
+        "actual_pnl_for_same_orders": -6.8739799999999995,
+        "triggered": 4,
+        "censored_at_actual_close": 9
+      }
+    },
+    "1m": {
+      "1.5/2.5": {
+        "orders": 5,
+        "pnl": -156.0923564675743,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "1/1.5": {
+        "orders": 5,
+        "pnl": -156.0923564675743,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "1/2.5": {
+        "orders": 5,
+        "pnl": -156.0923564675743,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "1.5/1.5": {
+        "orders": 5,
+        "pnl": -156.0923564675743,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "1.5/4": {
+        "orders": 5,
+        "pnl": -156.0923564675743,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "2/2.5": {
+        "orders": 5,
+        "pnl": -172.65063903839223,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      },
+      "2/3.5": {
+        "orders": 5,
+        "pnl": -172.65063903839223,
+        "actual_pnl_for_same_orders": -156.092356,
+        "triggered": 5,
+        "censored_at_actual_close": 0
+      }
+    }
+  },
+  "orders": [
+    {
+      "id": 1,
+      "symbol": "AVAUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": -50.0,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.413655,
+      "created_at": "2026-10-25T18:38:36.878898+08:00",
+      "closed_at": "2026-10-26T20:34:00.675569+08:00",
+      "signal_id_candidate": 196,
+      "candidate_age_seconds": 21.784016,
+      "atr": 0.0014597035778288801,
+      "excluded": "entry ATR/current settings do not reconstruct saved signal SL/TP"
+    },
+    {
+      "id": 2,
+      "symbol": "BABYUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": -57.087814,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.013243,
+      "created_at": "2026-10-25T18:38:36.885633+08:00",
+      "closed_at": "2026-10-26T20:34:00.712506+08:00",
+      "signal_id_candidate": 214,
+      "candidate_age_seconds": 21.171312,
+      "atr": 2.5603052068269972e-05,
+      "excluded": "entry ATR/current settings do not reconstruct saved signal SL/TP"
+    },
+    {
+      "id": 3,
+      "symbol": "BEAMXUSDT",
+      "strategy": "trend_follow",
+      "interval": "1m",
+      "side": "LONG",
+      "actual_pnl": -49.933954,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.003051,
+      "created_at": "2026-10-25T18:38:36.890684+08:00",
+      "closed_at": "2026-10-26T20:34:00.750711+08:00",
+      "signal_id_candidate": 242,
+      "candidate_age_seconds": 20.487406,
+      "atr": 6.054958978237986e-06,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-25 10:47:00+00:00",
+        "price": 0.003051,
+        "pnl": -49.933953691110254
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:47:00+00:00",
+          "price": 0.003051,
+          "pnl": -49.933953691110254
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:47:00+00:00",
+          "price": 0.003051,
+          "pnl": -49.933953691110254
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:47:00+00:00",
+          "price": 0.003051,
+          "pnl": -49.933953691110254
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:47:00+00:00",
+          "price": 0.003051,
+          "pnl": -49.933953691110254
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:47:00+00:00",
+          "price": 0.003051,
+          "pnl": -49.933953691110254
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 11:09:00+00:00",
+          "price": 0.003047,
+          "pnl": -66.49223626192818
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 11:09:00+00:00",
+          "price": 0.003047,
+          "pnl": -66.49223626192818
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "BELUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": 9.905715,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.103021,
+      "created_at": "2026-10-25T18:38:36.895720+08:00",
+      "closed_at": "2026-10-26T20:34:00.915580+08:00",
+      "signal_id_candidate": 244,
+      "candidate_age_seconds": 20.444553,
+      "atr": 8.47866470080522e-05,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-25 10:49:00+00:00",
+        "price": 0.103021,
+        "pnl": 9.905714792818214
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:49:00+00:00",
+          "price": 0.103021,
+          "pnl": 9.905714792818214
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "BERAUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": -49.847262,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.149804,
+      "created_at": "2026-10-25T18:38:36.901844+08:00",
+      "closed_at": "2026-10-26T20:34:00.954513+08:00",
+      "signal_id_candidate": 247,
+      "candidate_age_seconds": 20.386106,
+      "atr": 0.00013278686208706623,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-25 10:42:00+00:00",
+        "price": 0.149804,
+        "pnl": -49.84726190303233
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:42:00+00:00",
+          "price": 0.149804,
+          "pnl": -49.84726190303233
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "BIGTIMEUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": -15.414758,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.006901,
+      "created_at": "2026-10-25T18:38:36.907358+08:00",
+      "closed_at": "2026-10-26T20:34:00.991213+08:00",
+      "signal_id_candidate": 253,
+      "candidate_age_seconds": 20.265952,
+      "atr": 7.82591016464127e-06,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-25 10:45:00+00:00",
+        "price": 0.006901,
+        "pnl": -15.414758269435964
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:45:00+00:00",
+          "price": 0.006901,
+          "pnl": -15.414758269435964
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "BLURUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1m",
+      "side": "SHORT",
+      "actual_pnl": -50.802097,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.007722,
+      "created_at": "2026-10-25T18:38:36.911359+08:00",
+      "closed_at": "2026-10-26T20:34:01.027135+08:00",
+      "signal_id_candidate": 259,
+      "candidate_age_seconds": 20.131479,
+      "atr": 7.1003361164825315e-06,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-25 10:40:00+00:00",
+        "price": 0.007722,
+        "pnl": -50.80209739681396
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-25 10:40:00+00:00",
+          "price": 0.007722,
+          "pnl": -50.80209739681396
+        }
+      }
+    },
+    {
+      "id": 8,
+      "symbol": "AAVEUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": -42.111389,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 137.9411,
+      "created_at": "2026-10-26T20:34:01.036661+08:00",
+      "closed_at": "2026-10-26T23:02:05.945798+08:00",
+      "signal_id_candidate": 95234,
+      "candidate_age_seconds": 5.911902,
+      "atr": 1.4556780561788067,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-26 14:00:00+00:00",
+        "price": 137.9411,
+        "pnl": -42.11138910774102
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 137.9411,
+          "pnl": -42.11138910774102
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 137.2131,
+          "pnl": -29.048459185412376
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 137.2131,
+          "pnl": -29.048459185412376
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 137.9411,
+          "pnl": -42.11138910774102
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 137.9411,
+          "pnl": -42.11138910774102
+        },
+        "2/2.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 137.9411,
+          "pnl": -42.111389
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 137.9411,
+          "pnl": -42.111389
+        }
+      }
+    },
+    {
+      "id": 10,
+      "symbol": "BTCUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 8.75642,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 80181.48,
+      "created_at": "2026-10-26T20:34:01.052310+08:00",
+      "closed_at": "2026-10-26T23:02:06.074937+08:00",
+      "signal_id_candidate": 95264,
+      "candidate_age_seconds": 4.842191,
+      "atr": 382.03381488929057,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-26 14:00:00+00:00",
+        "price": 80181.48,
+        "pnl": 8.756420094934573
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 80181.48,
+          "pnl": 8.756420094934573
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 13:00:00+00:00",
+          "price": 79825.21,
+          "pnl": 34.652245022443736
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 80181.48,
+          "pnl": 8.756420094934573
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 13:00:00+00:00",
+          "price": 79825.21,
+          "pnl": 34.652245022443736
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 80181.48,
+          "pnl": 8.756420094934573
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 80181.48,
+          "pnl": 8.756420094934573
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 14:00:00+00:00",
+          "price": 80181.48,
+          "pnl": 8.756420094934573
+        }
+      }
+    },
+    {
+      "id": 11,
+      "symbol": "COMPUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": -48.651978,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 21.4637,
+      "created_at": "2026-10-26T20:34:01.059422+08:00",
+      "closed_at": "2026-10-27T02:00:59.221140+08:00",
+      "signal_id_candidate": 95276,
+      "candidate_age_seconds": 4.474425,
+      "atr": 0.35961338500107964,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-26 17:00:00+00:00",
+        "price": 21.4637,
+        "pnl": -48.651978351608335
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 17:00:00+00:00",
+          "price": 21.4637,
+          "pnl": -48.651978351608335
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 15:00:00+00:00",
+          "price": 21.2839,
+          "pnl": -33.155876899383266
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 15:00:00+00:00",
+          "price": 21.2839,
+          "pnl": -33.155876899383266
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 17:00:00+00:00",
+          "price": 21.4637,
+          "pnl": -48.651978351608335
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 17:00:00+00:00",
+          "price": 21.4637,
+          "pnl": -48.651978351608335
+        },
+        "2/2.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 21.4637,
+          "pnl": -48.651978
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 21.4637,
+          "pnl": -48.651978
+        }
+      }
+    },
+    {
+      "id": 12,
+      "symbol": "DOTUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 31.053781,
+      "actual_reason": "take_profit",
+      "actual_close_price": 0.994392,
+      "created_at": "2026-10-26T20:34:01.064426+08:00",
+      "closed_at": "2026-10-27T11:00:59.517088+08:00",
+      "signal_id_candidate": 95294,
+      "candidate_age_seconds": 3.949112,
+      "atr": 0.011882934064083665,
+      "base_replay": {
+        "state": "hit",
+        "reason": "take_profit",
+        "bar": "2026-10-27 02:00:00+00:00",
+        "price": 0.994392,
+        "pnl": 31.053780796487526
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 0.994392,
+          "pnl": 31.053780796487526
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 16:00:00+00:00",
+          "price": 1.0063,
+          "pnl": 18.072473634842662
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 0.994392,
+          "pnl": 31.053780796487526
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 16:00:00+00:00",
+          "price": 1.0063,
+          "pnl": 18.072473634842662
+        },
+        "1.5/4": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.994392,
+          "pnl": 31.053781
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 0.994392,
+          "pnl": 31.053780796487526
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.994392,
+          "pnl": 31.053781
+        }
+      }
+    },
+    {
+      "id": 13,
+      "symbol": "ENAUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "LONG",
+      "actual_pnl": -48.245292,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.203094,
+      "created_at": "2026-10-26T23:02:06.187704+08:00",
+      "closed_at": "2026-10-27T18:00:59.078717+08:00",
+      "signal_id_candidate": 125409,
+      "candidate_age_seconds": 9.419471,
+      "atr": 0.0048633997692822005,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-27 09:00:00+00:00",
+        "price": 0.203094,
+        "pnl": -48.24529247001393
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 09:00:00+00:00",
+          "price": 0.203094,
+          "pnl": -48.24529247001393
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 21:00:00+00:00",
+          "price": 0.205526,
+          "pnl": -32.69957751178781
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-26 21:00:00+00:00",
+          "price": 0.205526,
+          "pnl": -32.69957751178781
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 09:00:00+00:00",
+          "price": 0.203094,
+          "pnl": -48.24529247001393
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 09:00:00+00:00",
+          "price": 0.203094,
+          "pnl": -48.24529247001393
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 09:00:00+00:00",
+          "price": 0.200663,
+          "pnl": -63.79100742824024
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 09:00:00+00:00",
+          "price": 0.200663,
+          "pnl": -63.79100742824024
+        }
+      }
+    },
+    {
+      "id": 15,
+      "symbol": "FILUSDT",
+      "strategy": "ml_ensemble",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 39.765151,
+      "actual_reason": "take_profit",
+      "actual_close_price": 0.894904,
+      "created_at": "2026-10-26T23:02:06.207549+08:00",
+      "closed_at": "2026-10-27T08:00:59.366993+08:00",
+      "signal_id_candidate": 125420,
+      "candidate_age_seconds": 7.895284,
+      "atr": 0.012750148279240625,
+      "base_replay": {
+        "state": "hit",
+        "reason": "take_profit",
+        "bar": "2026-10-26 23:00:00+00:00",
+        "price": 0.894904,
+        "pnl": 39.765150999018374
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 23:00:00+00:00",
+          "price": 0.894904,
+          "pnl": 39.765150999018374
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 16:00:00+00:00",
+          "price": 0.907656,
+          "pnl": 23.28470032436922
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 23:00:00+00:00",
+          "price": 0.894904,
+          "pnl": 39.765150999018374
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 16:00:00+00:00",
+          "price": 0.907656,
+          "pnl": 23.28470032436922
+        },
+        "1.5/4": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.894904,
+          "pnl": 39.765151
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-26 23:00:00+00:00",
+          "price": 0.894904,
+          "pnl": 39.765150999018374
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.894904,
+          "pnl": 39.765151
+        }
+      }
+    },
+    {
+      "id": 17,
+      "symbol": "APTUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 23.009561,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.689723,
+      "created_at": "2026-10-27T02:00:59.367582+08:00",
+      "closed_at": "2026-10-27T16:00:59.432961+08:00",
+      "signal_id_candidate": 147618,
+      "candidate_age_seconds": 3.949509,
+      "atr": 0.00990452968629199,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-27 07:00:00+00:00",
+        "price": 0.689723,
+        "pnl": 23.009561333084363
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 0.689723,
+          "pnl": 23.009561333084363
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 0.68488,
+          "pnl": 35.15139533960603
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 0.689723,
+          "pnl": 23.009561333084363
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 0.68488,
+          "pnl": 35.15139533960603
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 0.689723,
+          "pnl": 23.009561333084363
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 0.689723,
+          "pnl": 23.009561333084363
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 0.689723,
+          "pnl": 23.009561333084363
+        }
+      }
+    },
+    {
+      "id": 18,
+      "symbol": "DASHUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "LONG",
+      "actual_pnl": 45.191821,
+      "actual_reason": "take_profit",
+      "actual_close_price": 55.4374,
+      "created_at": "2026-10-27T08:00:59.431339+08:00",
+      "closed_at": "2026-10-27T16:00:59.475689+08:00",
+      "signal_id_candidate": 224074,
+      "candidate_age_seconds": 3.266697,
+      "atr": 0.8073884623821594,
+      "base_replay": {
+        "state": "hit",
+        "reason": "take_profit",
+        "bar": "2026-10-27 07:00:00+00:00",
+        "price": 55.4374,
+        "pnl": 45.19182110671663
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 55.4374,
+          "pnl": 45.19182110671663
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 54.6302,
+          "pnl": 26.521561652347625
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 55.4374,
+          "pnl": 45.19182110671663
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 02:00:00+00:00",
+          "price": 54.6302,
+          "pnl": 26.521561652347625
+        },
+        "1.5/4": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 55.4374,
+          "pnl": 45.191821
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 55.4374,
+          "pnl": 45.19182110671663
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 55.4374,
+          "pnl": 45.191821
+        }
+      }
+    },
+    {
+      "id": 19,
+      "symbol": "AAVEUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 31.72081,
+      "actual_reason": "take_profit",
+      "actual_close_price": 129.6555,
+      "created_at": "2026-10-27T11:00:59.823029+08:00",
+      "closed_at": "2026-10-27T19:01:00.073111+08:00",
+      "signal_id_candidate": 261434,
+      "candidate_age_seconds": 4.280354,
+      "atr": 1.5401520197165206,
+      "base_replay": {
+        "state": "hit",
+        "reason": "take_profit",
+        "bar": "2026-10-27 10:00:00+00:00",
+        "price": 129.6555,
+        "pnl": 31.720809694953594
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 10:00:00+00:00",
+          "price": 129.6555,
+          "pnl": 31.720809694953594
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 131.196,
+          "pnl": 18.48172931346181
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 10:00:00+00:00",
+          "price": 129.6555,
+          "pnl": 31.720809694953594
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 07:00:00+00:00",
+          "price": 131.196,
+          "pnl": 18.48172931346181
+        },
+        "1.5/4": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 129.6555,
+          "pnl": 31.72081
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 10:00:00+00:00",
+          "price": 129.6555,
+          "pnl": 31.720809694953594
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 129.6555,
+          "pnl": 31.72081
+        }
+      }
+    },
+    {
+      "id": 22,
+      "symbol": "BTCUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": -8.41501,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 80365.79,
+      "created_at": "2026-10-27T16:00:59.552337+08:00",
+      "closed_at": "2026-10-27T21:00:58.257263+08:00",
+      "signal_id_candidate": 318662,
+      "candidate_age_seconds": 3.252732,
+      "atr": 383.68242677462274,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-27 12:00:00+00:00",
+        "price": 80365.79,
+        "pnl": -8.415010288394155
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 80365.79,
+          "pnl": -8.415010288394155
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 80173.91,
+          "pnl": -6.0098146082153745
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 80173.91,
+          "pnl": -6.0098146082153745
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 80365.79,
+          "pnl": -8.415010288394155
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 80365.79,
+          "pnl": -8.415010288394155
+        },
+        "2/2.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 80365.79,
+          "pnl": -8.41501
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 80365.79,
+          "pnl": -8.41501
+        }
+      }
+    },
+    {
+      "id": 23,
+      "symbol": "DOGEUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": -29.950674,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.077802,
+      "created_at": "2026-10-27T18:00:59.302711+08:00",
+      "closed_at": "2026-10-27T21:00:58.293045+08:00",
+      "signal_id_candidate": 341474,
+      "candidate_age_seconds": 3.167012,
+      "atr": 0.0005305361507166331,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-27 12:00:00+00:00",
+        "price": 0.077802,
+        "pnl": -29.95067387310143
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.077802,
+          "pnl": -29.95067387310143
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.077537,
+          "pnl": -21.012036988087964
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.077537,
+          "pnl": -21.012036988087964
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.077802,
+          "pnl": -29.95067387310143
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.077802,
+          "pnl": -29.95067387310143
+        },
+        "2/2.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.077802,
+          "pnl": -29.950674
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.077802,
+          "pnl": -29.950674
+        }
+      }
+    },
+    {
+      "id": 24,
+      "symbol": "FETUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": -25.265864,
+      "actual_reason": "stop_loss",
+      "actual_close_price": 0.178372,
+      "created_at": "2026-10-27T19:01:00.250705+08:00",
+      "closed_at": "2026-10-27T21:00:58.327664+08:00",
+      "signal_id_candidate": 353094,
+      "candidate_age_seconds": 2.651835,
+      "atr": 0.002357500257071429,
+      "base_replay": {
+        "state": "hit",
+        "reason": "stop_loss",
+        "bar": "2026-10-27 12:00:00+00:00",
+        "price": 0.178372,
+        "pnl": -25.265864273302928
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.178372,
+          "pnl": -25.265864273302928
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.177193,
+          "pnl": -17.31984783650956
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.177193,
+          "pnl": -17.31984783650956
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.178372,
+          "pnl": -25.265864273302928
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "stop_loss",
+          "bar": "2026-10-27 12:00:00+00:00",
+          "price": 0.178372,
+          "pnl": -25.265864273302928
+        },
+        "2/2.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.178372,
+          "pnl": -25.265864
+        },
+        "2/3.5": {
+          "state": "censored",
+          "reason": "actual_close",
+          "price": 0.178372,
+          "pnl": -25.265864
+        }
+      }
+    },
+    {
+      "id": 26,
+      "symbol": "LITUSDT",
+      "strategy": "trend_follow",
+      "interval": "1h",
+      "side": "SHORT",
+      "actual_pnl": 16.268683,
+      "actual_reason": "take_profit",
+      "actual_close_price": 2.9236,
+      "created_at": "2026-10-27T21:00:58.363312+08:00",
+      "closed_at": "2026-10-27T23:00:51.878412+08:00",
+      "signal_id_candidate": 376642,
+      "candidate_age_seconds": 1.436807,
+      "atr": 0.04983670986971398,
+      "base_replay": {
+        "state": "hit",
+        "reason": "take_profit",
+        "bar": "2026-10-27 14:00:00+00:00",
+        "price": 2.9236,
+        "pnl": 16.26868348194185
+      },
+      "variants": {
+        "1.5/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.9236,
+          "pnl": 16.26868348194185
+        },
+        "1/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.9734,
+          "pnl": 9.570463364080329
+        },
+        "1/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.9236,
+          "pnl": 16.26868348194185
+        },
+        "1.5/1.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.9734,
+          "pnl": 9.570463364080329
+        },
+        "1.5/4": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.8489,
+          "pnl": 26.316013658734075
+        },
+        "2/2.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.9236,
+          "pnl": 16.26868348194185
+        },
+        "2/3.5": {
+          "state": "hit",
+          "reason": "take_profit",
+          "bar": "2026-10-27 14:00:00+00:00",
+          "price": 2.8738,
+          "pnl": 22.966903599803317
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Signal match is inferred, not an order foreign key.",
+    "Current configuration is assumed; initial signal prices/ATR must reconstruct within one rounding tick.",
+    "Only closed paper orders whose actual reason and exit price replay successfully are compared.",
+    "First partial entry bar is omitted; only complete bars up to actual close are used.",
+    "Alternative positions still open at actual close inherit the actual close and PnL; future paths are not evaluated.",
+    "Actual entry, quantity and fees are fixed; changed sizing, later entries, portfolio and account halt are not simulated.",
+    "This is a tiny in-sample sensitivity analysis, not selection or out-of-sample validation."
+  ]
+}

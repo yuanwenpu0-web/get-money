@@ -18,6 +18,7 @@ function view(name, api, exports) {
   const mounted = []
   const unmounted = []
   let timers = 0
+  let clearedTimers = 0
   const context = vm.createContext({
     api,
     ref: (value) => ({ value }),
@@ -27,7 +28,7 @@ function view(name, api, exports) {
     onBeforeUnmount: (callback) => unmounted.push(callback),
     ElMessage: { error: (message) => assert.fail(message) },
     setInterval: () => { timers += 1; return timers },
-    clearInterval: () => {},
+    clearInterval: () => { clearedTimers += 1 },
   })
   vm.runInContext(`${source}\nglobalThis.subject = { ${exports.join(', ')} }`, context)
   return {
@@ -35,6 +36,7 @@ function view(name, api, exports) {
     mount: () => Promise.all(mounted.map((callback) => callback())),
     unmount: () => unmounted.forEach((callback) => callback()),
     timerCount: () => timers,
+    clearedTimerCount: () => clearedTimers,
   }
 }
 
@@ -62,7 +64,7 @@ test('Orders serializes refreshes and keeps a refresh requested after filters ch
   assert.equal(subject.orders.value[0].id, 2)
 })
 
-test('Dashboard does not start queued or symbol requests after unmounting', async () => {
+test('Dashboard starts resources independently and does not restart them after unmounting', async () => {
   const response = deferred()
   let dashboardCalls = 0
   let symbolCalls = 0
@@ -79,10 +81,10 @@ test('Dashboard does not start queued or symbol requests after unmounting', asyn
   await pending
   await subject.load()
   assert.equal(dashboardCalls, 1)
-  assert.equal(symbolCalls, 0)
+  assert.equal(symbolCalls, 1)
 })
 
-test('Orders loads settings and orders together and skips a late timer after unmount', async () => {
+test('Orders loads settings and orders together and clears its timer on unmount', async () => {
   const settings = deferred()
   const orders = deferred()
   const calls = []
@@ -96,16 +98,18 @@ test('Orders loads settings and orders together and skips a late timer after unm
   settings.resolve({ symbols: ['BTCUSDT'] })
   orders.resolve({ orders: [] })
   await pending
-  assert.equal(subject.timerCount(), 0)
+  assert.equal(subject.timerCount(), 1)
+  assert.equal(subject.clearedTimerCount(), 1)
 })
 
 test('Market starts its chart before sources and symbols requests complete', async () => {
   const sources = deferred()
   const symbols = deferred()
   const bars = deferred()
+  const settings = deferred()
   const calls = []
   const subject = view('Market', {
-    getSettings: async () => ({ symbols: ['BTCUSDT'], interval: '1h' }),
+    getSettings: () => settings.promise,
     getMarketSources() { calls.push('sources'); return sources.promise },
     getMarketSymbols() { calls.push('symbols'); return symbols.promise },
     getKlines() { calls.push('bars'); return bars.promise },
@@ -113,6 +117,7 @@ test('Market starts its chart before sources and symbols requests complete', asy
   const pending = subject.init()
   await tick()
   assert.deepEqual(calls, ['sources', 'symbols', 'bars'])
+  settings.resolve({ symbols: ['BTCUSDT'], interval: '1m' })
   sources.resolve({})
   symbols.resolve({ symbols: ['BTCUSDT'] })
   bars.resolve({ bars: [] })

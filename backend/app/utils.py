@@ -35,6 +35,8 @@ def dt_ms(dt: datetime) -> int:
 
 
 def round_price(value: float) -> float:
+    # pandas/NumPy 运算会保留 numpy 标量；数据库驱动需要原生数值。
+    value = float(value)
     if value >= 1000:
         return round(value, 2)
     if value >= 1:

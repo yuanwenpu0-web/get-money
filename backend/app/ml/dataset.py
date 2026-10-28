@@ -27,6 +27,7 @@ def build_dataset(
     days: int = 30,
     with_label: bool = True,
     end_ms: int | None = None,
+    barrier: dict | None = None,
 ) -> pd.DataFrame:
     if horizon < 1 or days < 1:
         raise ValueError("预测跨度和历史天数必须为正数")
@@ -53,11 +54,13 @@ def build_dataset(
     diffs = frame.index.to_series().diff().dt.total_seconds() * 1000
     gaps = diffs.gt(step)
     funding = service.load_funding_frame(symbol, start_ms - 90 * 86_400_000, as_of)
+    sentiment = service.load_sentiment_frame(symbol, start_ms - 3 * 86_400_000)
     segments = []
     for _, segment in frame.groupby(diffs.ne(step).cumsum()):
         if len(segment) >= 60:
             segments.append(
-                build_features(segment, with_label=with_label, horizon=horizon, funding=funding)
+                build_features(segment, with_label=with_label, horizon=horizon,
+                               funding=funding, sentiment=sentiment, barrier=barrier)
             )
     if not segments:
         raise ValueError("连续K线不足 60 根，无法计算指标")

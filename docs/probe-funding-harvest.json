@@ -1,0 +1,36 @@
+{
+  "days": 400,
+  "symbols": 507,
+  "persistence": {
+    "n_periods": 131,
+    "mean_ic": 0.7773669018818326,
+    "pos_frac": 1.0,
+    "top10_future_edge_per_3d": 0.005637617472618672
+  },
+  "gate0": true,
+  "sims": [
+    {
+      "k": 10,
+      "n_periods": 131,
+      "flat_frac": 0.0,
+      "avg_turnover": 0.4733612443536107,
+      "gross_ann_pct": 55.623995729997176,
+      "net_ann_pct": 41.801847394871736,
+      "win_frac": 0.9236641221374046,
+      "worst_3d_pct": -2.446776857142857,
+      "avg_trail_funding_8h_pct": 0.07705336093251941
+    },
+    {
+      "k": 20,
+      "n_periods": 131,
+      "flat_frac": 0.0,
+      "avg_turnover": 0.41248546598238167,
+      "gross_ann_pct": 44.656638753065344,
+      "net_ann_pct": 32.612063146379796,
+      "win_frac": 0.9465648854961832,
+      "worst_3d_pct": -1.1700769444444445,
+      "avg_trail_funding_8h_pct": 0.06017674043753196
+    }
+  ],
+  "gate1": true
+}

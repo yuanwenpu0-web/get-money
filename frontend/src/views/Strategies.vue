@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 import { price, symbolsLabel } from '../utils/format'
@@ -9,6 +9,14 @@ const strategies = ref([])
 const settings = ref({})
 const symbolCount = ref(0)
 const loading = ref(false)
+const listError = ref('')
+const settingsLoading = ref(false)
+const settingsReady = ref(false)
+const settingsError = ref('')
+const symbolsLoading = ref(false)
+const symbolsError = ref('')
+const formEdited = ref(false)
+const scheduleEdited = ref(false)
 const previewing = ref(false)
 const running = ref(false)
 const preview = ref(null)
@@ -23,30 +31,86 @@ const editParams = ref('{}')
 const editSaving = ref(false)
 const scheduleForm = reactive({ enabled: true, seconds: 60 })
 const scheduleSaving = ref(false)
+const initialForm = { ...form }
+let listPromise = null
+let settingsPromise = null
+let symbolsPromise = null
+let disposed = false
 
 const intervalOptions = ['1m', '5m', '15m', '1h', '4h', '1d']
 
-async function load() {
+function loadStrategies() {
+  if (disposed) return Promise.resolve()
+  if (listPromise) return listPromise
   loading.value = true
-  try {
-    const [list, config] = await Promise.all([api.getStrategies(), api.getSettings()])
-    strategies.value = list.strategies || []
-    settings.value = config
-    form.symbol = config.symbols?.[0] || 'BTCUSDT'
-    form.interval = config.interval || '1m'
-    scheduleForm.enabled = Boolean(config.schedule_enabled)
-    scheduleForm.seconds = Number(config.schedule_seconds || 60)
-  } catch (error) {
-    ElMessage.error(error.message)
-  } finally {
+  listError.value = ''
+  listPromise = api.getStrategies().then((data) => {
+    if (!disposed) strategies.value = data.strategies || []
+  }).catch((error) => {
+    if (!disposed) listError.value = error.message
+  }).finally(() => {
     loading.value = false
-  }
-  try {
-    const data = await api.getMarketSymbols()
-    symbolCount.value = data.symbols?.length || 0
-  } catch (error) {
-    /* 币种数量接口不可用时展示“全部永续”不带数量 */
-  }
+    listPromise = null
+  })
+  return listPromise
+}
+
+function loadSettings() {
+  if (disposed) return Promise.resolve()
+  if (settingsPromise) return settingsPromise
+  settingsLoading.value = true
+  settingsError.value = ''
+  settingsPromise = api.getSettings().then((config) => {
+    if (disposed) return
+    settings.value = config
+    if (!settingsReady.value) {
+      if (!formEdited.value && Object.keys(initialForm).every((key) => form[key] === initialForm[key])) {
+        form.symbol = config.symbols?.[0] || 'BTCUSDT'
+        form.interval = config.interval || '1m'
+      }
+      if (!scheduleEdited.value && scheduleForm.enabled === true && scheduleForm.seconds === 60) {
+        scheduleForm.enabled = Boolean(config.schedule_enabled)
+        scheduleForm.seconds = Number(config.schedule_seconds || 60)
+      }
+    }
+    settingsReady.value = true
+  }).catch((error) => {
+    if (!disposed) settingsError.value = error.message
+  }).finally(() => {
+    settingsLoading.value = false
+    settingsPromise = null
+  })
+  return settingsPromise
+}
+
+function loadSymbols() {
+  if (disposed) return Promise.resolve()
+  if (symbolsPromise) return symbolsPromise
+  symbolsLoading.value = true
+  symbolsError.value = ''
+  symbolsPromise = api.getMarketSymbols().then((data) => {
+    if (!disposed) symbolCount.value = data.symbols?.length || 0
+  }).catch((error) => {
+    if (!disposed) symbolsError.value = error.message
+  }).finally(() => {
+    symbolsLoading.value = false
+    symbolsPromise = null
+  })
+  return symbolsPromise
+}
+
+function load() {
+  return Promise.all([loadStrategies(), loadSettings(), loadSymbols()])
+}
+
+async function refreshStrategies() {
+  if (listPromise) await listPromise
+  return loadStrategies()
+}
+
+async function refreshSettings() {
+  if (settingsPromise) await settingsPromise
+  return loadSettings()
 }
 
 async function toggle(row) {
@@ -82,7 +146,7 @@ async function saveEdit() {
     await api.updateStrategy(editCode.value, { params: parsed })
     ElMessage.success('策略参数已保存')
     editVisible.value = false
-    await load()
+    await refreshStrategies()
   } catch (error) {
     ElMessage.error(error.message)
   } finally {
@@ -104,12 +168,13 @@ async function runPreview(code) {
 }
 
 async function runCycle() {
+  if (!settingsReady.value || running.value) return
   running.value = true
   try {
     const result = await api.runCycle()
     runResult.value = result
     runVisible.value = true
-    await load()
+    load()
     if (result.ok) ElMessage.success('巡检完成')
   } catch (error) {
     ElMessage.error(error.message)
@@ -119,6 +184,7 @@ async function runCycle() {
 }
 
 async function saveSchedule() {
+  if (!settingsReady.value || scheduleSaving.value) return
   scheduleSaving.value = true
   try {
     await api.saveSettings({
@@ -126,7 +192,7 @@ async function saveSchedule() {
       schedule_seconds: Number(scheduleForm.seconds),
     })
     ElMessage.success('定时任务设置已生效')
-    await load()
+    refreshSettings()
   } catch (error) {
     ElMessage.error(error.message)
   } finally {
@@ -139,10 +205,11 @@ function directionText(direction) {
 }
 
 onMounted(load)
+onBeforeUnmount(() => { disposed = true })
 </script>
 
 <template>
-  <div v-loading="loading">
+  <div>
     <div class="panel" style="margin-bottom: 14px">
       <div class="panel-head">
         <div>
@@ -150,19 +217,26 @@ onMounted(load)
           <div class="panel-sub">定时同步本地K线、重算特征、管理持仓并调整止损止盈</div>
         </div>
         <div class="row">
-          <el-switch v-model="scheduleForm.enabled" active-text="启用" inactive-text="暂停" />
-          <el-input-number v-model="scheduleForm.seconds" :min="10" :max="3600" :step="10" size="small" style="width: 120px" />
+          <el-switch v-model="scheduleForm.enabled" :disabled="!settingsReady" active-text="启用" inactive-text="暂停" @update:model-value="scheduleEdited = true" />
+          <el-input-number v-model="scheduleForm.seconds" :disabled="!settingsReady" :min="10" :max="3600" :step="10" size="small" style="width: 120px" @update:model-value="scheduleEdited = true" />
           <span class="muted">秒</span>
-          <el-button size="small" :loading="scheduleSaving" @click="saveSchedule">应用</el-button>
-          <el-button size="small" type="primary" :loading="running" @click="runCycle">立即巡检</el-button>
+          <el-button size="small" :disabled="!settingsReady" :loading="scheduleSaving" @click="saveSchedule">应用</el-button>
+          <el-button size="small" type="primary" :disabled="!settingsReady" :loading="running" @click="runCycle">立即巡检</el-button>
         </div>
       </div>
-      <div class="row">
+      <div v-if="settingsLoading && !settingsReady" class="muted" role="status">正在加载巡检配置…</div>
+      <div v-if="settingsError" class="row" role="alert" style="margin-bottom: 12px">
+        <span class="down">巡检配置加载失败：{{ settingsError }}</span>
+        <el-button size="small" :loading="settingsLoading" @click="loadSettings">重试</el-button>
+      </div>
+      <div v-if="settingsReady" class="row">
         <el-tag size="small" effect="plain" :type="settings.scheduler?.running ? 'success' : 'info'">
           {{ settings.scheduler?.running ? '调度运行中' : '调度已暂停' }}
         </el-tag>
         <span class="muted">交易对 {{ symbolsLabel(settings, symbolCount.value) }} · 周期 {{ settings.interval }}</span>
         <span class="muted">下次运行 {{ settings.scheduler?.next_run || '—' }}</span>
+        <span v-if="symbolsLoading" class="muted" role="status">正在加载币种数量…</span>
+        <el-button v-else-if="symbolsError" size="small" link @click="loadSymbols">重试币种数量</el-button>
       </div>
     </div>
 
@@ -174,13 +248,13 @@ onMounted(load)
         </div>
       </div>
       <div class="row">
-        <el-select v-model="form.symbol" size="small" style="width: 130px">
+        <el-select v-model="form.symbol" size="small" style="width: 130px" @update:model-value="formEdited = true">
           <el-option v-for="symbol in settings.symbols || ['BTCUSDT', 'ETHUSDT']" :key="symbol" :label="symbol" :value="symbol" />
         </el-select>
-        <el-select v-model="form.interval" size="small" style="width: 100px">
+        <el-select v-model="form.interval" size="small" style="width: 100px" @update:model-value="formEdited = true">
           <el-option v-for="item in intervalOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select v-model="form.strategy" size="small" style="width: 190px">
+        <el-select v-model="form.strategy" size="small" style="width: 190px" @update:model-value="formEdited = true">
           <el-option v-for="row in strategies" :key="row.code" :label="row.name" :value="row.code" />
         </el-select>
         <el-button size="small" type="primary" :loading="previewing" @click="runPreview()">计算信号</el-button>
@@ -228,6 +302,17 @@ onMounted(load)
       </div>
     </div>
 
+    <div class="row" style="margin-bottom: 12px">
+      <div class="panel-title">策略列表</div>
+      <div class="spacer"></div>
+      <el-button size="small" :loading="loading" @click="loadStrategies">刷新</el-button>
+    </div>
+    <div v-if="listError" class="row" role="alert" style="margin-bottom: 12px">
+      <span class="down">策略列表加载失败：{{ listError }}</span>
+      <el-button size="small" :loading="loading" @click="loadStrategies">重试</el-button>
+    </div>
+    <div v-if="loading && !strategies.length" class="panel empty-hint" role="status">正在加载策略…</div>
+    <div v-else-if="!strategies.length && !listError" class="panel empty-hint">暂无策略</div>
     <div class="three-col">
       <div v-for="row in strategies" :key="row.code" class="panel strategy-card">
         <div class="strategy-head">

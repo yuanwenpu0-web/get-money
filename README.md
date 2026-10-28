@@ -15,7 +15,7 @@
 | 回测 | 统一顺序撮合；隔离训练/验证/测试、验证集选参、同口径基线对比，计入杠杆、双边成本、风险预算、止损止盈与冷却 |
 | 交易 | 支持模拟盘与币安 U 本位合约测试网实盘：开仓（杠杆设置、步长/最小名义价值校验、市价单或 limit_maker postOnly 限价单，`order_type` 可切）、交易所侧止损止盈保护单、撤单改单、reduceOnly 平仓、交易所状态周期同步、反手；账户级熔断（总回撤或连续亏损达到设置线即冻结开仓，`risk_halt` 需人工恢复）；保证金与权益本地核算，盈利自动累加总资金，支持追加/提取/重置资金 |
 | 巡检 | APScheduler 每 N 秒同步最新K线（默认最多 8 路网络请求，共享连接池、调用线程顺序写库）、同币种多策略共享指标，检查止损止盈、移动止损、信号反转、超时平仓；周期日志记录币种数、同步/信号/执行各阶段耗时 |
-| 前端 | Vue 3 + Element Plus + ECharts 深色界面：总览、订单、策略、回测、模型、行情、设置 7 个页面 |
+| 前端 | Vue 3 + Element Plus + ECharts 深色界面：总览、订单、策略、回测、模型、行情、设置 7 个页面；路由与图表按需加载，各区独立显示数据、加载状态和错误重试；订单、模型、回测历史/成交、本地数据列表采用服务端分页，默认每页 20 条 |
 
 ## 2. 目录
 
@@ -186,21 +186,25 @@ npm run dev
 | GET | `/api/market/klines` | 本地K线（ECharts 格式） |
 | GET | `/api/market/symbols` | 可交易币种列表（全量宇宙或自定义） |
 | GET | `/api/market/funding` | 最近资金费记录 + 当前费率/年化/z-score/24h 累计 |
-| GET | `/api/market/sources` | 本地 / 币安数据源状态 |
+| GET | `/api/market/sources`、`/api/market/stats` | 本地数据按组分页，`sources.local` 含分页元数据 |
 | POST | `/api/market/sync` | 从币安同步K线 |
 | POST | `/api/market/preview` | 预演信号与指标快照 |
 | GET/PUT | `/api/strategies`、`/api/strategies/{code}` | 策略列表 / 启停与参数 |
 | POST | `/api/strategies/run-once` | 立即执行一次巡检 |
-| GET/POST | `/api/models`、`/api/models/train` | 模型列表 / 训练 |
+| GET/POST | `/api/models`、`/api/models/train` | 模型分页列表 / 训练 |
+| GET | `/api/backtests` | 回测历史分页列表 |
 | POST | `/api/backtests` | 创建回测（后台线程执行） |
-| GET | `/api/backtests/{id}` | 回测结果、权益曲线、成交 |
+| GET | `/api/backtests/{id}` | 回测结果与权益曲线；前端传 `include_trades=false`，省略全量成交 |
+| GET | `/api/backtests/{id}/trades` | 已保存成交的分页列表（沿用最近 500 笔的保存范围） |
 | GET | `/api/trading/dashboard` | 总览：权益、持仓、信号、日志 |
-| GET | `/api/trading/orders` | 订单列表与汇总 |
+| GET | `/api/trading/orders` | 订单分页列表与当前筛选条件下的全部订单汇总 |
 | PATCH | `/api/trading/orders/{id}` | 修改止损止盈 |
 | POST | `/api/trading/orders/{id}/close` | 平仓 |
 | POST | `/api/trading/orders/{id}/reverse` | 反手 |
 | GET | `/api/trading/equity` | 权益快照 |
 | POST | `/api/trading/run-once` | 手动巡检 |
+
+列表统一支持 `page`（从 1 开始）和 `page_size`（默认 20，上限 100），响应保留原列表字段，并附带 `total`、`page`、`page_size`、`pages`；空集合 `pages=0`。前端可选每页 10 / 20 / 50 / 100 条，筛选或条数变化回到第一页，数据减少导致空页时自动回到有效页。订单和日志接口仍兼容旧 `limit` 参数，新前端只使用分页参数。设置读取使用 `include_stats=false` 仅取 `data_stats_count`，总览使用 `include_market=false` 省去未展示的完整行情统计。
 
 ## 9. 验证
 
@@ -214,8 +218,11 @@ Invoke-RestMethod http://127.0.0.1:8010/api/health
 
 # 前端构建
 cd ..\frontend
+npm test
 npm run build
 ```
+
+并发参数、优化范围与离线基准见 [性能优化记录](docs/performance-optimization.md)。`MARKET_SYNC_WORKERS` 默认 8（1–32，根目录 `.env` 配置后重启），自动训练并发默认 2，可在设置页调整；实际训练并发受 CPU 数量限制。
 
 ## 10. 已知边界
 

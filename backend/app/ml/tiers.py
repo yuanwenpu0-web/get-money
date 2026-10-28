@@ -80,10 +80,13 @@ def _load_bars(
 ) -> pd.DataFrame:
     """读取 OHLC + quote_volume，用于算成交额与波动率。
 
-    source="derived"（默认 auto 的首选）：走 MarketDataService._candle_query，
-    从 1m 原始K线按目标周期聚合 —— **与回测引擎完全同源**，这是分档口径正确性的前提。
-    若某币种在该模式下无数据，再回落读原生 interval 行（"native"）。
+    source="derived"（默认 auto 的首选）：走 MarketDataService._merged_candle_rows，
+    从 1m 原始K线按目标周期聚合，并在 1m 未覆盖的时段用同周期原生行补齐 ——
+    **与回测引擎完全同源**（回测走 load_frame 的同一条混合取数路径），
+    这是分档口径正确性的前提。补齐只在聚合缺失处发生，重叠桶一律取聚合值。
+    若整批币种在该模式下无数据，再回落读原生 interval 行（"native"）。
     """
+    from ..config import MARKET_NATIVE_FALLBACK
     from ..market.data_service import MarketDataService
 
     columns = ["symbol", "open_time", "high", "low", "close", "quote_volume"]
@@ -96,19 +99,20 @@ def _load_bars(
             service = None
         for symbol in (symbols if service is not None else []):
             try:
-                subquery = service._candle_query(symbol, interval, start_ms, end_ms).subquery()
-                rows = session.execute(
-                    select(
-                        subquery.c.open_time, subquery.c.open, subquery.c.high,
-                        subquery.c.low, subquery.c.close, subquery.c.quote_volume,
-                    ).order_by(subquery.c.open_time)
-                ).all()
+                rows = service._merged_candle_rows(
+                    symbol, interval, start_ms, end_ms,
+                    allow_native=MARKET_NATIVE_FALLBACK,
+                )[0]
             except Exception:
                 continue
             if rows:
                 frames.append(
                     pd.DataFrame(
-                        [[symbol, r[0], r[2], r[3], r[4], r[5]] for r in rows],
+                        [
+                            [symbol, r["open_time"], r["high"], r["low"],
+                             r["close"], r["quote_volume"]]
+                            for r in rows
+                        ],
                         columns=columns,
                     )
                 )

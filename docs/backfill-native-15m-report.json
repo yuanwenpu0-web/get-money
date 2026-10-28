@@ -1,0 +1,284 @@
+{
+  "interval": "15m",
+  "days_target": 300,
+  "universe_size": 39,
+  "total_inserted": 902510,
+  "backfilled": 39,
+  "skipped": 0,
+  "errors": 0,
+  "results": [
+    {
+      "symbol": "APRUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "TAOUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "PUMPUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "LINKUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "FILUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "BANKUSDT",
+      "status": "ok",
+      "inserted": 28567,
+      "fetched": 28567,
+      "earliest_before": 1792864800000
+    },
+    {
+      "symbol": "CHIPUSDT",
+      "status": "ok",
+      "inserted": 18382,
+      "fetched": 18382,
+      "earliest_before": 1792866600000
+    },
+    {
+      "symbol": "INJUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "HUMAUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "ARBUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "BCHUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "ONDOUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "XMRUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "TIAUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "TRUMPUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "DOTUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "STRKUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "PAXGUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "ORDERUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "KATUSDT",
+      "status": "ok",
+      "inserted": 22711,
+      "fetched": 22711,
+      "earliest_before": 1792866600000
+    },
+    {
+      "symbol": "LTCUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "BEATUSDT",
+      "status": "ok",
+      "inserted": 28569,
+      "fetched": 28569,
+      "earliest_before": 1792866600000
+    },
+    {
+      "symbol": "ZROUSDT",
+      "status": "ok",
+      "inserted": 28567,
+      "fetched": 28567,
+      "earliest_before": 1792864800000
+    },
+    {
+      "symbol": "DOSUSDT",
+      "status": "ok",
+      "inserted": 1,
+      "fetched": 1,
+      "earliest_before": 1786460400000
+    },
+    {
+      "symbol": "LITUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "TAGUSDT",
+      "status": "ok",
+      "inserted": 28569,
+      "fetched": 28569,
+      "earliest_before": 1792866600000
+    },
+    {
+      "symbol": "BRUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "DASHUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "NILUSDT",
+      "status": "ok",
+      "inserted": 28066,
+      "fetched": 28066,
+      "earliest_before": 1792413900000
+    },
+    {
+      "symbol": "XLMUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "APTUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "PENGUUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "AGTUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "ASTERUSDT",
+      "status": "ok",
+      "inserted": 20106,
+      "fetched": 20106,
+      "earliest_before": 1785249900000
+    },
+    {
+      "symbol": "SOONUSDT",
+      "status": "ok",
+      "inserted": 28067,
+      "fetched": 28067,
+      "earliest_before": 1792414800000
+    },
+    {
+      "symbol": "XAUTUSDT",
+      "status": "ok",
+      "inserted": 20371,
+      "fetched": 20371,
+      "earliest_before": 1792866600000
+    }
+  ]
+}

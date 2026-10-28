@@ -1,0 +1,375 @@
+{
+  "as_of": "2026-10-27T00:14:09.050762+00:00",
+  "params": {
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "DOGEUSDT"
+    ],
+    "interval": "1h",
+    "strategy": "ml_ensemble",
+    "days": 400,
+    "initial": 10000.0,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "output": "docs/edge-diagnostic-tb.json",
+    "markdown_output": "docs/edge-diagnostic-tb.md",
+    "report_only": false,
+    "triple_barrier": true
+  },
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "label_mode": "triple_barrier",
+      "data_width": {
+        "merged": {
+          "rows": 9634,
+          "span_days": 401.4,
+          "first": "2025-09-20",
+          "last": "2026-10-27",
+          "sources": {
+            "aggregated": 2197,
+            "native": 7437,
+            "overlap": 2184,
+            "enabled": true
+          }
+        },
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 131774,
+          "span_days": 91.5,
+          "first": "2026-07-27",
+          "last": "2026-10-27"
+        },
+        "derived_span_days": 91.5,
+        "wasted_ratio": 0.772,
+        "gain_ratio": 4.39
+      },
+      "stats": {
+        "trades": 58,
+        "gross_pnl": -178.36,
+        "fees": 259.91,
+        "net_pnl": -438.26,
+        "gross_return_pct": -1.7836,
+        "cost_return_pct": 2.5991,
+        "net_return_pct": -4.3826,
+        "cost_absorption": null,
+        "win_rate": 43.1,
+        "gross_win_rate": 44.83,
+        "avg_margin": 2033.51,
+        "avg_margin_pct": 20.335,
+        "avg_leverage": 2.79,
+        "avg_fee_per_trade": 4.4811,
+        "exit_reasons": {
+          "stop_loss": 40,
+          "take_profit": 17,
+          "close_at_end": 1
+        }
+      },
+      "metrics": {
+        "total_return_pct": -4.3826,
+        "max_drawdown_pct": -7.5022,
+        "random_baseline_return_pct": -1.0062,
+        "buy_hold_return_pct": 23.5993,
+        "exposure_pct": 27.6079,
+        "avg_bars_held": 11.36,
+        "signal_bars": 517,
+        "blocked_signals": {
+          "weak_trend": 700,
+          "trend_conflict": 508,
+          "below_threshold": 410,
+          "model_edge": 247,
+          "cost_filter": 5
+        },
+        "test_rows": 2387,
+        "significance": {
+          "expectancy_ci": {
+            "trades": 58,
+            "mean_return_pct": -0.4047,
+            "ci_low_pct": -0.9807,
+            "ci_high_pct": 0.1712,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.077,
+            "verdict": "inconclusive"
+          },
+          "information_coefficient": {
+            "pairs": 2387,
+            "ic": -0.02773,
+            "verdict": "usable"
+          },
+          "random_distribution": {
+            "n_seeds": 10,
+            "mean_pct": -6.2364,
+            "std_pct": 3.3394,
+            "min_pct": -10.9872,
+            "max_pct": -1.0062,
+            "p05_pct": -10.4902,
+            "p95_pct": -1.8125
+          }
+        }
+      },
+      "beats_random": false,
+      "zero_cost": {
+        "trades": 61,
+        "gross_pnl": 47.02,
+        "fees": 0.0,
+        "net_pnl": 47.02,
+        "gross_return_pct": 0.4702,
+        "cost_return_pct": 0.0,
+        "net_return_pct": 0.4702,
+        "cost_absorption": 0.0,
+        "win_rate": 47.54,
+        "gross_win_rate": 47.54,
+        "avg_margin": 2270.95,
+        "avg_margin_pct": 22.709,
+        "avg_leverage": 2.89,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 41,
+          "take_profit": 19,
+          "close_at_end": 1
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "label_mode": "triple_barrier",
+      "data_width": {
+        "merged": {
+          "rows": 9634,
+          "span_days": 401.4,
+          "first": "2025-09-20",
+          "last": "2026-10-27",
+          "sources": {
+            "aggregated": 2176,
+            "native": 7458,
+            "overlap": 2163,
+            "enabled": true
+          }
+        },
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 130606,
+          "span_days": 91.5,
+          "first": "2026-07-27",
+          "last": "2026-10-27"
+        },
+        "derived_span_days": 91.5,
+        "wasted_ratio": 0.772,
+        "gain_ratio": 4.39
+      },
+      "stats": {
+        "trades": 61,
+        "gross_pnl": 208.64,
+        "fees": 207.64,
+        "net_pnl": 1.0,
+        "gross_return_pct": 2.0864,
+        "cost_return_pct": 2.0764,
+        "net_return_pct": 0.01,
+        "cost_absorption": 0.995,
+        "win_rate": 42.62,
+        "gross_win_rate": 42.62,
+        "avg_margin": 2130.55,
+        "avg_margin_pct": 21.306,
+        "avg_leverage": 2.02,
+        "avg_fee_per_trade": 3.4039,
+        "exit_reasons": {
+          "stop_loss": 37,
+          "take_profit": 24
+        }
+      },
+      "metrics": {
+        "total_return_pct": 0.01,
+        "max_drawdown_pct": -5.129,
+        "random_baseline_return_pct": -0.0705,
+        "buy_hold_return_pct": 23.7494,
+        "exposure_pct": 25.5551,
+        "avg_bars_held": 10.0,
+        "signal_bars": 514,
+        "blocked_signals": {
+          "weak_trend": 648,
+          "trend_conflict": 475,
+          "below_threshold": 445,
+          "model_edge": 297,
+          "cost_filter": 8
+        },
+        "test_rows": 2387,
+        "significance": {
+          "expectancy_ci": {
+            "trades": 61,
+            "mean_return_pct": 0.0131,
+            "ci_low_pct": -0.6114,
+            "ci_high_pct": 0.635,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.503,
+            "verdict": "inconclusive"
+          },
+          "information_coefficient": {
+            "pairs": 2387,
+            "ic": 0.02044,
+            "verdict": "usable"
+          },
+          "random_distribution": {
+            "n_seeds": 10,
+            "mean_pct": -2.1592,
+            "std_pct": 3.5478,
+            "min_pct": -7.5933,
+            "max_pct": 3.0063,
+            "p05_pct": -6.9923,
+            "p95_pct": 2.8303
+          }
+        }
+      },
+      "beats_random": true,
+      "zero_cost": {
+        "trades": 61,
+        "gross_pnl": 433.48,
+        "fees": 0.0,
+        "net_pnl": 433.48,
+        "gross_return_pct": 4.3348,
+        "cost_return_pct": 0.0,
+        "net_return_pct": 4.3348,
+        "cost_absorption": 0.0,
+        "win_rate": 44.26,
+        "gross_win_rate": 44.26,
+        "avg_margin": 2309.39,
+        "avg_margin_pct": 23.094,
+        "avg_leverage": 2.1,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 37,
+          "take_profit": 24
+        }
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "label_mode": "triple_barrier",
+      "data_width": {
+        "merged": {
+          "rows": 9634,
+          "span_days": 401.4,
+          "first": "2025-09-20",
+          "last": "2026-10-27",
+          "sources": {
+            "aggregated": 2170,
+            "native": 7464,
+            "overlap": 2157,
+            "enabled": true
+          }
+        },
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 130170,
+          "span_days": 90.4,
+          "first": "2026-07-28",
+          "last": "2026-10-27"
+        },
+        "derived_span_days": 90.4,
+        "wasted_ratio": 0.775,
+        "gain_ratio": 4.44
+      },
+      "stats": {
+        "trades": 53,
+        "gross_pnl": -146.93,
+        "fees": 123.86,
+        "net_pnl": -270.79,
+        "gross_return_pct": -1.4693,
+        "cost_return_pct": 1.2386,
+        "net_return_pct": -2.7079,
+        "cost_absorption": null,
+        "win_rate": 39.62,
+        "gross_win_rate": 39.62,
+        "avg_margin": 2157.57,
+        "avg_margin_pct": 21.576,
+        "avg_leverage": 1.4,
+        "avg_fee_per_trade": 2.337,
+        "exit_reasons": {
+          "stop_loss": 34,
+          "take_profit": 19
+        }
+      },
+      "metrics": {
+        "total_return_pct": -2.7079,
+        "max_drawdown_pct": -6.0717,
+        "random_baseline_return_pct": -5.7238,
+        "buy_hold_return_pct": 6.4191,
+        "exposure_pct": 24.6334,
+        "avg_bars_held": 11.09,
+        "signal_bars": 617,
+        "blocked_signals": {
+          "weak_trend": 725,
+          "below_threshold": 435,
+          "trend_conflict": 349,
+          "model_edge": 251,
+          "excess_volatility": 10
+        },
+        "test_rows": 2387,
+        "significance": {
+          "expectancy_ci": {
+            "trades": 53,
+            "mean_return_pct": -0.2795,
+            "ci_low_pct": -0.8751,
+            "ci_high_pct": 0.3623,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.196,
+            "verdict": "inconclusive"
+          },
+          "information_coefficient": {
+            "pairs": 2387,
+            "ic": 0.00239,
+            "verdict": "noise"
+          },
+          "random_distribution": {
+            "n_seeds": 10,
+            "mean_pct": -3.0763,
+            "std_pct": 4.3555,
+            "min_pct": -9.8694,
+            "max_pct": 5.9456,
+            "p05_pct": -8.0039,
+            "p95_pct": 4.0849
+          }
+        }
+      },
+      "beats_random": true,
+      "zero_cost": {
+        "trades": 53,
+        "gross_pnl": -115.1,
+        "fees": 0.0,
+        "net_pnl": -115.1,
+        "gross_return_pct": -1.151,
+        "cost_return_pct": 0.0,
+        "net_return_pct": -1.151,
+        "cost_absorption": null,
+        "win_rate": 39.62,
+        "gross_win_rate": 39.62,
+        "avg_margin": 2247.97,
+        "avg_margin_pct": 22.48,
+        "avg_leverage": 1.4,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 34,
+          "take_profit": 19
+        }
+      }
+    }
+  ]
+}

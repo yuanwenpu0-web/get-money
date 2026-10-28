@@ -110,9 +110,9 @@ def test_minimum_sample_trades_scales_with_validation_size():
     from app.backtest.runner import minimum_sample_trades
 
     assert minimum_sample_trades(2880) == 57  # 2880 根验证集 → 57 笔门槛
-    assert minimum_sample_trades(1000) == 20
-    assert minimum_sample_trades(100) == 10  # 短验证集退回 10 笔保底
-    assert minimum_sample_trades(0) == 10
+    assert minimum_sample_trades(1000) == 30  # 20 被 30 的保底门槛取代
+    assert minimum_sample_trades(100) == 30  # 短验证集退回 30 笔保底
+    assert minimum_sample_trades(0) == 30
 
 
 def _selection(monkeypatch, validation_bars, trades):
@@ -132,17 +132,17 @@ def _selection(monkeypatch, validation_bars, trades):
 
 
 def test_select_parameters_rejects_small_sample_candidates(monkeypatch):
-    # 1000 根验证集 → 20 笔门槛；12 笔成交的小样本幸运儿必须被拒
+    # 1000 根验证集 → 30 笔门槛；12 笔成交的小样本幸运儿必须被拒
     trades = [{"pnl": 5.0, "fees": 0.1}] * 12
     best, selection = _selection(monkeypatch, 1000, trades)
     assert selection["status"] == "insufficient_trades"
-    assert selection["minimum_trades"] == 20
+    assert selection["minimum_trades"] == 30
     assert all(not candidate["eligible"] for candidate in selection["candidates"])
     assert best == resolve_params("trend_follow", {})  # 保留当前参数
 
 
 def test_select_parameters_accepts_large_sample_candidates(monkeypatch):
-    trades = [{"pnl": 5.0, "fees": 0.1}] * 25  # 超过 20 笔门槛，正常参与选择
+    trades = [{"pnl": 5.0, "fees": 0.1}] * 40  # 超过 30 笔门槛，正常参与选择
     best, selection = _selection(monkeypatch, 1000, trades)
     assert selection["status"] == "selected"
     assert selection["selected"] == "current"

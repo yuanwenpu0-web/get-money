@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from .funding import FUNDING_FEATURES, attach_funding
+from .sentiment import SENTIMENT_FEATURES, attach_sentiment
 
 try:
     import talib
@@ -52,6 +53,7 @@ FEATURES = [
     "dow_sin",
     "dow_cos",
     *FUNDING_FEATURES,
+    *SENTIMENT_FEATURES,
 ]
 
 
@@ -177,8 +179,51 @@ def _adx(frame: pd.DataFrame, length: int = 14) -> tuple[pd.Series, pd.Series]:
     return smooth(dx), (plus - minus).fillna(0.)
 
 
+def _triple_barrier_label(
+    data: pd.DataFrame, close: pd.Series, barrier: dict,
+) -> pd.Series:
+    """三分类 triple-barrier 标签，与实盘 sl/tp/max_hold 出场对齐。
+
+    标签值：
+      +1 = 未来窗口内先触上轨（tp_atr_mult*ATR）→ 实盘止盈；
+      -1 = 先触下轨（sl_atr_mult*ATR）→ 实盘止损；
+       0 = 到期（max_hold_bars）未触任一 barrier → 横盘，做了也是白交费。
+    时间屏障 H 取实盘 max_hold_bars（封顶 300 控成本）；未设则退化为 horizon*4。
+    这是相对 `future_return>0` 二分类的核心改进：被止损打掉但最后涨回的 bar，
+    二分类仍标 +1（模型学"该做多"），triple-barrier 标 -1（不该做多）。
+    """
+    n = len(data)
+    sl_m = float(barrier.get("sl_atr_mult", 2.0))
+    tp_m = float(barrier.get("tp_atr_mult", 3.0))
+    H = int(barrier.get("max_hold_bars", 0))
+    H = H if 0 < H <= 300 else min(max(int(barrier.get("horizon", 5)) * 4, 60), 300)
+    high = data["high"].to_numpy(dtype=float)
+    low = data["low"].to_numpy(dtype=float)
+    c = close.to_numpy(dtype=float)
+    ap = data["atr_pct"].to_numpy(dtype=float)
+    labels = np.full(n, np.nan)
+    for i in range(n - 1):
+        if not np.isfinite(ap[i]) or ap[i] <= 0 or c[i] <= 0:
+            continue
+        tp_price = c[i] * (1.0 + tp_m * ap[i])
+        sl_price = c[i] * (1.0 - sl_m * ap[i])
+        end = min(n, i + 1 + H)
+        seg_h, seg_l = high[i + 1:end], low[i + 1:end]
+        hit_up = seg_h >= tp_price
+        hit_dn = seg_l <= sl_price
+        if hit_up.any() and (not hit_dn.any() or int(np.argmax(hit_up)) < int(np.argmax(hit_dn))):
+            labels[i] = 1.0
+        elif hit_dn.any():
+            labels[i] = -1.0
+        else:
+            labels[i] = 0.0
+    return pd.Series(labels, index=data.index)
+
+
 def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int = 5,
-                   funding: pd.DataFrame | None = None) -> pd.DataFrame:
+                   funding: pd.DataFrame | None = None,
+                   sentiment: pd.DataFrame | None = None,
+                   barrier: dict | None = None) -> pd.DataFrame:
     if frame.empty:
         return frame
     data = frame.copy()
@@ -228,6 +273,7 @@ def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int =
     data["di_diff"] = di_diff
 
     attach_funding(data, funding)
+    attach_sentiment(data, sentiment)
 
     if isinstance(data.index, pd.DatetimeIndex):
         minutes = data.index.hour * 60 + data.index.minute
@@ -243,7 +289,11 @@ def build_features(frame: pd.DataFrame, with_label: bool = False, horizon: int =
 
     if with_label:
         data["future_return"] = close.pct_change(horizon).shift(-horizon)
-        data["label"] = (data["future_return"] > 0).astype(int)
-        data.loc[data["future_return"].isna(), "label"] = np.nan
+        if barrier is not None:
+            # triple-barrier 三分类标签：与实盘 sl/tp/max_hold 出场对齐
+            data["label"] = _triple_barrier_label(data, close, barrier).astype("Int64")
+        else:
+            data["label"] = (data["future_return"] > 0).astype(int)
+            data.loc[data["future_return"].isna(), "label"] = np.nan
 
     return data

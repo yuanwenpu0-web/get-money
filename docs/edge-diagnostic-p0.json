@@ -1,0 +1,412 @@
+{
+  "as_of": "2026-10-26T17:26:37.449833+00:00",
+  "params": {
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "DOGEUSDT",
+      "AVAXUSDT",
+      "PENDLEUSDT"
+    ],
+    "interval": "1h",
+    "strategy": "ml_ensemble",
+    "days": 400,
+    "initial": 10000.0,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "output": "docs/edge-diagnostic-p0.json",
+    "markdown_output": "docs/edge-diagnostic-p0.md",
+    "report_only": false
+  },
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "data_width": {
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 131367,
+          "span_days": 91.2,
+          "first": "2026-07-27",
+          "last": "2026-10-26"
+        },
+        "derived_span_days": 91.2,
+        "wasted_ratio": 0.773
+      },
+      "stats": {
+        "trades": 63,
+        "gross_pnl": -637.1,
+        "fees": 270.67,
+        "net_pnl": -907.77,
+        "gross_return_pct": -6.371,
+        "cost_return_pct": 2.7067,
+        "net_return_pct": -9.0777,
+        "cost_absorption": null,
+        "win_rate": 33.33,
+        "gross_win_rate": 34.92,
+        "avg_margin": 1986.75,
+        "avg_margin_pct": 19.868,
+        "avg_leverage": 2.75,
+        "avg_fee_per_trade": 4.2963,
+        "exit_reasons": {
+          "stop_loss": 48,
+          "take_profit": 15
+        }
+      },
+      "metrics": {
+        "total_return_pct": -9.0777,
+        "max_drawdown_pct": -9.5504,
+        "random_baseline_return_pct": -8.0829,
+        "buy_hold_return_pct": 24.1301,
+        "exposure_pct": 28.9485,
+        "avg_bars_held": 10.97,
+        "signal_bars": 407,
+        "blocked_signals": {
+          "weak_trend": 689,
+          "model_edge": 527,
+          "below_threshold": 481,
+          "trend_conflict": 281,
+          "cost_filter": 2
+        },
+        "test_rows": 2387
+      },
+      "beats_random": false,
+      "zero_cost": {
+        "trades": 64,
+        "gross_pnl": -379.51,
+        "fees": 0.0,
+        "net_pnl": -379.51,
+        "gross_return_pct": -3.7951,
+        "cost_return_pct": 0.0,
+        "net_return_pct": -3.7951,
+        "cost_absorption": null,
+        "win_rate": 39.06,
+        "gross_win_rate": 39.06,
+        "avg_margin": 2222.2,
+        "avg_margin_pct": 22.222,
+        "avg_leverage": 2.78,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 47,
+          "take_profit": 17
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "data_width": {
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 130199,
+          "span_days": 91.2,
+          "first": "2026-07-27",
+          "last": "2026-10-26"
+        },
+        "derived_span_days": 91.2,
+        "wasted_ratio": 0.773
+      },
+      "stats": {
+        "trades": 56,
+        "gross_pnl": -66.91,
+        "fees": 183.22,
+        "net_pnl": -250.13,
+        "gross_return_pct": -0.6691,
+        "cost_return_pct": 1.8322,
+        "net_return_pct": -2.5013,
+        "cost_absorption": null,
+        "win_rate": 39.29,
+        "gross_win_rate": 39.29,
+        "avg_margin": 2147.39,
+        "avg_margin_pct": 21.474,
+        "avg_leverage": 1.93,
+        "avg_fee_per_trade": 3.2718,
+        "exit_reasons": {
+          "stop_loss": 35,
+          "take_profit": 20,
+          "close_at_end": 1
+        }
+      },
+      "metrics": {
+        "total_return_pct": -2.5013,
+        "max_drawdown_pct": -4.9046,
+        "random_baseline_return_pct": -3.5485,
+        "buy_hold_return_pct": 25.3964,
+        "exposure_pct": 25.3037,
+        "avg_bars_held": 10.79,
+        "signal_bars": 359,
+        "blocked_signals": {
+          "weak_trend": 658,
+          "model_edge": 552,
+          "below_threshold": 430,
+          "trend_conflict": 382,
+          "cost_filter": 6
+        },
+        "test_rows": 2387
+      },
+      "beats_random": true,
+      "zero_cost": {
+        "trades": 56,
+        "gross_pnl": 101.17,
+        "fees": 0.0,
+        "net_pnl": 101.17,
+        "gross_return_pct": 1.0117,
+        "cost_return_pct": 0.0,
+        "net_return_pct": 1.0117,
+        "cost_absorption": 0.0,
+        "win_rate": 41.07,
+        "gross_win_rate": 41.07,
+        "avg_margin": 2278.8,
+        "avg_margin_pct": 22.788,
+        "avg_leverage": 1.98,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 35,
+          "take_profit": 20,
+          "close_at_end": 1
+        }
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "data_width": {
+        "native": {
+          "rows": 9622,
+          "span_days": 400.9,
+          "first": "2025-09-20",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 129763,
+          "span_days": 90.1,
+          "first": "2026-07-28",
+          "last": "2026-10-26"
+        },
+        "derived_span_days": 90.1,
+        "wasted_ratio": 0.775
+      },
+      "stats": {
+        "trades": 61,
+        "gross_pnl": 52.05,
+        "fees": 132.6,
+        "net_pnl": -80.55,
+        "gross_return_pct": 0.5205,
+        "cost_return_pct": 1.326,
+        "net_return_pct": -0.8055,
+        "cost_absorption": 2.548,
+        "win_rate": 40.98,
+        "gross_win_rate": 42.62,
+        "avg_margin": 2074.92,
+        "avg_margin_pct": 20.749,
+        "avg_leverage": 1.33,
+        "avg_fee_per_trade": 2.1737,
+        "exit_reasons": {
+          "stop_loss": 40,
+          "take_profit": 20,
+          "close_at_end": 1
+        }
+      },
+      "metrics": {
+        "total_return_pct": -0.8055,
+        "max_drawdown_pct": -4.7762,
+        "random_baseline_return_pct": -4.041,
+        "buy_hold_return_pct": 6.4948,
+        "exposure_pct": 23.7118,
+        "avg_bars_held": 9.28,
+        "signal_bars": 327,
+        "blocked_signals": {
+          "weak_trend": 751,
+          "model_edge": 628,
+          "below_threshold": 398,
+          "trend_conflict": 274,
+          "excess_volatility": 9
+        },
+        "test_rows": 2387
+      },
+      "beats_random": true,
+      "zero_cost": {
+        "trades": 61,
+        "gross_pnl": 152.25,
+        "fees": 0.0,
+        "net_pnl": 152.25,
+        "gross_return_pct": 1.5225,
+        "cost_return_pct": 0.0,
+        "net_return_pct": 1.5225,
+        "cost_absorption": 0.0,
+        "win_rate": 42.62,
+        "gross_win_rate": 42.62,
+        "avg_margin": 2152.59,
+        "avg_margin_pct": 21.526,
+        "avg_leverage": 1.33,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 40,
+          "take_profit": 20,
+          "close_at_end": 1
+        }
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "data_width": {
+        "native": {
+          "rows": 2892,
+          "span_days": 120.5,
+          "first": "2026-06-28",
+          "last": "2026-10-26"
+        },
+        "minute": {
+          "rows": 129763,
+          "span_days": 90.1,
+          "first": "2026-07-28",
+          "last": "2026-10-26"
+        },
+        "derived_span_days": 90.1,
+        "wasted_ratio": 0.252
+      },
+      "stats": {
+        "trades": 20,
+        "gross_pnl": -292.93,
+        "fees": 36.04,
+        "net_pnl": -328.97,
+        "gross_return_pct": -2.9293,
+        "cost_return_pct": 0.3604,
+        "net_return_pct": -3.2897,
+        "cost_absorption": null,
+        "win_rate": 30.0,
+        "gross_win_rate": 30.0,
+        "avg_margin": 2077.15,
+        "avg_margin_pct": 20.771,
+        "avg_leverage": 1.1,
+        "avg_fee_per_trade": 1.802,
+        "exit_reasons": {
+          "stop_loss": 15,
+          "take_profit": 4,
+          "close_at_end": 1
+        }
+      },
+      "metrics": {
+        "total_return_pct": -3.2897,
+        "max_drawdown_pct": -4.0394,
+        "random_baseline_return_pct": -0.5278,
+        "buy_hold_return_pct": -15.5388,
+        "exposure_pct": 30.9423,
+        "avg_bars_held": 11.0,
+        "signal_bars": 94,
+        "blocked_signals": {
+          "below_threshold": 177,
+          "weak_trend": 171,
+          "trend_conflict": 170,
+          "model_edge": 99
+        },
+        "test_rows": 711
+      },
+      "beats_random": false,
+      "zero_cost": {
+        "trades": 20,
+        "gross_pnl": -288.96,
+        "fees": 0.0,
+        "net_pnl": -288.96,
+        "gross_return_pct": -2.8896,
+        "cost_return_pct": 0.0,
+        "net_return_pct": -2.8896,
+        "cost_absorption": null,
+        "win_rate": 30.0,
+        "gross_win_rate": 30.0,
+        "avg_margin": 2138.11,
+        "avg_margin_pct": 21.381,
+        "avg_leverage": 1.1,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 15,
+          "take_profit": 4,
+          "close_at_end": 1
+        }
+      }
+    },
+    {
+      "symbol": "PENDLEUSDT",
+      "data_width": {
+        "native": {
+          "rows": 1001,
+          "span_days": 41.7,
+          "first": "2026-09-13",
+          "last": "2026-10-25"
+        },
+        "minute": {
+          "rows": 129601,
+          "span_days": 90.0,
+          "first": "2026-07-28",
+          "last": "2026-10-26"
+        },
+        "derived_span_days": 90.0,
+        "wasted_ratio": -1.158
+      },
+      "stats": {
+        "trades": 15,
+        "gross_pnl": 31.52,
+        "fees": 25.39,
+        "net_pnl": 6.13,
+        "gross_return_pct": 0.3152,
+        "cost_return_pct": 0.2539,
+        "net_return_pct": 0.0613,
+        "cost_absorption": 0.806,
+        "win_rate": 46.67,
+        "gross_win_rate": 46.67,
+        "avg_margin": 2127.92,
+        "avg_margin_pct": 21.279,
+        "avg_leverage": 1.0,
+        "avg_fee_per_trade": 1.6925,
+        "exit_reasons": {
+          "stop_loss": 10,
+          "take_profit": 5
+        }
+      },
+      "metrics": {
+        "total_return_pct": 0.0613,
+        "max_drawdown_pct": -1.743,
+        "random_baseline_return_pct": 1.6401,
+        "buy_hold_return_pct": -20.4623,
+        "exposure_pct": 26.7552,
+        "avg_bars_held": 9.4,
+        "signal_bars": 57,
+        "blocked_signals": {
+          "weak_trend": 154,
+          "below_threshold": 135,
+          "trend_conflict": 102,
+          "model_edge": 79
+        },
+        "test_rows": 527
+      },
+      "beats_random": false,
+      "zero_cost": {
+        "trades": 15,
+        "gross_pnl": 40.37,
+        "fees": 0.0,
+        "net_pnl": 40.37,
+        "gross_return_pct": 0.4037,
+        "cost_return_pct": 0.0,
+        "net_return_pct": 0.4037,
+        "cost_absorption": 0.0,
+        "win_rate": 46.67,
+        "gross_win_rate": 46.67,
+        "avg_margin": 2198.83,
+        "avg_margin_pct": 21.988,
+        "avg_leverage": 1.0,
+        "avg_fee_per_trade": 0.0,
+        "exit_reasons": {
+          "stop_loss": 10,
+          "take_profit": 5
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-10-27T00:39:55.089737+00:00",
+  "params": {
+    "symbols": "BTCUSDT,ETHUSDT",
+    "days": 400,
+    "output": "docs/probe-funding.json"
+  },
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "up_ratio": 0.388,
+      "ic_f_rate": -0.01816615134317295,
+      "ic_f_z": 0.09041948590391005,
+      "ic_f_diff": 0.008328630461662196,
+      "ic_f_cum": -0.09378456893376633
+    },
+    {
+      "symbol": "ETHUSDT",
+      "up_ratio": 0.382,
+      "ic_f_rate": -0.0734427048679978,
+      "ic_f_z": 0.004191388673495118,
+      "ic_f_diff": 0.018707003165981166,
+      "ic_f_cum": -0.0861481235339304
+    }
+  ],
+  "ic_means": {
+    "ic_f_rate": -0.0458,
+    "ic_f_z": 0.0473,
+    "ic_f_diff": 0.0135,
+    "ic_f_cum": -0.09
+  },
+  "verdict": "资金费率特征 IC 均值：{'ic_f_rate': -0.0458, 'ic_f_z': 0.0473, 'ic_f_diff': 0.0135, 'ic_f_cum': -0.09}。★ ic_f_cum=-0.09 显著>0.05，出现第一条独立 alpha，P6 值得正式接入特征工程"
+}

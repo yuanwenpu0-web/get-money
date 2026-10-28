@@ -11,6 +11,10 @@ const reasons = {
   trending_market: '强趋势中暂停均值回归',
   band_confirmation: '布林带尚未确认',
   cost_filter: '波动或净盈亏比不足以覆盖成本',
+  htf_trend_weak: '4h 趋势强度不足',
+  no_pullback: '尚未出现回调',
+  no_confirmation: '回调后未转强确认',
+  below_avwap: '价格失守锚定 VWAP',
 }
 
 export const signalReason = (code) => reasons[code] || code || '符合开仓条件'

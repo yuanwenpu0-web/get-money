@@ -17,11 +17,15 @@ FUNDING_FEATURES = [
     "funding_rate_annualized",
     "funding_zscore",
     "funding_24h_sum",
+    "funding_cum",           # 3 天滚动累积费率：期限结构/多头拥挤度代理（P6 最强信号）
     "funding_available",
 ]
 FUNDING_Z_WINDOW = 90
 FUNDING_FILTER_Z = 2.0
 ANNUALIZATION = 3 * 365  # 每日 3 次结算
+# 累积费率窗口：与探针验证口径一致（1h 下 72 根 ≈ 3 天）。用时间窗口而非 bar 数，
+# 使该特征与 K线周期无关——任意周期都能表达"近期累计资金费"这一拥挤度代理。
+FUNDING_CUM_WINDOW = "3D"
 
 
 def attach_funding(frame: pd.DataFrame, funding: pd.DataFrame | None, z_window: int = FUNDING_Z_WINDOW) -> pd.DataFrame:
@@ -33,6 +37,7 @@ def attach_funding(frame: pd.DataFrame, funding: pd.DataFrame | None, z_window: 
         data["funding_rate_annualized"] = 0.0
         data["funding_zscore"] = 0.0
         data["funding_24h_sum"] = 0.0
+        data["funding_cum"] = 0.0
         data["funding_available"] = 0.0
         return data
 
@@ -45,10 +50,14 @@ def attach_funding(frame: pd.DataFrame, funding: pd.DataFrame | None, z_window: 
     rolling = data["funding_rate"].rolling(z_window, min_periods=z_window)
     std = rolling.std(ddof=0)
     data["funding_zscore"] = ((data["funding_rate"] - rolling.mean()) / std.replace(0, np.nan)).fillna(0.0)
-    # 24h 累计按资金费事件求和（每条事件只计一次），再 asof 映射到 bar；
-    # 直接对 bar 级序列求和会把同一事件重复计数数十次
+    # 24h / 3D 累计按资金费事件求和（每条事件只计一次），再 asof 映射到 bar；
+    # 直接对 bar 级序列求和会把同一事件重复计数数十次。
+    # funding_cum = 滚动累积费率：持续正费率意味着多头持续付费、仓位拥挤，
+    # 是 P6 验证出的最强独立信号（IC≈-0.09：累积费率越高越不易止盈）。
     event_sum = series.rolling("24h").sum()
     data["funding_24h_sum"] = event_sum.reindex(data.index, method="ffill").fillna(0.0)
+    event_cum = series.rolling(FUNDING_CUM_WINDOW).sum()
+    data["funding_cum"] = event_cum.reindex(data.index, method="ffill").fillna(0.0)
     return data
 
 

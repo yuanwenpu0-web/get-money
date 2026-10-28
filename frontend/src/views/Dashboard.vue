@@ -9,11 +9,14 @@ import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, 
 const dashboard = ref(null)
 const equity = ref([])
 const symbolCount = ref(0)
-const loading = ref(false)
+const dashboardLoading = ref(false)
+const equityLoading = ref(false)
+const symbolLoading = ref(false)
+const dashboardError = ref('')
+const equityError = ref('')
+const symbolError = ref('')
 const running = ref(false)
 let timer = null
-let loadPromise = null
-let reloadRequested = false
 let disposed = false
 
 const portfolio = computed(() => dashboard.value?.portfolio || {})
@@ -103,37 +106,48 @@ function logText(message) {
   return String(message || '').slice(0, 240)
 }
 
-async function loadSymbolCount() {
-  try {
-    const data = await api.getMarketSymbols()
-    symbolCount.value = data.symbols?.length || 0
-  } catch (error) {
-    /* 币种数量接口不可用时展示“全部永续”不带数量 */
+// Each panel owns its request, so a slow chart never holds up account refreshes.
+function createLoader(request, apply, busy, errorState) {
+  let pending = null
+  let reloadRequested = false
+  return function refresh() {
+    if (disposed) return Promise.resolve()
+    reloadRequested = true
+    if (pending) return pending
+    busy.value = true
+    pending = (async () => {
+      do {
+        reloadRequested = false
+        try {
+          const data = await request()
+          if (!disposed) {
+            apply(data)
+            errorState.value = ''
+          }
+        } catch (error) {
+          if (!disposed) errorState.value = error.message || '加载失败'
+        }
+      } while (reloadRequested && !disposed)
+    })().finally(() => {
+      pending = null
+      busy.value = false
+    })
+    return pending
   }
 }
 
+const loadDashboard = createLoader(
+  () => api.getDashboard(), (data) => { dashboard.value = data }, dashboardLoading, dashboardError,
+)
+const loadEquity = createLoader(
+  () => api.getEquity(1500), (data) => { equity.value = data.points || [] }, equityLoading, equityError,
+)
+const loadSymbolCount = createLoader(
+  () => api.getMarketSymbols(), (data) => { symbolCount.value = data.symbols?.length || 0 }, symbolLoading, symbolError,
+)
+
 function load() {
-  if (disposed) return Promise.resolve()
-  reloadRequested = true
-  if (loadPromise) return loadPromise
-  loading.value = true
-  loadPromise = (async () => {
-    do {
-      reloadRequested = false
-      try {
-        const [dash, points] = await Promise.all([api.getDashboard(), api.getEquity(1500)])
-        dashboard.value = dash
-        equity.value = points.points || []
-        if (!disposed) await loadSymbolCount()
-      } catch (error) {
-        ElMessage.error(error.message)
-      }
-    } while (reloadRequested && !disposed)
-  })().finally(() => {
-    loadPromise = null
-    loading.value = false
-  })
-  return loadPromise
+  return Promise.all([loadDashboard(), loadEquity(), loadSymbolCount()])
 }
 
 async function runNow() {
@@ -164,21 +178,36 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-loading="loading">
+  <div>
     <div class="row" style="margin-bottom: 14px">
       <div>
         <div class="panel-title">账户与收益</div>
         <div class="panel-sub">
-          {{ symbolsLabel(settings, symbolCount.value) }} · {{ settings.interval }} · 自动巡检
-          {{ settings.schedule_enabled ? `${settings.schedule_seconds}s` : '已关闭' }}
+          <template v-if="dashboard">
+            {{ symbolsLabel(settings, symbolCount) }} · {{ settings.interval }} · 自动巡检
+            {{ settings.schedule_enabled ? `${settings.schedule_seconds}s` : '已关闭' }}
+          </template>
+          <template v-else>{{ dashboardError ? '账户与系统状态加载失败' : '账户与系统状态加载中…' }}</template>
         </div>
       </div>
       <div class="spacer"></div>
-      <el-button size="small" :loading="running" type="primary" @click="runNow">立即巡检</el-button>
+      <span v-if="dashboardLoading && dashboard" class="muted" role="status">账户数据更新中…</span>
+      <el-button size="small" :loading="running" :disabled="!dashboard" type="primary" @click="runNow">立即巡检</el-button>
       <el-button size="small" @click="load">刷新</el-button>
     </div>
 
-    <div class="grid stats-grid">
+    <div v-if="dashboardError" class="panel" role="alert" style="margin-bottom: 14px">
+      <span class="down">账户与持仓加载失败：{{ dashboardError }}</span>
+      <el-button size="small" text type="primary" @click="loadDashboard">重试</el-button>
+    </div>
+    <div v-if="!dashboard" class="grid stats-grid" :aria-busy="dashboardLoading">
+      <div v-for="label in ['总权益', '可用现金', '未实现盈亏', '累计已实现', '总收益率', '胜率']" :key="label" class="stat-card">
+        <div class="stat-label">{{ label }}</div>
+        <div class="stat-value">—</div>
+        <div class="stat-sub">{{ dashboardError ? '数据加载失败' : '数据加载中…' }}</div>
+      </div>
+    </div>
+    <div v-else class="grid stats-grid">
       <StatCard label="总权益" :value="money(portfolio.equity)" :sub="`收益基准 ${money(portfolio.initial_capital)}`" />
       <StatCard label="可用现金" :value="money(portfolio.cash)" :sub="`占用保证金 ${money(portfolio.margin_used)}`" />
       <StatCard
@@ -211,8 +240,14 @@ onBeforeUnmount(() => {
           </div>
           <el-tag size="small" effect="plain">{{ equity.length }} 个采样点</el-tag>
         </div>
-        <EChart v-if="equity.length > 1" :option="equityOption" height="330px" />
-        <div v-else class="empty-hint">暂无权益快照。点击“立即巡检”生成第一笔记录。</div>
+        <div v-if="equityError" class="muted" role="alert">
+          权益曲线加载失败：{{ equityError }}
+          <el-button size="small" text type="primary" @click="loadEquity">重试</el-button>
+        </div>
+        <div v-if="equityLoading && !equity.length" class="empty-hint" role="status">权益曲线加载中…</div>
+        <EChart v-else-if="equity.length > 1" :option="equityOption" height="330px" />
+        <div v-else-if="!equityError" class="empty-hint">暂无权益快照。点击“立即巡检”生成第一笔记录。</div>
+        <div v-if="equityLoading && equity.length" class="muted" role="status">权益曲线更新中…</div>
       </div>
 
       <div class="panel">
@@ -222,21 +257,26 @@ onBeforeUnmount(() => {
             <div class="panel-sub">调度、数据与最近巡检</div>
           </div>
           <el-tag size="small" :type="dashboard?.scheduler?.running ? 'success' : 'info'" effect="plain">
-            {{ dashboard?.scheduler?.running ? 'RUNNING' : 'PAUSED' }}
+            {{ !dashboard ? (dashboardError ? 'ERROR' : 'LOADING') : dashboard.scheduler?.running ? 'RUNNING' : 'PAUSED' }}
           </el-tag>
         </div>
         <div class="kv-grid">
-          <div class="kv"><span class="kv-key">执行模式</span><span class="kv-value" :class="executionModeClass">{{ executionModeLabel }}</span></div>
-          <div class="kv"><span class="kv-key">定时周期</span><span class="kv-value mono">{{ settings.schedule_seconds }}s</span></div>
-          <div class="kv"><span class="kv-key">交易对</span><span class="kv-value">{{ symbolsLabel(settings, symbolCount.value) }}</span></div>
+          <div class="kv"><span class="kv-key">执行模式</span><span class="kv-value" :class="executionModeClass">{{ dashboard ? executionModeLabel : '—' }}</span></div>
+          <div class="kv"><span class="kv-key">定时周期</span><span class="kv-value mono">{{ dashboard ? `${settings.schedule_seconds}s` : '—' }}</span></div>
+          <div class="kv"><span class="kv-key">交易对</span><span class="kv-value">{{ dashboard ? symbolsLabel(settings, symbolCount) : '—' }}</span></div>
           <div class="kv"><span class="kv-key">最新信号</span><span class="kv-value">{{ dashboard?.recent_signals?.[0] ? tsLabel(dashboard.recent_signals[0].time) : '—' }}</span></div>
+        </div>
+        <div v-if="symbolLoading" class="muted" role="status">币种数量加载中…</div>
+        <div v-if="symbolError" class="muted" role="alert">
+          币种数量加载失败
+          <el-button size="small" text type="primary" @click="loadSymbolCount">重试</el-button>
         </div>
         <div class="timeline-log" style="margin-top: 16px">
           <div v-for="log in logs" :key="log.id" class="log-item" :class="{ error: log.level === 'error' }">
             <div class="log-time">{{ tsLabel(log.created_at) }} · {{ log.job }}</div>
             <div class="log-text">{{ logText(log.message) }}</div>
           </div>
-          <div v-if="!logs.length" class="empty-hint">暂无日志</div>
+          <div v-if="!logs.length" class="empty-hint">{{ !dashboard ? (dashboardError ? '日志加载失败' : '日志加载中…') : '暂无日志' }}</div>
         </div>
       </div>
     </div>
@@ -249,7 +289,7 @@ onBeforeUnmount(() => {
         </div>
         <router-link to="/orders"><el-button size="small" text type="primary">管理订单</el-button></router-link>
       </div>
-      <el-table :data="positions" class="table-compact" empty-text="暂无持仓">
+      <el-table :data="positions" class="table-compact" :empty-text="!dashboard ? (dashboardError ? '持仓加载失败' : '持仓加载中…') : '暂无持仓'">
         <el-table-column prop="symbol" label="币种" width="100" />
         <el-table-column label="方向" width="80">
           <template #default="{ row }">
@@ -285,7 +325,7 @@ onBeforeUnmount(() => {
             <div class="panel-sub">评分来自 ML 概率与趋势指标共振</div>
           </div>
         </div>
-        <el-table :data="dashboard?.recent_signals || []" class="table-compact" empty-text="暂无信号">
+        <el-table :data="dashboard?.recent_signals || []" class="table-compact" :empty-text="!dashboard ? (dashboardError ? '信号加载失败' : '信号加载中…') : '暂无信号'">
           <el-table-column label="时间" min-width="135">
             <template #default="{ row }">{{ tsLabel(row.time) }}</template>
           </el-table-column>
@@ -311,11 +351,11 @@ onBeforeUnmount(() => {
           <div>
             <div class="panel-title">最近订单</div>
             <div class="panel-sub" :class="executionModeClass">
-              {{ executionModeLabel === '本地模拟' ? '全部为本地模拟成交' : `订单按${executionModeLabel}提交至币安${settings.testnet ? '测试网' : '主网'}成交` }}
+              {{ !dashboard ? '订单加载中…' : executionModeLabel === '本地模拟' ? '全部为本地模拟成交' : `订单按${executionModeLabel}提交至币安${settings.testnet ? '测试网' : '主网'}成交` }}
             </div>
           </div>
         </div>
-        <el-table :data="dashboard?.recent_orders || []" class="table-compact" empty-text="暂无订单">
+        <el-table :data="dashboard?.recent_orders || []" class="table-compact" :empty-text="!dashboard ? (dashboardError ? '订单加载失败' : '订单加载中…') : '暂无订单'">
           <el-table-column prop="id" label="#" width="52" />
           <el-table-column prop="symbol" label="币种" width="90" />
           <el-table-column label="方向" width="70">

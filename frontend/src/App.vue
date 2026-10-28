@@ -8,7 +8,13 @@ const route = useRoute()
 const scheduler = ref({ running: false, next_run: null })
 const settings = ref({})
 const symbolCount = ref(0)
+const statusLoaded = ref(false)
+const statusError = ref('')
+const statusLoading = ref(true)
 let timer = null
+let statusPromise = null
+let symbolsPromise = null
+let disposed = false
 
 const menu = [
   { path: '/dashboard', label: '总览', hint: '收益 · 持仓 · 状态' },
@@ -23,6 +29,7 @@ const menu = [
 const title = computed(() => route.meta.title || '总览')
 
 const executionModeLabel = computed(() => {
+  if (!statusLoaded.value) return statusError.value ? '状态未知' : '加载中'
   if (settings.value.execution_mode === 'live') {
     return settings.value.testnet ? 'TESTNET LIVE' : 'LIVE'
   }
@@ -30,6 +37,7 @@ const executionModeLabel = computed(() => {
 })
 
 const executionModeTagType = computed(() => {
+  if (!statusLoaded.value) return 'info'
   if (settings.value.execution_mode === 'live') {
     return settings.value.testnet ? 'warning' : 'danger'
   }
@@ -37,6 +45,7 @@ const executionModeTagType = computed(() => {
 })
 
 const modeHint = computed(() => {
+  if (!statusLoaded.value) return statusError.value ? '运行状态暂不可用' : '正在获取运行状态'
   if (settings.value.execution_mode === 'live') {
     return settings.value.testnet ? '订单提交币安测试网 · 不涉及真实资金' : '真实资金实盘 · 主网真实成交'
   }
@@ -44,37 +53,58 @@ const modeHint = computed(() => {
 })
 
 const pageSub = computed(() => {
+  if (!statusLoaded.value) return '本地K线 · 策略评分 · 交易与风控'
   if (settings.value.execution_mode === 'live') {
     return `本地K线 · 策略评分 · 币安${settings.value.testnet ? '测试网' : '主网'}实盘 · 自动巡检`
   }
   return '本地K线 · 策略评分 · 模拟撮合 · 自动巡检'
 })
 
-async function loadStatus() {
-  try {
-    const data = await api.getSettings()
-    settings.value = data
-    scheduler.value = data.scheduler || { running: false }
-    loadSymbolCount()
-  } catch (error) {
-    /* 顶部状态静默失败 */
-  }
+function loadStatus() {
+  if (disposed) return Promise.resolve()
+  if (statusPromise) return statusPromise
+  statusLoading.value = true
+  statusPromise = (async () => {
+    try {
+      const data = await api.getSettings()
+      if (disposed) return
+      settings.value = data
+      scheduler.value = data.scheduler || { running: false }
+      statusLoaded.value = true
+      statusError.value = ''
+    } catch (error) {
+      if (!disposed) statusError.value = error.message
+    } finally {
+      if (!disposed) statusLoading.value = false
+      statusPromise = null
+    }
+  })()
+  return statusPromise
 }
 
-async function loadSymbolCount() {
-  try {
-    const data = await api.getMarketSymbols()
-    symbolCount.value = data.symbols?.length || 0
-  } catch (error) {
-    /* 币种数量接口不可用时展示“全部永续”不带数量 */
-  }
+function loadSymbolCount() {
+  if (disposed) return Promise.resolve()
+  if (symbolsPromise) return symbolsPromise
+  symbolsPromise = (async () => {
+    try {
+      const data = await api.getMarketSymbols()
+      if (!disposed) symbolCount.value = data.symbols?.length || 0
+    } catch (error) {
+      /* 币种数量失败时保留已有状态。 */
+    } finally {
+      symbolsPromise = null
+    }
+  })()
+  return symbolsPromise
 }
 
 onMounted(() => {
   loadStatus()
-  timer = setInterval(loadStatus, 30000)
+  loadSymbolCount()
+  timer = setInterval(() => { loadStatus(); loadSymbolCount() }, 30000)
 })
 onBeforeUnmount(() => {
+  disposed = true
   if (timer) clearInterval(timer)
 })
 </script>
@@ -104,11 +134,15 @@ onBeforeUnmount(() => {
       <div class="sidebar-footer">
         <div class="mode-row">
           <span class="status-dot" :class="{ live: scheduler.running }"></span>
-          {{ scheduler.running ? '定时监测运行中' : '定时监测已暂停' }}
+          {{ statusLoaded ? (scheduler.running ? '定时监测运行中' : '定时监测已暂停') : '运行状态加载中…' }}
         </div>
         <div class="muted" :class="{ down: executionModeLabel === 'LIVE' }">{{ modeHint }}</div>
         <div v-if="scheduler.next_run" class="muted">下次巡检 {{ tsLabel(scheduler.next_run) }}</div>
-        <div class="muted">{{ symbolsLabel(settings, symbolCount.value) }} · {{ settings.interval || '1m' }}</div>
+        <div v-if="statusLoaded" class="muted">{{ symbolsLabel(settings, symbolCount.value) }} · {{ settings.interval }}</div>
+        <div v-if="statusError" class="muted" role="status">
+          状态刷新失败
+          <el-button size="small" link :loading="statusLoading" @click="loadStatus">重试</el-button>
+        </div>
       </div>
     </aside>
 

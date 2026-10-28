@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -42,14 +44,22 @@ def _clean(value):
 
 
 @router.get("/stats")
-def market_stats(db: Session = Depends(get_db)):
-    return {"stats": MarketDataService(db).stats()}
+def market_stats(
+    db: Session = Depends(get_db),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+):
+    return MarketDataService(db).stats_page(page, page_size)
 
 
 @router.get("/sources")
-def market_sources(db: Session = Depends(get_db)):
+def market_sources(
+    db: Session = Depends(get_db),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+):
     return {
-        "local": {"stats": MarketDataService(db).stats()},
+        "local": MarketDataService(db).stats_page(page, page_size),
         "binance": {"available": True, "source_interval": "1m", "note": "仅获取 1m K线，其他周期由本地聚合生成"},
     }
 

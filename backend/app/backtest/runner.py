@@ -4,6 +4,7 @@ import importlib.util
 import json
 import math
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
@@ -12,19 +13,29 @@ from ..ml.dataset import build_dataset, purged_split
 from ..ml.trainer import _build_estimator
 from ..models import StrategyConfig
 from ..state import all_state
+from ..strategy.coin_router import get_route
 from ..strategy.rules import evaluate_signals, resolve_params
 from .execution import exposure_metrics, randomize_directions, simulate
 from .metrics import downsample, metrics_from_equity
+from .significance import (
+    bootstrap_expectancy_ci,
+    information_coefficient,
+    percentile_rank,
+    random_baseline_distribution,
+)
 
 # Dependency information only; all runs use the same explicit execution semantics.
 HAS_VBT = importlib.util.find_spec("vectorbt") is not None
 
 
 def minimum_sample_trades(validation_bars: int) -> int:
-    """小样本惩罚：验证集每 50 根K线至少 1 笔成交，下限 10 笔。
-    2880 根验证集 → 57 笔门槛；验证集越短门槛越低，短窗口退回 10 笔保底，
-    防止小样本幸运儿靠一两笔运气成交被选为最优参数。"""
-    return max(10, int(validation_bars) // 50)
+    """小样本惩罚：验证集每 50 根K线至少 1 笔成交，下限 **30 笔**。
+
+    下限从 10 提到 30：单笔收益的方差极大，10 笔成交选出来的「最优参数」几乎
+    必然是运气（实测 60 天窗口只成交 5~10 笔时，收益读数完全不可信）。
+    2880 根验证集 → 57 笔门槛；验证集越短门槛越低，短窗口退回 30 笔保底。
+    """
+    return max(30, int(validation_bars) // 50)
 
 
 def select_parameters(
@@ -57,6 +68,17 @@ def select_parameters(
     if "z_threshold" in params:
         variants.append(
             ("extreme_strict", {"z_threshold": params["z_threshold"] + 0.5})
+        )
+    if "target_r" in params:
+        # 强回调专属网格：4h 趋势门槛更严 / 确认窗口更短（只承认快速转强）
+        variants.append(
+            ("htf_strict", {"htf_adx_filter": min(60.0, params["htf_adx_filter"] + 5.0)})
+        )
+        variants.append(
+            (
+                "confirm_strict",
+                {"pullback_confirm_bars": max(2, int(params["pullback_confirm_bars"]) - 2)},
+            )
         )
     candidates, seen = [], set()
     min_trades = minimum_sample_trades(len(validation))
@@ -112,7 +134,27 @@ def run_backtest(
     threshold: float | None = None,
     optimize: bool = False,
     end_ms: int | None = None,
+    triple_barrier: bool = False,
+    param_overrides: dict | None = None,
+    use_route: bool = False,
 ) -> dict:
+    """回测单个币种。
+
+    use_route=True 时，若路由表对该 symbol 有精确或族群匹配，则覆盖 strategy
+    并把路由 params 合并进 param_overrides。显式 param_overrides 优先级仍高于路由表。
+    默认 use_route=False — UI 手动选策略的回测不应被自动路由覆盖。
+    """
+    # --- 币级路由（可选） ---
+    if use_route:
+        route = get_route(symbol)
+        if route is not None:
+            strategy = route["strategy"]
+            route_params = route.get("params", {})
+            if route_params:
+                merged = {**route_params}
+                if param_overrides:
+                    merged.update(param_overrides)
+                param_overrides = merged
     state = all_state(db)
     initial = float(
         initial_cash
@@ -127,14 +169,28 @@ def run_backtest(
         raise ValueError("未知模型算法")
     config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
     overrides = json.loads(config.params or "{}") if config else {}
+    if param_overrides:
+        if not isinstance(param_overrides, dict):
+            raise ValueError("参数覆盖必须是 JSON 对象")
+        overrides.update(param_overrides)
     if threshold is not None:
         overrides["min_score"] = threshold
     params = resolve_params(
-        strategy, {**state, "fee_rate": fee, "slippage": slippage}, overrides
+        strategy, {**state, "fee_rate": fee, "slippage": slippage}, overrides,
+        interval=interval,
     )
     horizon = int(state.get("train_horizon", 5))
+    barrier = None
+    if triple_barrier and strategy == "ml_ensemble" and algo != "rule":
+        # triple-barrier 标签与实盘 sl/tp/max_hold 出场对齐
+        barrier = {
+            "sl_atr_mult": params["sl_atr_mult"],
+            "tp_atr_mult": params["tp_atr_mult"],
+            "max_hold_bars": params["max_hold_bars"],
+            "horizon": horizon,
+        }
     data = build_dataset(
-        db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms
+        db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms, barrier=barrier
     )
     if len(data) < 800:
         raise ValueError(f"回测样本不足（{len(data)} 行），至少需要 800 根有效K线")
@@ -160,9 +216,13 @@ def run_backtest(
     def predict(frame):
         if estimator is None:
             return None
-        return pd.Series(
-            estimator.predict_proba(frame[FEATURES])[:, 1], index=frame.index
-        )
+        proba = estimator.predict_proba(frame[FEATURES])
+        classes = getattr(estimator, "classes_", None)
+        if classes is not None and len(classes) > 2:
+            # 三分类：class==1 是「止盈」，用作做多概率（趋势策略只在止盈类做多）
+            k = int(np.where(classes == 1)[0][0])
+            return pd.Series(proba[:, k], index=frame.index)
+        return pd.Series(proba[:, 1], index=frame.index)  # 类1 = 涨（二分类/未知）
 
     selection = {"enabled": False, "status": "disabled", "applied_to_paper": False}
     configured = params.copy()
@@ -198,6 +258,24 @@ def run_backtest(
     metrics.update(exposure_metrics(equity, trades, interval))
     quality = data.attrs.get("data_quality", {})
     warnings = []
+
+    # 统计显著性：收益读数必须与置信区间、IC、随机基线分布一起看，
+    # 否则「+2%」和「0」在小样本下无法区分（见 significance 模块说明）。
+    expectancy_ci = bootstrap_expectancy_ci(trades)
+    ic = (
+        information_coefficient(probability.reindex(test.index), test["future_return"])
+        if probability is not None
+        else {"pairs": 0, "ic": None, "verdict": "no_model"}
+    )
+    random_dist = random_baseline_distribution(
+        test, baseline_signals, baseline_params, initial, fee, slippage, interval,
+        n_seeds=10,
+    )
+    if expectancy_ci.get("verdict") == "inconclusive":
+        warnings.append(
+            f"每笔期望的 95% 置信区间 [{expectancy_ci['ci_low_pct']}, "
+            f"{expectancy_ci['ci_high_pct']}] 跨 0，无法判定是否存在正 edge——不要据此下结论。"
+        )
     if quality.get("gap_count"):
         warnings.append(
             f"历史数据存在 {quality['gap_count']} 处缺口；指标重新预热，跨缺口持仓在下一可见开盘平仓，结果受缺失行情影响。"
@@ -239,6 +317,11 @@ def run_backtest(
             "parameters": params,
             "baseline": baseline,
             "random_baseline": random_baseline,
+            "significance": {
+                "expectancy_ci": expectancy_ci,
+                "information_coefficient": ic,
+                "random_distribution": random_dist,
+            },
             "return_improvement_pct": round(
                 metrics["total_return_pct"] - baseline["total_return_pct"], 4
             ),

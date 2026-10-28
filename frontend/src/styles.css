@@ -2,6 +2,28 @@
   color-scheme: dark;
 }
 
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.chart-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.table-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
 * {
   box-sizing: border-box;
 }

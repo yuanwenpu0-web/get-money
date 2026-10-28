@@ -92,6 +92,48 @@ def test_cycle_log_is_compact_without_symbols_array(db, monkeypatch):
     assert "decisions" not in row.message
 
 
+def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch):
+    from app.models import ModelRecord, StrategyConfig
+
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", ["BADUSDT", "GOODUSDT"])
+    db.add(StrategyConfig(code="trend_follow", name="Trend", enabled=1, params="{}"))
+    db.commit()
+    evaluated = []
+
+    def evaluate(self, symbol, *args, **kwargs):
+        evaluated.append(symbol)
+        if symbol == "BADUSDT":
+            db.add(ModelRecord(symbol=symbol, interval="1h", algo="lightgbm", path=None))
+            db.flush()  # A real constraint violation requires rollback before reuse.
+        assert db.query(ModelRecord).count() == 0
+        return None
+
+    _stub_cycle(monkeypatch, evaluate=evaluate)
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is True
+    assert evaluated == ["BADUSDT", "GOODUSDT"]
+    assert len(result["signal_errors"]) == 1
+    assert db.query(JobLog).filter(JobLog.job == "trading_cycle").count() == 1
+
+
+def test_cycle_database_failure_can_still_record_error_log(db, monkeypatch):
+    from app.models import ModelRecord
+
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", [])
+
+    def fail(self):
+        db.add(ModelRecord(symbol="BADUSDT", interval="1h", algo="lightgbm", path=None))
+        db.flush()
+
+    monkeypatch.setattr(TradingService, "_enabled_strategies", fail)
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is False
+    row = db.query(JobLog).filter(JobLog.job == "trading_cycle").one()
+    assert row.level == "error"
+
+
 def test_cycle_updates_existing_positions_after_interval_and_scope_changes(db, monkeypatch):
     from app.market.data_service import MarketDataService
     from app.utils import now_ms
@@ -176,3 +218,51 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
         assert order.close_reason == "stop_loss"
         assert order.realized_pnl < 0
         assert summary["managed"] == [{"order_id": order.id, "actions": ["stop_loss"]}]
+
+
+@pytest.mark.parametrize("default_interval,sync_interval", [("1h", "1h"), ("1m", "15m")])
+def test_pullback_uses_15m_while_other_strategy_and_orders_keep_their_intervals(
+    db, monkeypatch, default_interval, sync_interval
+):
+    from types import SimpleNamespace
+
+    from app.models import StrategyConfig
+
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", ["AAAUSDT"])
+    set_state(db, "interval", default_interval)
+    set_state(db, "use_coin_route", False)
+    for code in ("strong_pullback", "trend_follow"):
+        db.add(StrategyConfig(code=code, name=code, enabled=1, params="{}"))
+    for code, interval in (("strong_pullback", "15m"), ("trend_follow", default_interval)):
+        db.add(Order(symbol="AAAUSDT", interval=interval, side="LONG", qty=1,
+                     entry_price=100, mark_price=100, margin=10,
+                     strategy=code, status="OPEN"))
+    db.commit()
+
+    calls = []
+    evaluated = {}
+    managed = {}
+
+    def evaluate(self, symbol, interval, code, **kwargs):
+        signal = SimpleNamespace(direction="FLAT", interval=interval, strategy=code)
+        evaluated[(symbol, interval, code)] = signal
+        return signal
+
+    def manage(db, order, signal):
+        managed[order.strategy] = signal
+        return {"order_id": order.id, "actions": []}
+
+    _stub_cycle(monkeypatch, evaluate=evaluate)
+    monkeypatch.setattr(trading_service, "_sync_recent_many", lambda symbols, interval: calls.append((symbols, interval)) or [])
+    monkeypatch.setattr(trading_service, "manage_order", manage)
+    summary = TradingService(db).run_cycle()
+
+    assert summary["ok"] is True
+    assert calls == [(["AAAUSDT"], sync_interval)]
+    assert set(evaluated) == {
+        ("AAAUSDT", "15m", "strong_pullback"),
+        ("AAAUSDT", default_interval, "trend_follow"),
+    }
+    assert managed["strong_pullback"] is evaluated[("AAAUSDT", "15m", "strong_pullback")]
+    assert managed["trend_follow"] is evaluated[("AAAUSDT", default_interval, "trend_follow")]

@@ -1,11 +1,15 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../api'
 import { money, tsLabel } from '../utils/format'
 
 const settings = ref({})
 const loading = ref(false)
+const settingsReady = ref(false)
+const loadError = ref('')
+let loadPromise = null
+let disposed = false
 const saving = ref(false)
 const credentialInfo = ref({})
 const credentialSaving = ref(false)
@@ -85,18 +89,29 @@ function applySettings(data) {
   credentialForm.testnet = Boolean(data.testnet)
 }
 
-async function load() {
+function load() {
+  if (disposed) return Promise.resolve()
+  if (loadPromise) return loadPromise
   loading.value = true
-  try {
-    applySettings(await api.getSettings())
-  } catch (error) {
-    ElMessage.error(error.message)
-  } finally {
+  loadPromise = (async () => {
+    try {
+      const data = await api.getSettings()
+      if (disposed) return
+      applySettings(data)
+      settingsReady.value = true
+      loadError.value = ''
+    } catch (error) {
+      if (!disposed) loadError.value = error.message || '设置加载失败'
+    }
+  })().finally(() => {
     loading.value = false
-  }
+    loadPromise = null
+  })
+  return loadPromise
 }
 
 async function saveSettings() {
+  if (!settingsReady.value || loading.value) return
   if (form.symbol_scope === 'custom' && !form.symbols.length) {
     ElMessage.error('自定义列表至少保留一个交易对')
     return
@@ -145,6 +160,7 @@ async function saveSettings() {
 }
 
 async function saveCredentials() {
+  if (!settingsReady.value || loading.value) return
   if (!credentialForm.api_key.trim() || !credentialForm.api_secret.trim()) {
     ElMessage.error('请填写 API key 与 secret')
     return
@@ -168,6 +184,7 @@ async function saveCredentials() {
 }
 
 async function testCredentials() {
+  if (!settingsReady.value || loading.value) return
   testing.value = true
   testResult.value = null
   try {
@@ -180,6 +197,7 @@ async function testCredentials() {
 }
 
 async function adjustCapital() {
+  if (!settingsReady.value || loading.value) return
   capitalLoading.value = true
   try {
     await api.adjustCapital({ mode: capitalForm.mode, amount: Number(capitalForm.amount), note: capitalForm.note })
@@ -227,19 +245,26 @@ watch(
 )
 
 onMounted(load)
+onBeforeUnmount(() => { disposed = true })
 </script>
 
 <template>
-  <div v-loading="loading">
+  <div>
     <div class="row" style="margin-bottom: 14px">
       <div>
         <div class="panel-title">系统设置</div>
         <div class="panel-sub">所有金额单位 USDT；盈亏会自动累加到总资金，也可手动调整</div>
       </div>
       <div class="spacer"></div>
-      <el-button type="primary" :loading="saving" @click="saveSettings">保存风控与系统设置</el-button>
+      <span v-if="loading" class="muted" role="status">正在读取已保存设置…</span>
+      <el-button type="primary" :disabled="!settingsReady || loading" :loading="saving" @click="saveSettings">保存风控与系统设置</el-button>
     </div>
 
+    <div v-if="loadError" class="panel" role="alert" style="margin-bottom: 14px">
+      <span class="down">设置读取失败：{{ loadError }}</span>
+      <el-button size="small" link type="primary" :loading="loading" @click="load">重试</el-button>
+    </div>
+    <el-form :disabled="!settingsReady || loading" @submit.prevent>
     <div class="two-col">
       <div style="display: flex; flex-direction: column; gap: 14px">
         <div class="panel">
@@ -249,7 +274,7 @@ onMounted(load)
               <div class="panel-sub">本地模拟仅在系统内记账；实盘下单会真实提交到币安合约</div>
             </div>
             <el-tag size="small" effect="plain" :type="form.execution_mode === 'live' ? (form.testnet ? 'warning' : 'danger') : 'info'">
-              {{ form.execution_mode === 'live' ? (form.testnet ? '测试网实盘' : '真实资金实盘') : '本地模拟' }}
+              {{ settingsReady ? (form.execution_mode === 'live' ? (form.testnet ? '测试网实盘' : '真实资金实盘') : '本地模拟') : '读取中…' }}
             </el-tag>
           </div>
           <el-radio-group v-model="form.execution_mode" @change="confirmExecutionMode">
@@ -291,7 +316,7 @@ onMounted(load)
               <div class="panel-sub">{{ credentialPanelSub }}</div>
             </div>
             <el-tag size="small" effect="plain" :type="credentialInfo.configured ? 'success' : 'info'">
-              {{ credentialInfo.configured ? '已配置' : '未配置' }}
+              {{ settingsReady ? (credentialInfo.configured ? '已配置' : '未配置') : '读取中…' }}
             </el-tag>
           </div>
           <el-alert type="warning" :closable="false" show-icon style="margin-bottom: 12px"
@@ -511,7 +536,7 @@ onMounted(load)
               <div class="panel-sub">持续监测K线形态，管理止损止盈，必要时反手</div>
             </div>
             <el-tag size="small" effect="plain" :type="settings.scheduler?.running ? 'success' : 'info'">
-              {{ settings.scheduler?.running ? '运行中' : '已暂停' }}
+              {{ settingsReady ? (settings.scheduler?.running ? '运行中' : '已暂停') : '读取中…' }}
             </el-tag>
           </div>
           <div class="row">
@@ -525,5 +550,6 @@ onMounted(load)
         </div>
       </div>
     </div>
+    </el-form>
   </div>
 </template>

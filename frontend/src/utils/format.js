@@ -50,11 +50,14 @@ export const closeReasonLabel = (reason) =>
     time_stop: '超时平仓',
     signal_reverse: '信号反转',
     signal_weak: '信号转弱',
+    ema_exit: 'EMA9 失守',
     close_at_end: '回测结束',
   })[reason] || reason || '—'
 
 export const strategyLabel = (code) =>
-  ({ ml_ensemble: 'ML 趋势共振', trend_follow: 'SuperTrend 趋势跟随', mean_reversion: 'RSI 均值回归' })[code] || code
+  ({ ml_ensemble: 'ML 趋势共振', trend_follow: 'SuperTrend 趋势跟随', mean_reversion: 'RSI 均值回归',
+    funding_extreme: '资金费率极值', mtf_resonance: '多周期趋势共振',
+    strong_pullback: 'Martin Luk 强势回调' })[code] || code
 
 export function symbolsLabel(settings, count = 0) {
   if (settings?.symbol_scope === 'all') {

@@ -172,14 +172,16 @@ def _validate(payload: dict, db: Session | None = None) -> None:
 
 
 @router.get("")
-def read_settings(db: Session = Depends(get_db)):
+def read_settings(db: Session = Depends(get_db), include_stats: bool = True):
     state = all_state(db)
-    stats = MarketDataService(db).stats()
+    service = MarketDataService(db)
+    stats = service.stats() if include_stats else []
     return {
         **state,
         "credentials": _credentials_state(db),
         "scheduler": scheduler.status(),
         "data_stats": stats,
+        "data_stats_count": len(stats) if include_stats else service.stats_count(),
         "features": {"talib": HAS_TALIB, "pandas_ta": HAS_PTA, "vectorbt": HAS_VBT},
         "model_count": db.query(ModelRecord).filter(ModelRecord.status == "ready").count(),
         "intervals": SUPPORTED_INTERVALS,
@@ -195,7 +197,7 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     merged = {**all_state(db), **data}
     _validate({key: value for key, value in merged.items() if key in EDITABLE_KEYS}, db)
     try:
-        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion', 'mtf_resonance'):
+        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion', 'mtf_resonance', 'strong_pullback'):
             resolve_params(code, merged)
         for strategy in db.query(StrategyConfig).all():
             resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))

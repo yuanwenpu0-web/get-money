@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, as_completed, wait
 from contextlib import nullcontext
 from typing import Callable, Iterable, Iterator
 
@@ -12,8 +12,9 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, aliased
 
-from ..config import MARKET_SYNC_WORKERS
-from ..models import FundingRate, Kline
+from ..config import MARKET_NATIVE_FALLBACK, MARKET_SYNC_WORKERS
+from ..models import FundingRate, Kline, Sentiment
+from ..pagination import page_metadata
 from ..state import all_state
 from ..utils import interval_ms, now_ms
 from .binance import BinanceClient, parse_klines
@@ -23,6 +24,8 @@ FUNDING_PAGE = 1000
 FUNDING_STEP_MS = 8 * 3_600_000
 MINUTE_MS = 60_000
 KLINE_PAGE_SIZE = 1000
+# 允许用已存储的同周期行补齐的周期。1m 本身就是源，无需回落。
+NATIVE_FALLBACK_INTERVALS = ("5m", "15m", "1h", "4h", "1d")
 
 
 def default_market_client(db: Session | None):
@@ -331,6 +334,106 @@ class MarketDataService:
         )
         frame.index.name = "funding_time"
         return frame
+
+    # ---------------- P9 正交衍生品情绪（OI/多空比/taker，免 Key 公开接口） ----------------
+
+    def sync_sentiment_many(
+        self, symbols: list[str], workers: int = MARKET_SYNC_WORKERS,
+    ) -> dict:
+        """拉取每个 symbol 的 OI 历史 + 多空比 + taker 比（1h，各 ~500 条 ≈ 21 天），
+        按 timestamp 合并后 upsert 到 sentiment 表。端点不分页，每 symbol 固定 4 个请求。"""
+        client = self._futures_client()
+        workers = max(1, min(int(workers), 32, len(symbols)))
+        total, errors = 0, []
+        with self._connection_pool(client), ThreadPoolExecutor(
+            max_workers=workers, thread_name_prefix="sentiment-sync"
+        ) as executor:
+            futures = {
+                executor.submit(self._fetch_sentiment, client, symbol): symbol
+                for symbol in symbols
+            }
+            for future in as_completed(futures):
+                symbol = futures[future]
+                try:
+                    rows = future.result()
+                    total += self._store_sentiment(symbol, rows)
+                except Exception as exc:
+                    self.db.rollback()
+                    errors.append(f"{symbol}: {exc}")
+        return {"requested": len(symbols), "inserted": total, "errors": errors}
+
+    @staticmethod
+    def _fetch_sentiment(client: BinanceFuturesClient, symbol: str) -> list[dict]:
+        """四端点各拉 1h×500，按 timestamp 外对齐合并为单行序列（缺端点留 0）。"""
+        def to_map(rows: list[dict], key: str) -> dict[int, float]:
+            return {int(r["timestamp"]): float(r[key]) for r in rows}
+
+        oi_map = to_map(client.open_interest_history(symbol, "1h", 500), "sum_open_interest")
+        oiv_map = to_map(client.open_interest_history(symbol, "1h", 500), "sum_open_interest_value")
+        lsr_map = to_map(client.long_short_ratio(symbol, "1h", 500), "long_short_ratio")
+        top_map = to_map(client.top_trader_long_short(symbol, "1h", 500), "long_short_ratio")
+        taker_map = to_map(client.taker_buy_sell_ratio(symbol, "1h", 500), "buy_sell_ratio")
+
+        stamps = sorted(set(oi_map) | set(oiv_map) | set(lsr_map) | set(top_map) | set(taker_map))
+        return [
+            {
+                "ts": ts,
+                "open_interest": oi_map.get(ts, 0.0),
+                "oi_value": oiv_map.get(ts, 0.0),
+                "long_short_ratio": lsr_map.get(ts, 0.0),
+                "top_long_short": top_map.get(ts, 0.0),
+                "taker_buy_sell": taker_map.get(ts, 0.0),
+            }
+            for ts in stamps
+        ]
+
+    def _store_sentiment(self, symbol: str, rows: list[dict]) -> int:
+        if not rows:
+            return 0
+        insert_fn = self._insert_fn()
+        for start in range(0, len(rows), 500):
+            chunk = [{"symbol": symbol, **r} for r in rows[start : start + 500]]
+            stmt = insert_fn(Sentiment).values(chunk)
+            stmt = stmt.on_conflict_do_update(
+                index_elements=["symbol", "ts"],
+                set_={
+                    "open_interest": stmt.excluded.open_interest,
+                    "oi_value": stmt.excluded.oi_value,
+                    "long_short_ratio": stmt.excluded.long_short_ratio,
+                    "top_long_short": stmt.excluded.top_long_short,
+                    "taker_buy_sell": stmt.excluded.taker_buy_sell,
+                },
+            )
+            self.db.execute(stmt)
+        self.db.commit()
+        return len(rows)
+
+    def load_sentiment_frame(self, symbol: str, start_ms: int | None = None) -> pd.DataFrame:
+        """正交情绪序列：索引为 ts（UTC DatetimeIndex），5 列特征原值。"""
+        if self.db is None:
+            return pd.DataFrame(columns=["open_interest"])
+        query = select(Sentiment).where(Sentiment.symbol == symbol)
+        if start_ms:
+            query = query.where(Sentiment.ts >= int(start_ms))
+        rows = self.db.execute(query.order_by(Sentiment.ts.asc())).scalars().all()
+        if not rows:
+            return pd.DataFrame(columns=["open_interest"])
+        frame = pd.DataFrame(
+            [
+                {
+                    "open_interest": row.open_interest,
+                    "oi_value": row.oi_value,
+                    "long_short_ratio": row.long_short_ratio,
+                    "top_long_short": row.top_long_short,
+                    "taker_buy_sell": row.taker_buy_sell,
+                }
+                for row in rows
+            ],
+            index=pd.to_datetime([row.ts for row in rows], unit="ms", utc=True),
+        )
+        frame.index.name = "ts"
+        return frame
+
     def _candle_query(
         self, symbol: str, interval: str,
         start_ms: int | None = None, end_ms: int | None = None,
@@ -424,12 +527,83 @@ class MarketDataService:
             span *= 2
             lower = max(0, min(lower - span * step, int(previous) // step * step))
 
+    def _native_candle_query(
+        self, symbol: str, interval: str,
+        start_ms: int | None = None, end_ms: int | None = None,
+    ):
+        """已单独存储的同周期行（不经 1m 聚合）。
+
+        末根必须排除：那是「下载那一刻还没走完的周期」的快照，OHLCV 是半截值
+        （实测 BNB 1h 末根 volume 1622，而该小时完整值 13332），且永远不会更新。
+        """
+        step = interval_ms(interval)
+        predicates = [Kline.symbol == symbol, Kline.interval == interval]
+        if start_ms is not None:
+            predicates.append(Kline.open_time >= start_ms // step * step)
+        if end_ms is not None:
+            predicates.append(Kline.open_time <= end_ms)
+        latest = (
+            select(func.max(Kline.open_time))
+            .where(Kline.symbol == symbol, Kline.interval == interval)
+            .scalar_subquery()
+        )
+        return select(
+            Kline.open_time, Kline.close_time, Kline.open, Kline.high, Kline.low,
+            Kline.close, Kline.volume, Kline.quote_volume, Kline.trades,
+        ).where(*predicates, Kline.open_time < latest)
+
+    def _merged_candle_rows(
+        self, symbol: str, interval: str,
+        start_ms: int | None = None, end_ms: int | None = None,
+        allow_native: bool = True,
+    ) -> tuple[list[dict], dict]:
+        """聚合优先 + native 补齐。
+
+        重叠桶一律采用聚合结果：聚合口径与既有回测完全同源，且两者在重叠区间
+        已通过逐根比对（见 docs/native-consistency.md，6/6 币种零差异）。
+        native 只负责补 1m 根本没覆盖到的历史段，不覆盖任何已有聚合桶。
+        """
+        query = self._candle_query(symbol, interval, start_ms, end_ms).subquery()
+        rows = [
+            dict(row)
+            for row in self.db.execute(
+                select(query).order_by(query.c.open_time.asc())
+            ).mappings().all()
+        ]
+        sources = {"aggregated": len(rows), "native": 0, "overlap": 0, "enabled": False}
+        if interval == "1m" or not allow_native or interval not in NATIVE_FALLBACK_INTERVALS:
+            return rows, sources
+        sources["enabled"] = True
+        known = {int(row["open_time"]) for row in rows}
+        native = self.db.execute(
+            self._native_candle_query(symbol, interval, start_ms, end_ms)
+            .order_by(Kline.open_time.asc())
+        ).mappings().all()
+        for row in native:
+            key = int(row["open_time"])
+            if key in known:
+                sources["overlap"] += 1
+                continue
+            rows.append(dict(row))
+            known.add(key)
+            sources["native"] += 1
+        rows.sort(key=lambda row: int(row["open_time"]))
+        return rows, sources
+
     def load_frame(
         self, symbol: str, interval: str, limit: int = 3000,
         start_ms: int | None = None, end_ms: int | None = None,
+        allow_native: bool | None = None,
     ) -> pd.DataFrame:
+        if allow_native is None:
+            allow_native = MARKET_NATIVE_FALLBACK
+        sources: dict | None = None
         if interval != "1m" and limit and start_ms is None:
             rows = list(reversed(self._tail_candle_rows(symbol, interval, limit, end_ms)))
+        elif start_ms is not None and interval != "1m" and allow_native:
+            # 只有显式给出 start_ms 的取数（回测/训练）才启用 native 回落；
+            # 图表与实盘走尾部路径，不应被历史行影响。
+            rows, sources = self._merged_candle_rows(symbol, interval, start_ms, end_ms)
         else:
             query = self._candle_query(symbol, interval, start_ms, end_ms).subquery()
             statement = select(query).order_by(query.c.open_time.asc())
@@ -439,9 +613,12 @@ class MarketDataService:
             else:
                 rows = self.db.execute(statement).mappings().all()
         if not rows:
-            return pd.DataFrame(columns=["open", "high", "low", "close", "volume", "quote_volume", "close_time", "trades"])
+            frame = pd.DataFrame(columns=["open", "high", "low", "close", "volume", "quote_volume", "close_time", "trades"])
+            frame.attrs["candle_sources"] = sources
+            return frame
         frame = pd.DataFrame([dict(row) for row in rows])
         frame.index = pd.DatetimeIndex(pd.to_datetime(frame.pop("open_time"), unit="ms", utc=True), name="time")
+        frame.attrs["candle_sources"] = sources
         return frame
 
     def series_stats(self, symbol: str, interval: str) -> dict:
@@ -473,3 +650,29 @@ class MarketDataService:
                 }
             )
         return result
+
+    def stats_count(self) -> int:
+        return int(self.db.execute(
+            select(func.count(func.distinct(Kline.symbol))).where(Kline.interval == "1m")
+        ).scalar_one())
+
+    def stats_page(self, page: int = 1, page_size: int = 20) -> dict:
+        """Paginate the stored minute series in SQL before materializing rows."""
+        total = self.stats_count()
+        rows = self.db.execute(
+            select(
+                Kline.symbol, Kline.interval, func.count(Kline.id),
+                func.min(Kline.open_time), func.max(Kline.open_time),
+            ).where(Kline.interval == "1m")
+            .group_by(Kline.symbol, Kline.interval)
+            .order_by(Kline.symbol.asc(), Kline.interval.asc())
+            .offset((page - 1) * page_size).limit(page_size)
+        ).all()
+        return {
+            "stats": [
+                {"symbol": symbol, "interval": interval, "count": count,
+                 "first_open_time": int(first or 0), "last_open_time": int(last or 0)}
+                for symbol, interval, count, first, last in rows
+            ],
+            **page_metadata(total, page, page_size),
+        }

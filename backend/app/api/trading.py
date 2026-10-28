@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..market.data_service import MarketDataService
 from ..models import EquitySnapshot, JobLog, Order, Signal
+from ..pagination import page_metadata
 from ..schemas import OrderPatch
 from ..serializers import order_dict, signal_dict
 from ..state import all_state
@@ -19,14 +23,14 @@ router = APIRouter(prefix="/trading", tags=["trading"])
 
 
 @router.get("/dashboard")
-def dashboard(db: Session = Depends(get_db)):
+def dashboard(db: Session = Depends(get_db), include_market: bool = True):
     snapshot = portfolio_snapshot(db, update_marks=True)
     state = all_state(db)
     open_orders = db.query(Order).filter(Order.status == "OPEN").order_by(Order.created_at.desc()).all()
     recent_orders = db.query(Order).order_by(Order.id.desc()).limit(10).all()
     recent_signals = db.query(Signal).order_by(Signal.id.desc()).limit(8).all()
     latest_logs = db.query(JobLog).order_by(JobLog.id.desc()).limit(8).all()
-    stats = MarketDataService(db).stats()
+    stats = MarketDataService(db).stats() if include_market else []
     return {
         "portfolio": snapshot,
         "positions": [order_dict(row) for row in open_orders],
@@ -57,22 +61,36 @@ def dashboard(db: Session = Depends(get_db)):
 
 @router.get("/orders")
 def list_orders(
-    status: str | None = Query(None),
-    symbol: str | None = Query(None),
-    limit: int = Query(100, ge=1, le=500),
+    status: str | None = None,
+    symbol: str | None = None,
+    limit: Annotated[int | None, Query(ge=1, le=500)] = None,
     db: Session = Depends(get_db),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int | None, Query(ge=1, le=100)] = None,
 ):
+    # Explicit page_size wins; legacy callers may still request their old limit.
+    page_size = page_size if page_size is not None else (limit if limit is not None else 20)
     query = db.query(Order)
     if status:
         query = query.filter(Order.status == status.upper())
     if symbol:
         query = query.filter(Order.symbol == symbol.upper())
-    rows = query.order_by(Order.id.desc()).limit(limit).all()
-    total_closed = db.query(Order).filter(Order.status == "CLOSED").count()
-    open_count = db.query(Order).filter(Order.status == "OPEN").count()
+    mark = func.coalesce(func.nullif(Order.mark_price, 0), Order.entry_price)
+    pnl = (mark - Order.entry_price) * Order.qty * case((Order.side == "LONG", 1), else_=-1)
+    total, open_count, closed_count, realized, unrealized = query.with_entities(
+        func.count(Order.id),
+        func.coalesce(func.sum(case((Order.status == "OPEN", 1), else_=0)), 0),
+        func.coalesce(func.sum(case((Order.status == "CLOSED", 1), else_=0)), 0),
+        func.coalesce(func.sum(case((Order.status == "CLOSED", Order.realized_pnl), else_=0.0)), 0.0),
+        func.coalesce(func.sum(case((Order.status == "OPEN", pnl), else_=0.0)), 0.0),
+    ).one()
+    rows = (query.order_by(Order.created_at.desc(), Order.id.desc())
+            .offset((page - 1) * page_size).limit(page_size).all())
     return {
         "orders": [order_dict(row) for row in rows],
-        "summary": {"open": open_count, "closed": total_closed},
+        **page_metadata(total, page, page_size),
+        "summary": {"open": open_count, "closed": closed_count,
+                    "realized_pnl": round(realized, 4), "unrealized_pnl": round(unrealized, 4)},
     }
 
 
@@ -144,9 +162,19 @@ def equity_history(limit: int = Query(1000, ge=10, le=5000), db: Session = Depen
 
 
 @router.get("/logs")
-def logs(limit: int = Query(100, ge=1, le=500), db: Session = Depends(get_db)):
-    rows = db.query(JobLog).order_by(JobLog.id.desc()).limit(limit).all()
+def logs(
+    limit: Annotated[int | None, Query(ge=1, le=500)] = None,
+    db: Session = Depends(get_db),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int | None, Query(ge=1, le=100)] = None,
+):
+    page_size = page_size if page_size is not None else (limit if limit is not None else 20)
+    query = db.query(JobLog)
+    total = query.count()
+    rows = (query.order_by(JobLog.created_at.desc(), JobLog.id.desc())
+            .offset((page - 1) * page_size).limit(page_size).all())
     return {
+        **page_metadata(total, page, page_size),
         "logs": [
             {
                 "id": row.id,

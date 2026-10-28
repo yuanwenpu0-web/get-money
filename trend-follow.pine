@@ -1,0 +1,126 @@
+//@version=6
+strategy("SuperTrend 趋势跟随（Quant Desk 本地适配）", overlay=true,
+     initial_capital=10000, currency=currency.USD, pyramiding=0,
+     margin_long=10, margin_short=10, commission_type=strategy.commission.percent,
+     commission_value=0.04, slippage=0, process_orders_on_close=false,
+     calc_on_every_tick=false, calc_on_order_fills=false)
+
+// 项目当前趋势跟随策略参数快照；当前运行周期为 1 小时，可根据需要切换图表周期。
+// 必须使用标准 K 线。信号在收盘确认，市价单默认下一根开盘成交。
+// TradingView 滑点为固定 tick，而项目按成交价 0.02%/边计算；默认滑点为 0，
+// 策略属性可手动指定近似 tick，规则过滤和风控估算仍按 0.02%/边。
+// 每笔名义数量近似模拟本地动态杠杆，图表模拟器保证金固定为 10%（允许最高 10 倍）；
+// 此保证金并非逐笔杠杆设置，也无法完整复制本地无强平模拟和实际交易所强平规则。
+// 信号收盘时无法知道下一根开盘价，因此数量和开盘跳空撤单与本地存在差异。
+// 同 K 线同时触及止盈和止损时，本地止损优先；TV 的 OHLC 路径/跳空撮合规则不同。
+// 指标预热、SuperTrend 实现、行情源、数据缺口、路由、资金费和多币共享资金均可能造成差异。
+// 反向信号只平仓，冷却结束后才允许重新开仓；风险保护不受最短持仓限制。
+
+if not chart.is_standard
+    runtime.error("请使用标准 K 线图。")
+
+adxFilter = input.float(18.0, "ADX 门槛", minval=0, maxval=100)
+minScore = input.float(0.55, "最低评分", minval=0.5, maxval=1)
+heavyScore = input.float(0.75, "重仓评分", minval=0.5, maxval=1)
+baseFraction = input.float(0.08, "基础保证金比例", minval=0, maxval=1)
+maxFraction = input.float(0.25, "最大保证金比例", minval=0, maxval=1)
+riskFraction = input.float(0.005, "单笔风险预算比例", minval=0.0001, maxval=0.05)
+maxLeverage = input.int(10, "杠杆上限（不超过 10）", minval=1, maxval=10)
+slATR = input.float(1.5, "初始止损 ATR 倍数", minval=0.1)
+tpATR = input.float(2.5, "固定止盈 ATR 倍数", minval=0.2)
+trailEnabled = input.bool(true, "启用移动止损")
+trailActivation = input.float(1.5, "移动止损激活 ATR", minval=0.1)
+trailDistance = input.float(1.2, "移动止损距离 ATR", minval=0.1)
+minHoldBars = input.int(30, "反向退出最短持仓 K 线", minval=0)
+maxHoldBars = input.int(120, "最长持仓 K 线（0=不限制）", minval=0)
+cooldownBars = input.int(10, "平仓后冷却 K 线", minval=0)
+
+feeRate = 0.0004
+slippageRate = 0.0002
+cost = 2.0 * (feeRate + slippageRate)
+ema9 = ta.ema(close, 9)
+ema21 = ta.ema(close, 21)
+ema50 = ta.ema(close, 50)
+[stLine, stDirection] = ta.supertrend(3.0, 10)
+[macdLine, macdSignal, macdHist] = ta.macd(close, 12, 26, 9)
+[plusDI, minusDI, adx] = ta.dmi(14, 14)
+rsi = ta.rsi(close, 14)
+atr = ta.atr(14)
+atrPct = atr / close
+// TradingView 的 SuperTrend 方向：-1 表示上涨；本地 +1 表示上涨。
+stSide = -stDirection
+emaSide = math.sign(ema9 / ema21 - 1.0)
+slowSide = math.sign(ema21 / ema50 - 1.0)
+macdSide = math.sign(macdHist / close)
+rules = 0.5 * stSide + 0.3 * emaSide + 0.2 * macdSide
+signedScore = rules * (adx >= adxFilter ? 1.0 : 0.5)
+side = math.sign(signedScore)
+score = 0.5 + 0.5 * math.abs(signedScore)
+confidence = math.max(0.0, math.min(1.0, (score - 0.5) / 0.5))
+leverage = math.max(1, math.min(maxLeverage, math.round(0.015 / math.max(atrPct, 0.0001) * (0.6 + 0.4 * confidence))))
+slPct = math.max(atrPct * slATR, 0.0025)
+tpPct = math.max(atrPct * tpATR, 0.005)
+netRewardRisk = (tpPct - cost) / (slPct + cost)
+scoreSpan = math.max(heavyScore - minScore, 0.000001)
+scoreFraction = math.max(0.0, math.min(1.0, (score - minScore) / scoreSpan))
+marginFraction = score >= heavyScore ? maxFraction : baseFraction + scoreFraction * (maxFraction - baseFraction)
+marginFraction := math.min(marginFraction, riskFraction / (leverage * (slPct + cost)))
+valid = barstate.isconfirmed and close > 0 and not na(atr) and atr > 0 and not na(rsi) and not na(adx) and not na(macdHist) and not na(stLine) and score >= minScore and side != 0 and adx >= adxFilter and stSide == side and emaSide == side and slowSide == side and atrPct <= 0.03 and atrPct >= cost * 0.5 and netRewardRisk >= 1.0 and marginFraction > 0
+
+var float activeStop = na
+var float activeTarget = na
+var int lastExitBar = na
+closedThisBar = ta.change(strategy.closedtrades) > 0
+if closedThisBar
+    lastExitBar := bar_index
+    activeStop := na
+    activeTarget := na
+canEnter = strategy.position_size == 0 and not closedThisBar and (na(lastExitBar) or bar_index - lastExitBar >= cooldownBars)
+
+if valid and canEnter
+    proposedStop = close * (1.0 - side * slPct)
+    proposedTarget = close * (1.0 + side * tpPct)
+    assumedEntry = close * (1.0 + side * slippageRate)
+    assumedStopFill = proposedStop * (1.0 - side * slippageRate)
+    lossRate = math.max(0.0, side * (assumedEntry - assumedStopFill) / assumedEntry) + feeRate * (1.0 + assumedStopFill / assumedEntry)
+    riskMargin = strategy.equity * riskFraction / (leverage * math.max(lossRate, 0.000000000001))
+    margin = math.min(math.min(strategy.equity * marginFraction, strategy.equity / (1.0 + leverage * feeRate)), riskMargin)
+    if proposedStop > 0 and proposedTarget > 0 and margin >= 10.0 and (assumedEntry - proposedStop) * side > 0 and (proposedTarget - assumedEntry) * side > 0
+        activeStop := proposedStop
+        activeTarget := proposedTarget
+        quantity = margin * leverage / assumedEntry
+        if side > 0
+            strategy.entry("Long", strategy.long, qty=quantity)
+            strategy.exit("Long exit", from_entry="Long", stop=activeStop, limit=activeTarget)
+            alert("趋势跟随多头信号 " + syminfo.tickerid, alert.freq_once_per_bar_close)
+        else
+            strategy.entry("Short", strategy.short, qty=quantity)
+            strategy.exit("Short exit", from_entry="Short", stop=activeStop, limit=activeTarget)
+            alert("趋势跟随空头信号 " + syminfo.tickerid, alert.freq_once_per_bar_close)
+
+if strategy.position_size != 0
+    currentSide = strategy.position_size > 0 ? 1 : -1
+    if trailEnabled and (close - strategy.position_avg_price) * currentSide > atr * trailActivation
+        candidate = close - currentSide * atr * trailDistance
+        activeStop := currentSide > 0 ? math.max(activeStop, candidate) : math.min(activeStop, candidate)
+    if currentSide > 0
+        strategy.exit("Long exit", from_entry="Long", stop=activeStop, limit=activeTarget)
+    else
+        strategy.exit("Short exit", from_entry="Short", stop=activeStop, limit=activeTarget)
+    heldToNextOpen = bar_index - strategy.opentrades.entry_bar_index(0) + 1
+    timeExit = maxHoldBars > 0 and heldToNextOpen >= maxHoldBars
+    reverseExit = valid and side == -currentSide and heldToNextOpen >= minHoldBars
+    if timeExit or reverseExit
+        if currentSide > 0
+            strategy.close("Long", comment=timeExit ? "time stop" : "signal reverse")
+        else
+            strategy.close("Short", comment=timeExit ? "time stop" : "signal reverse")
+
+plot(ema9, "EMA9", color=color.orange)
+plot(ema21, "EMA21", color=color.aqua)
+plot(ema50, "EMA50", color=color.blue)
+plot(stLine, "SuperTrend", color=stSide > 0 ? color.green : color.red, style=plot.style_linebr)
+plot(strategy.position_size != 0 ? activeStop : na, "结构 / 移动止损", color=color.red, style=plot.style_linebr)
+plot(strategy.position_size != 0 ? activeTarget : na, "固定止盈", color=color.lime, style=plot.style_linebr)
+plotshape(valid and canEnter and side > 0, title="多头确认", style=shape.triangleup, location=location.belowbar, color=color.lime, size=size.tiny)
+plotshape(valid and canEnter and side < 0, title="空头确认", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny)

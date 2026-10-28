@@ -24,7 +24,9 @@ import argparse
 import json
 import statistics
 import sys
+import threading
 import time
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
@@ -41,6 +43,8 @@ from app.backtest.portfolio import align_portfolio_equity  # noqa: E402
 from app.config import DEFAULT_STATE  # noqa: E402
 from app.db import make_engine  # noqa: E402
 from app.features.indicators import FEATURES  # noqa: E402
+from app.features.funding import FUNDING_FEATURES  # noqa: E402
+from app.features.sentiment import SENTIMENT_FEATURES  # noqa: E402
 from app.ml.tier_model import (  # noqa: E402
     DEFAULT_N_ESTIMATORS,
     build_tier_panels,
@@ -67,28 +71,55 @@ class DatasetCache:
     """缓存 build_dataset 结果：同一 (symbol, days, end_ms) 只算一次。
 
     分层组与对照组共用同一份 features —— 这是公平对比的前提，也省掉一半以上耗时。
+    并行提取时会被多个 worker 线程同时读写，故全部访问都在锁内完成。
     """
 
     def __init__(self) -> None:
         self._dataset: dict[tuple, pd.DataFrame | None] = {}
         self._misses = 0
+        self._errors: list = []
+        self._lock = threading.Lock()
 
     def get(self, db: Session, symbol: str, interval: str, horizon: int, days: int, end_ms: int):
         key = (symbol, interval, horizon, days, end_ms)
-        if key in self._dataset:
-            return self._dataset[key]
+        with self._lock:
+            cached = self._dataset.get(key)
+            # 命中（含已确认取不到的 None）直接返回，避免重复建数据集
+            if key in self._dataset:
+                return cached
         try:
             data = build_dataset(
                 db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms
             )
         except Exception as exc:
             data = None
-            self._misses += 1
-            self._dataset[key] = None
-            self._errors: list = getattr(self, "_errors", [])
-            self._errors.append({"symbol": symbol, "reason": str(exc)[:160]})
-        self._dataset[key] = data
+            with self._lock:
+                self._misses += 1
+                self._dataset[key] = None
+                self._errors.append({"symbol": symbol, "reason": str(exc)[:160]})
+            return None
+        with self._lock:
+            self._dataset[key] = data
         return data
+
+    def prefetch(self, db: Session, symbols: Sequence[str], interval: str, horizon: int,
+                 days: int, end_ms: int, workers: int | None = None) -> dict:
+        """按币种并行提取数据集（含特征计算）——整轮回测最耗时的一段。
+
+        build_dataset 里既有 DB 往返也有 pandas 计算，按币种切分后彼此独立，
+        天然可并行。结果写入缓存，后续串行消费逻辑无需改动。
+        """
+        from app.backtest.parallel import parallel_symbol_map
+
+        pending = [s for s in symbols if (s, interval, horizon, days, end_ms) not in self._dataset]
+        if not pending:
+            return {"requested": 0, "workers": 0}
+        parallel_symbol_map(
+            db, pending,
+            lambda worker_db, symbol: self.get(worker_db, symbol, interval, horizon, days, end_ms),
+            workers=workers, thread_name="tier_extract",
+        )
+        return {"requested": len(pending), "workers": workers}
 
     @property
     def errors(self) -> list:
@@ -96,9 +127,14 @@ class DatasetCache:
 
 
 # ---------------------------------------------------------------- 基础收益矿工
-def _base_params(strategy: str, fee: float, slippage: float) -> dict:
+def _base_params(strategy: str, fee: float, slippage: float, funding_filter: bool = False) -> dict:
     state = {**DEFAULT_STATE, "fee_rate": fee, "slippage": slippage}
-    return resolve_params(strategy, state)
+    params = resolve_params(strategy, state)
+    # P7 叠加层：极端资金费率拥挤时禁开顺费仓位（复用 rules.funding_filter）。
+    # 仅作为布尔开关透传，不参与寻优——与 regime/cost 过滤器同级，逻辑在 rules.evaluate_signals。
+    if funding_filter:
+        params["funding_filter"] = True
+    return params
 
 
 def minimum_trades_gate(frame_map: dict) -> int:
@@ -166,6 +202,8 @@ def select_tier_params(
     fee: float,
     slippage: float,
     interval: str,
+    workers: int | None = None,
+    processes: int | None = None,
 ) -> tuple[dict, dict]:
     """坐标下降寻优：先 (min_score, sl_atr_mult)，再 (tp_atr_mult, max_hold_bars)。
 
@@ -188,27 +226,60 @@ def select_tier_params(
     for round_keys in OPTIMIZE_ROUNDS:
         # 每轮都用更新后的 current 重新生成候选（见 tier_params.round_combos 注释）
         combos = round_combos(round_keys, current)
-        best_candidate, best_objective, best_trades = None, float("-inf"), 0
-        for changes in combos:
+
+        def evaluate(changes):
             candidate = {**current, **dict(changes)}
             try:
                 candidate = _sanitize(candidate)
             except Exception:
-                continue
+                return None
             metrics, trades = score(candidate)
             if metrics is None:
-                continue
+                return None
             objective = metrics["total_return_pct"] + 0.5 * metrics["max_drawdown_pct"]
-            history.append({
+            return {
                 "changes": dict(changes),
+                "candidate": candidate,
                 "objective": round(objective, 4),
                 "return_pct": metrics["total_return_pct"],
                 "max_drawdown_pct": metrics["max_drawdown_pct"],
                 "trades": trades,
                 "eligible": trades >= min_trades,
-            })
-            if trades >= min_trades and objective > best_objective:
-                best_candidate, best_objective, best_trades = candidate, objective, trades
+            }
+
+        # 候选组之间无共享状态，可并行评估。结果按 combos 顺序还原后再选优，
+        # 保证与串行逐位一致（objective 取严格更大的首个候选）。
+        #
+        # 进程 vs 线程：evaluate_split 的核心是 simulate 的逐 bar Python 循环，
+        # 线程被 GIL 锁死（实测 8 线程 37.0s ≈ 串行 36.8s，毫无收益）；
+        # 只有进程池才能真并行，代价是 DataFrame 与模型 payload 的 pickle 开销。
+        if processes and processes > 1 and len(combos) > 1:
+            tasks = [
+                {
+                    "changes": changes, "current": current, "val_map": val_map,
+                    "strategy": strategy, "payload": payload, "cash": cash_per_symbol,
+                    "fee": fee, "slippage": slippage, "interval": interval,
+                    "min_trades": min_trades,
+                }
+                for changes in combos
+            ]
+            with ProcessPoolExecutor(max_workers=min(processes, len(combos))) as executor:
+                evaluated = list(executor.map(_evaluate_combo_task, tasks))
+        elif workers and workers > 1 and len(combos) > 1:
+            with ThreadPoolExecutor(max_workers=min(workers, len(combos))) as executor:
+                evaluated = list(executor.map(evaluate, combos))
+        else:
+            evaluated = [evaluate(changes) for changes in combos]
+
+        best_candidate, best_objective, best_trades = None, float("-inf"), 0
+        for item in evaluated:
+            if item is None:
+                continue
+            history.append({k: v for k, v in item.items() if k != "candidate"})
+            if item["eligible"] and item["objective"] > best_objective:
+                best_candidate, best_objective, best_trades = (
+                    item["candidate"], item["objective"], item["trades"],
+                )
         if best_candidate is not None:
             current = best_candidate
     return current, {
@@ -216,6 +287,60 @@ def select_tier_params(
         "minimum_trades": min_trades,
         "evaluated": len(history),
         "history_sample": history[:6],
+    }
+
+
+def _evaluate_tier_task(task: dict):
+    """单个档位的「寻优 + 回测」worker——模块级函数，供进程池 pickle。
+
+    只做纯计算：模型已在主进程训好并以 payload 传入，本函数不碰 DB。
+    内部刻意不再开进程池/线程池（嵌套池会死锁），档内寻优保持串行。
+    """
+    params, selection = select_tier_params(
+        task["tier_val"], task["strategy"], task["tier_base"], task["payload"],
+        task["cash_map"], task["fee"], task["slippage"], task["interval"],
+    )
+    evaluated = evaluate_split(
+        task["tier_test"], task["strategy"], params, task["payload"],
+        task["cash_map"], task["fee"], task["slippage"], task["interval"],
+    )
+    return {
+        "members": task["members"],
+        "tier_base": task["tier_base"],
+        "selection": selection,
+        # legs/trades 含 numpy 类型与 Timestamp，可 pickle；回主进程再聚合
+        "evaluated": evaluated,
+    }
+
+
+def _evaluate_combo_task(task: dict):
+    """候选参数评估 worker——**必须是模块级函数**，否则进程池无法 pickle。
+
+    只做纯计算（evaluate_split 不碰 DB），因此可安全跨进程。
+    返回 None 表示该候选无效（参数非法或无成交）。
+    """
+    candidate = {**task["current"], **dict(task["changes"])}
+    try:
+        candidate = _sanitize(candidate)
+    except Exception:
+        return None
+    result = evaluate_split(
+        task["val_map"], task["strategy"], candidate, task["payload"],
+        task["cash"], task["fee"], task["slippage"], task["interval"],
+    )
+    if result is None:
+        return None
+    metrics = result[0]
+    trades = int(metrics.get("total_trades") or 0)
+    objective = metrics["total_return_pct"] + 0.5 * metrics["max_drawdown_pct"]
+    return {
+        "changes": dict(task["changes"]),
+        "candidate": candidate,
+        "objective": round(objective, 4),
+        "return_pct": metrics["total_return_pct"],
+        "max_drawdown_pct": metrics["max_drawdown_pct"],
+        "trades": trades,
+        "eligible": trades >= task["min_trades"],
     }
 
 
@@ -281,24 +406,44 @@ def evaluate_tier_branch(
     results: list[dict] = []
     legs_all: list[dict] = []
     trades_all: list[dict] = []
-    for key in TIER_KEYS:
+
+    def build_task(key: str) -> dict | None:
         members = active_tiers.get(key)
         if not members:
-            continue
+            return None
+        tier_cash_pool = args.initial_cash / len(active_tiers)
+        return {
+            "key": key,
+            "members": members,
+            "payload": payloads.get(key),
+            "model_metrics": models.get(key) or {},
+            "tier_val": {s: val_map[s] for s in members},
+            "tier_test": {s: test_map[s] for s in members},
+            "tier_train": {s: train_map[s] for s in members},
+            "cash_map": {s: tier_cash_pool / len(members) for s in members},
+            "tier_base": tier_params(base, key),
+            "strategy": strategy,
+            "fee": fee,
+            "slippage": slippage,
+            "interval": INTERVAL,
+        }
+
+    tasks = [t for t in (build_task(k) for k in TIER_KEYS) if t]
+    processes = getattr(args, "processes", None)
+    # 档与档之间完全独立，是天然的并行边界。进程池**只建一次**并跨档复用：
+    # 每次寻优都新建池时，Windows 的 spawn 开销远超计算本身（实测 52.9s > 串行 36.8s）。
+    if processes and processes > 1 and len(tasks) > 1:
+        with ProcessPoolExecutor(max_workers=min(processes, len(tasks))) as executor:
+            outcomes = list(executor.map(_evaluate_tier_task, tasks))
+    else:
+        outcomes = [_evaluate_tier_task(t) for t in tasks]
+
+    for key, outcome in zip([t["key"] for t in tasks], outcomes):
+        members = outcome["members"]
         payload = payloads.get(key)
         model_metrics = models.get(key) or {}
-        tier_val = {s: val_map[s] for s in members}
-        tier_test = {s: test_map[s] for s in members}
-        tier_cash_pool = args.initial_cash / len(active_tiers)
-        cash_map = {s: tier_cash_pool / len(members) for s in members}
-
-        tier_base = tier_params(base, key)
-        params, selection = select_tier_params(
-            tier_val, strategy, tier_base, payload, cash_map, fee, slippage, INTERVAL
-        )
-        evaluated = evaluate_split(
-            tier_test, strategy, params, payload, cash_map, fee, slippage, INTERVAL
-        )
+        selection = outcome["selection"]
+        evaluated = outcome["evaluated"]
         metrics = evaluated[0] if evaluated else None
         if evaluated:
             _, legs, trades = evaluated
@@ -316,7 +461,7 @@ def evaluate_tier_branch(
             },
             "selected_params": selection["selected_params"],
             "baseline_params": {
-                k: tier_base.get(k) for k in ("min_score", "sl_atr_mult", "tp_atr_mult", "max_hold_bars")
+                k: outcome["tier_base"].get(k) for k in ("min_score", "sl_atr_mult", "tp_atr_mult", "max_hold_bars")
             },
             "optimization": {"minimum_trades": selection["minimum_trades"],
                              "evaluated": selection["evaluated"]},
@@ -336,7 +481,7 @@ def run_window(db: Session, args, end_ms: int, index: int, cache: DatasetCache) 
     strategy = args.strategy
     fee, slippage = args.fee, args.slippage
     window_days = args.window_days
-    base = _base_params(strategy, fee, slippage)
+    base = _base_params(strategy, fee, slippage, funding_filter=args.funding_filter)
     horizon = int(DEFAULT_STATE.get("train_horizon", 5))
 
     # 1) 反前视分档：用回测窗口开始前的成交额/波动给币种分档。
@@ -357,6 +502,11 @@ def run_window(db: Session, args, end_ms: int, index: int, cache: DatasetCache) 
     symbols_all = sorted({s for members in selected.values() for s in members})
 
     # 2) 逐币种构建 features 并切分（缓存，分层组与对照组共用）
+    #    提取阶段按币种并行——这是整轮回测最耗时的一段；切分仍是串行且确定性的。
+    extract = cache.prefetch(
+        db, symbols_all, INTERVAL, horizon, window_days, end_ms,
+        workers=getattr(args, "workers", None),
+    )
     train_map, val_map, test_map = {}, {}, {}
     skipped: list[dict] = []
     for symbol in symbols_all:
@@ -405,7 +555,9 @@ def run_window(db: Session, args, end_ms: int, index: int, cache: DatasetCache) 
             uniform_model = {"error": str(exc)[:200]}
 
     uniform_params, uniform_selection = select_tier_params(
-        val_map, strategy, base, uniform_payload, cash_uniform, fee, slippage, INTERVAL
+        val_map, strategy, base, uniform_payload, cash_uniform, fee, slippage, INTERVAL,
+        workers=getattr(args, "workers", None),
+        processes=getattr(args, "processes", None),
     )
     uniform_eval = evaluate_split(
         test_map, strategy, uniform_params, uniform_payload, cash_uniform, fee, slippage, INTERVAL
@@ -677,6 +829,14 @@ def main() -> None:
     parser.add_argument("--train-ratio", type=float, default=0.8)
     parser.add_argument("--val-ratio", type=float, default=0.2)
     parser.add_argument("--n-estimators", type=int, default=DEFAULT_N_ESTIMATORS)
+    parser.add_argument(
+        "--workers", type=int, default=None,
+        help="按币种并行提取数据的线程数；缺省取 min(CPU逻辑核//2, 8, 币种数)，1 表示串行",
+    )
+    parser.add_argument(
+        "--processes", type=int, default=None,
+        help="参数寻优的进程数；simulate 是纯 Python 循环受 GIL 限制，只有进程池能真并行",
+    )
     parser.add_argument("--fee", type=float, default=FEE)
     parser.add_argument("--slippage", type=float, default=SLIPPAGE)
     parser.add_argument("--initial-cash", type=float, default=INITIAL_CASH)
@@ -689,7 +849,40 @@ def main() -> None:
         default=ROOT / "docs" / "backfill-tier-minutes.json",
         help="回填脚本产出的代表币种清单（限制分档候选集，提升速度）",
     )
+    parser.add_argument(
+        "--exclude-funding",
+        action="store_true",
+        help="A/B 对照：剔除全部 funding 特征（FUNDING_FEATURES），验证资金费率对 PnL 的边际贡献",
+    )
+    parser.add_argument(
+        "--funding-filter",
+        action="store_true",
+        help="P7 叠加层：开启资金费率拥挤过滤（funding_z>=2σ 禁多 / <=-2σ 禁空），"
+        "避开最拥挤的顺费仓位；与 --exclude-funding 正交（本开关保留 funding 特征，仅加规则）",
+    )
+    parser.add_argument(
+        "--exclude-sentiment",
+        dest="exclude_sentiment",
+        action="store_true",
+        help="A/B 对照：剔除全部正交情绪特征（SENTIMENT_FEATURES，OI/多空比/taker），"
+        "验证 sentiment 对 PnL 的边际贡献；与 --exclude-funding 正交。"
+        "注意：sentiment 仅覆盖最近 ~21 天（API 上限），老窗口内该组特征退化为 0",
+    )
+    parser.add_argument(
+        "--suffix", type=str, default="",
+        help="输出文件名后缀（区分 funding-on / funding-off 两次运行），如 -funding / -nofunding",
+    )
     args = parser.parse_args()
+
+    # 受控 A/B：原地收窄全局 FEATURES（dataset / tier_model / predict 均引用同一 list 对象），
+    # 使训练与预测在 funding 开关下完全一致；进程内同一次运行只跑一种口径，保证公平。
+    if args.exclude_funding:
+        FEATURES[:] = [f for f in FEATURES if f not in FUNDING_FEATURES]
+    if args.exclude_sentiment:
+        FEATURES[:] = [f for f in FEATURES if f not in SENTIMENT_FEATURES]
+    if args.suffix:
+        args.output = args.output.with_name(f"tier-backtest{args.suffix}.json")
+        args.markdown_output = args.markdown_output.with_name(f"tier-backtest{args.suffix}.md")
 
     as_of = datetime.fromisoformat(args.as_of.replace("Z", "+00:00"))
     if as_of.tzinfo is None:
@@ -745,6 +938,8 @@ def main() -> None:
     payload = {
         "as_of": as_of.isoformat(),
         "params": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
+        "funding_features": [f for f in FUNDING_FEATURES if f in FEATURES],
+        "sentiment_features": [f for f in SENTIMENT_FEATURES if f in FEATURES],
         "elapsed_sec": round(time.time() - started, 1),
         "windows": windows_out,
     }

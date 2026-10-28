@@ -1,0 +1,1093 @@
+{
+  "as_of": "2026-10-27T00:00:00+00:00",
+  "params": {
+    "as_of": "2026-10-27T00:00:00+00:00",
+    "strategy": "ml_ensemble",
+    "window_days": 45,
+    "step_days": 15,
+    "windows": 2,
+    "per_tier": 8,
+    "cross_ablation": false,
+    "report_only": false,
+    "train_ratio": 0.8,
+    "val_ratio": 0.2,
+    "n_estimators": 180,
+    "workers": 8,
+    "processes": 4,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "initial_cash": 10000.0,
+    "output": "D:\\UGit\\get-money\\docs\\tier-backtestnofunding.json",
+    "markdown_output": "D:\\UGit\\get-money\\docs\\tier-backtestnofunding.md",
+    "candidates_file": "D:\\UGit\\get-money\\docs\\backfill-tier-minutes.json",
+    "exclude_funding": true,
+    "suffix": "nofunding",
+    "candidates": [
+      "0GUSDT",
+      "1000PEPEUSDT",
+      "AAVEUSDT",
+      "ADAUSDT",
+      "AGTUSDT",
+      "AKEUSDT",
+      "APTUSDT",
+      "ARBUSDT",
+      "ARCUSDT",
+      "ARIAUSDT",
+      "ARUSDT",
+      "ASTERUSDT",
+      "AVAXUSDT",
+      "AXSUSDT",
+      "BATUSDT",
+      "BCHUSDT",
+      "BEAMXUSDT",
+      "BIRBUSDT",
+      "BNBUSDT",
+      "BOMEUSDT",
+      "BRUSDT",
+      "BTCUSDT",
+      "BTWUSDT",
+      "BULLAUSDT",
+      "CAKEUSDT",
+      "COTIUSDT",
+      "DOGEUSDT",
+      "DOODUSDT",
+      "DOSUSDT",
+      "DOTUSDT",
+      "EIGENUSDT",
+      "ENAUSDT",
+      "ETHUSDT",
+      "FETUSDT",
+      "FILUSDT",
+      "GALAUSDT",
+      "GTCUSDT",
+      "HBARUSDT",
+      "HYPEUSDT",
+      "INJUSDT",
+      "IOSTUSDT",
+      "IRYSUSDT",
+      "JCTUSDT",
+      "LINKUSDT",
+      "LITUSDT",
+      "LTCUSDT",
+      "LYNUSDT",
+      "MAGICUSDT",
+      "MAGMAUSDT",
+      "MANAUSDT",
+      "METUSDT",
+      "MORPHOUSDT",
+      "MOVRUSDT",
+      "NEARUSDT",
+      "OGNUSDT",
+      "ONDOUSDT",
+      "OPUSDT",
+      "PENDLEUSDT",
+      "PENGUUSDT",
+      "POLUSDT",
+      "PONSUSDT",
+      "PROMUSDT",
+      "PUMPUSDT",
+      "QNTUSDT",
+      "RAREUSDT",
+      "RIVERUSDT",
+      "RLCUSDT",
+      "RUNEUSDT",
+      "SAGAUSDT",
+      "SANDUSDT",
+      "SKYUSDT"
+    ]
+  },
+  "funding_features": [],
+  "elapsed_sec": 47.1,
+  "windows": [
+    {
+      "index": 0,
+      "end_date": "2026-10-27",
+      "end_ms": 1793059200000,
+      "ok": true,
+      "strategy": "ml_ensemble",
+      "total_symbols": 47,
+      "skipped": [],
+      "tier_summary": [
+        {
+          "tier": "mega_stable",
+          "symbols": 1,
+          "median_daily_usd": 11766098766.4,
+          "median_atr_pct": 0.005664,
+          "top_symbols": [
+            "BTCUSDT"
+          ]
+        },
+        {
+          "tier": "mega_volatile",
+          "symbols": 2,
+          "median_daily_usd": 4988466606.27,
+          "median_atr_pct": 0.010117,
+          "top_symbols": [
+            "ETHUSDT",
+            "HYPEUSDT"
+          ]
+        },
+        {
+          "tier": "large_stable",
+          "symbols": 6,
+          "median_daily_usd": 221009020.47,
+          "median_atr_pct": 0.012556,
+          "top_symbols": [
+            "DOGEUSDT",
+            "BNBUSDT",
+            "1000PEPEUSDT",
+            "LINKUSDT",
+            "ADAUSDT"
+          ]
+        },
+        {
+          "tier": "large_volatile",
+          "symbols": 6,
+          "median_daily_usd": 196244634.99,
+          "median_atr_pct": 0.023978,
+          "top_symbols": [
+            "ENAUSDT",
+            "PUMPUSDT",
+            "AKEUSDT",
+            "NEARUSDT",
+            "ARBUSDT"
+          ]
+        },
+        {
+          "tier": "mid_stable",
+          "symbols": 12,
+          "median_daily_usd": 67819264.77,
+          "median_atr_pct": 0.013494,
+          "top_symbols": [
+            "BCHUSDT",
+            "AVAXUSDT",
+            "FILUSDT",
+            "ASTERUSDT",
+            "LTCUSDT"
+          ]
+        },
+        {
+          "tier": "mid_volatile",
+          "symbols": 12,
+          "median_daily_usd": 50553256.61,
+          "median_atr_pct": 0.024896,
+          "top_symbols": [
+            "PROMUSDT",
+            "LITUSDT",
+            "IOSTUSDT",
+            "PENGUUSDT",
+            "MAGMAUSDT"
+          ]
+        },
+        {
+          "tier": "small_stable",
+          "symbols": 8,
+          "median_daily_usd": 10043675.62,
+          "median_atr_pct": 0.012775,
+          "top_symbols": [
+            "PENDLEUSDT",
+            "MORPHOUSDT",
+            "CAKEUSDT",
+            "SANDUSDT",
+            "RUNEUSDT"
+          ]
+        },
+        {
+          "tier": "small_volatile",
+          "symbols": 8,
+          "median_daily_usd": 12009713.1,
+          "median_atr_pct": 0.01821,
+          "top_symbols": [
+            "GALAUSDT",
+            "DOSUSDT",
+            "RIVERUSDT",
+            "METUSDT",
+            "EIGENUSDT"
+          ]
+        }
+      ],
+      "tiers": [
+        {
+          "tier": "mega_stable",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "n_symbols": 1,
+          "pooled_train_rows": 610,
+          "model": {
+            "train_auc": 0.999,
+            "val_auc": 0.566,
+            "test_auc": 0.5129,
+            "test_accuracy": 0.4466,
+            "atr_mean_pct": 0.005089,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.56,
+            "sl_atr_mult": 1.4,
+            "tp_atr_mult": 2.4,
+            "max_hold_bars": 160
+          },
+          "baseline_params": {
+            "min_score": 0.56,
+            "sl_atr_mult": 1.4,
+            "tp_atr_mult": 2.4,
+            "max_hold_bars": 160
+          },
+          "optimization": {
+            "minimum_trades": 10,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 1.3008,
+            "max_drawdown_pct": -0.9856,
+            "sharpe": 7.65,
+            "total_trades": 7,
+            "expectancy": 2.323,
+            "win_rate": 71.43
+          }
+        },
+        {
+          "tier": "mega_volatile",
+          "symbols": [
+            "ETHUSDT",
+            "HYPEUSDT"
+          ],
+          "n_symbols": 2,
+          "pooled_train_rows": 1214,
+          "model": {
+            "train_auc": 0.999,
+            "val_auc": 0.5612,
+            "test_auc": 0.3488,
+            "test_accuracy": 0.3878,
+            "atr_mean_pct": 0.008647,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.8,
+            "tp_atr_mult": 2.8,
+            "max_hold_bars": 140
+          },
+          "baseline_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.8,
+            "tp_atr_mult": 2.8,
+            "max_hold_bars": 140
+          },
+          "optimization": {
+            "minimum_trades": 10,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -1.2384,
+            "max_drawdown_pct": -1.4259,
+            "sharpe": -9.46,
+            "total_trades": 15,
+            "expectancy": -1.0325,
+            "win_rate": 33.33
+          }
+        },
+        {
+          "tier": "large_stable",
+          "symbols": [
+            "DOGEUSDT",
+            "BNBUSDT",
+            "1000PEPEUSDT",
+            "LINKUSDT",
+            "ADAUSDT",
+            "AAVEUSDT"
+          ],
+          "n_symbols": 6,
+          "pooled_train_rows": 3648,
+          "model": {
+            "train_auc": 0.9945,
+            "val_auc": 0.6067,
+            "test_auc": 0.4313,
+            "test_accuracy": 0.4407,
+            "atr_mean_pct": 0.011699,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.5,
+            "tp_atr_mult": 3.0,
+            "max_hold_bars": 98.0
+          },
+          "baseline_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.5,
+            "tp_atr_mult": 2.5,
+            "max_hold_bars": 140
+          },
+          "optimization": {
+            "minimum_trades": 23,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.0984,
+            "max_drawdown_pct": -0.2845,
+            "sharpe": 1.76,
+            "total_trades": 34,
+            "expectancy": 0.0362,
+            "win_rate": 50.0
+          }
+        },
+        {
+          "tier": "large_volatile",
+          "symbols": [
+            "ENAUSDT",
+            "PUMPUSDT",
+            "AKEUSDT",
+            "NEARUSDT",
+            "ARBUSDT",
+            "BTWUSDT"
+          ],
+          "n_symbols": 6,
+          "pooled_train_rows": 3654,
+          "model": {
+            "train_auc": 0.9945,
+            "val_auc": 0.4999,
+            "test_auc": 0.4716,
+            "test_accuracy": 0.4773,
+            "atr_mean_pct": 0.03262,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 1.615,
+            "tp_atr_mult": 2.465,
+            "max_hold_bars": 84.0
+          },
+          "baseline_params": {
+            "min_score": 0.58,
+            "sl_atr_mult": 1.9,
+            "tp_atr_mult": 2.9,
+            "max_hold_bars": 120
+          },
+          "optimization": {
+            "minimum_trades": 23,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.3848,
+            "max_drawdown_pct": -0.5087,
+            "sharpe": 5.16,
+            "total_trades": 26,
+            "expectancy": 0.1854,
+            "win_rate": 53.85
+          }
+        },
+        {
+          "tier": "mid_stable",
+          "symbols": [
+            "BCHUSDT",
+            "AVAXUSDT",
+            "FILUSDT",
+            "ASTERUSDT",
+            "LTCUSDT",
+            "ONDOUSDT",
+            "DOTUSDT",
+            "INJUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4874,
+          "model": {
+            "train_auc": 0.985,
+            "val_auc": 0.529,
+            "test_auc": 0.4652,
+            "test_accuracy": 0.4569,
+            "atr_mean_pct": 0.014592,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 1.955,
+            "tp_atr_mult": 2.7,
+            "max_hold_bars": 84.0
+          },
+          "baseline_params": {
+            "min_score": 0.58,
+            "sl_atr_mult": 1.7,
+            "tp_atr_mult": 2.7,
+            "max_hold_bars": 120
+          },
+          "optimization": {
+            "minimum_trades": 31,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.0056,
+            "max_drawdown_pct": -0.3597,
+            "sharpe": 0.13,
+            "total_trades": 40,
+            "expectancy": 0.0017,
+            "win_rate": 50.0
+          }
+        },
+        {
+          "tier": "mid_volatile",
+          "symbols": [
+            "PROMUSDT",
+            "LITUSDT",
+            "IOSTUSDT",
+            "PENGUUSDT",
+            "MAGMAUSDT",
+            "BULLAUSDT",
+            "BOMEUSDT",
+            "COTIUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4850,
+          "model": {
+            "train_auc": 0.9854,
+            "val_auc": 0.4804,
+            "test_auc": 0.4849,
+            "test_accuracy": 0.4829,
+            "atr_mean_pct": 0.023971,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.64,
+            "sl_atr_mult": 2.415,
+            "tp_atr_mult": 3.84,
+            "max_hold_bars": 70.0
+          },
+          "baseline_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 2.1,
+            "tp_atr_mult": 3.2,
+            "max_hold_bars": 100
+          },
+          "optimization": {
+            "minimum_trades": 31,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.0816,
+            "max_drawdown_pct": -0.4212,
+            "sharpe": -1.28,
+            "total_trades": 33,
+            "expectancy": -0.0309,
+            "win_rate": 54.55
+          }
+        },
+        {
+          "tier": "small_stable",
+          "symbols": [
+            "PENDLEUSDT",
+            "MORPHOUSDT",
+            "CAKEUSDT",
+            "SANDUSDT",
+            "RUNEUSDT",
+            "BEAMXUSDT",
+            "AXSUSDT",
+            "SKYUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4832,
+          "model": {
+            "train_auc": 0.9848,
+            "val_auc": 0.5618,
+            "test_auc": 0.4778,
+            "test_accuracy": 0.4583,
+            "atr_mean_pct": 0.015451,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 2.185,
+            "tp_atr_mult": 3.6,
+            "max_hold_bars": 70.0
+          },
+          "baseline_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 1.9,
+            "tp_atr_mult": 3.0,
+            "max_hold_bars": 100
+          },
+          "optimization": {
+            "minimum_trades": 31,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.1416,
+            "max_drawdown_pct": -0.2488,
+            "sharpe": -4.42,
+            "total_trades": 33,
+            "expectancy": -0.0537,
+            "win_rate": 48.48
+          }
+        },
+        {
+          "tier": "small_volatile",
+          "symbols": [
+            "GALAUSDT",
+            "DOSUSDT",
+            "RIVERUSDT",
+            "METUSDT",
+            "EIGENUSDT",
+            "DOODUSDT",
+            "ARUSDT",
+            "SAGAUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4844,
+          "model": {
+            "train_auc": 0.9865,
+            "val_auc": 0.5337,
+            "test_auc": 0.4758,
+            "test_accuracy": 0.5,
+            "atr_mean_pct": 0.021887,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 2.3,
+            "tp_atr_mult": 3.5,
+            "max_hold_bars": 80
+          },
+          "baseline_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 2.3,
+            "tp_atr_mult": 3.5,
+            "max_hold_bars": 80
+          },
+          "optimization": {
+            "minimum_trades": 31,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.552,
+            "max_drawdown_pct": -0.2025,
+            "sharpe": 7.34,
+            "total_trades": 32,
+            "expectancy": 0.216,
+            "win_rate": 68.75
+          }
+        }
+      ],
+      "cross": null,
+      "tiered": {
+        "total_return_pct": 0.11,
+        "max_drawdown_pct": -0.2988,
+        "sharpe": 2.8,
+        "total_trades": 220,
+        "expectancy": 0.05
+      },
+      "uniform": {
+        "total_return_pct": -0.1429,
+        "max_drawdown_pct": -0.1821,
+        "sharpe": -5.55,
+        "total_trades": 169,
+        "expectancy": -0.0846,
+        "selected_params": {
+          "min_score": 0.75,
+          "sl_atr_mult": 1.5,
+          "tp_atr_mult": 2.5,
+          "max_hold_bars": 120
+        },
+        "model": {
+          "train_auc": 0.8488,
+          "val_auc": 0.4981,
+          "test_auc": 0.438,
+          "error": null
+        }
+      }
+    },
+    {
+      "index": 1,
+      "end_date": "2026-10-12",
+      "end_ms": 1791763200000,
+      "ok": true,
+      "strategy": "ml_ensemble",
+      "total_symbols": 45,
+      "skipped": [],
+      "tier_summary": [
+        {
+          "tier": "mega_stable",
+          "symbols": 1,
+          "median_daily_usd": 9971714959.07,
+          "median_atr_pct": 0.004972,
+          "top_symbols": [
+            "BTCUSDT"
+          ]
+        },
+        {
+          "tier": "mega_volatile",
+          "symbols": 2,
+          "median_daily_usd": 4152803450.39,
+          "median_atr_pct": 0.009229,
+          "top_symbols": [
+            "ETHUSDT",
+            "HYPEUSDT"
+          ]
+        },
+        {
+          "tier": "large_stable",
+          "symbols": 5,
+          "median_daily_usd": 204479044.9,
+          "median_atr_pct": 0.009805,
+          "top_symbols": [
+            "DOGEUSDT",
+            "BNBUSDT",
+            "1000PEPEUSDT",
+            "LINKUSDT",
+            "NEARUSDT"
+          ]
+        },
+        {
+          "tier": "large_volatile",
+          "symbols": 5,
+          "median_daily_usd": 168765270.88,
+          "median_atr_pct": 0.024057,
+          "top_symbols": [
+            "ENAUSDT",
+            "PUMPUSDT",
+            "ADAUSDT",
+            "AKEUSDT",
+            "BTWUSDT"
+          ]
+        },
+        {
+          "tier": "mid_stable",
+          "symbols": 9,
+          "median_daily_usd": 42031269.11,
+          "median_atr_pct": 0.009267,
+          "top_symbols": [
+            "AVAXUSDT",
+            "BCHUSDT",
+            "LTCUSDT",
+            "FILUSDT",
+            "ASTERUSDT"
+          ]
+        },
+        {
+          "tier": "mid_volatile",
+          "symbols": 10,
+          "median_daily_usd": 54232311.81,
+          "median_atr_pct": 0.013927,
+          "top_symbols": [
+            "COTIUSDT",
+            "AAVEUSDT",
+            "ONDOUSDT",
+            "PROMUSDT",
+            "PENGUUSDT"
+          ]
+        },
+        {
+          "tier": "small_stable",
+          "symbols": 9,
+          "median_daily_usd": 9867384.96,
+          "median_atr_pct": 0.011988,
+          "top_symbols": [
+            "OPUSDT",
+            "GALAUSDT",
+            "MORPHOUSDT",
+            "PENDLEUSDT",
+            "SANDUSDT"
+          ]
+        },
+        {
+          "tier": "small_volatile",
+          "symbols": 9,
+          "median_daily_usd": 7320545.28,
+          "median_atr_pct": 0.021179,
+          "top_symbols": [
+            "BRUSDT",
+            "MAGMAUSDT",
+            "MOVRUSDT",
+            "RIVERUSDT",
+            "BULLAUSDT"
+          ]
+        }
+      ],
+      "tiers": [
+        {
+          "tier": "mega_stable",
+          "symbols": [
+            "BTCUSDT"
+          ],
+          "n_symbols": 1,
+          "pooled_train_rows": 610,
+          "model": {
+            "train_auc": 0.9984,
+            "val_auc": 0.5082,
+            "test_auc": 0.4209,
+            "test_accuracy": 0.4417,
+            "atr_mean_pct": 0.004958,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.56,
+            "sl_atr_mult": 1.4,
+            "tp_atr_mult": 2.4,
+            "max_hold_bars": 160
+          },
+          "baseline_params": {
+            "min_score": 0.56,
+            "sl_atr_mult": 1.4,
+            "tp_atr_mult": 2.4,
+            "max_hold_bars": 160
+          },
+          "optimization": {
+            "minimum_trades": 10,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.0768,
+            "max_drawdown_pct": -0.5735,
+            "sharpe": 0.49,
+            "total_trades": 4,
+            "expectancy": 0.2399,
+            "win_rate": 50.0
+          }
+        },
+        {
+          "tier": "mega_volatile",
+          "symbols": [
+            "ETHUSDT",
+            "HYPEUSDT"
+          ],
+          "n_symbols": 2,
+          "pooled_train_rows": 1220,
+          "model": {
+            "train_auc": 0.9997,
+            "val_auc": 0.458,
+            "test_auc": 0.4461,
+            "test_accuracy": 0.483,
+            "atr_mean_pct": 0.008528,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.8,
+            "tp_atr_mult": 2.8,
+            "max_hold_bars": 140
+          },
+          "baseline_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.8,
+            "tp_atr_mult": 2.8,
+            "max_hold_bars": 140
+          },
+          "optimization": {
+            "minimum_trades": 10,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.4672,
+            "max_drawdown_pct": -0.3801,
+            "sharpe": 5.89,
+            "total_trades": 9,
+            "expectancy": 0.6496,
+            "win_rate": 55.56
+          }
+        },
+        {
+          "tier": "large_stable",
+          "symbols": [
+            "DOGEUSDT",
+            "BNBUSDT",
+            "1000PEPEUSDT",
+            "LINKUSDT",
+            "NEARUSDT"
+          ],
+          "n_symbols": 5,
+          "pooled_train_rows": 3050,
+          "model": {
+            "train_auc": 0.9974,
+            "val_auc": 0.5307,
+            "test_auc": 0.5112,
+            "test_accuracy": 0.5126,
+            "atr_mean_pct": 0.012606,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.61,
+            "sl_atr_mult": 1.275,
+            "tp_atr_mult": 2.125,
+            "max_hold_bars": 98.0
+          },
+          "baseline_params": {
+            "min_score": 0.57,
+            "sl_atr_mult": 1.5,
+            "tp_atr_mult": 2.5,
+            "max_hold_bars": 140
+          },
+          "optimization": {
+            "minimum_trades": 20,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.5488,
+            "max_drawdown_pct": -0.8824,
+            "sharpe": -6.64,
+            "total_trades": 32,
+            "expectancy": -0.2145,
+            "win_rate": 34.38
+          }
+        },
+        {
+          "tier": "large_volatile",
+          "symbols": [
+            "ENAUSDT",
+            "PUMPUSDT",
+            "ADAUSDT",
+            "AKEUSDT",
+            "BTWUSDT"
+          ],
+          "n_symbols": 5,
+          "pooled_train_rows": 3050,
+          "model": {
+            "train_auc": 0.9956,
+            "val_auc": 0.4591,
+            "test_auc": 0.5099,
+            "test_accuracy": 0.4874,
+            "atr_mean_pct": 0.031691,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.58,
+            "sl_atr_mult": 2.185,
+            "tp_atr_mult": 2.465,
+            "max_hold_bars": 84.0
+          },
+          "baseline_params": {
+            "min_score": 0.58,
+            "sl_atr_mult": 1.9,
+            "tp_atr_mult": 2.9,
+            "max_hold_bars": 120
+          },
+          "optimization": {
+            "minimum_trades": 20,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": 0.6408,
+            "max_drawdown_pct": -0.3994,
+            "sharpe": 5.56,
+            "total_trades": 28,
+            "expectancy": 0.2861,
+            "win_rate": 64.29
+          }
+        },
+        {
+          "tier": "mid_stable",
+          "symbols": [
+            "AVAXUSDT",
+            "BCHUSDT",
+            "LTCUSDT",
+            "FILUSDT",
+            "ASTERUSDT",
+            "DOTUSDT",
+            "ARBUSDT",
+            "HBARUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4880,
+          "model": {
+            "train_auc": 0.9854,
+            "val_auc": 0.5093,
+            "test_auc": 0.5269,
+            "test_accuracy": 0.5182,
+            "atr_mean_pct": 0.014135,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 1.7,
+            "tp_atr_mult": 2.295,
+            "max_hold_bars": 84.0
+          },
+          "baseline_params": {
+            "min_score": 0.58,
+            "sl_atr_mult": 1.7,
+            "tp_atr_mult": 2.7,
+            "max_hold_bars": 120
+          },
+          "optimization": {
+            "minimum_trades": 32,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.296,
+            "max_drawdown_pct": -0.5895,
+            "sharpe": -4.77,
+            "total_trades": 40,
+            "expectancy": -0.0924,
+            "win_rate": 45.0
+          }
+        },
+        {
+          "tier": "mid_volatile",
+          "symbols": [
+            "COTIUSDT",
+            "AAVEUSDT",
+            "ONDOUSDT",
+            "PROMUSDT",
+            "PENGUUSDT",
+            "LITUSDT",
+            "BOMEUSDT",
+            "INJUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4880,
+          "model": {
+            "train_auc": 0.9842,
+            "val_auc": 0.5368,
+            "test_auc": 0.5141,
+            "test_accuracy": 0.5146,
+            "atr_mean_pct": 0.019153,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.64,
+            "sl_atr_mult": 1.785,
+            "tp_atr_mult": 3.84,
+            "max_hold_bars": 70.0
+          },
+          "baseline_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 2.1,
+            "tp_atr_mult": 3.2,
+            "max_hold_bars": 100
+          },
+          "optimization": {
+            "minimum_trades": 32,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.4904,
+            "max_drawdown_pct": -0.5936,
+            "sharpe": -11.13,
+            "total_trades": 31,
+            "expectancy": -0.1976,
+            "win_rate": 25.81
+          }
+        },
+        {
+          "tier": "small_stable",
+          "symbols": [
+            "OPUSDT",
+            "GALAUSDT",
+            "MORPHOUSDT",
+            "PENDLEUSDT",
+            "SANDUSDT",
+            "EIGENUSDT",
+            "CAKEUSDT",
+            "AXSUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4880,
+          "model": {
+            "train_auc": 0.9829,
+            "val_auc": 0.5201,
+            "test_auc": 0.5612,
+            "test_accuracy": 0.5528,
+            "atr_mean_pct": 0.015665,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 1.615,
+            "tp_atr_mult": 2.55,
+            "max_hold_bars": 70.0
+          },
+          "baseline_params": {
+            "min_score": 0.6,
+            "sl_atr_mult": 1.9,
+            "tp_atr_mult": 3.0,
+            "max_hold_bars": 100
+          },
+          "optimization": {
+            "minimum_trades": 32,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.132,
+            "max_drawdown_pct": -0.2824,
+            "sharpe": -2.89,
+            "total_trades": 43,
+            "expectancy": -0.0383,
+            "win_rate": 48.84
+          }
+        },
+        {
+          "tier": "small_volatile",
+          "symbols": [
+            "BRUSDT",
+            "MAGMAUSDT",
+            "MOVRUSDT",
+            "RIVERUSDT",
+            "BULLAUSDT",
+            "SAGAUSDT",
+            "METUSDT",
+            "ARCUSDT"
+          ],
+          "n_symbols": 8,
+          "pooled_train_rows": 4880,
+          "model": {
+            "train_auc": 0.9855,
+            "val_auc": 0.4893,
+            "test_auc": 0.4863,
+            "test_accuracy": 0.4854,
+            "atr_mean_pct": 0.031001,
+            "error": null
+          },
+          "selected_params": {
+            "min_score": 0.64,
+            "sl_atr_mult": 1.955,
+            "tp_atr_mult": 2.975,
+            "max_hold_bars": 56.0
+          },
+          "baseline_params": {
+            "min_score": 0.62,
+            "sl_atr_mult": 2.3,
+            "tp_atr_mult": 3.5,
+            "max_hold_bars": 80
+          },
+          "optimization": {
+            "minimum_trades": 32,
+            "evaluated": 18
+          },
+          "test": {
+            "total_return_pct": -0.3824,
+            "max_drawdown_pct": -0.4551,
+            "sharpe": -11.89,
+            "total_trades": 29,
+            "expectancy": -0.1646,
+            "win_rate": 34.48
+          }
+        }
+      ],
+      "cross": null,
+      "tiered": {
+        "total_return_pct": -0.0831,
+        "max_drawdown_pct": -0.2959,
+        "sharpe": -1.4,
+        "total_trades": 216,
+        "expectancy": -0.0384
+      },
+      "uniform": {
+        "total_return_pct": -0.0782,
+        "max_drawdown_pct": -0.1711,
+        "sharpe": -5.4,
+        "total_trades": 159,
+        "expectancy": -0.0492,
+        "selected_params": {
+          "min_score": 0.75,
+          "sl_atr_mult": 1.5,
+          "tp_atr_mult": 2.5,
+          "max_hold_bars": 120
+        },
+        "model": {
+          "train_auc": 0.8586,
+          "val_auc": 0.4922,
+          "test_auc": 0.5112,
+          "error": null
+        }
+      }
+    }
+  ]
+}
