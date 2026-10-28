@@ -19,10 +19,10 @@ from ..market.futures import (
     round_to_tick,
     symbol_filters,
 )
-from ..models import Credential, JobLog, Order, StrategyConfig
+from ..models import Credential, JobLog, Order
 from ..security import decrypt
 from ..state import all_state, set_state
-from ..strategy.rules import resolve_params
+from ..strategy.bindings import resolve_order_params
 from ..utils import round_price
 from .paper import close_position as settle_close
 from .paper import entry_gates
@@ -75,8 +75,9 @@ def open_live(db: Session, signal) -> Order | None:
     if not key or not secret:
         log(db, "error", f"live 开仓被拒绝: 未配置币安 API 凭证 {getattr(signal, 'symbol', '')}")
         return None
-    config = db.query(StrategyConfig).filter(StrategyConfig.code == signal.strategy).first()
-    params = resolve_params(signal.strategy, state, json.loads(config.params or "{}") if config else None)
+    params = getattr(signal, "params", None) or resolve_order_params(
+        db, signal.strategy, signal.interval, getattr(signal, "pool", "")
+    )
     if not entry_gates(db, signal, params, ignore_cooldown=False):
         return None
 
@@ -171,6 +172,7 @@ def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, 
         status="OPEN",
         source="live",
         strategy=signal.strategy,
+        pool=getattr(signal, "pool", "") or "",
         entry_fee=round(fee, 6),
         note=note,
     )

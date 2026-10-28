@@ -1,8 +1,10 @@
-# Quant Desk · 虚拟币量化交易系统（吸收反转单策略版）
+# Quant Desk · 虚拟币量化交易系统
 
-本地运行的币安 U 本位合约交易系统：从 fapi 同步 1 分钟K线并在本地聚合其他周期，计算技术指标与订单流吸收特征，由**唯一策略「吸收反转 Absorption Reversal」**给出方向、评分、结构止损与目标，按评分分配仓位，通过定时巡检管理持仓。交易执行支持**模拟盘与币安 U 本位合约（测试网 / 主网）**（`execution_mode` 可切换，需自行承担 API Key 安全责任）。
+本地运行的币安 U 本位合约交易系统：从 fapi 同步 1 分钟K线并在本地聚合其他周期，计算技术指标与订单流吸收特征，由策略给出方向、评分、结构止损与目标，按评分分配仓位，通过定时巡检管理持仓。交易执行支持**模拟盘与币安 U 本位合约（测试网 / 主网）**（`execution_mode` 可切换，需自行承担 API Key 安全责任）。
 
-> 本仓库已按「只保留能稳定执行的策略」收敛：`absorption_reversal` 之外的策略、ML 训练/预测、TradingView 研究端口、资金费率收割与早期探针脚本均已删除。策略默认 **`enabled=0`**，原因见第 6 节与 [吸收反转策略报告](docs/absorption-reversal-strategy.md)。
+> 架构以「**策略 × 币种池绑定**」为中心：策略是可替换的插件（`strategy/specs/`），跑哪些币、用什么周期、用哪套参数由绑定决定，同一个策略可以在「主流 15m」「山寨 5m」「山寨 1m」上各跑一套互不干扰的参数。详见第 6 节。
+>
+> 本仓库已按「只保留能稳定执行的策略」收敛：`absorption_reversal` 之外的策略、ML 训练/预测、TradingView 研究端口、资金费率收割与早期探针脚本均已删除。策略默认 **`enabled=0`**、两条种子绑定也默认关闭，原因见第 6 节与 [吸收反转策略报告](docs/absorption-reversal-strategy.md)。
 
 ## 1. 功能
 
@@ -12,11 +14,12 @@
 | 指标 | TA-Lib 为主，pandas-ta-classic 与纯 pandas 逐级回退；RSI、MACD、ATR、SuperTrend、ADX、布林带、EMA、量能 Z 等基础特征 |
 | 订单流 | `features/absorption.py`：`|delta|` 滚动最近秩百分位、无价格进展、摆动极值、拒绝影线、单边支配度五条件 + 3 根内收盘穿越实体的确认状态机；优先用 lower-tf intrabar delta，缺数据回退脚本自带的 estDelta 估计 |
 | 资金费 | fapi 历史资金费入库（8 小时 1 条，幂等增量），asof 合并为K线特征（当前费率 / 年化 / z-score / 24h 累计），可选拥挤过滤 |
-| 策略 | 仅 `absorption_reversal`；参数与 Pine 脚本 1:1（灵敏度档位、`legacy_gap_logic` 可复现脚本运算符优先级 bug） |
+| 策略 | 注册表 + spec 插件：`strategy/specs/*` 只实现 `lookback/prepare/signals/describe`，参数默认值、范围、整数键、布尔键随 spec 声明；信号拼装（成本过滤、ATR 定杠杆、评分分层仓位、风险预算截断）由 `strategy/signals.py` 统一完成 |
+| 池与绑定 | `symbol_pools` 定义「跑哪些币」（静态列表或规则），`strategy_bindings` 定义「策略 × 池 × 周期 + 参数覆盖」；参数三层合并：全局设置 < 策略默认 < 绑定；同币多池各自评估、按评分只开一仓 |
 | 风控 | 结构止损（极值 ∓ 0.25 ATR）与 `min/max_sl_atr` 夹逼、2R 固定目标、1R 保本、30 根时间止损、含成本的单笔风险预算、平仓冷却、过期行情保护、最大杠杆 |
-| 回测 | 顺序撮合；样本内/外切分（`train_horizon` 隔离跨度）、可选验证集选参、同口径基线对比、随机方向基线、bootstrap 期望值置信区间 |
+| 回测 | 顺序撮合；样本内/外切分（`train_horizon` 隔离跨度）、可选验证集选参、同口径基线对比、随机方向基线、bootstrap 期望值置信区间；可指定「策略 × 池」绑定，参数层与实盘完全同源 |
 | 交易 | 模拟盘与合约（测试网/主网）：开仓（杠杆、步长/最小名义价值校验、市价或 `limit_maker` postOnly）、交易所侧止损止盈、撤改单、reduceOnly 平仓、状态周期同步、反手；账户级熔断；本地保证金与权益核算、追加/提取/重置资金 |
-| 巡检 | APScheduler 每 N 秒同步最新K线（默认最多 8 路并发、共享连接池）、单轮内复用指标帧、检查止损止盈/保本/时间止损/信号反转；周期日志记录币种数与各阶段耗时 |
+| 巡检 | 由**生效绑定**驱动：绑定启用 + 策略总开关启用 + 池启用 → 展开成 `(symbol, binding)` 逐对评估，每对带自己的参数与周期；APScheduler 每 N 秒同步最新K线（默认最多 8 路并发、共享连接池）、单轮内复用指标帧、检查止损止盈/保本/时间止损/信号反转；周期日志记录绑定数、币种数与各阶段耗时 |
 | 指标目录 | 读取 `data/pine-collection`、`data/pine-crypto-collection` 的第三方 Pine 指标索引，支持搜索与源码查看（只读资料，不参与计算） |
 | 前端 | Vue 3 + Element Plus + ECharts：总览、订单、策略、回测、行情、指标目录、设置；按需加载、独立空态与重试；订单/回测历史/成交/本地数据列表服务端分页（默认 20） |
 
@@ -26,12 +29,13 @@
 get-money/
 ├── backend/
 │   ├── app/
-│   │   ├── api/            # FastAPI 路由（backtests / indicators / market / settings / strategies / trading）
+│   │   ├── api/            # FastAPI 路由（backtests / bindings / indicators / market / pools / settings / strategies / trading）
 │   │   ├── backtest/       # 顺序撮合、指标、显著性检验
 │   │   ├── features/       # 基础指标 + absorption 订单流特征
 │   │   ├── market/         # 币安客户端、K线存储、metrics 观测
 │   │   ├── ml/             # 数据集构建与 purged 切分（仅回测用，无训练/预测）
-│   │   ├── strategy/       # coin_universe（主流币白名单）、rules、engine、defaults
+│   │   ├── strategy/       # registry（策略注册表）、signals（公共拼装）、pools、bindings、
+│   │   │                   # rules（参数分派）、engine、specs/absorption_reversal、coin_universe、defaults
 │   │   ├── trading/        # 资金、模拟撮合、订单管理、调度、实盘同步
 │   │   └── main.py
 │   ├── scripts/            # absorption_backtest + 数据回补/迁移/校验脚本
@@ -106,30 +110,99 @@ npm run dev        # 开发热更新，http://127.0.0.1:5173（代理到 8010）
 ## 5. 使用流程
 
 1. **行情**：默认 U 本位永续全量，可在设置页切自定义列表；选择币种/周期同步历史，本地数据表显示行数与起止时间；`funding=true` 同时拉资金费历史。
-2. **策略**：只有「吸收反转」一张卡；可启停、编辑 JSON 参数、预演信号（方向、评分、上涨概率、推荐杠杆、仓位占比、止损止盈、吸收快照）。
-3. **回测**：选择币种/周期/天数/手续费/滑点/评分阈值，可启用验证集选参；查看收益对比、权益曲线、过滤原因、显著性区间与成交明细。
+2. **策略**：上半部分是「策略 × 池 × 周期」绑定矩阵（新增/删除绑定、启停、优先级、参数 JSON 覆盖、成员数预览、新建币种池）；下半部分是策略卡（启停、编辑默认参数）与信号预演（可指定用哪条绑定的参数层）。
+3. **回测**：选择币种/周期/天数/手续费/滑点/评分阈值；「参数层」下拉可直接选一条「策略 × 池」绑定，回测参数与实盘巡检完全同源（不选则用策略默认参数）；可启用验证集选参；查看收益对比、权益曲线、过滤原因、显著性区间与成交明细。
 4. **设置**：币安 API（测试网校验测试网余额，主网校验合约账户）、执行模式、代理、资金调整、风控参数、定时巡检、流动性门槛、熔断参数、主单类型。
 5. **总览 / 订单**：权益曲线、持仓、已实现/未实现盈亏、胜率、日志；订单页可改止损止盈、平仓、反手。
 6. **指标目录**：搜索并查看 Pine 指标说明与源码（只读）。
 
-## 6. 策略与仓位规则
+## 6. 策略、币种池与绑定
 
-模拟盘与回测共用 `strategy/rules.py`；手续费与滑点只由全局设置或回测请求指定，策略不能覆盖撮合成本。
+```
+StrategySpec（注册表）        SymbolPool（池）            StrategyBinding（绑定）
+  默认参数 / 范围              static 手写列表              (策略, 池, 周期) 唯一
+  lookback / prepare          rule   规则动态解析           enabled / priority
+  signals（方向与评分）        最终统一减 BLACKLIST         params（参数覆盖层）
+        └───────────────┬───────────────┴───────────────┬────────────┘
+                        ▼                               ▼
+              engine.evaluate(symbol, interval,      巡检 / 回测 / 预演
+              strategy, params=绑定参数, pool=池)
+```
 
-- **吸收反转（`absorption_reversal`）**：放量单边主动成交（`|delta|` 位于滚动百分位之上）却推不出价格、在摆动极值留下拒绝影线 → 进攻方被困。**买方被吸收做空、卖方被吸收做多**。
-  - 五条件：`|delta|` 最近秩百分位、无价格进展（实体 < `body_mult × ATR`）、摆动极值（`extreme_lookback`）、拒绝影线（`wick_mult`）、单边支配度（`dominance_pct`）。
-  - 确认：`conf_mode=1` 要求后续 `conf_window_bars` 根内收盘穿越吸收 bar 实体；期间打穿吸收极值或超时作废。
-  - 出场：结构止损 `极值 ∓ sl_buffer_atr × ATR`（`min_sl_atr`/`max_sl_atr` 夹逼）、`target_r=2R`、浮盈 1R 移保本、`max_hold_bars=30` 时间止损。
-  - 仓位：脚本 `percent_of_equity=30`、`max_leverage=1`，双向交易；`min_score=0.75` 分层（默认全部通过，评分只用于仓位与分层）。
-  - 白名单：仅在 `coin_universe.MAJOR_SYMBOLS`（BTC/ETH/SOL/BNB/XRP/DOGE/ADA/LINK/AVAX/LTC/DOT/SUI/TRX/NEAR/APT/BCH）上运行，与「资金路由」解耦。
-  - **默认停用**：15m 主流币池化检验的每笔期望 95% 置信区间跨 0（不可判定），放宽灵敏度后转负。详见 `docs/absorption-reversal-strategy.md`。
+模拟盘与回测共用同一套参数与信号拼装；手续费与滑点只由全局设置或回测请求指定，策略与绑定都不能覆盖撮合成本。
+
+### 6.1 策略注册表：新增策略只实现一个 spec
+
+`strategy/registry.py` 用 `StrategySpec` 描述一个策略，`strategy/specs/<code>.py` 里 `register()` 即接入，不需要改 `rules.py`、`defaults.py`、API 或巡检：
+
+| 字段 | 作用 |
+| --- | --- |
+| `code` / `name` / `description` / `tags` | 标识与展示；`tags` 供前端分组 |
+| `defaults` | 策略默认参数（第二层） |
+| `ranges` / `bool_keys` / `int_keys` | 保存与绑定时的取值校验（必须覆盖 `signals` 用到的全部数值键） |
+| `lookback(params, interval)` | 需要多少根K线才能出信号；巡检与回测据此拉数据 |
+| `prepare(data, ctx)` | 策略专属特征（如 lower-tf intrabar delta） |
+| `signals(data, params)` | **唯一必须写死的部分**：返回 `signed`（方向）、`score`、`prob_up`、`sl_pct`、`tp_pct`、`reason` |
+| `describe(data, params)` | 预演面板展示的观测快照 |
+| `default_enabled` | 新建策略行时的初始启用状态 |
+
+成本过滤、ATR 倒数定杠杆、评分分层仓位、单笔风险预算截断、方向清零统一在 `strategy/signals.py::assemble_signal_frame` 完成，因此所有策略自动共享同一套风控与撮合口径。拦截原因用 `block()` 按 Pine 的判定顺序先到先得，保证与脚本一致。
+
+### 6.2 币种池：跑哪些币
+
+`symbol_pools` 一张表，`kind` 二选一：
+
+| kind | 含义 | 关键字段 |
+| --- | --- | --- |
+| `static` | 手写列表 | `symbols`（去空白、大写、去重） |
+| `rule` | 规则动态解析 | `rule.base`(`all`/`major`/`static`)、`rule.min_quote_volume_usd`、`rule.exclude_major`、`rule.max_symbols`（按 24h 成交额取 TopN）、`rule.exclude` |
+
+- 规则池的成员 = 解析结果 **− 全局黑名单**（`coin_universe.BLACKLIST`）**∩** 当前 `symbol_scope`（自定义币种时自动收窄）。
+- 成交量取不到时「宁贵不漏」：保留缺额币种而不是静默丢弃，避免池子因一次接口抖动突然变空。
+- 成员数是实时解析的（成交量走 TTL 缓存），前端绑定向导会先给「成员数预览」再让你调参数。
+- 种子池：`major`（主流 16 币）、`alt`（全量剔除主流）、`all`（全量）；只在表为空时写入，删掉不会被复活。
+
+### 6.3 绑定：三层参数与同币多池
+
+一条绑定 = `(策略, 池, 周期)` + 一套参数覆盖，唯一约束 `uq_binding_scope`。同一个策略可以在多个池上跑不同周期，例如：
+
+| 策略 | 池 | 周期 | 意图 |
+| --- | --- | --- | --- |
+| `absorption_reversal` | `major` | 15m | 主流币，脚本默认灵敏度 |
+| `absorption_reversal` | `alt` | 5m | 山寨币，更宽的 delta 门槛 + 更紧的止损 |
+| `absorption_reversal` | `alt` | 1m | 短线，只做多 |
+
+**参数三层合并**（`rules.resolve_params`）：全局设置 < 策略默认 < 本条绑定。`fee_rate` / `slippage` 由全局强制统一，任何一层都不能覆盖。未知字段、非有限数值、越界值在保存绑定时直接 400，不会等到巡检才炸。
+
+**生效条件**：绑定启用 **且** 策略总开关启用 **且** 池启用。
+
+**同币多池**：BTC 既在 `major` 又在 `all` 时，两条绑定各自独立评估，产生的信号按评分排序后**只开一仓**，不做互斥校验——这样池的组合可以随意调整而不会互相卡死。
+
+**订单可追溯**：`signals.pool` / `orders.pool` 记录来源绑定，持仓管理用 `resolve_order_params(策略, 周期, 池)` 精确回取所属绑定的参数（老订单无池时回落策略配置，行为等价）。
+
+**缓存正确性**：`engine` 的缓存键包含参数指纹，同币不同池的参数不会互相污染特征。
+
+### 6.4 吸收反转（`absorption_reversal`）
+
+放量单边主动成交（`|delta|` 位于滚动百分位之上）却推不出价格、在摆动极值留下拒绝影线 → 进攻方被困。**买方被吸收做空、卖方被吸收做多**。
+
+- 五条件：`|delta|` 最近秩百分位、无价格进展（实体 < `body_mult × ATR`）、摆动极值（`extreme_lookback`）、拒绝影线（`wick_mult`）、单边支配度（`dominance_pct`）。
+- 确认：`conf_mode=1` 要求后续 `conf_window_bars` 根内收盘穿越吸收 bar 实体；期间打穿吸收极值或超时作废。
+- 出场：结构止损 `极值 ∓ sl_buffer_atr × ATR`（`min_sl_atr`/`max_sl_atr` 夹逼）、`target_r=2R`、浮盈 1R 移保本、`max_hold_bars=30` 时间止损。
+- 仓位：脚本 `percent_of_equity=30`、`max_leverage=1`，双向交易；`min_score=0.75` 分层（默认全部通过，评分只用于仓位与分层）。
+- 运行范围：由绑定决定（种子 `major` 池即原 `MAJOR_SYMBOLS` 那 16 个主流币），不再有写死的白名单。
+- **默认停用**：15m 主流币池化检验的每笔期望 95% 置信区间跨 0（不可判定），放宽灵敏度后转负。详见 `docs/absorption-reversal-strategy.md`。
+
+### 6.5 风险仓位与巡检
+
 - **风险仓位**：评分给出保证金上限，再按止损距离、杠杆与双边费用/滑点缩小；默认 `risk_per_trade_pct=0.02`（单笔预算 2% 权益），成交时复查可用资金。跳空可能突破预算。
-- **巡检**：持仓只接收原策略信号；只处理尚未检查的已收盘K线，不复用开仓前/已处理行情；过期与重复信号不能开新仓。
+- **巡检**：`trading/service.py::run_cycle` 先取生效绑定并展开成 `(symbol, binding)`，逐对评估；持仓只接收原策略信号；只处理尚未检查的已收盘K线，不复用开仓前/已处理行情；过期与重复信号不能开新仓。summary 返回 `bindings` 明细与逐条错误（单条绑定坏掉不影响其它绑定）。
 
 关键参数：`delta_window`、`delta_pct`、`body_mult`、`extreme_lookback`、`wick_mult`、`dominance_pct`、`abs_gap_bars`、`legacy_gap_logic`、`conf_mode`、`conf_window_bars`、`direction_mode`、`trend_mode`、`session_start_hour`/`session_end_hour`、`sl_buffer_atr`、`target_r`、`be_trigger_r`、`min_sl_atr`/`max_sl_atr`、`max_hold_bars`、`cooldown_bars`、`risk_per_trade_pct`、`max_leverage`、`cost_filter`、`min_atr_cost_ratio`、`min_net_reward_risk`、`max_atr_pct`。未知字段、非有限数值与越界值在保存时被拒绝。
 
 ## 7. 回测口径
 
+- **参数层与实盘同源**：请求带 `pool` 且存在 `(策略, 池, 周期)` 绑定时，回测直接用该绑定的参数覆盖层，与巡检完全一致；不带或没有对应绑定则回落策略默认。前端「参数层」下拉就是这么用的。
 - **不选参**：前 75% / 后 25%；**启用选参**：前 60% 训练、中间 15% 验证、后 25% 测试，边界按 `train_horizon` 隔离。
 - 验证选参使用固定小集合（评分门槛 0.60/0.65/0.70 与更严格的成本门槛），按净收益 + 0.5×回撤排序，成交笔数门槛 `max(30, 验证K线数 // 50)`；不足则保留当前参数。测试段不参与选择。
 - 所有回测标记 `engine=sequential`：收盘出信号、下一根开盘成交；多空共享一个资金账户；计入评分仓位、杠杆、风险上限、双边成本与滑点。
@@ -162,10 +235,17 @@ npm run dev        # 开发热更新，http://127.0.0.1:5173（代理到 8010）
 | GET | `/api/market/funding` | 最近资金费记录 + 当前费率/年化/z-score/24h 累计 |
 | GET | `/api/market/sources`、`/api/market/stats` | 本地数据分组分页 |
 | POST | `/api/market/sync` | 从币安同步K线（可含资金费） |
-| POST | `/api/market/preview` | 预演信号与指标快照 |
+| POST | `/api/market/preview` | 预演信号与指标快照（可带 `pool` 指定参数层） |
 | GET | `/api/indicators`、`/api/indicators/{id}` | Pine 指标目录与详情 |
-| GET/PUT | `/api/strategies`、`/api/strategies/{code}` | 策略列表 / 启停与参数 |
+| GET/PUT | `/api/strategies`、`/api/strategies/{code}` | 策略列表（含 `specs` 元信息）/ 启停与默认参数 |
+| GET | `/api/strategies/{code}/bindings` | 该策略的全部绑定 |
 | POST | `/api/strategies/run-once` | 立即执行一次巡检 |
+| GET/POST | `/api/pools` | 币种池列表（含实时成员数）/ 新建 |
+| PUT/DELETE | `/api/pools/{code}` | 改池定义 / 删池（被绑定引用时 400） |
+| GET | `/api/pools/{code}/members` | 成员预览（调参数前先看会跑多少币） |
+| GET/POST | `/api/bindings` | 绑定列表（`?with_members=true` 带成员明细）/ 新建 |
+| PUT/DELETE | `/api/bindings/{id}` | 改周期/启停/优先级/参数覆盖（全量校验）/ 删除 |
+| GET | `/api/bindings/{id}/params` | 该绑定合并三层后的完整生效参数 |
 | GET | `/api/backtests` | 回测历史分页列表 |
 | POST | `/api/backtests` | 创建回测（后台线程执行） |
 | GET | `/api/backtests/{id}` | 结果与权益曲线（前端传 `include_trades=false`） |
@@ -198,6 +278,7 @@ npm run build
 - **行情源**：K线一律走 fapi 公共接口；paper 固定合约主网，live+测试网走测试网。历史 paper 期现货K线与合约价格存在口径差异，切换后建议清空 `klines` 重新同步。
 - **数据深度**：1m 历史仅约 90 余天；lower-tf intrabar delta 依赖 1m，历史不足时自动降级为 estDelta 估计（信号密度与质量都会变化）。
 - **实盘简化**：未模拟资金费率、盘口深度、强平与分批建仓；市价单以返回均价入账；`limit_maker` 挂 postOnly 最多轮询约 10 秒，超时撤单后剩余转市价；交易所侧止损止盈触发后本地按标记价结算，与真实成交价有偏差；保护单挂失败会市价回滚开仓并写日志。
+- **老库升级**：启动时自动建 `symbol_pools` / `strategy_bindings` 并给 `signals` / `orders` 补 `pool` 列（幂等 `ALTER TABLE ADD COLUMN`，双方言安全），首次启动写入 3 个池与 2 条**默认关闭**的绑定。不做数据回填：老订单 `pool` 为空，持仓管理按策略配置回落，行为等价。
 - **策略未经足够长期验证**：当前读数不支持「有正 edge」的结论，默认关闭；开启前请自行补足样本与独立复检。
 - 不构成投资建议。
 

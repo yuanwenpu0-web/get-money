@@ -9,12 +9,14 @@ from app.api import market as market_api
 from app.api.settings import _validate, update_settings
 from app.config import DEFAULT_SYMBOLS
 from app.market import universe
-from app.models import JobLog
+from app.models import JobLog, StrategyBinding
 from app.schemas import SettingsUpdate, SyncRequest
 from app.state import set_state
+from app.strategy import bindings
 from app.trading import service as trading_service
 from app.trading.service import TradingService
 
+from fakes import seed_binding
 from universe_helpers import FakeUniverseClient, clear_universe_cache, patch_universe, row
 
 
@@ -98,8 +100,14 @@ def test_resolve_universe_reports_source_and_cached(db, monkeypatch):
     assert live_mainnet["source"] == "futures-mainnet"
 
 
-def test_run_cycle_resolves_scope_all_and_custom(db, monkeypatch):
-    monkeypatch.setattr(trading_service, "universe_symbols", lambda session: ["AAAUSDT", "BBBUSDT"])
+def test_run_cycle_follows_bindings_and_scope(db, monkeypatch):
+    """巡检的币种范围来自绑定；symbol_scope=custom 只在其内部再做一次交集。"""
+    seed_binding(db, ["AAAUSDT"])
+
+    def members(session, pool, allowed=None):
+        return [s for s in ("AAAUSDT", "BBBUSDT") if allowed is None or s in allowed]
+
+    monkeypatch.setattr(bindings, "pool_symbols", members)
     monkeypatch.setattr(
         trading_service, "MarketDataService",
         lambda db, client=None: type("Stub", (), {"sync_recent_many": lambda self, *a, **k: {"errors": []}})(),
@@ -113,12 +121,22 @@ def test_run_cycle_resolves_scope_all_and_custom(db, monkeypatch):
     assert summary["ok"] is True
     assert summary["symbols"] == ["AAAUSDT", "BBBUSDT"]
     assert summary["symbol_count"] == 2
+    assert summary["bindings"][0]["pool"] == "test"
     assert "elapsed_ms" in summary
 
+    # 自定义名单是全局限制：池里不在名单内的币种本轮不跑
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["BTCUSDT", "ETHUSDT"])
+    set_state(db, "symbols", ["BBBUSDT"])
     summary = TradingService(db).run_cycle()
-    assert summary["symbols"] == ["BTCUSDT", "ETHUSDT"]
+    assert summary["symbols"] == ["BBBUSDT"]
+
+    # 没有启用的绑定 → 一个币种都不跑（不再是「全局周期 × 全宇宙」）
+    bindings_row = db.query(StrategyBinding).first()
+    bindings_row.enabled = 0
+    db.commit()
+    summary = TradingService(db).run_cycle()
+    assert summary["symbols"] == []
+    assert summary["bindings"] == []
 
 
 def test_settings_scope_validation():

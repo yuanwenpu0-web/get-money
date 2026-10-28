@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from ..ml.dataset import build_dataset, purged_split
 from ..models import StrategyConfig
+from ..strategy.bindings import binding_overrides
 from ..state import all_state
 from ..strategy.rules import evaluate_signals, resolve_params
 from .execution import exposure_metrics, randomize_directions, simulate
@@ -113,6 +114,7 @@ def run_backtest(
     optimize: bool = False,
     end_ms: int | None = None,
     param_overrides: dict | None = None,
+    pool: str | None = None,
 ) -> dict:
     """回测单个币种：同一撮合口径下的「当前参数 / 关闭过滤基线 / 随机方向基线」三者对照。"""
     state = all_state(db)
@@ -125,8 +127,13 @@ def run_backtest(
     slippage = float(slippage if slippage is not None else state["slippage"])
     if not math.isfinite(initial) or initial <= 0 or not 0.5 <= train_ratio <= 0.85:
         raise ValueError("初始资金或训练占比无效")
-    config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
-    overrides = json.loads(config.params or "{}") if config else {}
+    # 指定池时用「策略 × 池」绑定的参数覆盖层，与实盘走同一套参数
+    bound = binding_overrides(db, strategy, pool or "", interval)
+    if bound is not None:
+        overrides = dict(bound)
+    else:
+        config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
+        overrides = json.loads(config.params or "{}") if config else {}
     if param_overrides:
         if not isinstance(param_overrides, dict):
             raise ValueError("参数覆盖必须是 JSON 对象")
@@ -218,6 +225,7 @@ def run_backtest(
             "symbol": symbol,
             "interval": interval,
             "strategy": strategy,
+            "pool": pool or "",
             "algo": "rule",
             "fee_rate": fee,
             "slippage": slippage,

@@ -53,6 +53,18 @@ export default {
   getStrategies: () => http.get('/strategies'),
   updateStrategy: (code, payload) => http.put(`/strategies/${code}`, payload),
 
+  // 币种池与「策略 × 池」绑定：参数的真正归属地
+  getPools: () => http.get('/pools'),
+  createPool: (payload) => http.post('/pools', payload),
+  updatePool: (code, payload) => http.put(`/pools/${code}`, payload),
+  deletePool: (code) => http.delete(`/pools/${code}`),
+  getPoolMembers: (code) => http.get(`/pools/${code}/members`),
+
+  getBindings: (params) => http.get('/bindings', { params }),
+  createBinding: (payload) => http.post('/bindings', payload),
+  updateBinding: (id, payload) => http.put(`/bindings/${id}`, payload),
+  deleteBinding: (id) => http.delete(`/bindings/${id}`),
+
   createBacktest: (payload) => http.post('/backtests', payload),
   listBacktests: (params) => http.get('/backtests', { params }),
   getBacktest: (id, params = {}) => http.get(`/backtests/${id}`, { params: { include_trades: false, ...params } }),

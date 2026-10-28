@@ -6,9 +6,9 @@ import json
 
 from sqlalchemy.orm import Session
 
-from ..models import Order, StrategyConfig
+from ..models import Order
 from ..state import all_state, get_state, set_state
-from ..strategy.rules import resolve_params
+from ..strategy.bindings import resolve_order_params
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
 from .risk import position_size
@@ -47,8 +47,10 @@ def entry_gates(db: Session, signal, params: dict, ignore_cooldown: bool = False
 
 def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
     state = all_state(db)
-    config = db.query(StrategyConfig).filter(StrategyConfig.code == signal.strategy).first()
-    params = resolve_params(signal.strategy, state, json.loads(config.params or '{}') if config else None)
+    # 信号自带参数（来自「策略 × 池」绑定）；否则按订单归属反查，最后才回落策略配置
+    params = getattr(signal, "params", None) or resolve_order_params(
+        db, signal.strategy, signal.interval, getattr(signal, "pool", "")
+    )
     if not entry_gates(db, signal, params, ignore_cooldown):
         return None
 
@@ -89,6 +91,7 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
         status="OPEN",
         source="paper",
         strategy=signal.strategy,
+        pool=getattr(signal, "pool", "") or "",
         entry_fee=round(fee, 6),
         note=f"score={signal.score} prob_up={signal.prob_up}",
     )

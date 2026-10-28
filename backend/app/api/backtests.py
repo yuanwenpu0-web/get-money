@@ -36,6 +36,7 @@ def _execute(run_id: int) -> None:
             slippage=params.get("slippage"),
             threshold=params.get("threshold"),
             optimize=bool(params.get('optimize', False)),
+            pool=params.get("pool"),
         )
         run.metrics = json.dumps(result["metrics"], ensure_ascii=False)
         run.equity_curve = json.dumps(result["equity_curve"], ensure_ascii=False)

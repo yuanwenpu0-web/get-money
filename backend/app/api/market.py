@@ -13,6 +13,7 @@ from ..market import metrics as metrics_mod
 from ..market.universe import resolve_universe, universe_symbols
 from ..models import JobLog
 from ..schemas import MetricsSyncRequest, PreviewRequest, SyncRequest
+from ..strategy.bindings import resolve_order_params
 from ..strategy.engine import StrategyEngine
 from ..state import all_state
 from ..utils import interval_ms, now_ms
@@ -168,7 +169,20 @@ def klines(
 def preview_signal(payload: PreviewRequest, db: Session = Depends(get_db)):
     engine = StrategyEngine(db)
     try:
-        signal = engine.evaluate(payload.symbol.upper(), payload.interval, payload.strategy, save=False)
+        # 预演用「策略 × 池」绑定的参数（没有池或没有绑定就回落策略配置），
+        # 且不受策略总开关影响——否则默认停用的策略永远预演不出信号。
+        params = resolve_order_params(
+            db, payload.strategy, payload.interval, payload.pool or ""
+        )
+        signal = engine.evaluate(
+            payload.symbol.upper(),
+            payload.interval,
+            payload.strategy,
+            save=False,
+            params=params,
+            pool=payload.pool or "",
+            respect_enabled=False,
+        )
     except Exception as exc:
         raise HTTPException(400, f"信号计算失败: {exc}") from exc
     service = MarketDataService(db)

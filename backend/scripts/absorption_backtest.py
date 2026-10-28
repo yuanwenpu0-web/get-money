@@ -386,6 +386,21 @@ def main() -> int:
     return 0
 
 
+def _pooled_ci_lines(ci: dict) -> list[str]:
+    """池化判据正文。
+
+    零成交时 `bootstrap_expectancy_ci` 只返回 `{"trades": 0, "verdict": "no_trades"}`，
+    没有均值/区间可填。这里明说「无判据」，而不是补 0 让报告看起来像是有结论。
+    """
+    if "mean_return_pct" not in ci:
+        return ["- 无成交样本，无法计算每笔期望的置信区间 → **no_trades**（不构成判据）"]
+    return [
+        f"- 每笔收益均值 **{ci['mean_return_pct']:+.4f}%**，95% CI "
+        f"[{ci['ci_low_pct']:+.4f}%, {ci['ci_high_pct']:+.4f}%] → **{ci['verdict']}**",
+        f"- 重采样为正的比例 {ci['positive_share']:.1%}（>95% 才算统计上站得住）",
+    ]
+
+
 def render_markdown(payload: dict) -> str:
     agg = payload["aggregate"]
     preset = SENSITIVITY_PRESETS[payload["sensitivity"]]
@@ -408,9 +423,7 @@ def render_markdown(payload: dict) -> str:
         "",
         f"### 池化判据（{agg['pooled_trades']} 笔）",
         "",
-        f"- 每笔收益均值 **{ci['mean_return_pct']:+.4f}%**，95% CI "
-        f"[{ci['ci_low_pct']:+.4f}%, {ci['ci_high_pct']:+.4f}%] → **{ci['verdict']}**",
-        f"- 重采样为正的比例 {ci['positive_share']:.1%}（>95% 才算统计上站得住）",
+        *_pooled_ci_lines(ci),
         f"- 随机方向基线（同参数，均值）：{agg['pooled_random_mean_pct']:+.3f}%",
         "",
         "判读规则（与全项目一致）：CI 下界 > 0 才算有正 edge；跨 0 即不可判定；"

@@ -6,11 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .api import backtests, indicators, market, settings, strategies, trading
+from .api import backtests, bindings, indicators, market, pools, settings, strategies, trading
 from .config import BASE_DIR
 from .db import SessionLocal, init_db
 from .state import all_state, ensure_default_state
-from .strategy.defaults import seed_strategies
+from .strategy.defaults import seed_defaults
 from .trading.scheduler import scheduler, sync_scheduler_with_state
 
 
@@ -20,7 +20,7 @@ async def lifespan(_app: FastAPI):
     db = SessionLocal()
     try:
         ensure_default_state(db)
-        seed_strategies(db)
+        seed_defaults(db)
         sync_scheduler_with_state(db)
     finally:
         db.close()
@@ -42,6 +42,8 @@ app.include_router(settings.router, prefix="/api")
 app.include_router(market.router, prefix="/api")
 app.include_router(indicators.router, prefix="/api")
 app.include_router(strategies.router, prefix="/api")
+app.include_router(pools.router, prefix="/api")
+app.include_router(bindings.router, prefix="/api")
 app.include_router(backtests.router, prefix="/api")
 app.include_router(trading.router, prefix="/api")
 

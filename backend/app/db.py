@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -93,3 +93,26 @@ def init_db():
     from . import models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+    _add_missing_columns()
+
+
+# 轻量补列表：create_all 只建缺失的表，不会给既有表加列。
+# 这里只做「ADD COLUMN」（幂等、不重建表、不动数据），够用且对两种方言都安全。
+_ADDED_COLUMNS: dict[str, dict[str, str]] = {
+    # 引入币种池后，信号与订单需要记录自己用的是哪套池参数
+    "signals": {"pool": "VARCHAR(48) DEFAULT ''"},
+    "orders": {"pool": "VARCHAR(48) DEFAULT ''"},
+}
+
+
+def _add_missing_columns() -> None:
+    inspector = inspect(engine)
+    tables = set(inspector.get_table_names())
+    with engine.begin() as conn:
+        for table, columns in _ADDED_COLUMNS.items():
+            if table not in tables:
+                continue
+            existing = {column["name"] for column in inspector.get_columns(table)}
+            for name, ddl in columns.items():
+                if name not in existing:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))

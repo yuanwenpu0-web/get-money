@@ -6,10 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import StrategyConfig
+from ..models import StrategyBinding, StrategyConfig
 from ..schemas import StrategyUpdate
 from ..state import all_state
-from ..strategy.defaults import ALLOWED_CODES, DEFAULT_STRATEGIES, seed_strategies
+from ..strategy.bindings import describe_binding
+from ..strategy.defaults import ALLOWED_CODES, DEFAULT_STRATEGIES, seed_defaults
+from ..strategy.registry import all_specs, get_spec
 from ..strategy.rules import resolve_params
 from ..trading.service import TradingService
 
@@ -34,7 +36,7 @@ def _strategy_dict(row: StrategyConfig) -> dict:
 
 @router.get("")
 def list_strategies(db: Session = Depends(get_db)):
-    seed_strategies(db)
+    seed_defaults(db)
     # 老库可能残留已下线策略的配置行；它们已无规则实现、无法解析参数，
     # 这里只暴露当前仓库真正可执行的策略。
     rows = (
@@ -43,14 +45,35 @@ def list_strategies(db: Session = Depends(get_db)):
         .order_by(StrategyConfig.id.asc())
         .all()
     )
+    state = all_state(db)
     return {
-        "strategies": [{**_strategy_dict(row), 'effective_params': resolve_params(row.code, all_state(db), json.loads(row.params or '{}'))} for row in rows],
+        "strategies": [
+            {
+                **_strategy_dict(row),
+                "effective_params": resolve_params(row.code, state, json.loads(row.params or "{}")),
+                "default_params": get_spec(row.code).defaults,
+                "tags": list(get_spec(row.code).tags),
+            }
+            for row in rows
+        ],
         "defaults": DEFAULT_STRATEGIES,
+        # 前端「策略 × 池」矩阵需要的元信息
+        "specs": [
+            {
+                "code": spec.code,
+                "name": spec.name,
+                "tags": list(spec.tags),
+                "default_enabled": spec.default_enabled,
+            }
+            for spec in all_specs()
+        ],
     }
 
 
 @router.put("/{code}")
 def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(get_db)):
+    if code not in ALLOWED_CODES:
+        raise HTTPException(404, "策略不存在")
     row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
     if row is None:
         raise HTTPException(404, "策略不存在")
@@ -66,6 +89,20 @@ def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(ge
     db.commit()
     db.refresh(row)
     return _strategy_dict(row)
+
+
+@router.get("/{code}/bindings")
+def strategy_bindings(code: str, db: Session = Depends(get_db)):
+    """某个策略下的全部「策略 × 池」绑定（含有效参数与成员数）。"""
+    if code not in ALLOWED_CODES:
+        raise HTTPException(404, "策略不存在")
+    rows = (
+        db.query(StrategyBinding)
+        .filter(StrategyBinding.strategy_code == code)
+        .order_by(StrategyBinding.priority.asc(), StrategyBinding.id.asc())
+        .all()
+    )
+    return {"bindings": [describe_binding(db, row) for row in rows]}
 
 
 @router.post("/run-once")

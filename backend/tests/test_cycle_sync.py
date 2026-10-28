@@ -12,6 +12,8 @@ from app.state import set_state
 from app.trading import service as trading_service
 from app.trading.service import TradingService
 
+from fakes import seed_binding
+
 
 class _FakeSession:
     def close(self):
@@ -58,8 +60,10 @@ def test_db_none_client_is_futures_mainnet():
 
 
 def test_cycle_log_warning_on_partial_sync_failure(db, monkeypatch):
+    symbols = ["AAAUSDT", "BBBUSDT", "CCCUSDT"]
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["AAAUSDT", "BBBUSDT", "CCCUSDT"])
+    set_state(db, "symbols", symbols)
+    seed_binding(db, symbols)
     _stub_cycle(monkeypatch, fail_for={"BBBUSDT"})
     summary = TradingService(db).run_cycle()
     assert summary["ok"] is True and len(summary["sync_errors"]) == 1
@@ -68,8 +72,10 @@ def test_cycle_log_warning_on_partial_sync_failure(db, monkeypatch):
 
 
 def test_cycle_log_error_on_total_sync_failure(db, monkeypatch):
+    symbols = ["AAAUSDT", "BBBUSDT"]
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["AAAUSDT", "BBBUSDT"])
+    set_state(db, "symbols", symbols)
+    seed_binding(db, symbols)
     _stub_cycle(monkeypatch, fail_for={"AAAUSDT", "BBBUSDT"})
     TradingService(db).run_cycle()
     row = db.query(JobLog).filter(JobLog.job == "trading_cycle").order_by(JobLog.id.desc()).first()
@@ -77,8 +83,10 @@ def test_cycle_log_error_on_total_sync_failure(db, monkeypatch):
 
 
 def test_cycle_log_is_compact_without_symbols_array(db, monkeypatch):
+    symbols = [f"SYM{index:04d}USDT" for index in range(600)]
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", [f"SYM{index:04d}USDT" for index in range(600)])
+    set_state(db, "symbols", symbols)
+    seed_binding(db, symbols)
     _stub_cycle(monkeypatch)
     summary = TradingService(db).run_cycle()
     # API 返回值仍带全量 symbols
@@ -96,10 +104,8 @@ def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch
     from app.models import ModelRecord, StrategyConfig
 
     set_state(db, "symbol_scope", "custom")
-    # 吸收反转只在主流币白名单上运行，这里必须用白名单内的代码
     set_state(db, "symbols", ["BTCUSDT", "ETHUSDT"])
-    db.add(StrategyConfig(code="absorption_reversal", name="吸收反转", enabled=1, params="{}"))
-    db.commit()
+    seed_binding(db, ["BTCUSDT", "ETHUSDT"])
     evaluated = []
 
     def evaluate(self, symbol, *args, **kwargs):
@@ -124,11 +130,12 @@ def test_cycle_database_failure_can_still_record_error_log(db, monkeypatch):
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", [])
 
-    def fail(self):
+    def fail(*args, **kwargs):
         db.add(ModelRecord(symbol="BADUSDT", interval="1h", algo="lightgbm", path=None))
         db.flush()
 
-    monkeypatch.setattr(TradingService, "_enabled_strategies", fail)
+    # 巡检第一步就是解析绑定；这里让它在写库时炸掉，验证错误日志仍能落库
+    monkeypatch.setattr(trading_service, "active_bindings", fail)
     result = TradingService(db).run_cycle()
     assert result["ok"] is False
     row = db.query(JobLog).filter(JobLog.job == "trading_cycle").one()
@@ -142,6 +149,7 @@ def test_cycle_updates_existing_positions_after_interval_and_scope_changes(db, m
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", ["AAAUSDT"])
     set_state(db, "interval", "1h")
+    seed_binding(db, ["AAAUSDT"], interval="1h")
     for symbol, interval, status in [
         ("AAAUSDT", "1h", "OPEN"),
         ("HELDUSDT", "1h", "OPEN"),
@@ -187,6 +195,7 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", ["AAAUSDT"])
     set_state(db, "interval", "1h")
+    seed_binding(db, ["AAAUSDT"], interval="1h")
     created = (now_ms() // 60000 - 3) * 60000
     order = Order(symbol="HELDUSDT", interval="1m", side="LONG", qty=1,
                   entry_price=100, mark_price=100, margin=10, sl=99, tp=105,

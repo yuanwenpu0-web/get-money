@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 
 from ..features.indicators import build_features
 from ..market.data_service import MarketDataService
-from ..models import JobLog, Order, StrategyConfig
+from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
-from ..strategy.rules import resolve_params
+from ..strategy.bindings import resolve_order_params
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from . import live as live_exec
 from .dispatch import close_position
@@ -38,14 +38,9 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
     result = {"order_id": order.id, "actions": []}
     if order.status != "OPEN" or not order.created_at:
         return result
-    config = (
-        db.query(StrategyConfig).filter(StrategyConfig.code == order.strategy).first()
-    )
-    params = resolve_params(
-        order.strategy,
-        all_state(db),
-        json.loads(config.params or "{}") if config else None,
-        interval=order.interval,
+    # 订单必须用「它所属那条绑定」的参数管理，否则池级覆盖（止损宽度/时间止损）会失效
+    params = resolve_order_params(
+        db, order.strategy, order.interval, getattr(order, "pool", "")
     )
     step, created = interval_ms(order.interval), dt_ms(order.created_at)
     key = f"order_cursor:{order.id}"

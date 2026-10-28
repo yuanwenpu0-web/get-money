@@ -61,6 +61,45 @@ class StrategyUpdate(BaseModel):
     params: dict | None = None
 
 
+class PoolPayload(BaseModel):
+    """币种池定义。kind=static 用 symbols；kind=rule 用 rule（base/成交额/TopN/排除）。"""
+
+    code: str = Field(min_length=1, max_length=48, pattern=r'^[a-z0-9_]+$')
+    name: str = Field(min_length=1, max_length=96)
+    description: str = Field(default="", max_length=2000)
+    kind: Literal['static', 'rule'] = 'rule'
+    symbols: list[str] = Field(default_factory=list)
+    rule: dict = Field(default_factory=dict)
+    enabled: bool = True
+
+
+class PoolUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=96)
+    description: str | None = Field(default=None, max_length=2000)
+    kind: Literal['static', 'rule'] | None = None
+    symbols: list[str] | None = None
+    rule: dict | None = None
+    enabled: bool | None = None
+
+
+class BindingPayload(BaseModel):
+    """一条「策略 × 币种池」绑定：周期与参数都在这条记录上。"""
+
+    strategy: str = Field(min_length=1, max_length=48)
+    pool: str = Field(min_length=1, max_length=48)
+    interval: Literal['1m', '5m', '15m', '1h', '4h', '1d']
+    enabled: bool = True
+    priority: int = Field(default=100, ge=0, le=10_000)
+    params: dict = Field(default_factory=dict)
+
+
+class BindingUpdate(BaseModel):
+    enabled: bool | None = None
+    priority: int | None = Field(default=None, ge=0, le=10_000)
+    interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] | None = None
+    params: dict | None = None
+
+
 class SyncRequest(BaseModel):
     symbol: str = ""
     symbols: list[str] | None = None  # 非空=这些币种；空数组=全量 U 本位永续
@@ -74,6 +113,8 @@ class PreviewRequest(BaseModel):
     symbol: str
     interval: str = "1m"
     strategy: str = "absorption_reversal"
+    # 可选：按某条「策略 × 池」绑定的参数预演，留空则用策略配置 + 全局设置
+    pool: str | None = None
 
 
 class MetricsSyncRequest(BaseModel):
@@ -87,6 +128,8 @@ class BacktestRequest(BaseModel):
     symbol: str = Field(min_length=2, max_length=24, pattern=r'^[A-Za-z0-9]+$')
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '1m'
     strategy: Literal['absorption_reversal'] = 'absorption_reversal'
+    # 可选：用某条「策略 × 池」绑定的参数回测；留空则用策略配置
+    pool: str | None = None
     days: int = Field(default=30, ge=1, le=180)
     initial_cash: float | None = Field(default=None, gt=0)
     fee: float | None = Field(default=None, ge=0, le=.01)

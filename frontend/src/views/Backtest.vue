@@ -32,10 +32,15 @@ let tradeRequest = 0
 let selectedTradeRunId = null
 const touchedFields = new Set()
 
+const bindings = ref([])
+const strategyOptions = ref([])
+const selectedBinding = ref('')
+
 const form = reactive({
   symbol: 'BTCUSDT',
   interval: '1m',
   strategy: 'absorption_reversal',
+  pool: '',
   days: 30,
   initial_cash: 10000,
   fee_pct: 0.04,
@@ -43,6 +48,42 @@ const form = reactive({
   threshold: null,
   optimize: true,
 })
+
+const strategyChoices = computed(() => (
+  strategyOptions.value.length ? strategyOptions.value : [{ code: 'absorption_reversal', name: '吸收反转' }]
+))
+const bindingOptions = computed(() => bindings.value.filter((row) => row.strategy === form.strategy))
+
+function onStrategyChange() {
+  // 换策略后原来选中的绑定不再适用，清空回落到策略默认参数层
+  selectedBinding.value = ''
+  form.pool = ''
+}
+
+function applyBinding(bindingId) {
+  const row = bindings.value.find((item) => String(item.id) === String(bindingId))
+  if (!row) {
+    form.pool = ''
+    return
+  }
+  // 绑定的参数层要求 (策略, 池, 周期) 三元组精确命中，周期必须跟着绑定走
+  form.pool = row.pool
+  form.interval = row.interval
+  touchField('interval')
+}
+
+function onIntervalChange() {
+  touchField('interval')
+  // 绑定的参数层要求 (策略, 池, 周期) 三元组精确命中，手动换周期后必须检查，
+  // 否则会带着一个不存在的池去回测，参数层被静默忽略。
+  if (!form.pool) return
+  const hit = bindings.value.some((row) => (
+    row.strategy === form.strategy && row.pool === form.pool && row.interval === form.interval
+  ))
+  if (hit) return
+  form.pool = ''
+  selectedBinding.value = ''
+}
 
 const metrics = computed(() => result.value?.metrics || {})
 const equityCurve = computed(() => result.value?.equity_curve || [])
@@ -136,8 +177,24 @@ async function loadSettings() {
   }
 }
 
+async function loadBindings() {
+  if (disposed) return
+  try {
+    const [bindingData, strategyData] = await Promise.all([api.getBindings(), api.getStrategies()])
+    if (disposed) return
+    bindings.value = bindingData.bindings || []
+    strategyOptions.value = (strategyData.specs || []).map((spec) => ({ code: spec.code, name: spec.name }))
+  } catch {
+    // 绑定/策略列表加载失败不阻塞回测，退回「策略默认参数」这一层
+    if (!disposed) {
+      bindings.value = []
+      strategyOptions.value = []
+    }
+  }
+}
+
 function loadBase() {
-  return Promise.allSettled([loadSettings(), loadHistory()])
+  return Promise.allSettled([loadSettings(), loadHistory(), loadBindings()])
 }
 
 async function loadHistory() {
@@ -271,6 +328,7 @@ async function submit() {
       symbol: form.symbol,
       interval: form.interval,
       strategy: form.strategy,
+      pool: form.pool || null,
       days: Number(form.days),
       initial_cash: Number(form.initial_cash),
       fee: Number(form.fee_pct) / 100,
@@ -346,14 +404,31 @@ onBeforeUnmount(() => {
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">K线周期</div>
-          <el-select v-model="form.interval" style="width: 100%" @change="touchField('interval')">
+          <el-select v-model="form.interval" style="width: 100%" @change="onIntervalChange">
             <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
           </el-select>
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">策略</div>
-          <el-select v-model="form.strategy" style="width: 100%">
-            <el-option label="吸收反转" value="absorption_reversal" />
+          <el-select v-model="form.strategy" style="width: 100%" @change="onStrategyChange">
+            <el-option v-for="item in strategyChoices" :key="item.code" :label="item.name" :value="item.code" />
+          </el-select>
+        </div>
+        <div>
+          <div class="muted" style="margin-bottom: 4px">参数层（策略 × 池绑定）</div>
+          <el-select
+            v-model="selectedBinding"
+            clearable
+            placeholder="策略默认参数"
+            style="width: 100%"
+            @change="applyBinding"
+          >
+            <el-option
+              v-for="item in bindingOptions"
+              :key="item.id"
+              :label="`${item.pool_name || item.pool} × ${item.interval}${item.enabled ? '' : '（巡检已停用）'}`"
+              :value="item.id"
+            />
           </el-select>
         </div>
         <div>

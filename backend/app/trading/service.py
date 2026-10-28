@@ -10,11 +10,9 @@ from sqlalchemy.orm import Session
 from ..config import MARKET_SYNC_WORKERS
 from ..db import SessionLocal
 from ..market.data_service import MarketDataService
-from ..market.universe import universe_symbols
-from ..models import JobLog, Order, StrategyConfig
+from ..models import JobLog, Order
 from ..state import all_state
-from ..strategy.coin_universe import is_blacklisted, symbol_allowed
-from ..strategy.defaults import ALLOWED_CODES
+from ..strategy.bindings import active_bindings, expand
 from ..strategy.engine import StrategyEngine
 from ..utils import interval_ms, iso_utc
 from .order_manager import manage_order
@@ -36,22 +34,6 @@ def _sync_recent_many(symbols: list[str], interval: str, workers: int = SYNC_WOR
         db.close()
 
 
-def resolve_symbols(db: Session, state: dict) -> list[str]:
-    """symbol_scope=all → U 本位永续全量；custom → 用户 symbols 列表。"""
-    if state.get("symbol_scope", "all") == "all":
-        return universe_symbols(db)
-    return list(state.get("symbols") or [])
-
-
-def strategy_interval(code: str, default_interval: str) -> str:
-    """保留钩子：历史上强回调固定在 15m 上评估，其余策略跟随设置。
-
-    仓库只剩吸收反转（用全局设置周期），这里为沿用 (strategy, interval) 维度
-    的信号记账方式保留函数结构。
-    """
-    return default_interval
-
-
 class TradingService:
     _lock = threading.Lock()
 
@@ -62,24 +44,34 @@ class TradingService:
         self.db.add(JobLog(job="trading_cycle", level=level, message=message[:4000]))
         self.db.commit()
 
-    def _enabled_strategies(self) -> list[str]:
-        rows = self.db.query(StrategyConfig).filter(StrategyConfig.enabled == 1).all()
-        # 只跑当前仓库仍有规则实现的策略；老库里的历史配置行一律忽略
-        return [row.code for row in rows if row.code in ALLOWED_CODES]
-
     def run_cycle(self) -> dict:
         if not self._lock.acquire(blocking=False):
             return {"ok": False, "message": "已有交易周期在运行"}
         try:
             started = time.monotonic()
             state = all_state(self.db)
-            symbols = resolve_symbols(self.db, state)
             interval = state.get("interval", "1m")
-            codes = self._enabled_strategies()
+            # symbol_scope=custom 是全局限制（同步与执行范围），币种池在其内部再筛选
+            allowed = (
+                list(state.get("symbols") or [])
+                if state.get("symbol_scope", "all") == "custom"
+                else None
+            )
+            bindings, binding_errors = active_bindings(
+                self.db, state=state, allowed_symbols=allowed
+            )
+            pairs = expand(bindings)
+            symbols = sorted({symbol for symbol, _ in pairs})
             engine = StrategyEngine(self.db, cycle_snapshot=True)
+
+            # 同步窗口按「该币种需要的最大周期」取，保证绑定与既有持仓都能拿到足够预热数据
+            required_intervals = dict.fromkeys(symbols, interval)
+            for symbol, binding in pairs:
+                current = required_intervals.get(symbol)
+                if current is None or interval_ms(binding.interval) > interval_ms(current):
+                    required_intervals[symbol] = binding.interval
             # Existing positions keep using their own candle series, so an interval
             # change must never stop updating them.
-            required_intervals = dict.fromkeys(symbols, interval)
             for order in open_orders(self.db):
                 existing = required_intervals.get(order.symbol)
                 if existing is None or interval_ms(order.interval) > interval_ms(existing):
@@ -93,36 +85,29 @@ class TradingService:
             sync_target_count = sum(len(group) for group in sync_groups.values())
             synced_at = time.monotonic()
 
-            # 每个币种选评分最高的策略信号
-            # 为每个 symbol 决定要跑哪些策略：策略级宇宙（吸收反转→主流币）+ 黑名单
-            symbol_strategies: dict[str, list[str]] = {}
-            skipped_universe = 0
-            for symbol in symbols:
-                if is_blacklisted(symbol):
-                    skipped_universe += 1
-                    symbol_strategies[symbol] = []
-                else:
-                    symbol_strategies[symbol] = [
-                        code for code in codes if symbol_allowed(code, symbol)
-                    ]
-
+            # 同一币种可能落进多个池/周期：各自独立评估，再按评分择优只开一仓
             best_signals = {}
             strategy_signals = {}
-            signal_errors = []
-            for symbol in symbols:
-                for code in symbol_strategies.get(symbol, []):
-                    try:
-                        signal_interval = strategy_interval(code, interval)
-                        signal = engine.evaluate(symbol, signal_interval, code, save=True)
-                        strategy_signals[(symbol, signal_interval, code)] = signal
-                        if signal is None or signal.direction == "FLAT":
-                            continue
-                        current = best_signals.get(symbol)
-                        if current is None or signal.score > current.score:
-                            best_signals[symbol] = signal
-                    except Exception as exc:
-                        self.db.rollback()
-                        signal_errors.append(f"{symbol}/{code}: {exc}")
+            signal_errors = list(binding_errors)
+            for symbol, binding in pairs:
+                try:
+                    signal = engine.evaluate(
+                        symbol,
+                        binding.interval,
+                        binding.strategy,
+                        save=True,
+                        params=binding.params,
+                        pool=binding.pool,
+                    )
+                    strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
+                    if signal is None or signal.direction == "FLAT":
+                        continue
+                    current = best_signals.get(symbol)
+                    if current is None or signal.score > current.score:
+                        best_signals[symbol] = signal
+                except Exception as exc:
+                    self.db.rollback()
+                    signal_errors.append(f"{symbol}/{binding.strategy}×{binding.pool}: {exc}")
             signaled_at = time.monotonic()
 
             # 管理已有订单：live 订单先同步交易所状态（交易所侧止盈止损可能已触发）
@@ -139,8 +124,20 @@ class TradingService:
                         sync_errors.append(f"live #{order.id}: {exc}")
                         self._log("error", f"live 订单同步失败 #{order.id}: {exc}")
                         continue
-                binding = strategy_signals.get((order.symbol, order.interval, order.strategy))
-                result = manage_order(self.db, order, binding)
+                key = (order.symbol, order.interval, order.strategy, order.pool or "")
+                signal = strategy_signals.get(key)
+                if signal is None:
+                    # 老订单没有记录 pool：退回该 (币种, 周期, 策略) 上的任意一条信号
+                    signal = next(
+                        (
+                            value
+                            for (symbol, interval, strategy, _pool), value in strategy_signals.items()
+                            if (symbol, interval, strategy)
+                            == (order.symbol, order.interval, order.strategy)
+                        ),
+                        None,
+                    )
+                result = manage_order(self.db, order, signal)
                 if result["actions"]:
                     managed.append(result)
                 if order.status != 'OPEN':
@@ -177,7 +174,15 @@ class TradingService:
                 "time": iso_utc(),
                 "symbols": symbols,
                 "symbol_count": len(symbols),
-                "universe_skipped": skipped_universe,
+                "bindings": [
+                    {
+                        "strategy": binding.strategy,
+                        "pool": binding.pool,
+                        "interval": binding.interval,
+                        "symbol_count": len(binding.symbols),
+                    }
+                    for binding in bindings
+                ],
                 "sync_target_count": sync_target_count,
                 "elapsed_ms": elapsed_ms,
                 "sync_ms": int((synced_at - started) * 1000),

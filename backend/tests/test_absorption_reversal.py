@@ -30,7 +30,8 @@ from app.features.absorption import (
 from app.features.indicators import build_features
 from app.models import Order, StrategyConfig
 from app.schemas import BacktestRequest
-from app.strategy.coin_universe import MAJOR_SYMBOLS, symbol_allowed
+from app.strategy.coin_universe import BLACKLIST, MAJOR_SYMBOLS
+from app.strategy.pools import resolve_members
 from app.strategy.defaults import DEFAULT_STRATEGIES, seed_strategies
 from app.strategy.rules import evaluate_signals, resolve_params
 from app.trading import order_manager
@@ -137,13 +138,37 @@ def test_backtest_request_accepts_strategy():
         BacktestRequest(symbol="BTCUSDT", interval="15m", strategy="not_a_strategy")
 
 
-def test_universe_binding_limits_strategy_to_majors():
-    """策略级宇宙：只在主流币白名单上运行，其余策略不受限制。"""
-    assert "BTCUSDT" in MAJOR_SYMBOLS
-    assert symbol_allowed(CODE, "BTCUSDT")
-    assert symbol_allowed(CODE, "btcusdt")  # 大小写不敏感
-    assert not symbol_allowed(CODE, "WHATEVERUSDT")
-    assert symbol_allowed("trend_follow", "WHATEVERUSDT")  # 未登记宇宙的策略不约束
+def test_pool_members_use_major_whitelist_and_blacklist():
+    """币种池：主流池只含白名单币；任何池都会剔除全局黑名单。"""
+    members = resolve_members(
+        "rule", [], {"base": "major"},
+        universe=lambda: [], volumes=lambda: {},
+    )
+    assert members == list(MAJOR_SYMBOLS)
+    assert "BTCUSDT" in members
+
+    blocked = sorted(BLACKLIST)[0]
+    with_blacklist = resolve_members(
+        "static", [blocked, "BTCUSDT"], {"base": "static"},
+        universe=lambda: [], volumes=lambda: {},
+    )
+    assert with_blacklist == ["BTCUSDT"]
+
+
+def test_alt_pool_excludes_majors_and_keeps_unknown_volume():
+    universe = ["BTCUSDT", "ETHUSDT", "FOOUSDT", "BARUSDT"]
+    members = resolve_members(
+        "rule", [], {"base": "all", "exclude_major": True},
+        universe=lambda: universe, volumes=lambda: {},
+    )
+    assert members == ["FOOUSDT", "BARUSDT"]
+
+    # 门槛过滤：缺成交额的币种保留（宁贵不漏），只剔除明确低于门槛的
+    members = resolve_members(
+        "rule", [], {"base": "all", "min_quote_volume_usd": 1_000_000},
+        universe=lambda: universe, volumes=lambda: {"FOOUSDT": 10.0},
+    )
+    assert members == ["BTCUSDT", "ETHUSDT", "BARUSDT"]
 
 
 # ---------------------------------------------------------------- 特征层

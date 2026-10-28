@@ -88,6 +88,49 @@ class StrategyConfig(Base):
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
+class SymbolPool(Base):
+    """币种池：策略的运行范围单位。
+
+    kind=static → 成员就是 `symbols` 里手写的列表；
+    kind=rule   → 成员由 `rule` 动态解析（base / 成交额门槛 / 排除主流 / TopN / 排除项）。
+    两种都再减去全局黑名单，见 strategy/pools.py。
+    """
+
+    __tablename__ = "symbol_pools"
+
+    id = Column(Integer, primary_key=True)
+    code = Column(String(48), unique=True, nullable=False)
+    name = Column(String(96), nullable=False)
+    description = Column(Text, default="")
+    kind = Column(String(16), default="static")   # static / rule
+    symbols = Column(Text, default="[]")          # JSON 数组，static 池的成员
+    rule = Column(Text, default="{}")             # JSON 对象，rule 池的筛选条件
+    enabled = Column(Integer, default=1)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+class StrategyBinding(Base):
+    """策略 × 币种池 的运行绑定：一条绑定 = 一套完整参数 + 一个K线周期。
+
+    同一策略可以有多条绑定（主流 15m / 山寨 5m / 山寨 1m），各自参数互不影响。
+    参数优先级：全局设置 < 策略默认 < 本条绑定的 params。
+    """
+
+    __tablename__ = "strategy_bindings"
+    __table_args__ = (
+        UniqueConstraint("strategy_code", "pool_code", "interval", name="uq_binding_scope"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    strategy_code = Column(String(48), nullable=False, index=True)
+    pool_code = Column(String(48), nullable=False, index=True)
+    interval = Column(String(8), nullable=False)
+    enabled = Column(Integer, default=1)
+    priority = Column(Integer, default=100)       # 仅用于展示排序；同币多绑定时按评分择优
+    params = Column(Text, default="{}")           # JSON 对象，覆盖策略默认
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
 class ModelRecord(Base):
     __tablename__ = "models"
 
@@ -140,6 +183,7 @@ class Signal(Base):
     symbol = Column(String(24), nullable=False, index=True)
     interval = Column(String(8), nullable=False)
     strategy = Column(String(48), nullable=False)
+    pool = Column(String(48), default="")  # 产生该信号的币种池（参数归属追溯）
     ts = Column(BigInteger, nullable=False, index=True)
     price = Column(Float, nullable=False)
     direction = Column(String(8), nullable=False)
@@ -170,6 +214,7 @@ class Order(Base):
     status = Column(String(16), default="OPEN", index=True)  # OPEN / CLOSED / CANCELED
     source = Column(String(16), default="paper")
     strategy = Column(String(48), default="")
+    pool = Column(String(48), default="")  # 该仓位所用参数所属的币种池
     signal_id = Column(Integer, default=0)
     entry_fee = Column(Float, default=0.0)
     exit_fee = Column(Float, default=0.0)

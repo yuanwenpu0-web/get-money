@@ -9,6 +9,8 @@ from app.schemas import SettingsUpdate
 from app.state import all_state, set_state
 from app.trading import dispatch, paper
 from app.trading.service import TradingService
+
+from fakes import seed_binding
 from app.utils import interval_ms, now_ms
 
 
@@ -129,8 +131,7 @@ def test_run_cycle_skips_open_while_halted(db, monkeypatch):
     set_state(db, "symbols", ["BTCUSDT"])
     set_state(db, "risk_halt", True)
     set_state(db, "risk_halt_reason", "熔断测试")
-    db.add(StrategyConfig(code="absorption_reversal", name="趋势", params="{}", enabled=1))
-    db.commit()
+    seed_binding(db, ["BTCUSDT"])
 
     class _StubService:
         def __init__(self, db, client=None):

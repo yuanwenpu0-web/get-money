@@ -1,11 +1,14 @@
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 import { price, symbolsLabel } from '../utils/format'
 import { signalReason } from '../utils/strategy'
+import BindingMatrix from '../components/BindingMatrix.vue'
 
 const strategies = ref([])
+const bindings = ref([])
+const previewBinding = ref('')
 const settings = ref({})
 const symbolCount = ref(0)
 const loading = ref(false)
@@ -23,7 +26,7 @@ const preview = ref(null)
 const runResult = ref(null)
 const runVisible = ref(false)
 
-const form = reactive({ symbol: 'BTCUSDT', interval: '1m', strategy: 'absorption_reversal' })
+const form = reactive({ symbol: 'BTCUSDT', interval: '1m', strategy: 'absorption_reversal', pool: '' })
 const editVisible = ref(false)
 const editCode = ref('')
 const editName = ref('')
@@ -35,9 +38,53 @@ const initialForm = { ...form }
 let listPromise = null
 let settingsPromise = null
 let symbolsPromise = null
+let bindingsPromise = null
 let disposed = false
 
 const intervalOptions = ['1m', '5m', '15m', '1h', '4h', '1d']
+
+// 预演可以选一条「策略 × 池」绑定作为参数层；选中后周期跟着绑定走，
+// 因为后端取参数时要求 (策略, 池, 周期) 三元组精确命中。
+const previewBindingOptions = computed(() => bindings.value.filter((row) => row.strategy === form.strategy))
+
+function onPreviewStrategyChange() {
+  previewBinding.value = ''
+  form.pool = ''
+}
+
+function onPreviewBindingChange(bindingId) {
+  const row = bindings.value.find((item) => String(item.id) === String(bindingId))
+  if (!row) {
+    form.pool = ''
+    return
+  }
+  form.pool = row.pool
+  form.interval = row.interval
+}
+
+function onPreviewIntervalChange() {
+  formEdited.value = true
+  if (!form.pool) return
+  const hit = bindings.value.some((row) => (
+    row.strategy === form.strategy && row.pool === form.pool && row.interval === form.interval
+  ))
+  if (hit) return
+  form.pool = ''
+  previewBinding.value = ''
+}
+
+function loadBindings() {
+  if (disposed) return Promise.resolve()
+  if (bindingsPromise) return bindingsPromise
+  bindingsPromise = api.getBindings().then((data) => {
+    if (!disposed) bindings.value = data.bindings || []
+  }).catch(() => {
+    if (!disposed) bindings.value = []
+  }).finally(() => {
+    bindingsPromise = null
+  })
+  return bindingsPromise
+}
 
 function loadStrategies() {
   if (disposed) return Promise.resolve()
@@ -100,7 +147,7 @@ function loadSymbols() {
 }
 
 function load() {
-  return Promise.all([loadStrategies(), loadSettings(), loadSymbols()])
+  return Promise.all([loadStrategies(), loadSettings(), loadSymbols(), loadBindings()])
 }
 
 async function refreshStrategies() {
@@ -158,7 +205,7 @@ async function runPreview(code) {
   if (code) form.strategy = code
   previewing.value = true
   try {
-    preview.value = await api.previewSignal({ ...form })
+    preview.value = await api.previewSignal({ ...form, pool: form.pool || null })
   } catch (error) {
     preview.value = null
     ElMessage.error(error.message)
@@ -240,6 +287,8 @@ onBeforeUnmount(() => { disposed = true })
       </div>
     </div>
 
+    <BindingMatrix :strategies="strategies" @change="loadBindings" />
+
     <div class="panel" style="margin-bottom: 14px">
       <div class="panel-head">
         <div>
@@ -251,11 +300,26 @@ onBeforeUnmount(() => { disposed = true })
         <el-select v-model="form.symbol" size="small" style="width: 130px" @update:model-value="formEdited = true">
           <el-option v-for="symbol in settings.symbols || ['BTCUSDT', 'ETHUSDT']" :key="symbol" :label="symbol" :value="symbol" />
         </el-select>
-        <el-select v-model="form.interval" size="small" style="width: 100px" @update:model-value="formEdited = true">
+        <el-select v-model="form.interval" size="small" style="width: 100px" @update:model-value="onPreviewIntervalChange">
           <el-option v-for="item in intervalOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select v-model="form.strategy" size="small" style="width: 190px" @update:model-value="formEdited = true">
+        <el-select v-model="form.strategy" size="small" style="width: 190px" @update:model-value="onPreviewStrategyChange">
           <el-option v-for="row in strategies" :key="row.code" :label="row.name" :value="row.code" />
+        </el-select>
+        <el-select
+          v-model="previewBinding"
+          size="small"
+          clearable
+          placeholder="参数层：策略默认"
+          style="width: 200px"
+          @change="onPreviewBindingChange"
+        >
+          <el-option
+            v-for="row in previewBindingOptions"
+            :key="row.id"
+            :label="`${row.pool_name || row.pool} × ${row.interval}${row.enabled ? '' : '（巡检已停用）'}`"
+            :value="row.id"
+          />
         </el-select>
         <el-button size="small" type="primary" :loading="previewing" @click="runPreview()">计算信号</el-button>
       </div>

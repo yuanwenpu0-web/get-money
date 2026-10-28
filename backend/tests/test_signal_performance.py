@@ -53,7 +53,7 @@ def test_cycle_reuses_features_without_changing_saved_signals(db, monkeypatch, c
     # 换币种必须重新加载，缓存按当前序列单槽保留
     evaluator.evaluate("ETHUSDT", "1h", STRATEGY)
     assert calls["features"] == 2
-    assert len(evaluator._features) == 1
+    assert len(evaluator._frames) == 1
 
     # 新一轮巡检创建新实例，必须重新取数
     engine.StrategyEngine(db, cycle_snapshot=True).evaluate("BTCUSDT", "1h", STRATEGY)

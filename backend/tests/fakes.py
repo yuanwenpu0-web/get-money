@@ -74,6 +74,74 @@ def seed_strategy_params(db, code="absorption_reversal", **overrides):
     db.commit()
 
 
+def seed_binding(
+    db,
+    symbols,
+    *,
+    strategy="absorption_reversal",
+    interval="1m",
+    params=None,
+    pool_code="test",
+    priority=10,
+    enabled=1,
+    strategy_enabled=1,
+):
+    """装一条「策略 × 静态池」绑定。
+
+    巡检现在由绑定驱动：没有绑定就没有任何币种会被同步/评估。
+    测试里用静态池精确圈定要被跑到的币种，避免依赖 universe 网络拉取。
+    """
+    from app.models import StrategyBinding, SymbolPool
+
+    list_symbols = [symbol.upper() for symbol in symbols]
+    row = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
+    if row is None:
+        db.add(
+            StrategyConfig(
+                code=strategy, name=strategy, description="",
+                enabled=strategy_enabled, params=json.dumps(params or {}),
+            )
+        )
+    else:
+        row.enabled = strategy_enabled
+    pool = db.query(SymbolPool).filter(SymbolPool.code == pool_code).first()
+    if pool is None:
+        pool = SymbolPool(
+            code=pool_code, name=pool_code, kind="static",
+            symbols=json.dumps(list_symbols), rule="{}", enabled=1,
+        )
+        db.add(pool)
+    else:
+        pool.kind = "static"
+        pool.symbols = json.dumps(list_symbols)
+        pool.rule = "{}"
+        pool.enabled = 1
+    db.commit()
+
+    binding = (
+        db.query(StrategyBinding)
+        .filter(
+            StrategyBinding.strategy_code == strategy,
+            StrategyBinding.pool_code == pool_code,
+            StrategyBinding.interval == interval,
+        )
+        .first()
+    )
+    if binding is None:
+        binding = StrategyBinding(
+            strategy_code=strategy, pool_code=pool_code, interval=interval,
+            enabled=enabled, priority=priority,
+            params=json.dumps(params or {}, ensure_ascii=False),
+        )
+        db.add(binding)
+    else:
+        binding.enabled = enabled
+        binding.priority = priority
+        binding.params = json.dumps(params or {}, ensure_ascii=False)
+    db.commit()
+    return binding
+
+
 def market_orders(fake):
     return [params for call in fake.calls if call[0] == "order" for params in [call[1]]]
 

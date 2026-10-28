@@ -16,7 +16,7 @@ from ..models import Credential, JobLog, StrategyConfig, utcnow
 from ..schemas import CapitalAdjust, CredentialsPayload, SettingsUpdate
 from ..security import decrypt, encrypt, mask
 from ..state import all_state, set_state
-from ..strategy.rules import STRATEGY_PARAMS, resolve_params
+from ..strategy.rules import known_codes, resolve_params
 from ..trading.portfolio import adjust_capital
 from ..trading.scheduler import scheduler, update_schedule
 
@@ -176,11 +176,11 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     _validate({key: value for key, value in merged.items() if key in EDITABLE_KEYS}, db)
     try:
         # 校验目标是「已登记的策略」：默认代码 + 库里真实存在的策略配置行
-        for code in STRATEGY_PARAMS:
+        registered = known_codes()
+        for code in registered:
             resolve_params(code, merged)
-        known_codes = set(STRATEGY_PARAMS)
         for strategy in db.query(StrategyConfig).all():
-            if strategy.code in known_codes:
+            if strategy.code in registered:
                 resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc

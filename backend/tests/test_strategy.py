@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from app.strategy.defaults import DEFAULT_STRATEGIES
-from app.strategy.rules import STRATEGY_PARAMS, evaluate_signals, resolve_params
+from app.strategy.rules import evaluate_signals, known_codes, resolve_params
 
 CODE = "absorption_reversal"
 
@@ -52,7 +52,7 @@ def _out(**changes):
 
 def test_only_one_strategy_is_registered():
     assert [item["code"] for item in DEFAULT_STRATEGIES] == [CODE]
-    assert list(STRATEGY_PARAMS) == [CODE]
+    assert list(known_codes()) == [CODE]
 
 
 def test_unknown_strategy_is_rejected():

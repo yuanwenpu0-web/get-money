@@ -7,42 +7,19 @@ from dataclasses import asdict, dataclass, field
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from ..features.absorption import add_absorption_context, load_lower_tf_delta
 from ..features.indicators import build_features
-from ..market.data_service import MarketDataService
 from ..market import metrics as metrics_mod
+from ..market.data_service import MarketDataService
 from ..models import Signal, StrategyConfig
 from ..state import all_state
 from ..utils import interval_ms, now_ms, round_price
-from .rules import evaluate_signals, resolve_params
+from .registry import StrategySpec, get_spec
+from .rules import evaluate_signals, prepare_frame, resolve_params
 
 
-def _absorption_lookback(params: dict) -> int:
-    """吸收反转的回看长度：|delta| 百分位需要 delta_window 根窗口，EMA(trend_len) 需约 3×跨度预热。
-    取两者的较大者并留 1200 根底线，避免交易日不足时百分位/EMA 在末根仍失真。"""
-    return max(1200, int(params.get("delta_window", 500)) + 3 * int(params.get("trend_len", 200)))
-
-
-def _absorption_reason(row) -> dict:
-    """吸收信号的观测快照：delta/支配度/百分位阈值、吸收极值与待穿越关卡（不影响决策）。"""
-    def value(name):
-        try:
-            number = float(row[name])
-        except (KeyError, TypeError, ValueError):
-            return 0.0
-        return number if math.isfinite(number) else 0.0
-
-    return {
-        "abs_delta": round(value("abs_delta"), 4),
-        "abs_dominance": round(value("abs_dominance"), 4),
-        "abs_percentile": round(value("abs_percentile"), 4),
-        "abs_wick_ratio": round(value("abs_wick_ratio"), 6),
-        "abs_atr": round_price(value("abs_atr")),
-        "structure_extreme": round_price(value("abs_extreme")),
-        "confirm_level": round_price(value("abs_level")),
-        "signal_dir": value("abs_signal"),
-        "stop_price": round_price(value("abs_sl")),
-    }
+def _fingerprint(params: dict) -> str:
+    """参数指纹：不同池参数会产生不同特征，缓存键必须带上它。"""
+    return json.dumps(params, sort_keys=True, default=str)
 
 
 @dataclass
@@ -50,6 +27,7 @@ class TradeSignal:
     symbol: str
     interval: str
     strategy: str
+    pool: str
     ts: int
     price: float
     direction: str
@@ -61,9 +39,13 @@ class TradeSignal:
     position_pct: float
     atr_pct: float
     reason: dict = field(default_factory=dict)
+    # 产生该信号的绑定参数（进程内透传给撮合，避免再按策略配置解析一次而用错池参数）
+    params: dict = field(default_factory=dict, repr=False)
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        data.pop("params", None)
+        return data
 
 
 class StrategyEngine:
@@ -72,8 +54,9 @@ class StrategyEngine:
         self.db = db
         self.service = MarketDataService(db)
         self.cycle_snapshot = cycle_snapshot
-        self._features: dict[tuple[str, str, int], pd.DataFrame | None] = {}
-        self._mtf_features: dict[tuple[str, str, str], pd.DataFrame] = {}
+        # 缓存键 (symbol, interval, limit, 参数指纹)：同一币种在不同池下参数不同、
+        # 特征也不同，不能只按 (symbol, interval) 缓存。
+        self._frames: dict[tuple[str, str, int, str], pd.DataFrame | None] = {}
         self._metrics: dict[str, dict] = {}
         self._configs: dict[str, StrategyConfig | None] = {}
         self._state: dict | None = None
@@ -117,51 +100,58 @@ class StrategyEngine:
         funding = self.service.load_funding_frame(symbol, frame_start_ms - 90 * 86_400_000, now_ms())
         return build_features(frame, with_label=False, funding=funding)
 
-    def evaluate(
-        self, symbol: str, interval: str, strategy_code: str, save: bool = False
-    ) -> TradeSignal | None:
-        """评估单个 symbol 上指定策略的信号（策略必须显式给出）。
+    def _frame(
+        self,
+        symbol: str,
+        interval: str,
+        spec: StrategySpec,
+        params: dict,
+    ) -> pd.DataFrame | None:
+        """取指标帧并按策略补上下文；同轮同参数的重复请求走缓存。"""
+        limit = spec.lookback(params)
+        key = (symbol, interval, limit, _fingerprint(params))
+        if self.cycle_snapshot and key in self._frames:
+            return self._frames[key]
+        data = self._prepare_features(symbol, interval, limit)
+        if data is not None:
+            data = prepare_frame(data, spec.code, params, symbol=symbol, service=self.service)
+        if self.cycle_snapshot:
+            # 巡检按「绑定 × 币种」遍历，只保留当前序列，避免宇宙级缓存堆积
+            self._frames.clear()
+            self._frames[key] = data
+        return data
 
-        历史版本支持 strategy_code="auto"/None 走币级路由在多策略间挑选；仓库收敛到
-        单一策略后该层已删除，调用方一律显式传入策略代码。
+    def evaluate(
+        self,
+        symbol: str,
+        interval: str,
+        strategy_code: str,
+        save: bool = False,
+        *,
+        params: dict | None = None,
+        pool: str = "",
+        respect_enabled: bool = True,
+    ) -> TradeSignal | None:
+        """评估单个 (策略, 池, 币种, 周期) 的信号。
+
+        `params` 一般由 `bindings.active_bindings()` 解析好传入（已含池参数覆盖）；
+        不传时按策略配置 + 全局设置自行解析，供预演等临时调用使用。
+        `respect_enabled=False` 用于「预演」：策略总开关关闭时也允许算一次看看。
         """
         if strategy_code in (None, "auto"):
             return None
+        spec = get_spec(strategy_code)
         config = self._get_config(strategy_code)
-        if config is not None and not config.enabled:
+        if respect_enabled and config is not None and not config.enabled:
             return None
-        merged_params = json.loads(config.params or "{}") if config else {}
-        state = self._get_state()
-        params = resolve_params(
-            strategy_code, state, merged_params or None,
-            interval=interval,
-        )
-        # 吸收上下文：|delta| 百分位要 delta_window 根窗口、EMA(trend_len) 要 3 倍跨度预热
-        limit = _absorption_lookback(params)
-        key = (symbol, interval, limit)
-        if self.cycle_snapshot:
-            if key not in self._features:
-                # 巡检按币种遍历，只保留当前序列，避免全量宇宙积累数百份指标帧。
-                self._features.clear()
-                self._mtf_features.clear()
-                self._metrics.clear()
-                self._features[key] = self._prepare_features(symbol, interval, limit)
-            data = self._features[key]
-        else:
-            data = self._prepare_features(symbol, interval, limit)
+        if params is None:
+            merged = json.loads(config.params or "{}") if config else {}
+            params = resolve_params(
+                strategy_code, self._get_state(), merged or None, interval=interval
+            )
+        data = self._frame(symbol, interval, spec, params)
         if data is None:
             return None
-        # 吸收上下文整帧富化：delta / 滚动百分位 / c1..c5 / 确认状态机（纯因果）
-        context_key = (symbol, interval)
-        if self.cycle_snapshot and context_key in self._mtf_features:
-            data = self._mtf_features[context_key]
-        else:
-            # 优先用脚本的 lower-tf intrabar delta；拿不到数据自动降级 bar shape 估计
-            data = add_absorption_context(
-                data, params, load_lower_tf_delta(self.service, symbol, data.index)
-            )
-            if self.cycle_snapshot:
-                self._mtf_features[context_key] = data
         step = interval_ms(interval)
         row = data.iloc[-1]
         if not all(
@@ -173,23 +163,25 @@ class StrategyEngine:
             row["open"], row["close"], row["high"]
         ):
             return None
-        # 观测接入：把最新多源指标快照附在 reason 上（迭代 7 采集），不影响任何决策。
+        # 观测接入：把最新多源指标快照附在 reason 上（采集用），不影响任何决策。
         if self.cycle_snapshot:
             if symbol not in self._metrics:
                 self._metrics[symbol] = metrics_mod.load_latest_metrics(self.db, symbol) or {}
             metrics_features = self._metrics[symbol]
         else:
             metrics_features = metrics_mod.load_latest_metrics(self.db, symbol) or {}
-        decision = evaluate_signals(data.iloc[-1:], strategy_code, params).iloc[0]
+        decision = evaluate_signals(data.iloc[-1:], strategy_code, params, symbol=symbol).iloc[0]
         ts = int(data.index[-1].timestamp() * 1000)
         stale = now_ms() - (ts + step) > params["max_signal_age_bars"] * step
         direction = 0 if stale else int(decision.direction)
         price = float(row["close"])
         atr_pct = float(row["atr_pct"]) if math.isfinite(float(row["atr_pct"])) else 0.0
+        observation = spec.describe(row) if spec.describe else {}
         signal = TradeSignal(
             symbol=symbol,
             interval=interval,
             strategy=strategy_code,
+            pool=pool,
             ts=ts,
             price=round_price(price),
             direction={1: "LONG", -1: "SHORT", 0: "FLAT"}[direction],
@@ -212,9 +204,11 @@ class StrategyEngine:
                 "net_reward_risk": float(decision.net_reward_risk)
                 if math.isfinite(float(decision.net_reward_risk))
                 else 0.0,
+                "pool": pool,
                 "metrics": metrics_features,  # 观测用多源指标快照（附件，不影响决策）
-                **_absorption_reason(row),
+                **observation,
             },
+            params=dict(params),
         )
         if save:
             payload = signal.to_dict()
