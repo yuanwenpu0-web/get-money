@@ -559,8 +559,7 @@ class MarketDataService:
     ) -> tuple[list[dict], dict]:
         """聚合优先 + native 补齐。
 
-        重叠桶一律采用聚合结果：聚合口径与既有回测完全同源，且两者在重叠区间
-        已通过逐根比对（见 docs/native-consistency.md，6/6 币种零差异）。
+        重叠桶一律采用聚合结果。
         native 只负责补 1m 根本没覆盖到的历史段，不覆盖任何已有聚合桶。
         """
         query = self._candle_query(symbol, interval, start_ms, end_ms).subquery()
