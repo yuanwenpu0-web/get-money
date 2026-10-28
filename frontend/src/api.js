@@ -47,8 +47,16 @@ export default {
   syncMarket: (payload) => http.post('/market/sync', payload),
   previewSignal: (payload) => http.post('/market/preview', payload),
 
+  getIndicators: () => http.get('/indicators'),
+  getIndicator: (id) => http.get('/indicators/' + encodeURIComponent(id)),
+
   getStrategies: () => http.get('/strategies'),
   updateStrategy: (code, payload) => http.put(`/strategies/${code}`, payload),
+  getLocalStrategies: () => http.get('/local-strategies'),
+  updateLocalStrategy: (code, payload) => http.put(`/local-strategies/${code}`, payload),
+  getTradingViewStrategies: () => http.get('/tradingview-strategies'),
+  getTradingViewStrategy: (id) => http.get('/tradingview-strategies/' + encodeURIComponent(id)),
+  runTradingViewBacktest: (id, payload) => http.post('/tradingview-strategies/' + encodeURIComponent(id) + '/backtest', payload),
 
   getModels: (params) => http.get('/models', { params }),
   trainModel: (payload) => http.post('/models/train', payload),
@@ -59,3 +67,5 @@ export default {
   getBacktest: (id, params = {}) => http.get(`/backtests/${id}`, { params: { include_trades: false, ...params } }),
   getBacktestTrades: (id, params) => http.get(`/backtests/${id}/trades`, { params }),
 }
+
+

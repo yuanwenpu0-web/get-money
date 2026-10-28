@@ -6,7 +6,7 @@ import random
 
 import pandas as pd
 
-from ..trading.risk import position_size, stop_exit, trailing_stop
+from ..trading.risk import breakeven_stop, position_size, stop_exit, trailing_stop
 from ..utils import interval_ms
 
 RANDOM_BASELINE_SEED = 20261025
@@ -141,6 +141,11 @@ def simulate(
                 close_position(row.open, row.Index, "signal_reverse")
             exited = position is None
 
+        entry_allowed = True
+        if signal is not None and signal.direction:
+            attr = "allow_long_entry" if signal.direction == 1 else "allow_short_entry"
+            allowed = getattr(signal, attr, True)
+            entry_allowed = bool(allowed) if pd.notna(allowed) else False
         if (
             position is None
             and not exited
@@ -148,6 +153,7 @@ def simulate(
             and i >= next_entry
             and signal is not None
             and signal.direction
+            and entry_allowed
             and cash > 0
         ):
             side = int(signal.direction)
@@ -209,6 +215,15 @@ def simulate(
                         )
                         p["tp"] = 0.0
                         p["partial_done"] = True
+                p["sl"] = breakeven_stop(
+                    p["side"],
+                    p["entry"],
+                    p["sl"],
+                    row.high,
+                    row.low,
+                    float(params.get("be_trigger_r", 0.0)),
+                    p["risk"],
+                )
                 p["sl"] = trailing_stop(
                     p["side"],
                     p["entry"],

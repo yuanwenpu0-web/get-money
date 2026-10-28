@@ -104,7 +104,7 @@ class BacktestRequest(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
     symbol: str = Field(min_length=2, max_length=24, pattern=r'^[A-Za-z0-9]+$')
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '1m'
-    strategy: Literal['ml_ensemble', 'trend_follow', 'mean_reversion', 'funding_extreme', 'mtf_resonance', 'strong_pullback'] = 'ml_ensemble'
+    strategy: Literal['ml_ensemble', 'trend_follow', 'mean_reversion', 'funding_extreme', 'mtf_resonance', 'strong_pullback', 'absorption_reversal'] = 'ml_ensemble'
     algo: Literal['rule', 'lightgbm', 'xgboost'] = 'lightgbm'
     days: int = Field(default=30, ge=1, le=180)
     initial_cash: float | None = Field(default=None, gt=0)

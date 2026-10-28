@@ -123,6 +123,34 @@ BLACKLIST: set[str] = {
 }
 
 
+# ============================================================
+# 5. 策略级币种宇宙（"策略绑定到哪些币"）
+# ============================================================
+# 与上文的「路由」（每个币选最优策略）正交：这里限定**某个策略只在哪些币上运行**。
+# 用途：吸收反转的判定依赖 volume 与影线结构，中小币种的量价噪声会让 c1（|delta| 进入滚动
+# 95 分位）与 c5（单边支配度）失真，因此把它的运行范围钉在高流动性主流币上。
+#
+# 主流币 = 长期成交额居前、01:00 级分钟数据连续、且在 U 本位永续上深度充足的白名单。
+# 说明：本白名单**只约束运行范围，不是路由决策**——在 walk-forward 拿出 holdout 为正的
+# 证据之前，SYMBOL_ROUTES 里不会写入 absorption_reversal（路由纪律见第 3 节）。
+
+MAJOR_SYMBOLS: tuple[str, ...] = (
+    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT",
+    "ADAUSDT", "LINKUSDT", "AVAXUSDT", "LTCUSDT", "DOTUSDT", "SUIUSDT",
+    "TRXUSDT", "NEARUSDT", "APTUSDT", "BCHUSDT",
+)
+
+STRATEGY_UNIVERSE: dict[str, frozenset[str]] = {
+    "absorption_reversal": frozenset(MAJOR_SYMBOLS),
+}
+
+
+def symbol_allowed(code: str, symbol: str) -> bool:
+    """策略 → 币种的运行范围检查：未登记宇宙的策略不限制（返回 True）。"""
+    universe = STRATEGY_UNIVERSE.get(code)
+    return universe is None or symbol.upper() in universe
+
+
 def get_route(symbol: str) -> Optional[dict]:
     """查表返回 (strategy, params) 或 None。
 
@@ -149,7 +177,6 @@ def get_route(symbol: str) -> Optional[dict]:
 def get_coin_type(symbol: str) -> str | None:
     """返回币种类型标签，或 None（未知）。"""
     return COIN_TYPES.get(symbol.upper())
-
 
 def all_routes() -> dict[str, dict]:
     """返回当前所有 symbol→route 的完整映射（给 UI / 运维用）。"""

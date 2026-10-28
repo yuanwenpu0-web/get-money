@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .api import backtests, market, models_api, settings, strategies, trading
+from .api import backtests, indicators, local_strategies, market, models_api, settings, strategies, trading, tradingview_strategies
 from .config import BASE_DIR
 from .db import SessionLocal, init_db
 from .ml.auto_trainer import start_auto_train_thread
@@ -78,6 +78,9 @@ app.add_middleware(
 
 app.include_router(settings.router, prefix="/api")
 app.include_router(market.router, prefix="/api")
+app.include_router(indicators.router, prefix="/api")
+app.include_router(local_strategies.router, prefix="/api")
+app.include_router(tradingview_strategies.router, prefix="/api")
 app.include_router(strategies.router, prefix="/api")
 app.include_router(models_api.router, prefix="/api")
 app.include_router(backtests.router, prefix="/api")

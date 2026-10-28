@@ -12,7 +12,7 @@ function deferred() {
   return { promise, resolve, reject }
 }
 
-function view(name, api, exports) {
+function view(name, api, exports, onError = (message) => assert.fail(message)) {
   const text = readFileSync(new URL(`../src/views/${name}.vue`, import.meta.url), 'utf8')
   assert.match(text, /<template>\s*<div>/)
   const script = text.match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
@@ -24,7 +24,7 @@ function view(name, api, exports) {
     reactive: (value) => value,
     onMounted: (callback) => mounts.push(callback),
     onBeforeUnmount: (callback) => unmounts.push(callback),
-    ElMessage: { error: (message) => assert.fail(message), success: () => {} },
+    ElMessage: { error: onError, success: () => {} },
     number: (value) => String(value),
   })
   vm.runInContext(`${script}\nglobalThis.subject = { ${exports.join(', ')} }`, context)
@@ -195,4 +195,82 @@ test('Strategies late settings preserve edits and section requests are deduplica
   await pending
   assert.equal(subject.form.symbol, 'XRPUSDT')
   assert.equal(subject.scheduleForm.seconds, 180)
+})
+
+test('Local strategy settings load independently and save enabled state with bindings', async () => {
+  const local = deferred()
+  const saved = deferred()
+  let payload
+  const subject = view('Strategies', {
+    getStrategies: async () => ({ strategies: [{ code: 'trend_follow', name: 'Trend' }] }),
+    getSettings: async () => ({}),
+    getMarketSymbols: async () => ({ symbols: [] }),
+    getLocalStrategies: () => local.promise,
+    updateLocalStrategy: (code, body) => { payload = { code, ...body }; return saved.promise },
+  }, ['strategies', 'localStrategies', 'localSaving', 'saveLocalStrategy'])
+  const pending = subject.mount()
+  await tick()
+  assert.equal(subject.strategies.value[0].code, 'trend_follow')
+  local.resolve({ strategies: [{ code: 'sma_crossover', name: 'SMA', enabled: false, bound_strategies: [] }] })
+  await pending
+  const row = subject.localStrategies.value[0]
+  row.enabled = true
+  row.bound_strategies = ['trend_follow']
+  const saving = subject.saveLocalStrategy(row)
+  assert.equal(subject.localSaving.value.sma_crossover, true)
+  assert.deepEqual(JSON.parse(JSON.stringify(payload)), { code: 'sma_crossover', enabled: true, bound_strategies: ['trend_follow'] })
+  saved.resolve({ ...row, enabled: true })
+  await saving
+  assert.equal(subject.localSaving.value.sma_crossover, false)
+  assert.equal(subject.localStrategies.value[0].enabled, true)
+})
+
+test('A failed local strategy save restores the server state, including bindings', async () => {
+  let reads = 0
+  const errors = []
+  const subject = view('Strategies', {
+    getStrategies: async () => ({ strategies: [] }),
+    getSettings: async () => ({}),
+    getMarketSymbols: async () => ({ symbols: [] }),
+    getLocalStrategies: async () => {
+      reads += 1
+      return { strategies: [{ code: 'sma_crossover', name: 'SMA', enabled: true,
+        bound_strategies: reads === 1 ? ['trend_follow'] : ['mean_reversion'] }] }
+    },
+    updateLocalStrategy: async () => { throw new Error('network error') },
+  }, ['localStrategies', 'localDirty', 'saveLocalStrategy'], (message) => errors.push(message))
+  await subject.mount()
+  const draft = subject.localStrategies.value[0]
+  draft.enabled = false
+  draft.bound_strategies = []
+  assert.equal(subject.localDirty(draft), true)
+  await subject.saveLocalStrategy(draft)
+  const restored = subject.localStrategies.value[0]
+  assert.equal(restored.enabled, true)
+  assert.deepEqual(Array.from(restored.bound_strategies), ['mean_reversion'])
+  assert.equal(subject.localDirty(restored), false)
+  assert.match(errors[0], /重新读取服务器配置/)
+})
+
+test('A failed save and failed refresh restores last confirmed settings and warns of uncertainty', async () => {
+  let reads = 0
+  const errors = []
+  const subject = view('Strategies', {
+    getStrategies: async () => ({ strategies: [] }),
+    getSettings: async () => ({}),
+    getMarketSymbols: async () => ({ symbols: [] }),
+    getLocalStrategies: async () => {
+      if (++reads > 1) throw new Error('offline')
+      return { strategies: [{ code: 'sma_crossover', name: 'SMA', enabled: true, bound_strategies: ['trend_follow'] }] }
+    },
+    updateLocalStrategy: async () => { throw new Error('offline') },
+  }, ['localStrategies', 'saveLocalStrategy'], (message) => errors.push(message))
+  await subject.mount()
+  const row = subject.localStrategies.value[0]
+  row.enabled = false
+  row.bound_strategies = []
+  await subject.saveLocalStrategy(row)
+  assert.equal(subject.localStrategies.value[0].enabled, true)
+  assert.deepEqual(Array.from(subject.localStrategies.value[0].bound_strategies), ['trend_follow'])
+  assert.match(errors[0], /无法确认服务器当前状态/)
 })

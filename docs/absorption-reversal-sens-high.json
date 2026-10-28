@@ -1,0 +1,1395 @@
+{
+  "strategy": "absorption_reversal",
+  "generated_at": "2026-10-28T16:05:56+00:00",
+  "interval": "15m",
+  "days_per_window": 93,
+  "windows": 1,
+  "step_days": 93,
+  "sensitivity": "high",
+  "delta_source": "auto",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "LINKUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "DOTUSDT",
+    "SUIUSDT",
+    "TRXUSDT",
+    "NEARUSDT",
+    "APTUSDT",
+    "BCHUSDT"
+  ],
+  "parameters": {
+    "min_score": 0.75,
+    "heavy_score": 0.9,
+    "base_position_pct": 0.3,
+    "max_position_pct": 0.3,
+    "max_leverage": 1,
+    "sl_atr_mult": 1.5,
+    "tp_atr_mult": 2.5,
+    "trailing_atr_mult": 1.2,
+    "min_sl_pct": 0.0025,
+    "min_tp_pct": 0.005,
+    "min_hold_bars": 0,
+    "max_hold_bars": 30,
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "regime_filter": true,
+    "cost_filter": true,
+    "require_model": false,
+    "funding_filter": false,
+    "risk_per_trade_pct": 0.02,
+    "cooldown_bars": 0,
+    "min_atr_cost_ratio": 0.5,
+    "min_net_reward_risk": 1.0,
+    "max_atr_pct": 0.03,
+    "min_model_edge": 0.05,
+    "trailing_enabled": false,
+    "trail_activation_atr": 1.5,
+    "max_signal_age_bars": 2,
+    "ema_exit": false,
+    "partial_tp_r": 0.0,
+    "partial_tp_frac": 0.5,
+    "delta_window": 500,
+    "delta_pct": 90.0,
+    "body_mult": 0.35,
+    "extreme_lookback": 10,
+    "wick_mult": 0.15,
+    "dominance_pct": 20.0,
+    "abs_gap_bars": 10,
+    "legacy_gap_logic": false,
+    "conf_mode": 1,
+    "conf_window_bars": 3,
+    "direction_mode": 0,
+    "trend_mode": 0,
+    "trend_len": 200,
+    "session_start_hour": 0.0,
+    "session_end_hour": 24.0,
+    "sl_buffer_atr": 0.25,
+    "target_r": 2.0,
+    "be_trigger_r": 1.0,
+    "min_sl_atr": 0.3,
+    "max_sl_atr": 3.0
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "cash_per_symbol": 10000.0
+  },
+  "random_baseline_seeds": 10,
+  "elapsed_seconds": 18.2,
+  "windows_detail": [
+    {
+      "end_ms": 1793203538350,
+      "end": "2026-10-28T16:05:38.350000+00:00",
+      "summary": {
+        "symbols_total": 16,
+        "symbols_with_trades": 16,
+        "trades": 323,
+        "return_median_pct": -0.5004,
+        "return_mean_pct": -0.4781,
+        "positive_symbols": 5,
+        "win_rate_mean_pct": 33.52,
+        "max_drawdown_mean_pct": -2.0085,
+        "beats_random_p95": 2,
+        "status_counts": {
+          "stop_loss": 189,
+          "time_stop": 66,
+          "take_profit": 64,
+          "signal_reverse": 4
+        },
+        "blocked": {
+          "no_absorption_signal": 133624,
+          "stop_too_wide": 22
+        }
+      },
+      "per_symbol": [
+        {
+          "symbol": "BTCUSDT",
+          "rows": 8874,
+          "signal_bars": 19,
+          "delta_source": "lower",
+          "trades": 19,
+          "trade_returns": [
+            -0.53668,
+            0.473592,
+            -0.099992,
+            -0.099992,
+            -0.474301,
+            -0.099992,
+            -0.44769,
+            -0.870269,
+            -1.340846,
+            -0.100008,
+            0.367297,
+            -0.829032,
+            -0.526496,
+            0.378709,
+            -0.471671,
+            -0.822641,
+            -0.745489,
+            -0.099992,
+            -0.153421
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9806.64,
+            "total_return_pct": -1.9336,
+            "max_drawdown_pct": -2.1055,
+            "sharpe": -5.48,
+            "total_trades": 19.0,
+            "win_rate": 15.79,
+            "profit_factor": 0.158,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -10.1766,
+            "total_fees": 45.21,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "time_stop": 4,
+            "take_profit": 1,
+            "stop_loss": 14
+          },
+          "blocked": {
+            "no_absorption_signal": 8853,
+            "stop_too_wide": 2
+          },
+          "expectancy_ci": {
+            "trades": 19,
+            "mean_return_pct": -0.342,
+            "ci_low_pct": -0.5513,
+            "ci_high_pct": -0.1437,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.0,
+            "verdict": "negative"
+          },
+          "random": {
+            "mean_pct": -1.0031,
+            "std_pct": 0.6531,
+            "p95_pct": -0.1998,
+            "p05_pct": -1.888
+          }
+        },
+        {
+          "symbol": "ETHUSDT",
+          "rows": 8874,
+          "signal_bars": 20,
+          "delta_source": "lower",
+          "trades": 20,
+          "trade_returns": [
+            -0.100008,
+            0.835491,
+            -1.391047,
+            -0.853468,
+            1.135128,
+            0.737035,
+            -0.100008,
+            -0.772974,
+            -0.642844,
+            1.37938,
+            -0.493442,
+            0.898402,
+            -0.100008,
+            -0.673974,
+            0.696646,
+            -1.081627,
+            -0.185066,
+            -0.717068,
+            -0.100008,
+            -0.733294
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9931.79,
+            "total_return_pct": -0.6821,
+            "max_drawdown_pct": -1.0892,
+            "sharpe": -1.37,
+            "total_trades": 20.0,
+            "win_rate": 30.0,
+            "profit_factor": 0.714,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -3.4103,
+            "total_fees": 47.89,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 12,
+            "take_profit": 5,
+            "time_stop": 3
+          },
+          "blocked": {
+            "no_absorption_signal": 8852,
+            "stop_too_wide": 2
+          },
+          "expectancy_ci": {
+            "trades": 20,
+            "mean_return_pct": -0.1131,
+            "ci_low_pct": -0.4515,
+            "ci_high_pct": 0.2241,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.2645,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -0.353,
+            "std_pct": 0.7521,
+            "p95_pct": 0.5406,
+            "p05_pct": -1.5607
+          }
+        },
+        {
+          "symbol": "SOLUSDT",
+          "rows": 8874,
+          "signal_bars": 5,
+          "delta_source": "lower",
+          "trades": 5,
+          "trade_returns": [
+            -0.440435,
+            -0.099992,
+            1.261184,
+            0.846139,
+            -0.697035
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 10025.99,
+            "total_return_pct": 0.2599,
+            "max_drawdown_pct": -0.315,
+            "sharpe": 0.99,
+            "total_trades": 5.0,
+            "win_rate": 40.0,
+            "profit_factor": 1.698,
+            "profit_factor_infinite": 0.0,
+            "expectancy": 5.199,
+            "total_fees": 11.98,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 3,
+            "time_stop": 1,
+            "take_profit": 1
+          },
+          "blocked": {
+            "no_absorption_signal": 8868,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 5,
+            "mean_return_pct": 0.174,
+            "ci_low_pct": -0.475,
+            "ci_high_pct": 0.8379,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.6885,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -0.2112,
+            "std_pct": 0.428,
+            "p95_pct": 0.3615,
+            "p05_pct": -0.7937
+          }
+        },
+        {
+          "symbol": "BNBUSDT",
+          "rows": 8586,
+          "signal_bars": 19,
+          "delta_source": "lower",
+          "trades": 18,
+          "trade_returns": [
+            -0.099992,
+            -0.123275,
+            -0.415722,
+            -0.68937,
+            0.052986,
+            0.695804,
+            0.394068,
+            -0.100008,
+            -0.100008,
+            -0.809957,
+            -0.832605,
+            -0.371513,
+            0.637154,
+            -0.100008,
+            0.219836,
+            0.781088,
+            0.12931,
+            -0.686761
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9957.32,
+            "total_return_pct": -0.4268,
+            "max_drawdown_pct": -0.9766,
+            "sharpe": -1.3,
+            "total_trades": 18.0,
+            "win_rate": 38.89,
+            "profit_factor": 0.671,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -2.3708,
+            "total_fees": 43.12,
+            "bars": 8586.0,
+            "start": "2026-07-29 03:00:00+00:00",
+            "end": "2026-10-26 13:15:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 10,
+            "signal_reverse": 1,
+            "time_stop": 4,
+            "take_profit": 3
+          },
+          "blocked": {
+            "no_absorption_signal": 8562,
+            "stop_too_wide": 5
+          },
+          "expectancy_ci": {
+            "trades": 18,
+            "mean_return_pct": -0.0788,
+            "ci_low_pct": -0.2953,
+            "ci_high_pct": 0.1463,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.2585,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -0.5297,
+            "std_pct": 0.8148,
+            "p95_pct": 0.6022,
+            "p05_pct": -1.5987
+          }
+        },
+        {
+          "symbol": "XRPUSDT",
+          "rows": 8874,
+          "signal_bars": 6,
+          "delta_source": "lower",
+          "trades": 6,
+          "trade_returns": [
+            0.948676,
+            -0.099992,
+            -0.861988,
+            -0.704294,
+            0.41681,
+            -0.785166
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9967.34,
+            "total_return_pct": -0.3266,
+            "max_drawdown_pct": -0.8119,
+            "sharpe": -1.26,
+            "total_trades": 6.0,
+            "win_rate": 33.33,
+            "profit_factor": 0.556,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -5.4429,
+            "total_fees": 14.39,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "take_profit": 1,
+            "stop_loss": 4,
+            "time_stop": 1
+          },
+          "blocked": {
+            "no_absorption_signal": 8868
+          },
+          "expectancy_ci": {
+            "trades": 6,
+            "mean_return_pct": -0.181,
+            "ci_low_pct": -0.6831,
+            "ci_high_pct": 0.3837,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.273,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": 0.1288,
+            "std_pct": 0.5401,
+            "p95_pct": 1.0034,
+            "p05_pct": -0.494
+          }
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "rows": 8874,
+          "signal_bars": 27,
+          "delta_source": "lower",
+          "trades": 27,
+          "trade_returns": [
+            0.770546,
+            -0.397644,
+            0.552298,
+            0.452222,
+            -1.120047,
+            -0.100008,
+            0.05402,
+            -0.237074,
+            0.377924,
+            0.033984,
+            -0.099992,
+            -0.983458,
+            -0.099992,
+            1.723262,
+            3.473371,
+            -1.478564,
+            -0.184055,
+            -0.783125,
+            -0.099992,
+            -1.622848,
+            -0.805756,
+            -0.100008,
+            -1.029411,
+            0.970696,
+            1.23796,
+            1.018106,
+            0.927215
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 10072.39,
+            "total_return_pct": 0.7239,
+            "max_drawdown_pct": -1.8534,
+            "sharpe": 0.7,
+            "total_trades": 27.0,
+            "win_rate": 44.44,
+            "profit_factor": 1.263,
+            "profit_factor_infinite": 0.0,
+            "expectancy": 2.6811,
+            "total_fees": 64.8,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "take_profit": 8,
+            "stop_loss": 13,
+            "time_stop": 6
+          },
+          "blocked": {
+            "no_absorption_signal": 8846,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 27,
+            "mean_return_pct": 0.0907,
+            "ci_low_pct": -0.2942,
+            "ci_high_pct": 0.4801,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.6495,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -1.1178,
+            "std_pct": 1.7447,
+            "p95_pct": 0.7045,
+            "p05_pct": -3.733
+          }
+        },
+        {
+          "symbol": "ADAUSDT",
+          "rows": 8874,
+          "signal_bars": 26,
+          "delta_source": "lower",
+          "trades": 26,
+          "trade_returns": [
+            0.636584,
+            -0.099992,
+            -0.100008,
+            4.816451,
+            -0.215365,
+            -0.119976,
+            1.38297,
+            -0.784328,
+            1.631066,
+            0.023838,
+            -0.100008,
+            1.226358,
+            -1.730222,
+            -1.956574,
+            -2.221897,
+            -1.12833,
+            -1.252846,
+            -1.046399,
+            1.392124,
+            1.608131,
+            -1.005859,
+            1.529753,
+            -1.938536,
+            -1.109111,
+            -0.807153,
+            -0.778411
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9933.09,
+            "total_return_pct": -0.6691,
+            "max_drawdown_pct": -3.1885,
+            "sharpe": -0.56,
+            "total_trades": 26.0,
+            "win_rate": 34.62,
+            "profit_factor": 0.865,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -2.5734,
+            "total_fees": 63.0,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "time_stop": 7,
+            "stop_loss": 14,
+            "take_profit": 5
+          },
+          "blocked": {
+            "no_absorption_signal": 8848
+          },
+          "expectancy_ci": {
+            "trades": 26,
+            "mean_return_pct": -0.0826,
+            "ci_low_pct": -0.6256,
+            "ci_high_pct": 0.5617,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.397,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": 0.1401,
+            "std_pct": 3.1673,
+            "p95_pct": 4.8835,
+            "p05_pct": -3.9129
+          }
+        },
+        {
+          "symbol": "LINKUSDT",
+          "rows": 8874,
+          "signal_bars": 29,
+          "delta_source": "lower",
+          "trades": 29,
+          "trade_returns": [
+            -0.575637,
+            0.581104,
+            0.751241,
+            -0.811415,
+            -0.937969,
+            -1.085897,
+            0.6929,
+            -1.059296,
+            1.321935,
+            -0.100008,
+            -1.554051,
+            0.65082,
+            -1.128258,
+            -0.099992,
+            -0.715019,
+            -0.160803,
+            -0.85259,
+            0.024503,
+            1.737167,
+            -0.099992,
+            -0.100008,
+            2.64951,
+            -1.51598,
+            3.140718,
+            -0.099992,
+            1.780895,
+            -1.719249,
+            0.972477,
+            -1.373651
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 10007.44,
+            "total_return_pct": 0.0744,
+            "max_drawdown_pct": -2.0554,
+            "sharpe": 0.09,
+            "total_trades": 29.0,
+            "win_rate": 37.93,
+            "profit_factor": 1.018,
+            "profit_factor_infinite": 0.0,
+            "expectancy": 0.2564,
+            "total_fees": 69.15,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 17,
+            "time_stop": 6,
+            "take_profit": 6
+          },
+          "blocked": {
+            "no_absorption_signal": 8844,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 29,
+            "mean_return_pct": 0.0108,
+            "ci_low_pct": -0.4131,
+            "ci_high_pct": 0.4675,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.509,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -1.2076,
+            "std_pct": 1.9881,
+            "p95_pct": 1.437,
+            "p05_pct": -3.8934
+          }
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "rows": 8874,
+          "signal_bars": 28,
+          "delta_source": "lower",
+          "trades": 28,
+          "trade_returns": [
+            -1.113477,
+            1.450413,
+            1.135772,
+            1.672854,
+            0.353782,
+            -0.320554,
+            0.786966,
+            -0.100008,
+            -1.664462,
+            1.591361,
+            -0.099992,
+            -0.037782,
+            -0.877874,
+            0.880492,
+            -0.741955,
+            -1.642945,
+            1.501566,
+            -2.062925,
+            -0.741406,
+            2.39967,
+            -0.97405,
+            -2.597426,
+            1.164905,
+            2.08991,
+            -1.097053,
+            -1.030651,
+            -1.387133,
+            -0.684489
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9933.61,
+            "total_return_pct": -0.6639,
+            "max_drawdown_pct": -2.0393,
+            "sharpe": -0.62,
+            "total_trades": 28.0,
+            "win_rate": 39.29,
+            "profit_factor": 0.872,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -2.3711,
+            "total_fees": 67.56,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 15,
+            "take_profit": 7,
+            "time_stop": 6
+          },
+          "blocked": {
+            "no_absorption_signal": 8843,
+            "stop_too_wide": 3
+          },
+          "expectancy_ci": {
+            "trades": 28,
+            "mean_return_pct": -0.0767,
+            "ci_low_pct": -0.5571,
+            "ci_high_pct": 0.4385,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.3975,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -0.7326,
+            "std_pct": 1.7968,
+            "p95_pct": 2.0407,
+            "p05_pct": -2.5669
+          }
+        },
+        {
+          "symbol": "LTCUSDT",
+          "rows": 8874,
+          "signal_bars": 38,
+          "delta_source": "lower",
+          "trades": 37,
+          "trade_returns": [
+            -0.100008,
+            -0.458223,
+            -0.370641,
+            -0.398585,
+            -0.490309,
+            -0.500115,
+            -0.470199,
+            -0.100008,
+            -0.40411,
+            0.132116,
+            -0.481161,
+            -1.797194,
+            -0.45862,
+            1.481701,
+            -0.099992,
+            -0.647527,
+            -0.875563,
+            -1.533864,
+            -1.164609,
+            -1.301843,
+            -0.099992,
+            0.883695,
+            1.09731,
+            -0.100008,
+            -0.099992,
+            -2.262424,
+            -0.915937,
+            2.061515,
+            2.1102,
+            -0.524704,
+            -0.732528,
+            0.766466,
+            -0.631223,
+            -0.796429,
+            1.427257,
+            -0.100008,
+            -0.854559
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9737.59,
+            "total_return_pct": -2.6241,
+            "max_drawdown_pct": -3.5634,
+            "sharpe": -3.01,
+            "total_trades": 37.0,
+            "win_rate": 21.62,
+            "profit_factor": 0.526,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -7.0921,
+            "total_fees": 87.23,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 26,
+            "signal_reverse": 1,
+            "time_stop": 4,
+            "take_profit": 6
+          },
+          "blocked": {
+            "no_absorption_signal": 8836
+          },
+          "expectancy_ci": {
+            "trades": 37,
+            "mean_return_pct": -0.2381,
+            "ci_low_pct": -0.5147,
+            "ci_high_pct": 0.0619,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.062,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -1.8448,
+            "std_pct": 1.6193,
+            "p95_pct": 0.2072,
+            "p05_pct": -4.259
+          }
+        },
+        {
+          "symbol": "DOTUSDT",
+          "rows": 8874,
+          "signal_bars": 28,
+          "delta_source": "lower",
+          "trades": 28,
+          "trade_returns": [
+            -0.099992,
+            -0.67737,
+            -0.757995,
+            1.08181,
+            -0.961679,
+            0.909457,
+            -1.851976,
+            -1.515182,
+            -0.099992,
+            -1.942844,
+            1.072881,
+            -0.099992,
+            -1.088814,
+            -1.35149,
+            -2.707145,
+            -0.690378,
+            2.509425,
+            -2.958428,
+            2.977336,
+            -0.099992,
+            1.30185,
+            -1.531294,
+            -0.100008,
+            -2.079466,
+            1.670243,
+            -0.869064,
+            -1.317678,
+            -1.161155
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9630.92,
+            "total_return_pct": -3.6908,
+            "max_drawdown_pct": -3.9903,
+            "sharpe": -2.92,
+            "total_trades": 28.0,
+            "win_rate": 25.0,
+            "profit_factor": 0.477,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -13.1816,
+            "total_fees": 66.01,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 19,
+            "take_profit": 5,
+            "time_stop": 4
+          },
+          "blocked": {
+            "no_absorption_signal": 8846
+          },
+          "expectancy_ci": {
+            "trades": 28,
+            "mean_return_pct": -0.4442,
+            "ci_low_pct": -0.9359,
+            "ci_high_pct": 0.1229,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.058,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -1.3278,
+            "std_pct": 2.3072,
+            "p95_pct": 2.0802,
+            "p05_pct": -4.2012
+          }
+        },
+        {
+          "symbol": "SUIUSDT",
+          "rows": 8874,
+          "signal_bars": 4,
+          "delta_source": "lower",
+          "trades": 4,
+          "trade_returns": [
+            2.042409,
+            1.441039,
+            -1.110482,
+            0.792586
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 10095.05,
+            "total_return_pct": 0.9505,
+            "max_drawdown_pct": -0.627,
+            "sharpe": 1.63,
+            "total_trades": 4.0,
+            "win_rate": 75.0,
+            "profit_factor": 3.824,
+            "profit_factor_infinite": 0.0,
+            "expectancy": 23.7629,
+            "total_fees": 9.61,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "take_profit": 2,
+            "stop_loss": 1,
+            "time_stop": 1
+          },
+          "blocked": {
+            "no_absorption_signal": 8869,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 4,
+            "mean_return_pct": 0.7914,
+            "ci_low_pct": -0.4726,
+            "ci_high_pct": 1.7417,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.9285,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": 0.4738,
+            "std_pct": 1.0195,
+            "p95_pct": 1.565,
+            "p05_pct": -1.0384
+          }
+        },
+        {
+          "symbol": "TRXUSDT",
+          "rows": 1251,
+          "signal_bars": 1,
+          "delta_source": "lower",
+          "trades": 1,
+          "trade_returns": [
+            -0.153253
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9995.4,
+            "total_return_pct": -0.046,
+            "max_drawdown_pct": -0.0769,
+            "sharpe": -5.11,
+            "total_trades": 1.0,
+            "win_rate": 0.0,
+            "profit_factor": 0.0,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -4.5976,
+            "total_fees": 2.4,
+            "bars": 1251.0,
+            "start": "2026-10-15 14:00:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "time_stop": 1
+          },
+          "blocked": {
+            "no_absorption_signal": 1249,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 1,
+            "mean_return_pct": -0.1533,
+            "ci_low_pct": -0.1533,
+            "ci_high_pct": -0.1533,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.0,
+            "verdict": "negative"
+          },
+          "random": {
+            "mean_pct": -0.036,
+            "std_pct": 0.0105,
+            "p95_pct": -0.026,
+            "p05_pct": -0.046
+          }
+        },
+        {
+          "symbol": "NEARUSDT",
+          "rows": 8874,
+          "signal_bars": 23,
+          "delta_source": "lower",
+          "trades": 22,
+          "trade_returns": [
+            -0.099992,
+            -0.653815,
+            2.950029,
+            -0.655246,
+            -0.785296,
+            0.552269,
+            -1.341843,
+            2.887121,
+            -0.099992,
+            -0.501975,
+            0.535954,
+            2.547023,
+            -1.014115,
+            -2.422854,
+            -0.100008,
+            -1.847039,
+            2.623972,
+            7.711706,
+            -0.099992,
+            6.172576,
+            -0.099992,
+            0.701375
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 10515.27,
+            "total_return_pct": 5.1527,
+            "max_drawdown_pct": -2.193,
+            "sharpe": 2.9,
+            "total_trades": 22.0,
+            "win_rate": 40.91,
+            "profit_factor": 2.752,
+            "profit_factor_infinite": 0.0,
+            "expectancy": 23.4212,
+            "total_fees": 53.62,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 11,
+            "take_profit": 5,
+            "time_stop": 5,
+            "signal_reverse": 1
+          },
+          "blocked": {
+            "no_absorption_signal": 8850,
+            "stop_too_wide": 1
+          },
+          "expectancy_ci": {
+            "trades": 22,
+            "mean_return_pct": 0.7709,
+            "ci_low_pct": -0.1824,
+            "ci_high_pct": 1.8116,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.939,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": -2.2178,
+            "std_pct": 2.0442,
+            "p95_pct": 0.1599,
+            "p05_pct": -5.2419
+          }
+        },
+        {
+          "symbol": "APTUSDT",
+          "rows": 8774,
+          "signal_bars": 31,
+          "delta_source": "lower",
+          "trades": 31,
+          "trade_returns": [
+            -0.84686,
+            0.385701,
+            -0.351809,
+            -0.805756,
+            1.481897,
+            0.205996,
+            -0.873348,
+            0.595246,
+            4.163197,
+            0.536057,
+            -1.775534,
+            -0.099992,
+            0.009718,
+            0.610771,
+            -2.200294,
+            -1.184775,
+            -2.1303,
+            -1.031695,
+            -1.183413,
+            -1.857071,
+            5.664773,
+            -1.762069,
+            -1.621079,
+            0.623651,
+            -1.485879,
+            -0.100008,
+            -1.62394,
+            -0.100008,
+            -1.69384,
+            -2.098769,
+            -0.062465
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9682.61,
+            "total_return_pct": -3.1739,
+            "max_drawdown_pct": -4.9444,
+            "sharpe": -2.14,
+            "total_trades": 31.0,
+            "win_rate": 32.26,
+            "profit_factor": 0.572,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -10.2383,
+            "total_fees": 73.95,
+            "bars": 8774.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-27 13:30:00+00:00"
+          },
+          "status_counts": {
+            "time_stop": 9,
+            "take_profit": 5,
+            "stop_loss": 17
+          },
+          "blocked": {
+            "no_absorption_signal": 8743
+          },
+          "expectancy_ci": {
+            "trades": 31,
+            "mean_return_pct": -0.3423,
+            "ci_low_pct": -0.897,
+            "ci_high_pct": 0.3618,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.138,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": 0.731,
+            "std_pct": 2.7775,
+            "p95_pct": 5.1915,
+            "p05_pct": -2.7541
+          }
+        },
+        {
+          "symbol": "BCHUSDT",
+          "rows": 8874,
+          "signal_bars": 23,
+          "delta_source": "lower",
+          "trades": 22,
+          "trade_returns": [
+            -0.648262,
+            0.740632,
+            -0.673555,
+            -0.124653,
+            0.778804,
+            -0.692939,
+            -0.768667,
+            -0.473811,
+            5.070137,
+            -2.298912,
+            0.308916,
+            -0.793059,
+            -1.314746,
+            2.139679,
+            4.122139,
+            -1.167282,
+            -1.512086,
+            -0.747462,
+            -1.531459,
+            -1.093431,
+            -0.709769,
+            -0.429326
+          ],
+          "metrics": {
+            "initial_cash": 10000.0,
+            "final_equity": 9942.6,
+            "total_return_pct": -0.574,
+            "max_drawdown_pct": -2.3057,
+            "sharpe": -0.46,
+            "total_trades": 22.0,
+            "win_rate": 27.27,
+            "profit_factor": 0.873,
+            "profit_factor_infinite": 0.0,
+            "expectancy": -2.609,
+            "total_fees": 52.78,
+            "bars": 8874.0,
+            "start": "2026-07-28 04:15:00+00:00",
+            "end": "2026-10-28 14:30:00+00:00"
+          },
+          "status_counts": {
+            "stop_loss": 13,
+            "time_stop": 4,
+            "signal_reverse": 1,
+            "take_profit": 4
+          },
+          "blocked": {
+            "no_absorption_signal": 8847,
+            "stop_too_wide": 4
+          },
+          "expectancy_ci": {
+            "trades": 22,
+            "mean_return_pct": -0.0827,
+            "ci_low_pct": -0.7346,
+            "ci_high_pct": 0.7078,
+            "confidence": 0.95,
+            "n_boot": 2000,
+            "positive_share": 0.397,
+            "verdict": "inconclusive"
+          },
+          "random": {
+            "mean_pct": 1.2575,
+            "std_pct": 1.6078,
+            "p95_pct": 3.1307,
+            "p05_pct": -1.0326
+          }
+        }
+      ],
+      "delta_sources": {
+        "lower": 16
+      },
+      "skipped": []
+    }
+  ],
+  "aggregate": {
+    "windows": [
+      {
+        "end": "2026-10-28T16:05:38.350000+00:00",
+        "symbols_total": 16,
+        "symbols_with_trades": 16,
+        "trades": 323,
+        "return_median_pct": -0.5004,
+        "return_mean_pct": -0.4781,
+        "positive_symbols": 5,
+        "win_rate_mean_pct": 33.52,
+        "max_drawdown_mean_pct": -2.0085,
+        "beats_random_p95": 2,
+        "status_counts": {
+          "stop_loss": 189,
+          "time_stop": 66,
+          "take_profit": 64,
+          "signal_reverse": 4
+        },
+        "blocked": {
+          "no_absorption_signal": 133624,
+          "stop_too_wide": 22
+        }
+      }
+    ],
+    "trades": 323,
+    "return_median_pct": -0.5004,
+    "return_mean_pct": -0.4781,
+    "positive_window_ratio": 0.0,
+    "window_returns_pct": [
+      -0.5004
+    ],
+    "per_symbol": [
+      {
+        "symbol": "BTCUSDT",
+        "trades": 19,
+        "return_pct": -1.9336,
+        "win_rate": 15.79
+      },
+      {
+        "symbol": "ETHUSDT",
+        "trades": 20,
+        "return_pct": -0.6821,
+        "win_rate": 30.0
+      },
+      {
+        "symbol": "SOLUSDT",
+        "trades": 5,
+        "return_pct": 0.2599,
+        "win_rate": 40.0
+      },
+      {
+        "symbol": "BNBUSDT",
+        "trades": 18,
+        "return_pct": -0.4268,
+        "win_rate": 38.89
+      },
+      {
+        "symbol": "XRPUSDT",
+        "trades": 6,
+        "return_pct": -0.3266,
+        "win_rate": 33.33
+      },
+      {
+        "symbol": "DOGEUSDT",
+        "trades": 27,
+        "return_pct": 0.7239,
+        "win_rate": 44.44
+      },
+      {
+        "symbol": "ADAUSDT",
+        "trades": 26,
+        "return_pct": -0.6691,
+        "win_rate": 34.62
+      },
+      {
+        "symbol": "LINKUSDT",
+        "trades": 29,
+        "return_pct": 0.0744,
+        "win_rate": 37.93
+      },
+      {
+        "symbol": "AVAXUSDT",
+        "trades": 28,
+        "return_pct": -0.6639,
+        "win_rate": 39.29
+      },
+      {
+        "symbol": "LTCUSDT",
+        "trades": 37,
+        "return_pct": -2.6241,
+        "win_rate": 21.62
+      },
+      {
+        "symbol": "DOTUSDT",
+        "trades": 28,
+        "return_pct": -3.6908,
+        "win_rate": 25.0
+      },
+      {
+        "symbol": "SUIUSDT",
+        "trades": 4,
+        "return_pct": 0.9505,
+        "win_rate": 75.0
+      },
+      {
+        "symbol": "TRXUSDT",
+        "trades": 1,
+        "return_pct": -0.046,
+        "win_rate": 0.0
+      },
+      {
+        "symbol": "NEARUSDT",
+        "trades": 22,
+        "return_pct": 5.1527,
+        "win_rate": 40.91
+      },
+      {
+        "symbol": "APTUSDT",
+        "trades": 31,
+        "return_pct": -3.1739,
+        "win_rate": 32.26
+      },
+      {
+        "symbol": "BCHUSDT",
+        "trades": 22,
+        "return_pct": -0.574,
+        "win_rate": 27.27
+      }
+    ],
+    "expectancy_conclusive": 2,
+    "beats_random_ratio": 0.125,
+    "pooled_expectancy_ci": {
+      "trades": 323,
+      "mean_return_pct": -0.0794,
+      "ci_low_pct": -0.2273,
+      "ci_high_pct": 0.0811,
+      "confidence": 0.95,
+      "n_boot": 2000,
+      "positive_share": 0.1565,
+      "verdict": "inconclusive"
+    },
+    "pooled_trades": 323,
+    "pooled_status_counts": {
+      "stop_loss": 189,
+      "time_stop": 66,
+      "take_profit": 64,
+      "signal_reverse": 4
+    },
+    "pooled_blocked": {
+      "no_absorption_signal": 133624,
+      "stop_too_wide": 22
+    },
+    "pooled_random_mean_pct": -0.4906
+  }
+}

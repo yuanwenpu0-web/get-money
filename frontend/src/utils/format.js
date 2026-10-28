@@ -57,7 +57,8 @@ export const closeReasonLabel = (reason) =>
 export const strategyLabel = (code) =>
   ({ ml_ensemble: 'ML 趋势共振', trend_follow: 'SuperTrend 趋势跟随', mean_reversion: 'RSI 均值回归',
     funding_extreme: '资金费率极值', mtf_resonance: '多周期趋势共振',
-    strong_pullback: 'Martin Luk 强势回调' })[code] || code
+    strong_pullback: 'Martin Luk 强势回调',
+    absorption_reversal: '吸收反转' })[code] || code
 
 export function symbolsLabel(settings, count = 0) {
   if (settings?.symbol_scope === 'all') {

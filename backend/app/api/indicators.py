@@ -1,8 +1,7 @@
 """Read-only catalog of the third-party Pine indicator collections.
 
-The checked-in indexes and source files are the canonical imported data. Strategies
-are intentionally excluded; presence in this catalog does not imply compatibility
-with the local Pine compiler.
+The local indexes and source files are the catalog data. Strategies are
+intentionally excluded; catalog entries are not executed by this application.
 """
 from __future__ import annotations
 

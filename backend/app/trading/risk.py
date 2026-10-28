@@ -47,6 +47,32 @@ def position_size(
     return margin, margin * leverage / entry
 
 
+def breakeven_stop(
+    side: int, entry: float, stop: float, high: float, low: float, trigger_r: float,
+    risk: float,
+) -> float:
+    """浮盈达到 trigger_r 个 R 后把止损移到保本价（入场价）。
+
+    实现刻意**无状态**：只问"本根是否触及过 entry ± trigger_r×risk"，触及就把 stop
+    提升到 entry（单调、不可回落），因此命中过一次之后无需再记录标志位，
+    回测撮合与实盘持仓管理调用同一函数即可保证行为一致。
+
+    risk 是入场时的初始风险距离 |成交价 − 初始止损|；trigger_r<=0 或 risk<=0 时不动作。
+    """
+    if trigger_r <= 0 or risk <= 0 or stop <= 0:
+        return stop
+    trigger = entry + side * trigger_r * risk
+    reached = high >= trigger if side == 1 else low <= trigger
+    if not reached:
+        return stop
+    target = entry
+    if side == 1:
+        return max(stop, target)
+    if stop > 0:
+        return min(stop, target)
+    return target
+
+
 def trailing_stop(
     side: int, entry: float, stop: float, close: float, atr: float, params: dict
 ) -> float:

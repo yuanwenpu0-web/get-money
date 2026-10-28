@@ -19,6 +19,7 @@ let disposed = false
 const menu = [
   { path: '/dashboard', label: '总览', hint: '收益 · 持仓 · 状态' },
   { path: '/orders', label: '订单', hint: '持仓与历史成交' },
+  { path: '/indicators', label: '指标', hint: 'Pine 指标目录' },
   { path: '/strategies', label: '策略', hint: '信号与评分' },
   { path: '/backtest', label: '回测', hint: '策略验证 · 收益对比' },
   { path: '/models', label: '模型', hint: 'LightGBM / XGBoost' },
@@ -164,3 +165,4 @@ onBeforeUnmount(() => {
     </main>
   </div>
 </template>
+

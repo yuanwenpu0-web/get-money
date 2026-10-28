@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from ..config import DEFAULT_STATE
+from ..features.absorption import ABSORPTION_COLUMNS, add_absorption_context
 from ..features.funding import FUNDING_FILTER_Z
 from ..features.pullback import PULLBACK_COLUMNS, add_pullback_context
 from ..utils import interval_ms
@@ -62,6 +63,49 @@ STRATEGY_PARAMS = {
         "max_hold_bars": 192,  # 15m 下的 48 小时；其他周期由 resolve_params(interval=) 换算
         "min_hold_bars": 0,
         "ema_exit": True,
+    },
+    # Absorption Reversal（本地适配自 TradingView 脚本 Absorption Strat © blitz_locked）。
+    # 吸收 bar = 放量单边主动成交 + 无价格进展 + 摆动极值 + 拒绝影线 + 单边支配；
+    # 买方被吸收→做空，卖方被吸收→做多。默认「收盘穿越实体」确认（最多 3 根），
+    # 期间打穿吸收极值或超时即作废。
+    # 出场：结构止损（吸收极值 ∓ 0.25 ATR）+ 2R 固定目标 + 1R 保本 + 30 根时间止损，
+    # 无追踪止损、无平仓后冷却（与脚本一致）。
+    # 仓位：脚本 default_qty_type = percent_of_equity 30 → 名义 = 权益 30%、1 倍杠杆；
+    # risk_per_trade_pct 只作为极端宽止损下的兜底（max_sl_atr 已限制 3 ATR 以内）。
+    "absorption_reversal": {
+        # 吸收识别（Medium 档 = 脚本默认）
+        "delta_window": 500,
+        "delta_pct": 95.0,
+        "body_mult": 0.25,
+        "extreme_lookback": 20,
+        "wick_mult": 0.20,
+        "dominance_pct": 20.0,
+        "abs_gap_bars": 10,
+        # False = 修正后的「必须先满足吸收条件」节奏；True = 1:1 复现脚本的 and/or 优先级 bug
+        "legacy_gap_logic": False,
+        # 入场确认
+        "conf_mode": 1,          # 0 = 吸收 bar 收盘直接入场；1 = 收盘穿越实体后入场
+        "conf_window_bars": 3,
+        "direction_mode": 0,     # 0 = 多空都做；1 = 只做多；2 = 只做空
+        "trend_mode": 0,         # 0 = 关；1 = 顺 EMA 趋势；2 = 逆 EMA 趋势
+        "trend_len": 200,
+        "session_start_hour": 0.0,   # UTC 小时（含小数）；0/24 = 全天，等价关闭
+        "session_end_hour": 24.0,
+        # 出场与风险
+        "sl_buffer_atr": 0.25,
+        "target_r": 2.0,
+        "be_trigger_r": 1.0,     # 浮盈达到该 R 后止损移到保本价（0 = 禁用）
+        "min_sl_atr": 0.30,
+        "max_sl_atr": 3.00,
+        "max_hold_bars": 30,     # 脚本的 Time stop(bars)，按 bar 计（与脚本一致，不换算小时）
+        # 脚本在持仓期间允许反手；本地撮合需要 min_hold_bars=0 才允许反向信号先平后开
+        "min_hold_bars": 0,
+        "max_leverage": 1,
+        "base_position_pct": 0.30,
+        "max_position_pct": 0.30,
+        "risk_per_trade_pct": 0.02,
+        "cooldown_bars": 0,
+        "trailing_enabled": False,
     },
 }
 SHARED_KEYS = (
@@ -147,11 +191,30 @@ def resolve_params(
         "max_hold_hours": (0.5, 240),
         "pullback_min_bars": (0, 200),
         "pullback_confirm_bars": (1, 200),
+        # --- 吸收反转（脚本 1:1 参数） ---
+        "delta_window": (10, 2000),
+        "delta_pct": (50, 100),
+        "body_mult": (0, 2),
+        "extreme_lookback": (2, 200),
+        "wick_mult": (0, 1),
+        "dominance_pct": (0, 100),
+        "abs_gap_bars": (0, 500),
+        "conf_mode": (0, 1),
+        "conf_window_bars": (1, 20),
+        "direction_mode": (0, 2),
+        "trend_mode": (0, 2),
+        "trend_len": (5, 1000),
+        "session_start_hour": (0, 24),
+        "session_end_hour": (0, 24),
+        "sl_buffer_atr": (0, 5),
+        "be_trigger_r": (0, 20),
+        "min_sl_atr": (0, 10),
+        "max_sl_atr": (0.1, 20),
     }
     for key, value in params.items():
         if key in (
             "regime_filter", "cost_filter", "require_model", "trailing_enabled",
-            "funding_filter", "ema_exit",
+            "funding_filter", "ema_exit", "legacy_gap_logic",
         ):
             if not isinstance(value, bool):
                 raise ValueError(f"{key} 必须是布尔值")
@@ -186,6 +249,9 @@ def evaluate_signals(
     if code == "strong_pullback" and not set(PULLBACK_COLUMNS).issubset(data.columns):
         # 实盘只传末根已富化帧；回测/训练传整帧，这里补算 4h 上下文与回调状态机（纯因果）
         data = add_pullback_context(data, params)
+    if code == "absorption_reversal" and not set(ABSORPTION_COLUMNS).issubset(data.columns):
+        # 同理：整帧富化 delta/百分位/吸收条件/确认状态机后再交回下游（纯因果）
+        data = add_absorption_context(data, params)
 
     def column(name):
         return pd.to_numeric(
@@ -254,6 +320,25 @@ def evaluate_signals(
         confirmed = column("pb_confirm").fillna(0).gt(0)
         signed = (0.25 + 0.75 * htf_strength).where(confirmed, 0.0)
         probability = 0.5 + signed / 2
+    elif code == "absorption_reversal":
+        # 双向：买方被吸收（delta>0 却被压在极值）→ 做空；卖方被吸收 → 做多。
+        # 评分 = 两条「超预期」幅度的均值：|delta| 超出滚动百分位的幅度、单边支配度超出门槛的幅度。
+        # 脚本本身不区分信号强弱（一律入场），这里让评分只用于 min_score/heavy_score 分层，
+        # 默认 min_score=0.75 时全部通过，行为与原脚本一致。
+        raw_signal = column("abs_signal").fillna(0.0)
+        percentile = column("abs_percentile").replace(0, np.nan)
+        overflow = (column("abs_abs_delta") / percentile - 1.0).clip(lower=0.0, upper=0.5) / 0.5
+        overflow = overflow.fillna(0.0)
+        floor_dom = float(params["dominance_pct"])
+        dominance = column("abs_dominance").fillna(0.0)
+        dom_strength = (
+            ((dominance - floor_dom) / max(100.0 - floor_dom, 1e-9)).clip(lower=0.0, upper=1.0)
+            if floor_dom > 0
+            else (dominance / 100.0).clip(lower=0.0, upper=1.0)
+        )
+        strength = ((overflow + dom_strength) / 2.0).clip(lower=0.0, upper=1.0)
+        signed = (0.5 + 0.5 * strength).where(raw_signal.ne(0), 0.0) * np.sign(raw_signal)
+        probability = 0.5 + signed / 2
     elif code == "ml_ensemble":
         ml = (
             (prob_up.reindex(data.index) - 0.5) * 2
@@ -302,6 +387,48 @@ def evaluate_signals(
         block(trend_ok & bars_since.isna(), "no_pullback")
         block(trend_ok & bars_since.notna() & ~confirmed, "no_confirmation")
         block(confirmed & column("close").lt(column("avwap")), "below_avwap")
+    if code == "absorption_reversal":
+        # 门控顺序：有无信号 → 止损宽度 → 止损方向 → 方向开关 → 趋势 → 交易时段。
+        # 这些过滤全部写在脚本的 FILTERS 段（riskOK / slSide / dirOK / trendOK / inSess）。
+        atr_abs = column("abs_atr").replace(0, np.nan)
+        risk_dist = column("abs_risk")
+        has_signal = column("abs_signal").ne(0) & np.isfinite(risk_dist) & atr_abs.gt(0)
+        block(~has_signal, "no_absorption_signal")
+        risk_atr = risk_dist / atr_abs
+        block(has_signal & risk_atr.gt(params["max_sl_atr"]), "stop_too_wide")
+        block(has_signal & risk_atr.lt(params["min_sl_atr"]), "stop_too_tight")
+        stop_price = column("abs_sl")
+        price = column("close")
+        block(has_signal & column("abs_signal").gt(0) & stop_price.ge(price), "stop_wrong_side")
+        block(has_signal & column("abs_signal").lt(0) & stop_price.le(price), "stop_wrong_side")
+        direction_mode = int(params["direction_mode"])
+        if direction_mode == 1:
+            block(column("abs_signal").lt(0), "short_disabled")
+        elif direction_mode == 2:
+            block(column("abs_signal").gt(0), "long_disabled")
+        trend_mode = int(params["trend_mode"])
+        if trend_mode in (1, 2):
+            # 严格大小比较：close 恰好等于 EMA 时两个模式都判不通过（与脚本的 < / > 一致）
+            trend_ema = column("abs_trend_ema")
+            below_trend = price.lt(trend_ema)
+            above_trend = price.gt(trend_ema)
+            long_side = column("abs_signal").gt(0)
+            with_trend = (long_side & above_trend) | (~long_side & below_trend)
+            against_trend = (long_side & below_trend) | (~long_side & above_trend)
+            trend_ok = with_trend if trend_mode == 1 else against_trend
+            block(has_signal & ~trend_ok, "trend_filter")
+        start_hour = float(params["session_start_hour"])
+        end_hour = float(params["session_end_hour"])
+        if start_hour != end_hour:
+            hours = pd.Series(
+                data.index.hour + data.index.minute / 60.0, index=data.index
+            )
+            in_window = (
+                hours.ge(start_hour) & hours.lt(end_hour)
+                if start_hour < end_hour
+                else hours.ge(start_hour) | hours.lt(end_hour)
+            )
+            block(has_signal & ~in_window, "session_filter")
     block(score.lt(params["min_score"]) | side.eq(0), "below_threshold")
     block(atr.gt(params["max_atr_pct"]), "excess_volatility")
     if params["funding_filter"]:
@@ -333,6 +460,10 @@ def evaluate_signals(
         elif code == "strong_pullback":
             # 自带 4h 强势趋势 + 回调结构过滤（见上方 block），不套用 1h SuperTrend/EMA 规则
             pass
+        elif code == "absorption_reversal":
+            # 自带c1..c5 吸收条件 + 确认状态机 + 止损宽度过滤（见上方 block），
+            # 不套用 1h SuperTrend/EMA/ADX 的趋势一致性规则——吸收的本质就是逆下一根动能
+            pass
         else:
             block(adx.lt(params["adx_filter"]), "weak_trend")
             block(
@@ -348,7 +479,16 @@ def evaluate_signals(
                 )
 
     cost = 2 * (params["fee_rate"] + params["slippage"])
-    if code == "strong_pullback":
+    if code == "absorption_reversal":
+        # 止损/目标都从结构距离导出：risk = |close − 吸收极值 ∓ buffer×ATR|，目标 = target_r × risk。
+        # 注：脚本用实际成交价（次根开盘±滑点）计算 risk 与目标，本地撮合以信号 bar 收盘为参考，
+        # 二者差异只有滑点/跳空一个量级，方向语义（保本价、R 倍数）完全一致。
+        price = column("close")
+        sl_pct = (column("abs_risk") / price.replace(0, np.nan)).clip(
+            lower=params["min_sl_pct"]
+        ).fillna(params["min_sl_pct"])
+        tp_pct = (sl_pct * params["target_r"]).clip(lower=params["min_tp_pct"])
+    elif code == "strong_pullback":
         # 硬止损放回调段低点下方（结构止损），并以 ATR 止损兜底；目标 = target_r 倍风险（10R）
         close = column("close")
         structure = ((close - column("pb_stop_ref")) / close.replace(0, np.nan)).clip(lower=0.0)

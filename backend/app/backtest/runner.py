@@ -14,6 +14,7 @@ from ..ml.trainer import _build_estimator
 from ..models import StrategyConfig
 from ..state import all_state
 from ..strategy.coin_router import get_route
+from ..strategy.local_filters import list_filters
 from ..strategy.rules import evaluate_signals, resolve_params
 from .execution import exposure_metrics, randomize_directions, simulate
 from .metrics import downsample, metrics_from_equity
@@ -26,6 +27,16 @@ from .significance import (
 
 # Dependency information only; all runs use the same explicit execution semantics.
 HAS_VBT = importlib.util.find_spec("vectorbt") is not None
+
+
+def with_entry_filters(signals: pd.DataFrame, data: pd.DataFrame) -> pd.DataFrame:
+    """Keep strategy direction for exits and attach independent entry permissions."""
+    if signals is None:  # test doubles and callers without signals
+        return signals
+    for column in ("allow_long_entry", "allow_short_entry"):
+        if column in data:
+            signals[column] = data[column].reindex(signals.index).fillna(False).astype(bool)
+    return signals
 
 
 def minimum_sample_trades(validation_bars: int) -> int:
@@ -89,7 +100,7 @@ def select_parameters(
         if key in seen:
             continue
         seen.add(key)
-        signals = evaluate_signals(validation, strategy, candidate, probability)
+        signals = with_entry_filters(evaluate_signals(validation, strategy, candidate, probability), validation)
         equity, trades = simulate(
             validation, signals, candidate, initial, fee, slippage, interval
         )
@@ -189,8 +200,11 @@ def run_backtest(
             "max_hold_bars": params["max_hold_bars"],
             "horizon": horizon,
         }
+    filters = [item for item in list_filters(db) if item["enabled"] and strategy in item["bound_strategies"]]
+    dataset_options = {"entry_filters": filters} if filters else {}
     data = build_dataset(
-        db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms, barrier=barrier
+        db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms, barrier=barrier,
+        **dataset_options,
     )
     if len(data) < 800:
         raise ValueError(f"回测样本不足（{len(data)} 行），至少需要 800 根有效K线")
@@ -238,11 +252,11 @@ def run_backtest(
             interval,
         )
     probability = predict(test)
-    signals = evaluate_signals(test, strategy, params, probability)
+    signals = with_entry_filters(evaluate_signals(test, strategy, params, probability), test)
     equity, trades = simulate(test, signals, params, initial, fee, slippage, interval)
     # Identical fills, costs and risk caps; this is not the old vectorbt engine.
     baseline_params = {**configured, "regime_filter": False, "cost_filter": False}
-    baseline_signals = evaluate_signals(test, strategy, baseline_params, probability)
+    baseline_signals = with_entry_filters(evaluate_signals(test, strategy, baseline_params, probability), test)
     baseline_equity, baseline_trades = simulate(
         test, baseline_signals, baseline_params, initial, fee, slippage, interval
     )
@@ -258,6 +272,9 @@ def run_backtest(
     metrics.update(exposure_metrics(equity, trades, interval))
     quality = data.attrs.get("data_quality", {})
     warnings = []
+
+    if filters:
+        warnings.append("本地策略作为入场过滤器；策略、基线和随机方向均按各自方向检查过滤条件，平仓仍由系统策略管理。")
 
     # 统计显著性：收益读数必须与置信区间、IC、随机基线分布一起看，
     # 否则「+2%」和「0」在小样本下无法区分（见 significance 模块说明）。
@@ -315,6 +332,11 @@ def run_backtest(
                 .items()
             },
             "parameters": params,
+            "local_entry_filters": [{"code": item["code"], "params": item["params"]} for item in filters],
+            "local_filter_blocked_signals": int(
+                ((signals.direction.eq(1) & ~signals.allow_long_entry)
+                 | (signals.direction.eq(-1) & ~signals.allow_short_entry)).sum()
+            ) if filters else 0,
             "baseline": baseline,
             "random_baseline": random_baseline,
             "significance": {

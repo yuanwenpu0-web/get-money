@@ -359,6 +359,7 @@ onBeforeUnmount(() => {
             <el-option label="SuperTrend 趋势跟随" value="trend_follow" />
             <el-option label="RSI 均值回归" value="mean_reversion" />
             <el-option label="Martin Luk 强势回调" value="strong_pullback" />
+            <el-option label="吸收反转" value="absorption_reversal" />
           </el-select>
         </div>
         <div>

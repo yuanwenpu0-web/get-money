@@ -13,8 +13,14 @@ from ..market.data_service import MarketDataService
 from ..market.universe import universe_symbols
 from ..models import JobLog, Order, StrategyConfig
 from ..state import all_state
-from ..strategy.coin_router import BLACKLIST as COIN_BLACKLIST, get_coin_type, get_route
+from ..strategy.coin_router import (
+    BLACKLIST as COIN_BLACKLIST,
+    get_coin_type,
+    get_route,
+    symbol_allowed,
+)
 from ..strategy.engine import StrategyEngine
+from ..strategy.local_filters import EntryFilters
 from ..utils import interval_ms, iso_utc
 from .order_manager import manage_order
 from .dispatch import close_position, open_position
@@ -71,6 +77,7 @@ class TradingService:
             interval = state.get("interval", "1m")
             codes = self._enabled_strategies()
             engine = StrategyEngine(self.db, cycle_snapshot=True)
+            entry_filters = EntryFilters(self.db)
             # Entry filters and interval changes must not stop updating existing
             # positions: their P&L and protective exits use their own candle series.
             required_intervals = dict.fromkeys(symbols, interval)
@@ -97,6 +104,8 @@ class TradingService:
             symbol_strategies: dict[str, list[str]] = {}
             skipped_route = 0
             for symbol in symbols:
+                # 策略级宇宙：登记了运行范围的策略（如吸收反转→主流币）只在白名单币上运行
+                scoped = [code for code in codes if symbol_allowed(code, symbol)]
                 if use_route:
                     route = get_route(symbol)
                     is_blacklisted = symbol.upper() in COIN_BLACKLIST
@@ -107,12 +116,14 @@ class TradingService:
                     elif route is not None:
                         # 有精确/族群路由 → 只跑路由分配的策略
                         assigned = route["strategy"]
-                        symbol_strategies[symbol] = [assigned] if assigned in codes else []
+                        symbol_strategies[symbol] = (
+                            [assigned] if assigned in scoped else []
+                        )
                     else:
                         # 宇宙外（未知）→ fallback 到历史行为（遍历所有 enabled 策略）
-                        symbol_strategies[symbol] = codes
+                        symbol_strategies[symbol] = scoped
                 else:
-                    symbol_strategies[symbol] = codes
+                    symbol_strategies[symbol] = scoped
             if use_route:
                 pass  # 路由详情合并到周期结束的汇总日志（避免额外 JobLog 条目）
 
@@ -126,6 +137,10 @@ class TradingService:
                         signal = engine.evaluate(symbol, signal_interval, code, save=True)
                         strategy_signals[(symbol, signal_interval, code)] = signal
                         if signal is None or signal.direction == "FLAT":
+                            continue
+                        # Only entry selection is filtered. Keep the original signal
+                        # above for the order manager's independent exit handling.
+                        if not entry_filters.allows(signal):
                             continue
                         current = best_signals.get(symbol)
                         if current is None or signal.score > current.score:

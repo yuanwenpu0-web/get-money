@@ -14,7 +14,23 @@ from ..strategy.rules import resolve_params
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from . import live as live_exec
 from .dispatch import close_position
-from .risk import stop_exit, trailing_stop
+from .risk import breakeven_stop, stop_exit, trailing_stop
+
+
+def _initial_risk(db: Session, order: Order) -> float:
+    """入场时的初始风险距离 |成交价 − 初始止损|，一次计算后随订单缓存。
+
+    移动止损/保本止损会让 order.sl 单调变化，R 倍数必须以**入场时**的距离为尺，
+    否则每抬高一次止损，R 的定义就漂移一次。首次调用时把当前值落库。
+    """
+    key = f"order_initial_risk:{order.id}"
+    cached = get_state(db, key, 0)
+    if isinstance(cached, (int, float)) and cached > 0:
+        return float(cached)
+    risk = abs(order.entry_price - (order.sl or 0.0))
+    if risk > 0:
+        set_state(db, key, risk)
+    return risk
 
 
 def manage_order(db: Session, order: Order, signal=None) -> dict:
@@ -99,6 +115,36 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
             close_position(db, order, hit[0], hit[1])
             result["actions"].append(hit[1])
             return result
+        be_trigger_r = float(params.get("be_trigger_r", 0.0) or 0.0)
+        if be_trigger_r > 0:
+            new_be = round_price(
+                breakeven_stop(
+                    side,
+                    order.entry_price,
+                    order.sl or 0.0,
+                    row.high,
+                    row.low,
+                    be_trigger_r,
+                    _initial_risk(db, order),
+                )
+            )
+            if new_be != order.sl:
+                if order.source == "live":
+                    try:
+                        live_exec.modify_live(db, order, sl=new_be)
+                    except Exception as exc:
+                        db.add(JobLog(
+                            job="live_trading", level="error",
+                            message=f"订单 #{order.id} 保本止损失败: {exc}",
+                        ))
+                        db.commit()
+                        result["actions"].append("be_sl_failed")
+                        order.mark_price = round_price(row.close)
+                        cursor = ts
+                        continue
+                else:
+                    order.sl = new_be
+                result["actions"].append(f"be_sl={new_be}")
         atr = float(atr_values.loc[row.Index])
         if pd.notna(atr) and atr > 0:
             new_sl = round_price(

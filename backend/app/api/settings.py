@@ -197,7 +197,7 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     merged = {**all_state(db), **data}
     _validate({key: value for key, value in merged.items() if key in EDITABLE_KEYS}, db)
     try:
-        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion', 'mtf_resonance', 'strong_pullback'):
+        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion', 'mtf_resonance', 'strong_pullback', 'absorption_reversal'):
             resolve_params(code, merged)
         for strategy in db.query(StrategyConfig).all():
             resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
