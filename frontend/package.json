@@ -5,16 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5173",
-    "test": "node --test tests/*.test.mjs",
     "build": "vite build",
     "preview": "vite preview --port 4173"
   },
   "dependencies": {
-    "axios": "^1.8.4",
-    "echarts": "^5.6.0",
-    "element-plus": "^2.10.4",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.18"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.4",
