@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 
-from .models import BacktestRun, ModelRecord, Order, Signal
+from .models import BacktestRun, Order, Signal
 from .trading.portfolio import position_unrealized
 
 
@@ -66,29 +66,6 @@ def signal_dict(signal: Signal) -> dict:
         "position_pct": signal.position_pct,
         "reason": reason,
     }
-
-
-def model_dict(record: ModelRecord, include_path: bool = False) -> dict:
-    try:
-        metrics = json.loads(record.metrics or "{}")
-    except ValueError:
-        metrics = {}
-    result = {
-        "id": record.id,
-        "symbol": record.symbol,
-        "interval": record.interval,
-        "algo": record.algo,
-        "horizon": record.horizon,
-        "rows": record.rows,
-        "status": record.status,
-        "metrics": metrics,
-        "train_start": record.train_start,
-        "train_end": record.train_end,
-        "created_at": dt_iso(record.created_at),
-    }
-    if include_path:
-        result["path"] = record.path
-    return result
 
 
 def backtest_dict(run: BacktestRun, full: bool = False, include_trades: bool = True) -> dict:

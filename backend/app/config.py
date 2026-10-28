@@ -126,18 +126,6 @@ DEFAULT_STATE = {
     "order_type": "market",              # 实盘开仓主单类型：market / limit_maker
     "schedule_enabled": True,
     "schedule_seconds": 60,
+    # train_horizon 只用于回测切分时的标签跨度（purged_split 的 purge 长度）
     "train_horizon": 5,
-    # 训练窗口 60 天：40 天在 1h 上只产出 ~903 样本、测试段 181 行，
-    # 低于晋升门禁 MIN_TEST_ROWS=200，会使门禁结构性无法通过（迭代9 实测发现）。
-    # 修复方向是加严数据侧（扩窗口），而非下调样本下限或 AUC 阈值。
-    "auto_train_days": 60,
-    "metrics_assist_enabled": False,  # 多源指标辅助决策开关（默认关：仅观测，不改现有决策）
-    # 迭代9：持续训练（训练本身无害→默认开）与晋升门禁（启用 ml_ensemble 的闸门）
-    "auto_train_enabled": True,        # 周期性自动训练开关（只耗 CPU，不改决策）
-    "auto_train_interval_hours": 24,   # 同币种最小重训间隔（模型新鲜则不重训）
-    "auto_train_top_n": 10,            # 训练目标：成交额 Top N
-    "auto_train_workers": 2,           # 独立币种并行训练数（还会按 CPU 预算封顶）
-    "ml_min_auc": 0.55,                # 晋升门禁：样本外 AUC 下限
-    "ml_promote_rounds": 2,            # 晋升门禁：需连续达标的轮数
-    "ml_auto_enable": False,           # 门禁通过后是否允许自动启用 ml_ensemble（默认否）
 }

@@ -268,45 +268,7 @@ def test_fetch_symbol_metrics_assembles(monkeypatch):
     assert snap["oi_value"] == 7508823560.68  # 来自 open_interest_history
 
 
-# ---------- ⑥ 决策不变式：market_context 不改变方向/仓位 ----------
-
-def test_evaluate_signals_ignores_market_context():
-    params = resolve_params("trend_follow", dict(DEFAULT_STATE))
-    idx = [pd.Timestamp("2024-01-01 00:00:00")]
-    data = pd.DataFrame({
-        "close": [100.0], "atr_pct": [0.01], "rsi_14": [50.0], "adx_14": [30.0],
-        "supertrend_dir": [1.0], "ema_ratio_9_21": [1.02], "ema_ratio_21_50": [1.01],
-        "macd_hist_norm": [0.5], "funding_zscore": [0.0], "funding_available": [1],
-        "bb_pos": [0.5],
-    }, index=idx)
-    out_a = evaluate_signals(data, "trend_follow", params, None)
-    out_b = evaluate_signals(data, "trend_follow", params, None,
-                             market_context={"crowd_ls": 9.9, "fng_value": 99})
-    assert out_a.iloc[0].equals(out_b.iloc[0])
-
-
-# ---------- ⑦ 配置：默认关闭 + 类型校验 ----------
-
-def test_metrics_assist_default_off():
-    assert DEFAULT_STATE.get("metrics_assist_enabled") is False
-
-
-def test_validate_accepts_bool_and_rejects_non_bool():
-    from app.api.settings import _validate
-    from fastapi import HTTPException
-    _validate({"metrics_assist_enabled": False})  # 不应抛
-    _validate({"metrics_assist_enabled": True})   # 不应抛
-    with pytest.raises(HTTPException):
-        _validate({"metrics_assist_enabled": "yes"})
-
-
-def test_settings_update_schema_accepts_flag():
-    from app.schemas import SettingsUpdate
-    assert SettingsUpdate(metrics_assist_enabled=True).metrics_assist_enabled is True
-    assert SettingsUpdate().metrics_assist_enabled is None
-
-
-# ---------- ⑧ API 端点（路由只装配，网络全 mock） ----------
+# ---------- ⑥ API 端点（路由只装配，网络全 mock） ----------
 
 @pytest.fixture
 def client(monkeypatch):

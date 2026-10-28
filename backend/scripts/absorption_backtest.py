@@ -51,7 +51,7 @@ from app.db import make_engine  # noqa: E402
 from app.features.absorption import SENSITIVITY_PRESETS, load_lower_tf_delta  # noqa: E402
 from app.market.data_service import MarketDataService  # noqa: E402
 from app.ml.dataset import build_dataset  # noqa: E402
-from app.strategy.coin_router import MAJOR_SYMBOLS  # noqa: E402
+from app.strategy.coin_universe import MAJOR_SYMBOLS  # noqa: E402
 from app.strategy.rules import evaluate_signals, resolve_params  # noqa: E402
 from app.utils import interval_ms, now_ms  # noqa: E402
 from sqlalchemy.orm import Session  # noqa: E402
@@ -423,7 +423,7 @@ def render_markdown(payload: dict) -> str:
     if verdict == "positive":
         lines.append(
             f"池化 CI 下界为正 → 存在可判定的正 edge。下一步：换窗口/换标的做 holdout 复检，"
-            f"通过后才考虑写入 `coin_router.SYMBOL_ROUTES`。"
+            f"通过后再考虑在巡检中启用。"
         )
     elif verdict == "negative":
         lines.append(
@@ -439,8 +439,8 @@ def render_markdown(payload: dict) -> str:
             "",
             "1. 策略已完整移植并可随时手动开启（`StrategyConfig.absorption_reversal`，默认 enabled=0），"
             "便于对照观察与后续复检。",
-            "2. 运行范围钉在主流币（`coin_router.MAJOR_SYMBOLS`），避免量价噪声污染 c1/c5 判定。",
-            "3. **不写入** `SYMBOL_ROUTES`：没有 holdout 为正的证据，就不该在自动巡检里参与资金竞争。",
+            "2. 运行范围钉在主流币（`strategy.coin_universe.MAJOR_SYMBOLS`），避免量价噪声污染 c1/c5 判定。",
+            "3. **默认不启用**：没有 holdout 为正的证据，就不该在自动巡检里参与资金竞争。",
             "4. 真正的样本瓶颈是 1m 历史（当前约 93 天）：脚本的 intrabar delta 需要它。"
             "补齐半年以上 1m 历史后重跑本脚本，样本量会提高一个数量级。",
         ])

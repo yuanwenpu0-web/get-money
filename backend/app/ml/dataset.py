@@ -5,7 +5,6 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from ..features.indicators import FEATURES, build_features
-from ..features.mtf import add_mtf_trend
 from ..market.data_service import MarketDataService
 from ..utils import interval_ms, now_ms
 
@@ -27,8 +26,6 @@ def build_dataset(
     days: int = 30,
     with_label: bool = True,
     end_ms: int | None = None,
-    barrier: dict | None = None,
-    entry_filters: list[dict] | None = None,
 ) -> pd.DataFrame:
     if horizon < 1 or days < 1:
         raise ValueError("预测跨度和历史天数必须为正数")
@@ -60,27 +57,11 @@ def build_dataset(
     for _, segment in frame.groupby(diffs.ne(step).cumsum()):
         if len(segment) >= 60:
             enriched = build_features(segment, with_label=with_label, horizon=horizon,
-                                      funding=funding, sentiment=sentiment, barrier=barrier)
-            if entry_filters:
-                # Compute on raw continuous bars before feature warmup/dropna and
-                # partitioning. Each gap restarts indicator history.
-                from ..backtest.tradingview_native import tradingview_signals
-                candles = segment[["open", "high", "low", "close"]].to_dict("records")
-                allow_long = np.ones(len(segment), dtype=bool)
-                allow_short = np.ones(len(segment), dtype=bool)
-                for item in entry_filters:
-                    signals = tradingview_signals(candles, item["code"], item["params"])
-                    allow_long &= np.array([s["long"] for s in signals], dtype=bool)
-                    allow_short &= np.array([s["short"] for s in signals], dtype=bool)
-                enriched["allow_long_entry"] = pd.Series(allow_long, index=segment.index)
-                enriched["allow_short_entry"] = pd.Series(allow_short, index=segment.index)
+                                      funding=funding, sentiment=sentiment)
             segments.append(enriched)
     if not segments:
         raise ValueError("连续K线不足 60 根，无法计算指标")
     data = pd.concat(segments).replace([float("inf"), float("-inf")], np.nan)
-    # 多周期趋势共振特征：在已含 DatetimeIndex 的帧上附加 4h/1d 趋势/ADX 列。
-    # 非 mtf_resonance 策略忽略这些列（evaluate_signals 非 mtf 分支不读它们）。
-    data = add_mtf_trend(data)
     if with_label:
         data = data.dropna(subset=FEATURES + ["label", "future_return"])
         data["label"] = data["label"].astype(int)

@@ -1,42 +1,30 @@
+"""Sequential, single-strategy backtest runner.
+
+整个仓库只剩一套规则（吸收反转），因此这里不再有模型训练/预测、多策略候选回放
+或币级路由：同一份数据被切成训练/测试两段，规则只在测试段上按实盘口径回放。
+"""
 from __future__ import annotations
 
 import importlib.util
 import json
 import math
 
-import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from ..features.indicators import FEATURES
 from ..ml.dataset import build_dataset, purged_split
-from ..ml.trainer import _build_estimator
 from ..models import StrategyConfig
 from ..state import all_state
-from ..strategy.coin_router import get_route
-from ..strategy.local_filters import list_filters
 from ..strategy.rules import evaluate_signals, resolve_params
 from .execution import exposure_metrics, randomize_directions, simulate
 from .metrics import downsample, metrics_from_equity
 from .significance import (
     bootstrap_expectancy_ci,
-    information_coefficient,
-    percentile_rank,
     random_baseline_distribution,
 )
 
 # Dependency information only; all runs use the same explicit execution semantics.
 HAS_VBT = importlib.util.find_spec("vectorbt") is not None
-
-
-def with_entry_filters(signals: pd.DataFrame, data: pd.DataFrame) -> pd.DataFrame:
-    """Keep strategy direction for exits and attach independent entry permissions."""
-    if signals is None:  # test doubles and callers without signals
-        return signals
-    for column in ("allow_long_entry", "allow_short_entry"):
-        if column in data:
-            signals[column] = data[column].reindex(signals.index).fillna(False).astype(bool)
-    return signals
 
 
 def minimum_sample_trades(validation_bars: int) -> int:
@@ -53,7 +41,6 @@ def select_parameters(
     validation: pd.DataFrame,
     strategy: str,
     params: dict,
-    probability: pd.Series | None,
     initial: float,
     fee: float,
     slippage: float,
@@ -72,25 +59,6 @@ def select_parameters(
     variants.append(
         ("cost_strict", {"min_atr_cost_ratio": max(0.75, params["min_atr_cost_ratio"])})
     )
-    if "adx_filter" in params:
-        variants.append(
-            ("trend_strict", {"adx_filter": max(25.0, params["adx_filter"])})
-        )
-    if "z_threshold" in params:
-        variants.append(
-            ("extreme_strict", {"z_threshold": params["z_threshold"] + 0.5})
-        )
-    if "target_r" in params:
-        # 强回调专属网格：4h 趋势门槛更严 / 确认窗口更短（只承认快速转强）
-        variants.append(
-            ("htf_strict", {"htf_adx_filter": min(60.0, params["htf_adx_filter"] + 5.0)})
-        )
-        variants.append(
-            (
-                "confirm_strict",
-                {"pullback_confirm_bars": max(2, int(params["pullback_confirm_bars"]) - 2)},
-            )
-        )
     candidates, seen = [], set()
     min_trades = minimum_sample_trades(len(validation))
     best_params, best_score, chosen = params, -math.inf, "current"
@@ -100,7 +68,7 @@ def select_parameters(
         if key in seen:
             continue
         seen.add(key)
-        signals = with_entry_filters(evaluate_signals(validation, strategy, candidate, probability), validation)
+        signals = evaluate_signals(validation, strategy, candidate)
         equity, trades = simulate(
             validation, signals, candidate, initial, fee, slippage, interval
         )
@@ -136,7 +104,6 @@ def run_backtest(
     symbol: str,
     interval: str,
     strategy: str,
-    algo: str = "lightgbm",
     days: int = 30,
     initial_cash: float | None = None,
     fee: float | None = None,
@@ -145,27 +112,9 @@ def run_backtest(
     threshold: float | None = None,
     optimize: bool = False,
     end_ms: int | None = None,
-    triple_barrier: bool = False,
     param_overrides: dict | None = None,
-    use_route: bool = False,
 ) -> dict:
-    """回测单个币种。
-
-    use_route=True 时，若路由表对该 symbol 有精确或族群匹配，则覆盖 strategy
-    并把路由 params 合并进 param_overrides。显式 param_overrides 优先级仍高于路由表。
-    默认 use_route=False — UI 手动选策略的回测不应被自动路由覆盖。
-    """
-    # --- 币级路由（可选） ---
-    if use_route:
-        route = get_route(symbol)
-        if route is not None:
-            strategy = route["strategy"]
-            route_params = route.get("params", {})
-            if route_params:
-                merged = {**route_params}
-                if param_overrides:
-                    merged.update(param_overrides)
-                param_overrides = merged
+    """回测单个币种：同一撮合口径下的「当前参数 / 关闭过滤基线 / 随机方向基线」三者对照。"""
     state = all_state(db)
     initial = float(
         initial_cash
@@ -176,8 +125,6 @@ def run_backtest(
     slippage = float(slippage if slippage is not None else state["slippage"])
     if not math.isfinite(initial) or initial <= 0 or not 0.5 <= train_ratio <= 0.85:
         raise ValueError("初始资金或训练占比无效")
-    if algo not in ("rule", "lightgbm", "xgboost"):
-        raise ValueError("未知模型算法")
     config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
     overrides = json.loads(config.params or "{}") if config else {}
     if param_overrides:
@@ -191,21 +138,7 @@ def run_backtest(
         interval=interval,
     )
     horizon = int(state.get("train_horizon", 5))
-    barrier = None
-    if triple_barrier and strategy == "ml_ensemble" and algo != "rule":
-        # triple-barrier 标签与实盘 sl/tp/max_hold 出场对齐
-        barrier = {
-            "sl_atr_mult": params["sl_atr_mult"],
-            "tp_atr_mult": params["tp_atr_mult"],
-            "max_hold_bars": params["max_hold_bars"],
-            "horizon": horizon,
-        }
-    filters = [item for item in list_filters(db) if item["enabled"] and strategy in item["bound_strategies"]]
-    dataset_options = {"entry_filters": filters} if filters else {}
-    data = build_dataset(
-        db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms, barrier=barrier,
-        **dataset_options,
-    )
+    data = build_dataset(db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms)
     if len(data) < 800:
         raise ValueError(f"回测样本不足（{len(data)} 行），至少需要 800 根有效K线")
     split = int(len(data) * train_ratio)
@@ -219,25 +152,6 @@ def run_backtest(
         validation = data.iloc[validation_start : split - horizon]
         if len(validation) < 100:
             raise ValueError("验证集不足 100 根K线")
-    estimator, algo_used = None, "rule"
-    if strategy == "ml_ensemble" and algo != "rule":
-        if train["label"].nunique() < 2:
-            raise ValueError("训练集只有单一方向标签，无法训练分类器")
-        estimator = _build_estimator(algo)
-        estimator.fit(train[FEATURES], train["label"])
-        algo_used = algo
-
-    def predict(frame):
-        if estimator is None:
-            return None
-        proba = estimator.predict_proba(frame[FEATURES])
-        classes = getattr(estimator, "classes_", None)
-        if classes is not None and len(classes) > 2:
-            # 三分类：class==1 是「止盈」，用作做多概率（趋势策略只在止盈类做多）
-            k = int(np.where(classes == 1)[0][0])
-            return pd.Series(proba[:, k], index=frame.index)
-        return pd.Series(proba[:, 1], index=frame.index)  # 类1 = 涨（二分类/未知）
-
     selection = {"enabled": False, "status": "disabled", "applied_to_paper": False}
     configured = params.copy()
     if optimize:
@@ -245,18 +159,16 @@ def run_backtest(
             validation,
             strategy,
             params,
-            predict(validation),
             initial,
             fee,
             slippage,
             interval,
         )
-    probability = predict(test)
-    signals = with_entry_filters(evaluate_signals(test, strategy, params, probability), test)
+    signals = evaluate_signals(test, strategy, params)
     equity, trades = simulate(test, signals, params, initial, fee, slippage, interval)
     # Identical fills, costs and risk caps; this is not the old vectorbt engine.
     baseline_params = {**configured, "regime_filter": False, "cost_filter": False}
-    baseline_signals = with_entry_filters(evaluate_signals(test, strategy, baseline_params, probability), test)
+    baseline_signals = evaluate_signals(test, strategy, baseline_params)
     baseline_equity, baseline_trades = simulate(
         test, baseline_signals, baseline_params, initial, fee, slippage, interval
     )
@@ -273,17 +185,9 @@ def run_backtest(
     quality = data.attrs.get("data_quality", {})
     warnings = []
 
-    if filters:
-        warnings.append("本地策略作为入场过滤器；策略、基线和随机方向均按各自方向检查过滤条件，平仓仍由系统策略管理。")
-
-    # 统计显著性：收益读数必须与置信区间、IC、随机基线分布一起看，
+    # 统计显著性：收益读数必须与置信区间、随机基线分布一起看，
     # 否则「+2%」和「0」在小样本下无法区分（见 significance 模块说明）。
     expectancy_ci = bootstrap_expectancy_ci(trades)
-    ic = (
-        information_coefficient(probability.reindex(test.index), test["future_return"])
-        if probability is not None
-        else {"pairs": 0, "ic": None, "verdict": "no_model"}
-    )
     random_dist = random_baseline_distribution(
         test, baseline_signals, baseline_params, initial, fee, slippage, interval,
         n_seeds=10,
@@ -314,7 +218,7 @@ def run_backtest(
             "symbol": symbol,
             "interval": interval,
             "strategy": strategy,
-            "algo": algo_used,
+            "algo": "rule",
             "fee_rate": fee,
             "slippage": slippage,
             "threshold": params["min_score"],
@@ -332,16 +236,10 @@ def run_backtest(
                 .items()
             },
             "parameters": params,
-            "local_entry_filters": [{"code": item["code"], "params": item["params"]} for item in filters],
-            "local_filter_blocked_signals": int(
-                ((signals.direction.eq(1) & ~signals.allow_long_entry)
-                 | (signals.direction.eq(-1) & ~signals.allow_short_entry)).sum()
-            ) if filters else 0,
             "baseline": baseline,
             "random_baseline": random_baseline,
             "significance": {
                 "expectancy_ci": expectancy_ci,
-                "information_coefficient": ic,
                 "random_distribution": random_dist,
             },
             "return_improvement_pct": round(

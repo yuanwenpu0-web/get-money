@@ -54,16 +54,6 @@ class SettingsUpdate(BaseModel):
     order_type: str | None = None
     schedule_enabled: bool | None = None
     schedule_seconds: int | None = None
-    train_horizon: int | None = None
-    auto_train_days: int | None = None
-    metrics_assist_enabled: bool | None = None
-    auto_train_enabled: bool | None = None
-    auto_train_interval_hours: int | None = Field(default=None, ge=1, le=720)
-    auto_train_top_n: int | None = Field(default=None, ge=1, le=50)
-    auto_train_workers: int | None = Field(default=None, ge=1, le=8, strict=True)
-    ml_min_auc: float | None = Field(default=None, ge=.5, le=.9, allow_inf_nan=False)
-    ml_promote_rounds: int | None = Field(default=None, ge=1, le=10)
-    ml_auto_enable: bool | None = None
 
 
 class StrategyUpdate(BaseModel):
@@ -83,7 +73,7 @@ class SyncRequest(BaseModel):
 class PreviewRequest(BaseModel):
     symbol: str
     interval: str = "1m"
-    strategy: str = "ml_ensemble"
+    strategy: str = "absorption_reversal"
 
 
 class MetricsSyncRequest(BaseModel):
@@ -92,20 +82,11 @@ class MetricsSyncRequest(BaseModel):
     period: str = "5m"  # 多空比/主动买卖量/未平仓量历史聚合周期
 
 
-class TrainRequest(BaseModel):
-    symbol: str
-    interval: str = "1m"
-    algo: str = "lightgbm"
-    horizon: int = 5
-    days: int = 30
-
-
 class BacktestRequest(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
     symbol: str = Field(min_length=2, max_length=24, pattern=r'^[A-Za-z0-9]+$')
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '1m'
-    strategy: Literal['ml_ensemble', 'trend_follow', 'mean_reversion', 'funding_extreme', 'mtf_resonance', 'strong_pullback', 'absorption_reversal'] = 'ml_ensemble'
-    algo: Literal['rule', 'lightgbm', 'xgboost'] = 'lightgbm'
+    strategy: Literal['absorption_reversal'] = 'absorption_reversal'
     days: int = Field(default=30, ge=1, le=180)
     initial_cash: float | None = Field(default=None, gt=0)
     fee: float | None = Field(default=None, ge=0, le=.01)

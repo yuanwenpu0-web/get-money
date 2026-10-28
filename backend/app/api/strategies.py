@@ -9,7 +9,7 @@ from ..db import get_db
 from ..models import StrategyConfig
 from ..schemas import StrategyUpdate
 from ..state import all_state
-from ..strategy.defaults import DEFAULT_STRATEGIES, seed_strategies
+from ..strategy.defaults import ALLOWED_CODES, DEFAULT_STRATEGIES, seed_strategies
 from ..strategy.rules import resolve_params
 from ..trading.service import TradingService
 
@@ -35,7 +35,14 @@ def _strategy_dict(row: StrategyConfig) -> dict:
 @router.get("")
 def list_strategies(db: Session = Depends(get_db)):
     seed_strategies(db)
-    rows = db.query(StrategyConfig).order_by(StrategyConfig.id.asc()).all()
+    # 老库可能残留已下线策略的配置行；它们已无规则实现、无法解析参数，
+    # 这里只暴露当前仓库真正可执行的策略。
+    rows = (
+        db.query(StrategyConfig)
+        .filter(StrategyConfig.code.in_(ALLOWED_CODES))
+        .order_by(StrategyConfig.id.asc())
+        .all()
+    )
     return {
         "strategies": [{**_strategy_dict(row), 'effective_params': resolve_params(row.code, all_state(db), json.loads(row.params or '{}'))} for row in rows],
         "defaults": DEFAULT_STRATEGIES,

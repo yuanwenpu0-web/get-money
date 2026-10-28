@@ -1,17 +1,14 @@
-"""Cycle-local feature reuse must preserve every strategy's signal."""
+"""Cycle-local feature reuse must preserve the evaluation result."""
 
 import numpy as np
 import pandas as pd
 import pytest
-from pydantic import ValidationError
 
-from app.api.settings import _validate
 from app.models import Signal
-from app.schemas import SettingsUpdate
 from app.strategy import engine
 
 
-CODES = ("ml_ensemble", "trend_follow", "mean_reversion", "funding_extreme", "mtf_resonance")
+STRATEGY = "absorption_reversal"
 
 
 @pytest.fixture
@@ -27,12 +24,9 @@ def candle_frame(monkeypatch):
     return frame
 
 
-def test_cycle_reuses_features_without_changing_or_skipping_saved_signals(db, monkeypatch, candle_frame):
-    expected = {
-        code: engine.StrategyEngine(db).evaluate("BTCUSDT", "1h", code).to_dict()
-        for code in CODES
-    }
-    calls = dict(features=0, mtf=0, candles=0, funding=0, metrics=0, state=0)
+def test_cycle_reuses_features_without_changing_saved_signals(db, monkeypatch, candle_frame):
+    expected = engine.StrategyEngine(db).evaluate("BTCUSDT", "1h", STRATEGY).to_dict()
+    calls = dict(features=0, candles=0, state=0)
 
     def counted(name, original):
         def run(*args, **kwargs):
@@ -41,26 +35,32 @@ def test_cycle_reuses_features_without_changing_or_skipping_saved_signals(db, mo
         return run
 
     monkeypatch.setattr(engine, "build_features", counted("features", engine.build_features))
-    monkeypatch.setattr(engine, "add_mtf_trend", counted("mtf", engine.add_mtf_trend))
     monkeypatch.setattr(engine, "all_state", counted("state", engine.all_state))
-    monkeypatch.setattr(engine.MarketDataService, "load_frame", counted("candles", engine.MarketDataService.load_frame))
-    monkeypatch.setattr(engine.MarketDataService, "load_funding_frame", counted("funding", engine.MarketDataService.load_funding_frame))
-    monkeypatch.setattr(engine.metrics_mod, "load_latest_metrics", counted("metrics", engine.metrics_mod.load_latest_metrics))
+    monkeypatch.setattr(
+        engine.MarketDataService, "load_frame",
+        counted("candles", engine.MarketDataService.load_frame),
+    )
 
     evaluator = engine.StrategyEngine(db, cycle_snapshot=True)
-    for code in CODES:
-        assert evaluator.evaluate("BTCUSDT", "1h", code, save=True).to_dict() == expected[code]
-    assert db.query(Signal).count() == len(CODES)
-    assert calls == dict(features=1, mtf=1, candles=1, funding=1, metrics=1, state=1)
-    evaluator.evaluate("ETHUSDT", "1h", "trend_follow")
-    assert len(evaluator._features) == 1
+    first = evaluator.evaluate("BTCUSDT", "1h", STRATEGY, save=True)
+    second = evaluator.evaluate("BTCUSDT", "1h", STRATEGY, save=True)
+    assert first.to_dict() == second.to_dict() == expected
+    assert db.query(Signal).count() == 2
+    # 同币种同周期只计算一次特征（K 线会因 lower-tf delta 探测再取一次，故不比对）
+    assert calls["features"] == 1
+    assert calls["state"] == 1
+
+    # 换币种必须重新加载，缓存按当前序列单槽保留
+    evaluator.evaluate("ETHUSDT", "1h", STRATEGY)
     assert calls["features"] == 2
-    # A new cycle reloads the data rather than retaining the previous cycle's snapshot.
-    engine.StrategyEngine(db, cycle_snapshot=True).evaluate("BTCUSDT", "1h", "trend_follow")
+    assert len(evaluator._features) == 1
+
+    # 新一轮巡检创建新实例，必须重新取数
+    engine.StrategyEngine(db, cycle_snapshot=True).evaluate("BTCUSDT", "1h", STRATEGY)
     assert calls["features"] == 3
 
 
-def test_default_engine_refreshes_data_and_skips_unused_mtf(db, monkeypatch, candle_frame):
+def test_default_engine_refreshes_data_every_call(db, monkeypatch, candle_frame):
     calls = []
     original = engine.build_features
 
@@ -69,23 +69,16 @@ def test_default_engine_refreshes_data_and_skips_unused_mtf(db, monkeypatch, can
         return original(*args, **kwargs)
 
     monkeypatch.setattr(engine, "build_features", build)
-    monkeypatch.setattr(engine, "add_mtf_trend", lambda *a, **k: pytest.fail("unused MTF calculation"))
     evaluator = engine.StrategyEngine(db)
-    first = evaluator.evaluate("BTCUSDT", "1h", "trend_follow")
+    first = evaluator.evaluate("BTCUSDT", "1h", STRATEGY)
     candle_frame.iloc[-1, candle_frame.columns.get_loc("close")] += .01
-    second = evaluator.evaluate("BTCUSDT", "1h", "trend_follow")
+    second = evaluator.evaluate("BTCUSDT", "1h", STRATEGY)
     assert len(calls) == 2
     assert first.price != second.price
 
 
-@pytest.mark.parametrize("value", [0, 9, True, 1.5])
-def test_training_worker_setting_rejects_invalid_values(value):
-    with pytest.raises(ValidationError):
-        SettingsUpdate(auto_train_workers=value)
-
-
-def test_training_worker_setting_accepts_and_validates_bounds():
-    for value in (1, 2, 8):
-        payload = SettingsUpdate(auto_train_workers=value).model_dump(exclude_none=True)
-        _validate(payload)
-        assert payload["auto_train_workers"] == value
+def test_engine_requires_explicit_strategy(db, candle_frame):
+    """收敛后不再支持 auto 路由：未显式给出策略代码一律不评估。"""
+    evaluator = engine.StrategyEngine(db)
+    assert evaluator.evaluate("BTCUSDT", "1h", "auto") is None
+    assert evaluator.evaluate("BTCUSDT", "1h", None) is None

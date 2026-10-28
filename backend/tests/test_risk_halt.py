@@ -24,7 +24,7 @@ def signal(**overrides):
                 tp=103.0,
                 leverage=10,
                 position_pct=0.25,
-                strategy="trend_follow",
+                strategy="absorption_reversal",
                 score=1.0,
                 prob_up=0.8,
                 ts=now_ms() - interval_ms("1m"),  # 已收盘 bar，避免被入场闸门判为未收盘
@@ -48,7 +48,7 @@ def open_order(**overrides):
         tp=103.0,
         status="OPEN",
         source="paper",
-        strategy="trend_follow",
+        strategy="absorption_reversal",
     )
     return Order(**(defaults | overrides))
 
@@ -126,10 +126,10 @@ def test_run_cycle_skips_open_while_halted(db, monkeypatch):
     from app.trading import service as trading_service
 
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["AAAUSDT"])
+    set_state(db, "symbols", ["BTCUSDT"])
     set_state(db, "risk_halt", True)
     set_state(db, "risk_halt_reason", "熔断测试")
-    db.add(StrategyConfig(code="trend_follow", name="趋势", params="{}", enabled=1))
+    db.add(StrategyConfig(code="absorption_reversal", name="趋势", params="{}", enabled=1))
     db.commit()
 
     class _StubService:
@@ -140,10 +140,10 @@ def test_run_cycle_skips_open_while_halted(db, monkeypatch):
             return {"errors": []}
 
     live_signal = SimpleNamespace(
-        symbol="AAAUSDT", interval="1m", direction="LONG", score=0.9,
-        strategy="trend_follow", ts=now_ms() - interval_ms("1m"), price=100.0, sl=99.0, tp=103.0,
+        symbol="BTCUSDT", interval="1m", direction="LONG", score=0.9,
+        strategy="absorption_reversal", ts=now_ms() - interval_ms("1m"), price=100.0, sl=99.0, tp=103.0,
         leverage=5, position_pct=0.1, prob_up=0.7,
-        to_dict=lambda: {"symbol": "AAAUSDT"},
+        to_dict=lambda: {"symbol": "BTCUSDT"},
     )
     monkeypatch.setattr(trading_service, "MarketDataService", _StubService)
     monkeypatch.setattr(

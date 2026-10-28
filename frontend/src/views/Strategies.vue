@@ -4,14 +4,8 @@ import { ElMessage } from 'element-plus'
 import api from '../api'
 import { price, symbolsLabel } from '../utils/format'
 import { signalReason } from '../utils/strategy'
-import TradingViewCatalog from '../components/TradingViewCatalog.vue'
 
 const strategies = ref([])
-const localStrategies = ref([])
-const localSaved = ref({})
-const localLoading = ref(false)
-const localError = ref('')
-const localSaving = ref({})
 const settings = ref({})
 const symbolCount = ref(0)
 const loading = ref(false)
@@ -29,7 +23,7 @@ const preview = ref(null)
 const runResult = ref(null)
 const runVisible = ref(false)
 
-const form = reactive({ symbol: 'BTCUSDT', interval: '1m', strategy: 'ml_ensemble' })
+const form = reactive({ symbol: 'BTCUSDT', interval: '1m', strategy: 'absorption_reversal' })
 const editVisible = ref(false)
 const editCode = ref('')
 const editName = ref('')
@@ -39,7 +33,6 @@ const scheduleForm = reactive({ enabled: true, seconds: 60 })
 const scheduleSaving = ref(false)
 const initialForm = { ...form }
 let listPromise = null
-let localPromise = null
 let settingsPromise = null
 let symbolsPromise = null
 let disposed = false
@@ -60,75 +53,6 @@ function loadStrategies() {
     listPromise = null
   })
   return listPromise
-}
-
-function loadLocalStrategies() {
-  if (disposed) return Promise.resolve()
-  if (localPromise) return localPromise
-  if (Object.values(localSaving.value).some(Boolean)) return Promise.resolve()
-  localLoading.value = true
-  localError.value = ''
-  localPromise = Promise.resolve().then(() => api.getLocalStrategies()).then((data) => {
-    if (!disposed) {
-      localStrategies.value = (data.strategies || []).map(copyLocalStrategy)
-      localSaved.value = Object.fromEntries(localStrategies.value.map((row) => [row.code, copyLocalStrategy(row)]))
-    }
-  }).catch((error) => {
-    if (!disposed) localError.value = error.message
-  }).finally(() => {
-    localLoading.value = false
-    localPromise = null
-  })
-  return localPromise
-}
-
-function copyLocalStrategy(row) {
-  return { ...row, bound_strategies: [...(row.bound_strategies || [])], params: { ...(row.params || {}) } }
-}
-
-function localDirty(row) {
-  const saved = localSaved.value[row.code]
-  if (!saved) return false
-  return row.enabled !== saved.enabled ||
-    JSON.stringify([...row.bound_strategies].sort()) !== JSON.stringify([...saved.bound_strategies].sort())
-}
-
-async function saveLocalStrategy(row) {
-  if (localLoading.value || localSaving.value[row.code]) return
-  localSaving.value = { ...localSaving.value, [row.code]: true }
-  try {
-    const saved = await api.updateLocalStrategy(row.code, {
-      enabled: row.enabled,
-      bound_strategies: row.bound_strategies,
-    })
-    if (disposed) return
-    const index = localStrategies.value.findIndex((item) => item.code === row.code)
-    if (index >= 0) localStrategies.value[index] = copyLocalStrategy(saved)
-    localSaved.value = { ...localSaved.value, [row.code]: copyLocalStrategy(saved) }
-    ElMessage.success(`${row.name} 配置已保存`)
-  } catch (error) {
-    if (disposed) return
-    let verified = false
-    try {
-      const latest = await api.getLocalStrategies()
-      const serverRow = (latest.strategies || []).find((item) => item.code === row.code)
-      if (serverRow) {
-        localSaved.value = { ...localSaved.value, [row.code]: copyLocalStrategy(serverRow) }
-        verified = true
-      }
-    } catch (_) {
-      // Retain the last confirmed state if the server cannot be reached.
-    }
-    if (disposed) return
-    const index = localStrategies.value.findIndex((item) => item.code === row.code)
-    const saved = localSaved.value[row.code]
-    if (index >= 0 && saved) localStrategies.value[index] = copyLocalStrategy(saved)
-    ElMessage.error(verified
-      ? `保存请求失败，已重新读取服务器配置：${error.message}`
-      : `保存请求失败，无法确认服务器当前状态，已恢复上次确认的配置，请重新加载：${error.message}`)
-  } finally {
-    localSaving.value = { ...localSaving.value, [row.code]: false }
-  }
 }
 
 function loadSettings() {
@@ -176,7 +100,7 @@ function loadSymbols() {
 }
 
 function load() {
-  return Promise.all([loadStrategies(), loadSettings(), loadSymbols(), loadLocalStrategies()])
+  return Promise.all([loadStrategies(), loadSettings(), loadSymbols()])
 }
 
 async function refreshStrategies() {
@@ -286,8 +210,6 @@ onBeforeUnmount(() => { disposed = true })
 
 <template>
   <div>
-    <TradingViewCatalog />
-
     <div class="panel" style="margin-bottom: 14px">
       <div class="panel-head">
         <div>
@@ -376,42 +298,6 @@ onBeforeUnmount(() => { disposed = true })
         </div>
         <div v-if="preview.signal?.reason" class="form-hint mono" style="margin-top: 10px">
           {{ signalReason(preview.signal.reason.block_reason) }}
-        </div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom: 14px">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">TradingView 本地策略</div>
-          <div class="panel-sub">默认停用。启用并绑定系统策略后，只有双方在同一根已收盘 K 线上同时出现同方向入场信号才允许开仓；多个绑定的已启用本地策略须全部同方向触发。</div>
-        </div>
-        <el-button size="small" :loading="localLoading" :disabled="Object.values(localSaving).some(Boolean)" @click="loadLocalStrategies">重新加载</el-button>
-      </div>
-      <div class="form-hint" style="margin-bottom: 12px">本地策略仅作为入场过滤，仓位、止损止盈和平仓仍由系统策略与风控管理。原版策略回测与系统实际出场规则不同。修改后请点击保存配置，重新加载会放弃未保存修改；未绑定任何系统策略时不会影响开仓。</div>
-      <div v-if="localError" class="row" role="alert">
-        <span class="down">本地策略加载失败：{{ localError }}</span>
-        <el-button size="small" @click="loadLocalStrategies">重试</el-button>
-      </div>
-      <div v-else-if="localLoading && !localStrategies.length" class="muted" role="status">正在加载本地策略…</div>
-      <div v-else-if="!localStrategies.length" class="muted">暂无本地策略</div>
-      <div v-for="row in localStrategies" :key="row.code" class="signal-box" style="margin-top: 10px">
-        <div class="row">
-          <strong>{{ row.name }}</strong>
-          <span class="muted mono">{{ row.code }}</span>
-          <el-tag v-if="localDirty(row)" size="small" type="warning">未保存</el-tag>
-          <div class="spacer"></div>
-          <span class="muted">已保存：{{ localSaved[row.code]?.enabled ? '启用' : '停用' }}</span>
-          <el-switch v-model="row.enabled" :disabled="localLoading || localSaving[row.code]" active-text="启用" inactive-text="停用" />
-        </div>
-        <div class="muted" style="margin-top: 6px">{{ row.description }}</div>
-        <div class="muted mono" style="margin-top: 6px">来源：{{ row.source }}</div>
-        <div class="row" style="margin-top: 10px">
-          <span class="muted">绑定系统策略</span>
-          <el-select v-model="row.bound_strategies" multiple collapse-tags collapse-tags-tooltip placeholder="选择系统策略" style="min-width: 260px" :disabled="localLoading || localSaving[row.code]">
-            <el-option v-for="system in strategies" :key="system.code" :label="system.name" :value="system.code" />
-          </el-select>
-          <el-button size="small" type="primary" :disabled="localLoading" :loading="localSaving[row.code]" @click="saveLocalStrategy(row)">保存配置</el-button>
         </div>
       </div>
     </div>

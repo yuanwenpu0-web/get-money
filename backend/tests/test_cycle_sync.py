@@ -96,14 +96,15 @@ def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch
     from app.models import ModelRecord, StrategyConfig
 
     set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["BADUSDT", "GOODUSDT"])
-    db.add(StrategyConfig(code="trend_follow", name="Trend", enabled=1, params="{}"))
+    # 吸收反转只在主流币白名单上运行，这里必须用白名单内的代码
+    set_state(db, "symbols", ["BTCUSDT", "ETHUSDT"])
+    db.add(StrategyConfig(code="absorption_reversal", name="吸收反转", enabled=1, params="{}"))
     db.commit()
     evaluated = []
 
     def evaluate(self, symbol, *args, **kwargs):
         evaluated.append(symbol)
-        if symbol == "BADUSDT":
+        if symbol == "BTCUSDT":
             db.add(ModelRecord(symbol=symbol, interval="1h", algo="lightgbm", path=None))
             db.flush()  # A real constraint violation requires rollback before reuse.
         assert db.query(ModelRecord).count() == 0
@@ -112,7 +113,7 @@ def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch
     _stub_cycle(monkeypatch, evaluate=evaluate)
     result = TradingService(db).run_cycle()
     assert result["ok"] is True
-    assert evaluated == ["BADUSDT", "GOODUSDT"]
+    assert evaluated == ["BTCUSDT", "ETHUSDT"]
     assert len(result["signal_errors"]) == 1
     assert db.query(JobLog).filter(JobLog.job == "trading_cycle").count() == 1
 
@@ -149,7 +150,7 @@ def test_cycle_updates_existing_positions_after_interval_and_scope_changes(db, m
     ]:
         db.add(Order(symbol=symbol, interval=interval, side="LONG", qty=1,
                      entry_price=100, mark_price=100, margin=10,
-                     strategy="trend_follow", status=status))
+                     strategy="absorption_reversal", status=status))
     db.commit()
     calls = []
 
@@ -189,7 +190,7 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
     created = (now_ms() // 60000 - 3) * 60000
     order = Order(symbol="HELDUSDT", interval="1m", side="LONG", qty=1,
                   entry_price=100, mark_price=100, margin=10, sl=99, tp=105,
-                  strategy="trend_follow", created_at=datetime.fromtimestamp(created / 1000, timezone.utc))
+                  strategy="absorption_reversal", created_at=datetime.fromtimestamp(created / 1000, timezone.utc))
     db.add(order)
     db.commit()
 
@@ -218,51 +219,3 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
         assert order.close_reason == "stop_loss"
         assert order.realized_pnl < 0
         assert summary["managed"] == [{"order_id": order.id, "actions": ["stop_loss"]}]
-
-
-@pytest.mark.parametrize("default_interval,sync_interval", [("1h", "1h"), ("1m", "15m")])
-def test_pullback_uses_15m_while_other_strategy_and_orders_keep_their_intervals(
-    db, monkeypatch, default_interval, sync_interval
-):
-    from types import SimpleNamespace
-
-    from app.models import StrategyConfig
-
-    set_state(db, "symbol_scope", "custom")
-    set_state(db, "symbols", ["AAAUSDT"])
-    set_state(db, "interval", default_interval)
-    set_state(db, "use_coin_route", False)
-    for code in ("strong_pullback", "trend_follow"):
-        db.add(StrategyConfig(code=code, name=code, enabled=1, params="{}"))
-    for code, interval in (("strong_pullback", "15m"), ("trend_follow", default_interval)):
-        db.add(Order(symbol="AAAUSDT", interval=interval, side="LONG", qty=1,
-                     entry_price=100, mark_price=100, margin=10,
-                     strategy=code, status="OPEN"))
-    db.commit()
-
-    calls = []
-    evaluated = {}
-    managed = {}
-
-    def evaluate(self, symbol, interval, code, **kwargs):
-        signal = SimpleNamespace(direction="FLAT", interval=interval, strategy=code)
-        evaluated[(symbol, interval, code)] = signal
-        return signal
-
-    def manage(db, order, signal):
-        managed[order.strategy] = signal
-        return {"order_id": order.id, "actions": []}
-
-    _stub_cycle(monkeypatch, evaluate=evaluate)
-    monkeypatch.setattr(trading_service, "_sync_recent_many", lambda symbols, interval: calls.append((symbols, interval)) or [])
-    monkeypatch.setattr(trading_service, "manage_order", manage)
-    summary = TradingService(db).run_cycle()
-
-    assert summary["ok"] is True
-    assert calls == [(["AAAUSDT"], sync_interval)]
-    assert set(evaluated) == {
-        ("AAAUSDT", "15m", "strong_pullback"),
-        ("AAAUSDT", default_interval, "trend_follow"),
-    }
-    assert managed["strong_pullback"] is evaluated[("AAAUSDT", "15m", "strong_pullback")]
-    assert managed["trend_follow"] is evaluated[("AAAUSDT", default_interval, "trend_follow")]

@@ -28,7 +28,7 @@ def fixture_bars(n=5):
 
 def params(**kwargs):
     return resolve_params(
-        "trend_follow",
+        "absorption_reversal",
         {},
         {"risk_per_trade_pct": 0.02, "trailing_enabled": False, **kwargs},
     )
@@ -125,9 +125,9 @@ def _selection(monkeypatch, validation_bars, trades):
     equity = pd.Series(10000.0, index=validation.index)
     monkeypatch.setattr(runner, "evaluate_signals", lambda *a, **k: None)
     monkeypatch.setattr(runner, "simulate", lambda *a, **k: (equity, trades))
-    base = resolve_params("trend_follow", {})
+    base = resolve_params("absorption_reversal", {})
     return runner.select_parameters(
-        validation, "trend_follow", base, None, 10000.0, 0.0004, 0.0002, "1m"
+        validation, "absorption_reversal", base, 10000.0, 0.0004, 0.0002, "1m"
     )
 
 
@@ -138,7 +138,7 @@ def test_select_parameters_rejects_small_sample_candidates(monkeypatch):
     assert selection["status"] == "insufficient_trades"
     assert selection["minimum_trades"] == 30
     assert all(not candidate["eligible"] for candidate in selection["candidates"])
-    assert best == resolve_params("trend_follow", {})  # 保留当前参数
+    assert best == resolve_params("absorption_reversal", {})  # 保留当前参数
 
 
 def test_select_parameters_accepts_large_sample_candidates(monkeypatch):
@@ -147,11 +147,11 @@ def test_select_parameters_accepts_large_sample_candidates(monkeypatch):
     assert selection["status"] == "selected"
     assert selection["selected"] == "current"
     assert all(candidate["eligible"] for candidate in selection["candidates"])
-    assert best["min_score"] == resolve_params("trend_follow", {})["min_score"]
+    assert best["min_score"] == resolve_params("absorption_reversal", {})["min_score"]
 
 
 def test_select_parameters_zero_trade_variants_do_not_error(monkeypatch):
     best, selection = _selection(monkeypatch, 1000, [])
     assert selection["status"] == "insufficient_trades"
     assert all(candidate["total_trades"] == 0 for candidate in selection["candidates"])
-    assert best == resolve_params("trend_follow", {})
+    assert best == resolve_params("absorption_reversal", {})

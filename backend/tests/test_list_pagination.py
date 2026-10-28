@@ -8,25 +8,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import event
 
-from app.api import backtests, models_api, trading
+from app.api import backtests, trading
 from app.db import get_db
 from app.market.data_service import MarketDataService
-from app.models import BacktestRun, JobLog, ModelRecord, Order
+from app.models import BacktestRun, JobLog, Order
 
 
 CREATED = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
 
-def seed_models(db, count):
-    for index in range(count):
-        db.add(ModelRecord(symbol=f"MODEL{index}", interval="1h", algo="lightgbm",
-                           path="unused.pkl", features='["unused"]', created_at=CREATED))
-    db.commit()
-
-
 def seed_backtests(db, count):
     for index in range(count):
-        db.add(BacktestRun(symbol=f"BACKTEST{index}", interval="1h", strategy="trend_follow",
+        db.add(BacktestRun(symbol=f"BACKTEST{index}", interval="1h", strategy="absorption_reversal",
                            params='{"days": 30}', equity_curve='[{"equity": 10000}]',
                            trades=json.dumps([{"trade": trade} for trade in range(45)]),
                            created_at=CREATED))
@@ -38,25 +31,6 @@ def order(db, symbol="BTCUSDT", status="OPEN", side="LONG", pnl=0, mark=105):
                 entry_price=100, mark_price=mark, realized_pnl=pnl, created_at=CREATED)
     db.add(row)
     return row
-
-
-def test_model_pages_are_bounded_stable_and_cover_more_than_old_limit(db):
-    seed_models(db, 105)
-    first = models_api.list_models(db)
-    assert (first["total"], first["page"], first["page_size"], first["pages"]) == (105, 1, 20, 6)
-    assert [row["id"] for row in first["models"]] == list(range(105, 85, -1))
-    pages = [models_api.list_models(db, page=page)["models"] for page in range(1, 7)]
-    assert [row["id"] for rows in pages for row in rows] == list(range(105, 0, -1))
-    assert len(models_api.list_models(db, page=6)["models"]) == 5
-
-
-def test_deleted_last_model_page_remains_explicitly_empty(db):
-    seed_models(db, 21)
-    db.delete(db.get(ModelRecord, 1))
-    db.commit()
-    result = models_api.list_models(db, page=2)
-    assert result["models"] == []
-    assert (result["total"], result["page"], result["pages"]) == (20, 2, 1)
 
 
 def test_order_summary_covers_entire_filtered_set_and_mark_fallback(db):
@@ -91,8 +65,7 @@ def test_order_and_log_legacy_limits_are_bounded_and_explicit_page_size_wins(db)
 
 
 def test_empty_lists_have_zero_pages_and_summary(db):
-    for result, key in [(models_api.list_models(db), "models"),
-                        (backtests.list_backtests(db), "backtests"),
+    for result, key in [(backtests.list_backtests(db), "backtests"),
                         (trading.list_orders(db=db), "orders"),
                         (trading.logs(db=db), "logs")]:
         assert result[key] == []
@@ -115,17 +88,6 @@ def test_backtest_history_pages_do_not_load_detail_json(db):
     assert len(selects) == 1
     assert all(column not in selects[0] for column in ("backtest_runs.trades", "backtest_runs.equity_curve", "backtest_runs.params"))
     assert all("trades" not in row and "equity_curve" not in row for row in result["backtests"])
-
-
-def test_model_list_does_not_fetch_paths_or_unused_feature_json(db):
-    seed_models(db, 2)
-    sql = []
-    event.listen(db.get_bind(), "before_cursor_execute", lambda conn, cursor, statement, *args: sql.append(statement))
-    models_api.list_models(db)
-    selects = [statement for statement in sql if not statement.lstrip().startswith("SELECT count(")]
-    assert len(selects) == 1
-    assert "models.path" not in selects[0]
-    assert "models.features" not in selects[0]
 
 
 def test_backtest_details_can_skip_trades_and_fetch_them_in_pages(db):
@@ -176,11 +138,11 @@ def test_dashboard_keeps_legacy_market_statistics_by_default(db, monkeypatch):
     assert trading.dashboard(db)["market"] == [{"symbol": "BTCUSDT", "count": 1}]
 
 
-@pytest.mark.parametrize("path", ["/trading/orders", "/trading/logs", "/models", "/backtests", "/backtests/1/trades"])
+@pytest.mark.parametrize("path", ["/trading/orders", "/trading/logs", "/backtests", "/backtests/1/trades"])
 @pytest.mark.parametrize("params", [{"page": 0}, {"page": -1}, {"page_size": 0}, {"page_size": 101}])
 def test_pagination_rejects_invalid_query_parameters_before_accessing_database(db, path, params):
     app = FastAPI()
-    for router in (trading.router, models_api.router, backtests.router):
+    for router in (trading.router, backtests.router):
         app.include_router(router)
     app.dependency_overrides[get_db] = lambda: db
     with TestClient(app) as client:

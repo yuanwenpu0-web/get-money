@@ -31,12 +31,12 @@ def test_backtest_rejects_invalid_parameters(changes):
 
 
 def test_strategy_rejects_invalid_json_values_before_mutation(db):
-    row = StrategyConfig(code="trend_follow", name="test", params="{}", enabled=1)
+    row = StrategyConfig(code="absorption_reversal", name="test", params="{}", enabled=1)
     db.add(row)
     db.commit()
     with pytest.raises(HTTPException):
         update_strategy(
-            "trend_follow",
+            "absorption_reversal",
             StrategyUpdate(enabled=False, params={"risk_per_trade_pct": -1}),
             db,
         )
@@ -84,33 +84,6 @@ def test_dataset_excludes_unclosed_candles_and_resets_at_gaps(monkeypatch):
     ).any()
 
 
-def test_test_partition_cannot_influence_training_or_parameter_selection(
-    db, monkeypatch
-):
-    data = indicators.build_features(prices(), with_label=True).dropna()
-    fits = []
-
-    class Estimator:
-        def fit(self, features, labels):
-            fits.append((features.copy(), labels.copy()))
-
-        def predict_proba(self, features):
-            return np.tile([0.3, 0.7], (len(features), 1))
-
-    monkeypatch.setattr(runner, "_build_estimator", lambda algo: Estimator())
-    monkeypatch.setattr(runner, "build_dataset", lambda *a, **kw: data)
-    first = runner.run_backtest(db, "BTCUSDT", "1m", "ml_ensemble", optimize=True)
-    split = int(len(data) * 0.75)
-    data.iloc[split:, data.columns.get_indexer(["open", "high", "low", "close"])] *= 2
-    data.iloc[split:, data.columns.get_loc("label")] = 1
-    second = runner.run_backtest(db, "BTCUSDT", "1m", "ml_ensemble", optimize=True)
-    assert first["metrics"]["validation"] == second["metrics"]["validation"]
-    pd.testing.assert_frame_equal(fits[0][0], fits[1][0])
-    pd.testing.assert_series_equal(fits[0][1], fits[1][1])
-    assert fits[0][0].index[-1] < data.index[int(len(data) * 0.6) - 5]
-    json.dumps(second, allow_nan=False)
-
-
 def test_supported_long_intervals_have_correct_duration():
     assert interval_ms("4h") == 14_400_000
     assert interval_ms("1d") == 86_400_000
@@ -125,7 +98,7 @@ def test_background_job_passes_selection_and_preserves_json_result(db, monkeypat
     run = BacktestRun(
         symbol="BTCUSDT",
         interval="1m",
-        strategy="ml_ensemble",
+        strategy="absorption_reversal",
         algo="rule",
         status="running",
         params=json.dumps({"optimize": True, "fee": 0.0}),

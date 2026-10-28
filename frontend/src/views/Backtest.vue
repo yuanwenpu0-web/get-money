@@ -35,8 +35,7 @@ const touchedFields = new Set()
 const form = reactive({
   symbol: 'BTCUSDT',
   interval: '1m',
-  strategy: 'ml_ensemble',
-  algo: 'lightgbm',
+  strategy: 'absorption_reversal',
   days: 30,
   initial_cash: 10000,
   fee_pct: 0.04,
@@ -272,7 +271,6 @@ async function submit() {
       symbol: form.symbol,
       interval: form.interval,
       strategy: form.strategy,
-      algo: form.algo,
       days: Number(form.days),
       initial_cash: Number(form.initial_cash),
       fee: Number(form.fee_pct) / 100,
@@ -355,19 +353,7 @@ onBeforeUnmount(() => {
         <div>
           <div class="muted" style="margin-bottom: 4px">策略</div>
           <el-select v-model="form.strategy" style="width: 100%">
-            <el-option label="ML 趋势共振" value="ml_ensemble" />
-            <el-option label="SuperTrend 趋势跟随" value="trend_follow" />
-            <el-option label="RSI 均值回归" value="mean_reversion" />
-            <el-option label="Martin Luk 强势回调" value="strong_pullback" />
             <el-option label="吸收反转" value="absorption_reversal" />
-          </el-select>
-        </div>
-        <div>
-          <div class="muted" style="margin-bottom: 4px">模型</div>
-          <el-select v-model="form.algo" :disabled="form.strategy !== 'ml_ensemble'" style="width: 100%">
-            <el-option label="LightGBM" value="lightgbm" />
-            <el-option label="XGBoost" value="xgboost" />
-            <el-option label="纯规则（不训练）" value="rule" />
           </el-select>
         </div>
         <div>
@@ -411,14 +397,14 @@ onBeforeUnmount(() => {
         <StatCard label="盈利因子" :value="profitFactor(metrics)" sub="总盈利 / 总亏损" />
         <StatCard label="手续费" :value="money(metrics.total_fees)" :tone="pnlClass(-Number(metrics.total_fees || 0))" :sub="`滑点 ${(metrics.slippage * 100).toFixed(3)}% · 费率 ${(metrics.fee_rate * 100).toFixed(3)}%`" />
         <StatCard label="买入持有" :value="pct(metrics.buy_hold_return_pct)" :tone="pnlClass(metrics.buy_hold_return_pct)" sub="测试区间基准" />
-        <StatCard label="回测引擎" :value="metrics.engine === 'sequential' ? '顺序撮合' : metrics.engine" :sub="`${metrics.algo} · ${metrics.signal_bars} 个信号K线`" />
+        <StatCard label="回测引擎" :value="metrics.engine === 'sequential' ? '顺序撮合' : metrics.engine" :sub="`${metrics.signal_bars} 个信号K线`" />
       </div>
 
       <div v-if="comparison.length" class="panel section-gap">
         <div class="panel-head">
           <div>
             <div class="panel-title">样本外对比</div>
-            <div class="panel-sub">两组使用相同数据、模型、撮合与风险限制；基础信号关闭行情和成本过滤。收益差 {{ number(metrics.return_improvement_pct) }} 个百分点</div>
+            <div class="panel-sub">两组使用相同数据、撮合与风险限制；基础信号关闭行情和成本过滤。收益差 {{ number(metrics.return_improvement_pct) }} 个百分点</div>
           </div>
         </div>
         <el-table :data="comparison" class="table-compact">
@@ -518,7 +504,6 @@ onBeforeUnmount(() => {
         <el-table-column prop="symbol" label="币种" width="96" />
         <el-table-column prop="interval" label="周期" width="70" />
         <el-table-column prop="strategy" label="策略" min-width="120" />
-        <el-table-column prop="algo" label="模型" width="90" />
         <el-table-column label="状态" width="90">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" :type="row.status === 'done' ? 'success' : row.status === 'failed' ? 'danger' : 'warning'">{{ row.status }}</el-tag>

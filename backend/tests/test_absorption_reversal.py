@@ -30,7 +30,7 @@ from app.features.absorption import (
 from app.features.indicators import build_features
 from app.models import Order, StrategyConfig
 from app.schemas import BacktestRequest
-from app.strategy.coin_router import MAJOR_SYMBOLS, symbol_allowed
+from app.strategy.coin_universe import MAJOR_SYMBOLS, symbol_allowed
 from app.strategy.defaults import DEFAULT_STRATEGIES, seed_strategies
 from app.strategy.rules import evaluate_signals, resolve_params
 from app.trading import order_manager
@@ -552,12 +552,6 @@ def test_without_be_the_same_path_exits_at_initial_stop():
         10_000.0, 0.0004, 0.0002, "15m",
     )
     assert trades and trades[0]["exit_price"] == pytest.approx(99.0, abs=0.05)
-
-
-def test_other_strategies_unaffected_by_be_default():
-    from app.strategy.rules import resolve_params as _resolve
-
-    assert _resolve("trend_follow", {}, interval="15m").get("be_trigger_r", 0.0) == 0.0
 
 
 def test_manage_order_replays_breakeven(db, monkeypatch):

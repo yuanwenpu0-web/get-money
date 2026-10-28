@@ -181,11 +181,14 @@ def test_evaluate_signals_without_funding_data_does_not_raise():
     from app.features.indicators import build_features
 
     data = build_features(frame)
-    params = resolve_params("funding_extreme", {})
-    result = evaluate_signals(data, "funding_extreme", params)
-    assert (result.direction == 0).all()  # 无数据不出信号
-    # 指标预热期之外的行必须明确报资金费数据缺失，而不是静默无信号
-    assert result.block_reason.iloc[-1] == "funding_data_missing"
+    params = resolve_params("absorption_reversal", {})
+    result = evaluate_signals(data, "absorption_reversal", params)
+    # 无资金费数据不影响本策略的出信号路径：这里要么没信号，要么被明确记录原因，
+    # 关键是调用不抛异常、也不会把 zscore=0 当成「资金费极值」。
+    assert set(result.block_reason) <= {
+        "no_absorption_signal", "invalid_indicators", "funding_filter_long",
+        "funding_filter_short", "cost_filter", "below_threshold", "",
+    }
 
 
 # ---------- funding_snapshot ----------

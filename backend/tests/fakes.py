@@ -7,8 +7,19 @@ import json
 from types import SimpleNamespace
 
 from app.market.futures import BinanceApiError
-from app.models import Order
+from app.models import Order, StrategyConfig
 from app.trading import live
+
+# 本仓库只剩一套策略，它的默认参数是 scripts 移植口径（1 倍杠杆 / 30% 名义）。
+# 期货链路要测的是交易所取整、保护单与回滚，不应被策略默认杠杆牵连，
+# 因此统一把 unrealistic 权限放宽回测试期望的通用档位。
+EXECUTION_TEST_PARAMS = {
+    "max_leverage": 10,
+    "base_position_pct": 0.25,
+    "max_position_pct": 0.25,
+    "cooldown_bars": 10,
+    "risk_per_trade_pct": 0.005,   # 策略默认 0.02 会放宽风险预算，这里退回全局默认
+}
 
 
 def signal(**overrides):
@@ -23,7 +34,7 @@ def signal(**overrides):
                 tp=103.0,
                 leverage=10,
                 position_pct=0.25,
-                strategy="trend_follow",
+                strategy="absorption_reversal",
                 score=1.0,
                 prob_up=0.8,
             )
@@ -46,10 +57,21 @@ def live_order(**overrides):
         tp=103.0,
         status="OPEN",
         source="live",
-        strategy="trend_follow",
+        strategy="absorption_reversal",
         note=json.dumps({"exchange_order_id": 100, "sl_order_id": 101, "tp_order_id": 102}),
     )
     return Order(**(defaults | overrides))
+
+
+def seed_strategy_params(db, code="absorption_reversal", **overrides):
+    """给指定策略写一份「测试档」参数，避免策略默认（1 倍杠杆/零冷却）掩盖被测行为。"""
+    row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
+    params = json.dumps({**EXECUTION_TEST_PARAMS, **overrides}, ensure_ascii=False)
+    if row is None:
+        db.add(StrategyConfig(code=code, name=code, description="", enabled=1, params=params))
+    else:
+        row.params = params
+    db.commit()
 
 
 def market_orders(fake):
@@ -57,6 +79,7 @@ def market_orders(fake):
 
 
 def patch_live(db, monkeypatch, fake):
+    seed_strategy_params(db)
     monkeypatch.setattr(live, "load_credentials", lambda session: ("key", "secret"))
     monkeypatch.setattr(live, "BinanceFuturesClient", lambda *args, **kwargs: fake)
 

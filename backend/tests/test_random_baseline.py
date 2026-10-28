@@ -17,7 +17,7 @@ from app.strategy.rules import resolve_params
 
 def params(**kwargs):
     return resolve_params(
-        "trend_follow",
+        "absorption_reversal",
         {},
         {"risk_per_trade_pct": 0.02, "trailing_enabled": False, **kwargs},
     )
@@ -197,7 +197,7 @@ def test_zero_trade_boundary_does_not_break_metrics():
 def test_run_backtest_exposes_random_baseline_and_exposure(db, monkeypatch):
     data = indicators.build_features(prices(), with_label=True).dropna()
     monkeypatch.setattr(runner, "build_dataset", lambda *a, **kw: data)
-    result = runner.run_backtest(db, "BTCUSDT", "1m", "trend_follow")
+    result = runner.run_backtest(db, "BTCUSDT", "1m", "absorption_reversal")
     metrics = result["metrics"]
     for group in ("baseline", "random_baseline"):
         assert group in metrics

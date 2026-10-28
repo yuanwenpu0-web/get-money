@@ -12,11 +12,11 @@ from ..db import get_db
 from ..features.indicators import HAS_PTA, HAS_TALIB
 from ..market.data_service import MarketDataService
 from ..market.futures import BinanceFuturesClient
-from ..models import Credential, JobLog, ModelRecord, StrategyConfig, utcnow
+from ..models import Credential, JobLog, StrategyConfig, utcnow
 from ..schemas import CapitalAdjust, CredentialsPayload, SettingsUpdate
 from ..security import decrypt, encrypt, mask
 from ..state import all_state, set_state
-from ..strategy.rules import resolve_params
+from ..strategy.rules import STRATEGY_PARAMS, resolve_params
 from ..trading.portfolio import adjust_capital
 from ..trading.scheduler import scheduler, update_schedule
 
@@ -31,11 +31,7 @@ EDITABLE_KEYS = {
     "cooldown_bars", "trailing_enabled", "trail_activation_atr", "max_signal_age_bars",
     "min_quote_volume_usd", "symbol_blacklist", "risk_halt", "risk_halt_reason",
     "max_drawdown_halt_pct", "consecutive_loss_halt", "order_type",
-    "schedule_enabled", "schedule_seconds", "train_horizon", "auto_train_days",
-    "metrics_assist_enabled",
-    # 迭代9：持续训练与晋升门禁
-    "auto_train_enabled", "auto_train_interval_hours", "auto_train_top_n", "auto_train_workers",
-    "ml_min_auc", "ml_promote_rounds", "ml_auto_enable",
+    "schedule_enabled", "schedule_seconds", "train_horizon",
 }
 
 
@@ -102,21 +98,6 @@ def _validate(payload: dict, db: Session | None = None) -> None:
         raise HTTPException(400, "order_type 仅支持 market / limit_maker")
     if "risk_halt" in payload and not isinstance(payload["risk_halt"], bool):
         raise HTTPException(400, "risk_halt 必须为布尔值")
-    if "metrics_assist_enabled" in payload and not isinstance(payload["metrics_assist_enabled"], bool):
-        raise HTTPException(400, "metrics_assist_enabled 必须为布尔值")
-    for key in ("auto_train_enabled", "ml_auto_enable"):
-        if key in payload and not isinstance(payload[key], bool):
-            raise HTTPException(400, f"{key} 必须为布尔值")
-    for key, (low, high) in (("auto_train_interval_hours", (1, 720)),
-                             ("auto_train_top_n", (1, 50)),
-                             ("auto_train_workers", (1, 8)),
-                             ("ml_promote_rounds", (1, 10))):
-        if key in payload:
-            value = payload[key]
-            if isinstance(value, bool) or not isinstance(value, int):
-                raise HTTPException(400, f"{key} 必须为整数")
-            if not low <= value <= high:
-                raise HTTPException(400, f"{key} 超出允许范围 [{low}, {high}]")
     if "min_quote_volume_usd" in payload:
         volume = payload["min_quote_volume_usd"]
         if isinstance(volume, bool) or not isinstance(volume, int) or volume < 0:
@@ -150,10 +131,8 @@ def _validate(payload: dict, db: Session | None = None) -> None:
         "max_hold_bars": (0, 100000),
         "schedule_seconds": (10, 3600),
         "train_horizon": (1, 60),
-        "auto_train_days": (7, 365),
         "max_drawdown_halt_pct": (0, 1),
         "consecutive_loss_halt": (0, 1000),
-        "ml_min_auc": (0.5, 0.9),
     }
     for key, (low, high) in ranges.items():
         if key in payload:
@@ -183,7 +162,6 @@ def read_settings(db: Session = Depends(get_db), include_stats: bool = True):
         "data_stats": stats,
         "data_stats_count": len(stats) if include_stats else service.stats_count(),
         "features": {"talib": HAS_TALIB, "pandas_ta": HAS_PTA, "vectorbt": HAS_VBT},
-        "model_count": db.query(ModelRecord).filter(ModelRecord.status == "ready").count(),
         "intervals": SUPPORTED_INTERVALS,
     }
 
@@ -197,10 +175,13 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     merged = {**all_state(db), **data}
     _validate({key: value for key, value in merged.items() if key in EDITABLE_KEYS}, db)
     try:
-        for code in ('ml_ensemble', 'trend_follow', 'mean_reversion', 'mtf_resonance', 'strong_pullback', 'absorption_reversal'):
+        # 校验目标是「已登记的策略」：默认代码 + 库里真实存在的策略配置行
+        for code in STRATEGY_PARAMS:
             resolve_params(code, merged)
+        known_codes = set(STRATEGY_PARAMS)
         for strategy in db.query(StrategyConfig).all():
-            resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
+            if strategy.code in known_codes:
+                resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     for key, value in data.items():

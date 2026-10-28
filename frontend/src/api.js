@@ -52,15 +52,6 @@ export default {
 
   getStrategies: () => http.get('/strategies'),
   updateStrategy: (code, payload) => http.put(`/strategies/${code}`, payload),
-  getLocalStrategies: () => http.get('/local-strategies'),
-  updateLocalStrategy: (code, payload) => http.put(`/local-strategies/${code}`, payload),
-  getTradingViewStrategies: () => http.get('/tradingview-strategies'),
-  getTradingViewStrategy: (id) => http.get('/tradingview-strategies/' + encodeURIComponent(id)),
-  runTradingViewBacktest: (id, payload) => http.post('/tradingview-strategies/' + encodeURIComponent(id) + '/backtest', payload),
-
-  getModels: (params) => http.get('/models', { params }),
-  trainModel: (payload) => http.post('/models/train', payload),
-  deleteModel: (id) => http.delete(`/models/${id}`),
 
   createBacktest: (payload) => http.post('/backtests', payload),
   listBacktests: (params) => http.get('/backtests', { params }),

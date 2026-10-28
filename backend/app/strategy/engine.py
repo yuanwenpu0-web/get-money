@@ -9,48 +9,18 @@ from sqlalchemy.orm import Session
 
 from ..features.absorption import add_absorption_context, load_lower_tf_delta
 from ..features.indicators import build_features
-from ..features.mtf import add_mtf_trend
-from ..features.pullback import add_pullback_context
 from ..market.data_service import MarketDataService
-from ..ml.predictor import latest_model, predict_row
 from ..market import metrics as metrics_mod
 from ..models import Signal, StrategyConfig
 from ..state import all_state
 from ..utils import interval_ms, now_ms, round_price
-from .coin_router import get_route
 from .rules import evaluate_signals, resolve_params
-
-# 需要额外多周期上下文的策略（引擎负责整帧富化，规则层只读末根）
-CONTEXT_CODES = ("mtf_resonance", "strong_pullback", "absorption_reversal")
-# 强回调的 15m 回看长度：1200 根 = 300 小时 ≈ 75 个 4h 桶，足够 4h ADX(14) 与 ema50 预热
-PULLBACK_LOOKBACK = 1200
 
 
 def _absorption_lookback(params: dict) -> int:
     """吸收反转的回看长度：|delta| 百分位需要 delta_window 根窗口，EMA(trend_len) 需约 3×跨度预热。
     取两者的较大者并留 1200 根底线，避免交易日不足时百分位/EMA 在末根仍失真。"""
     return max(1200, int(params.get("delta_window", 500)) + 3 * int(params.get("trend_len", 200)))
-
-
-def _pullback_reason(row) -> dict:
-    """强回调信号的观测快照：4h 趋势强度、EMA9/AVWAP 位置与回调进度（不影响决策）。"""
-    def value(name):
-        try:
-            number = float(row[name])
-        except (KeyError, TypeError, ValueError):
-            return 0.0
-        return number if math.isfinite(number) else 0.0
-
-    return {
-        "pb_htf_dir": value("pb_dir_4h"),
-        "pb_htf_adx": value("pb_adx_4h"),
-        "ema9": round_price(value("ema9")),
-        "avwap": round_price(value("avwap")),
-        "avwap_dist": round(value("avwap_dist"), 6),
-        "bars_since_touch": value("pb_bars_since_touch"),
-        "pullback_depth": round(value("pb_depth"), 6),
-        "structure_stop": round_price(value("pb_stop_ref")),
-    }
 
 
 def _absorption_reason(row) -> dict:
@@ -148,42 +118,26 @@ class StrategyEngine:
         return build_features(frame, with_label=False, funding=funding)
 
     def evaluate(
-        self, symbol: str, interval: str, strategy_code: str | None, save: bool = False
+        self, symbol: str, interval: str, strategy_code: str, save: bool = False
     ) -> TradeSignal | None:
-        """评估单个 symbol 的策略信号。
+        """评估单个 symbol 上指定策略的信号（策略必须显式给出）。
 
-        strategy_code=None 或 "auto" 时启用币级路由 — 按 symbol 查表选最优策略+参数。
-        显式指定 strategy_code 时（UI 手动选 / 已在执行的订单）路由不介入，行为与历史一致。
+        历史版本支持 strategy_code="auto"/None 走币级路由在多策略间挑选；仓库收敛到
+        单一策略后该层已删除，调用方一律显式传入策略代码。
         """
-        # --- 币级路由（仅 auto/None 触发） ---
-        use_route = strategy_code in (None, "auto")
-        route_params: dict = {}
-        if use_route:
-            route = get_route(symbol)
-            if route is None:
-                return None  # 黑名单 / 宇宙外 → 不产生信号
-            strategy_code = route["strategy"]
-            route_params = route.get("params", {})
-
+        if strategy_code in (None, "auto"):
+            return None
         config = self._get_config(strategy_code)
         if config is not None and not config.enabled:
             return None
-        # 合并：DB 里 StrategyConfig.params 为主，路由 params 作为补充
         merged_params = json.loads(config.params or "{}") if config else {}
-        for k, v in route_params.items():
-            merged_params.setdefault(k, v)  # DB 参数优先级更高
         state = self._get_state()
         params = resolve_params(
             strategy_code, state, merged_params or None,
             interval=interval,
         )
-        # 强回调要 4h 上下文：15m 下 400 根只有 100 小时（≈25 个 4h 桶），
-        # 不足以让 4h ADX(14) 稳定预热，故按策略加长回看窗口。
-        limit = 400
-        if strategy_code == "strong_pullback":
-            limit = PULLBACK_LOOKBACK
-        elif strategy_code == "absorption_reversal":
-            limit = _absorption_lookback(params)
+        # 吸收上下文：|delta| 百分位要 delta_window 根窗口、EMA(trend_len) 要 3 倍跨度预热
+        limit = _absorption_lookback(params)
         key = (symbol, interval, limit)
         if self.cycle_snapshot:
             if key not in self._features:
@@ -197,23 +151,17 @@ class StrategyEngine:
             data = self._prepare_features(symbol, interval, limit)
         if data is None:
             return None
-        # 只有多周期策略消费这些列，其他策略直接复用基础指标。
-        if strategy_code in CONTEXT_CODES:
-            context_key = (symbol, interval, strategy_code)
-            if self.cycle_snapshot and context_key in self._mtf_features:
-                data = self._mtf_features[context_key]
-            else:
-                if strategy_code == "mtf_resonance":
-                    data = add_mtf_trend(data)
-                elif strategy_code == "absorption_reversal":
-                    # 优先用脚本的 lower-tf intrabar delta；拿不到数据自动降级 bar shape 估计
-                    data = add_absorption_context(
-                        data, params, load_lower_tf_delta(self.service, symbol, data.index)
-                    )
-                else:
-                    data = add_pullback_context(data, params)
-                if self.cycle_snapshot:
-                    self._mtf_features[context_key] = data
+        # 吸收上下文整帧富化：delta / 滚动百分位 / c1..c5 / 确认状态机（纯因果）
+        context_key = (symbol, interval)
+        if self.cycle_snapshot and context_key in self._mtf_features:
+            data = self._mtf_features[context_key]
+        else:
+            # 优先用脚本的 lower-tf intrabar delta；拿不到数据自动降级 bar shape 估计
+            data = add_absorption_context(
+                data, params, load_lower_tf_delta(self.service, symbol, data.index)
+            )
+            if self.cycle_snapshot:
+                self._mtf_features[context_key] = data
         step = interval_ms(interval)
         row = data.iloc[-1]
         if not all(
@@ -225,25 +173,14 @@ class StrategyEngine:
             row["open"], row["close"], row["high"]
         ):
             return None
-        probability, model = None, None
-        if strategy_code == "ml_ensemble":
-            model = latest_model(self.db, symbol, interval)
-            if model is not None:
-                probability = pd.Series(
-                    [predict_row(model, row)], index=data.index[-1:]
-                )
-        # 观测接入：附加最新多源指标特征（迭代 7）。开关关闭时仅附带、不改变决策；
-        # 开关开启时把特征作为 market_context 透传给规则引擎（当前规则不消费，行为不变）。
+        # 观测接入：把最新多源指标快照附在 reason 上（迭代 7 采集），不影响任何决策。
         if self.cycle_snapshot:
             if symbol not in self._metrics:
                 self._metrics[symbol] = metrics_mod.load_latest_metrics(self.db, symbol) or {}
             metrics_features = self._metrics[symbol]
         else:
             metrics_features = metrics_mod.load_latest_metrics(self.db, symbol) or {}
-        decision = evaluate_signals(
-            data.iloc[-1:], strategy_code, params, probability,
-            market_context=metrics_features if state.get("metrics_assist_enabled") else None,
-        ).iloc[0]
+        decision = evaluate_signals(data.iloc[-1:], strategy_code, params).iloc[0]
         ts = int(data.index[-1].timestamp() * 1000)
         stale = now_ms() - (ts + step) > params["max_signal_age_bars"] * step
         direction = 0 if stale else int(decision.direction)
@@ -275,15 +212,8 @@ class StrategyEngine:
                 "net_reward_risk": float(decision.net_reward_risk)
                 if math.isfinite(float(decision.net_reward_risk))
                 else 0.0,
-                "model_id": model.id if model is not None else 0,
-                "algo": model.algo if model is not None else "rule",
                 "metrics": metrics_features,  # 观测用多源指标快照（附件，不影响决策）
-                **(_pullback_reason(row) if strategy_code == "strong_pullback" else {}),
-                **(
-                    _absorption_reason(row)
-                    if strategy_code == "absorption_reversal"
-                    else {}
-                ),
+                **_absorption_reason(row),
             },
         )
         if save:

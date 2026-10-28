@@ -105,100 +105,15 @@ test('Orders refreshes a valid previous page when the last page becomes empty', 
   assert.equal(subject.orders.value[0].id, 1)
 })
 
-test('Models requests a bounded page and counts all available models', async () => {
-  const requests = []
-  const subject = view('Models', {
-    getModels: async (params) => {
-      requests.push({ ...params })
-      return page({ models: [{ id: params.page }] }, 67, params.page, params.page_size)
-    },
-  }, ['loadModels', 'models', 'pagination', 'changePage', 'changePageSize'])
-  await subject.loadModels()
-  assert.deepEqual(requests[0], { page: 1, page_size: 20 })
-  assert.equal(subject.pagination.total, 67)
-  assert.equal(subject.models.value.length, 1)
-  await subject.changePage(3)
-  assert.deepEqual(requests.at(-1), { page: 3, page_size: 20 })
-  await subject.changePageSize(50)
-  assert.deepEqual(requests.at(-1), { page: 1, page_size: 50 })
-})
-
-test('Models drops obsolete responses and fetches the most recently selected page', async () => {
-  const requests = []
-  const subject = view('Models', {
-    getModels: (params) => {
-      const response = deferred()
-      requests.push({ params, ...response })
-      return response.promise
-    },
-  }, ['loadModels', 'models', 'pagination', 'changePage'])
-  const pending = subject.loadModels()
-  subject.changePage(2)
-  subject.changePage(3)
-  requests[0].resolve(page({ models: [{ id: 1 }] }, 80, 1, 20))
-  await tick()
-  assert.equal(subject.models.value.length, 0)
-  assert.equal(requests.length, 2)
-  assert.equal(requests[1].params.page, 3)
-  requests[1].resolve(page({ models: [{ id: 3 }] }, 80, 3, 20))
-  await pending
-  assert.equal(subject.models.value[0].id, 3)
-})
-
-test('Models deletion refreshes its current page and recovers from deleting the last row', async () => {
-  let total = 21
-  const requests = []
-  const subject = view('Models', {
-    getModels: async (params) => {
-      requests.push({ ...params })
-      const start = (params.page - 1) * params.page_size
-      const models = Array.from({ length: Math.max(0, Math.min(params.page_size, total - start)) }, (_, index) => ({ id: start + index + 1 }))
-      return page({ models }, total, params.page, params.page_size)
-    },
-    deleteModel: async () => { total -= 1 },
-  }, ['loadModels', 'models', 'pagination', 'remove'])
-  subject.pagination.page = 2
-  await subject.loadModels()
-  assert.equal(subject.models.value.length, 1)
-  await subject.remove({ id: 21, symbol: 'BTCUSDT', algo: 'lightgbm' })
-  assert.deepEqual(requests.map((params) => params.page), [2, 2, 1])
-  assert.equal(subject.pagination.page, 1)
-  assert.equal(subject.pagination.total, 20)
-  assert.equal(subject.models.value.length, 20)
-})
-
-test('Models retains its current page after an ordinary refresh and supports legacy mock responses', async () => {
+test('Unloading the order list stops a queued page request and ignores the in-flight response', async () => {
+  const response = deferred()
   let requests = 0
-  const subject = view('Models', {
-    getModels: async (params) => {
-      requests += 1
-      return page({ models: [{ id: 99 }] }, 80, params.page, params.page_size)
-    },
-  }, ['loadModels', 'models', 'pagination', 'refreshModels'])
-  subject.pagination.page = 3
-  await subject.loadModels()
-  await subject.refreshModels()
-  assert.equal(subject.pagination.page, 3)
-  assert.equal(requests, 2)
-  const legacy = view('Models', { getModels: async () => ({ models: [{ id: 1 }, { id: 2 }] }) }, ['loadModels', 'pagination'])
-  await legacy.loadModels()
-  assert.equal(legacy.pagination.total, 2)
-})
-
-test('Unloading either list stops a queued page request and ignores the in-flight response', async () => {
-  for (const name of ['Orders', 'Models']) {
-    const response = deferred()
-    let requests = 0
-    const key = name === 'Orders' ? 'orders' : 'models'
-    const loader = name === 'Orders' ? 'load' : 'loadModels'
-    const method = name === 'Orders' ? 'getOrders' : 'getModels'
-    const subject = view(name, { [method]: () => { requests += 1; return response.promise } }, [loader, key, 'changePage'])
-    const pending = subject[loader]()
-    subject.changePage(2)
-    subject.unmount()
-    response.resolve(page({ [key]: [{ id: 1 }] }, 60, 1, 20))
-    await pending
-    assert.equal(requests, 1)
-    assert.equal(subject[key].value.length, 0)
-  }
+  const subject = view('Orders', { getOrders: () => { requests += 1; return response.promise } }, ['load', 'orders', 'changePage'])
+  const pending = subject.load()
+  subject.changePage(2)
+  subject.unmount()
+  response.resolve(page({ orders: [{ id: 1 }] }, 60, 1, 20))
+  await pending
+  assert.equal(requests, 1)
+  assert.equal(subject.orders.value.length, 0)
 })

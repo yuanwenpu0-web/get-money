@@ -30,7 +30,6 @@ def _execute(run_id: int) -> None:
             run.symbol,
             run.interval,
             run.strategy,
-            algo=run.algo,
             days=int(params.get("days", 30)),
             initial_cash=params.get("initial_cash"),
             fee=params.get("fee"),
@@ -60,7 +59,7 @@ def create_backtest(payload: BacktestRequest, db: Session = Depends(get_db)):
         symbol=payload.symbol.upper(),
         interval=payload.interval,
         strategy=payload.strategy,
-        algo=payload.algo,
+        algo="rule",
         status="running",
         params=json.dumps(payload.model_dump(), ensure_ascii=False),
     )

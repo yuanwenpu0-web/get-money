@@ -44,8 +44,6 @@ const form = reactive({
   cooldown_bars: 10,
   trail_activation_atr: 1.5,
   train_horizon: 5,
-  auto_train_days: 40,
-  auto_train_workers: 2,
   schedule_enabled: true,
   schedule_seconds: 60,
 })
@@ -82,8 +80,6 @@ function applySettings(data) {
   form.cooldown_bars = data.cooldown_bars ?? 10
   form.trail_activation_atr = data.trail_activation_atr ?? 1.5
   form.train_horizon = data.train_horizon ?? 5
-  form.auto_train_days = data.auto_train_days ?? 40
-  form.auto_train_workers = data.auto_train_workers ?? 2
   form.schedule_enabled = Boolean(data.schedule_enabled)
   form.schedule_seconds = Number(data.schedule_seconds || 60)
   credentialForm.testnet = Boolean(data.testnet)
@@ -145,8 +141,6 @@ async function saveSettings() {
       cooldown_bars: Number(form.cooldown_bars),
       trail_activation_atr: Number(form.trail_activation_atr),
       train_horizon: Number(form.train_horizon),
-      auto_train_days: Number(form.auto_train_days),
-      auto_train_workers: Number(form.auto_train_workers),
       schedule_enabled: form.schedule_enabled,
       schedule_seconds: Number(form.schedule_seconds),
     }
@@ -510,17 +504,9 @@ onBeforeUnmount(() => { disposed = true })
               <el-input-number v-model="form.slippage_pct" :min="0" :max="1" :step="0.01" :precision="4" style="width: 100%" />
             </div>
             <div>
-              <div class="muted" style="margin-bottom: 4px">训练预测跨度</div>
+              <div class="muted" style="margin-bottom: 4px">回测切分隔离跨度</div>
               <el-input-number v-model="form.train_horizon" :min="1" :max="60" style="width: 100%" />
-            </div>
-            <div>
-              <div class="muted" style="margin-bottom: 4px">训练数据天数</div>
-              <el-input-number v-model="form.auto_train_days" :min="7" :max="365" style="width: 100%" />
-            </div>
-            <div>
-              <div class="muted" style="margin-bottom: 4px">自动训练并发数</div>
-              <el-input-number v-model="form.auto_train_workers" :min="1" :max="8" style="width: 100%" />
-              <div class="form-hint">默认 2；实际并发按 CPU 数量限制，内存较小时可设为 1。</div>
+              <div class="form-hint">训练段与测试段之间隔离的K线根数。</div>
             </div>
           </div>
           <div class="row" style="margin-top: 12px">

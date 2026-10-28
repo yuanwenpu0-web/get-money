@@ -19,7 +19,7 @@ def signal(**overrides):
                 tp=103.0,
                 leverage=10,
                 position_pct=0.25,
-                strategy="trend_follow",
+                strategy="absorption_reversal",
                 score=1.0,
                 prob_up=0.8,
             )
@@ -29,6 +29,12 @@ def signal(**overrides):
 
 
 def test_paper_stop_loss_respects_fee_inclusive_risk(db):
+    from app.models import StrategyConfig
+
+    # 吸收反转默认无冷却（脚本没有该闸门）；本用例单独配置冷却来验证撮合侧闸门
+    db.add(StrategyConfig(code="absorption_reversal", name="吸收反转", enabled=1,
+                          params='{"cooldown_bars": 10}'))
+    db.commit()
     order = paper.open_position(db, signal())
     assert order is not None
     closed = paper.close_position(db, order, order.sl, "stop_loss")
@@ -63,7 +69,7 @@ def test_order_does_not_replay_pre_entry_candle_or_same_candle(db, monkeypatch):
         leverage=1,
         sl=99.0,
         tp=105.0,
-        strategy="trend_follow",
+        strategy="absorption_reversal",
         status="OPEN",
         created_at=start.to_pydatetime(),
     )
@@ -112,15 +118,15 @@ def test_signal_engine_matches_shared_rules_and_blocks_stale(db, monkeypatch):
     monkeypatch.setattr(engine.MarketDataService, "load_frame", lambda *a, **k: frame)
     timestamp = int(index[-1].timestamp() * 1000) + 60000
     monkeypatch.setattr(engine, "now_ms", lambda: timestamp)
-    result = engine.StrategyEngine(db).evaluate("BTCUSDT", "1m", "trend_follow")
+    result = engine.StrategyEngine(db).evaluate("BTCUSDT", "1m", "absorption_reversal")
     shared = evaluate_signals(
         build_features(frame).iloc[-1:],
-        "trend_follow",
-        resolve_params("trend_follow", {}),
+        "absorption_reversal",
+        resolve_params("absorption_reversal", {}),
     ).iloc[0]
     assert result.direction == {0: "FLAT", 1: "LONG", -1: "SHORT"}[shared.direction]
     assert result.position_pct == pytest.approx(shared.position_pct)
     monkeypatch.setattr(engine, "now_ms", lambda: timestamp + 300000)
-    stale = engine.StrategyEngine(db).evaluate("BTCUSDT", "1m", "trend_follow")
+    stale = engine.StrategyEngine(db).evaluate("BTCUSDT", "1m", "absorption_reversal")
     assert stale.direction == "FLAT"
     assert stale.reason["block_reason"] == "stale_data"
