@@ -1,0 +1,17 @@
+[
+  {
+    "path": "mvrv_regime_monitor.pine",
+    "kind": "indicator",
+    "title": "MVRV Regime Monitor",
+    "title_zh": "比特币 MVRV 市场阶段监测",
+    "original_description": "Pulls `INTOTHEBLOCK:BTC_MVRV` (free TradingView feed) on the daily timeframe",
+    "description_zh": "从日线数据源 INTOTHEBLOCK:BTC_MVRV 获取比特币 MVRV 指标。",
+    "crypto_relevance": "比特币专用；作者表示不应推广至山寨币。",
+    "implementation_note_zh": "需要 TradingView 的 INTOTHEBLOCK:BTC_MVRV 数据；指标提供市场阶段提示，不是买卖信号。作者的回测结果未经独立验证。",
+    "source_url": "https://github.com/lonelyobserver0/mvrv-regime-monitor/blob/6f3e0b58c5ae19ca6317247aa4cdecd9336c90be/mvrv_regime_monitor.pine",
+    "description_source_url": "https://github.com/lonelyobserver0/mvrv-regime-monitor/blob/6f3e0b58c5ae19ca6317247aa4cdecd9336c90be/README.md",
+    "source_commit": "6f3e0b58c5ae19ca6317247aa4cdecd9336c90be",
+    "license": "MIT（另附金融风险声明）",
+    "sha256": "a33b6f78aeb12dd2dffdd0f8ecb35c96d49e7e5b40581117e903d89317db180c"
+  }
+]

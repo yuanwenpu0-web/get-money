@@ -1,0 +1,51 @@
+[
+  {
+    "path": "SK_Current_Day_POC_VAH_VAL.pine",
+    "kind": "indicator",
+    "title": "[ad] Current Day POC / VAH / VAL v1.0",
+    "title_zh": "当日成交量分布控制点及价值区上下界",
+    "original_description": "draws a developing current-day POC, VAH, and VAL on intraday charts. The default profile day is the full UTC day for 24/7 crypto markets.",
+    "description_zh": "在日内图上绘制不断变化的当日控制点（POC）及价值区上下界（VAH、VAL）。默认使用完整 UTC 日，适用于全天候加密货币市场。",
+    "crypto_relevance": "作者明确说明默认日周期适用于全天候加密市场。",
+    "description_source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/README.md",
+    "source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/SK_Current_Day_POC_VAH_VAL.pine",
+    "source_commit": "6462d70730e28488cea8ffbc910650efac69d305",
+    "sha256": "58a027b06ca8ca6fde0ae7c379dbc3882caa177c272b4156a23b5677588cb8f9",
+    "license": "MIT",
+    "author": "Amadeusz",
+    "additional_original_description": "The profile is an approximation based on chart-bar volume distributed across configurable price rows. It can differ from TradingView's built-in Volume Profile, which can use finer intrabar data.",
+    "additional_description_zh": "该成交量分布使用图表 K 线成交量近似计算，可能与能使用更细粒度数据的 TradingView 内置成交量分布不同。"
+  },
+  {
+    "path": "SK_MTF_Nearest_Support_Resistance.pine",
+    "kind": "indicator",
+    "title": "[ad] MTF Nearest Support / Resistance v1.0",
+    "title_zh": "多周期最近支撑与阻力（通用指标）",
+    "original_description": "shows the nearest confirmed pivot support below price and resistance above price from up to three selected source timeframes. It is intentionally separate from the main SFP indicator.",
+    "description_zh": "从最多三个选定的来源周期显示价格下方最近的已确认枢轴支撑和价格上方最近的已确认枢轴阻力；它与主 SFP 指标相互独立。",
+    "crypto_relevance": "通用指标：作者未单独声明该脚本专用于加密市场。",
+    "description_source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/README.md",
+    "source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/SK_MTF_Nearest_Support_Resistance.pine",
+    "source_commit": "6462d70730e28488cea8ffbc910650efac69d305",
+    "sha256": "790a53600a60b12372add63602f17d2e560df50d997d796e1a541a13afec58bc",
+    "license": "MIT",
+    "author": "Amadeusz"
+  },
+  {
+    "path": "SK_SFP_Najblizsze_Poziomy.pine",
+    "kind": "indicator",
+    "title": "[ad] SFP + FVG / IFVG v5.17",
+    "title_zh": "SFP 流动性扫单与 FVG / IFVG 区域",
+    "original_description": "no directional RAW/CONF signal lines on CRYPTOCAP market-cap indices such as TOTAL, while blue SFP context and FVG/IFVG zones remain visible,",
+    "description_zh": "对于 TOTAL 等 CRYPTOCAP 市值指数，不显示方向性的 RAW/CONF 信号线，但蓝色 SFP 背景和 FVG/IFVG 区域仍然可见。",
+    "crypto_relevance": "作者明确说明该脚本在 CRYPTOCAP 市值指数上的显示行为。",
+    "description_source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/README.md",
+    "source_url": "https://github.com/amadeo987/sfp-fvg-indicator/blob/6462d70730e28488cea8ffbc910650efac69d305/SK_SFP_Najblizsze_Poziomy.pine",
+    "source_commit": "6462d70730e28488cea8ffbc910650efac69d305",
+    "sha256": "7fbe82192b84a2650df45503726c444f93b5905014d143d8fb216b1b3d930d04",
+    "license": "MIT",
+    "author": "Amadeusz",
+    "additional_original_description": "the compact `SFP? → SFP → RAW → CONF` liquidity-sweep hierarchy,",
+    "additional_description_zh": "包含 SFP? → SFP → RAW → CONF 的流动性扫单层级。"
+  }
+]

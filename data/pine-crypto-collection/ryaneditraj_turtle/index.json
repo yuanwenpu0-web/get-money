@@ -1,0 +1,16 @@
+[
+  {
+    "path": "pinescript/turtle_dennis_breakout.pine",
+    "kind": "strategy",
+    "title_zh": "海龟唐奇安突破策略",
+    "original_description": "// Markets/TFs: Liquid futures, FX majors, crypto majors, liquid ETFs (SPY).\n// Prefer Daily; 4H OK on majors. Avoid illiquid names.",
+    "description_zh": "作者建议用于流动性较好的期货、主要外汇、主要加密货币和流动性较好的 ETF；优先日线，主要品种也可使用 4 小时周期。",
+    "crypto_relevance": "作者在源码中将主要加密货币列为适用市场之一；策略并非仅针对加密。",
+    "notes": "该脚本是通用海龟突破策略，并非仓库中的 BTC 雷达 Python 程序；默认允许加仓，手续费及滑点参数需按实际交易场所核对。作者的效果描述未经独立验证。",
+    "source_url": "https://github.com/ryaneditraj/trading-ai/blob/e448b988caa30fbd090dd8f75bb4bef4d3dc9feb/pinescript/turtle_dennis_breakout.pine",
+    "description_source_url": "https://github.com/ryaneditraj/trading-ai/blob/e448b988caa30fbd090dd8f75bb4bef4d3dc9feb/pinescript/turtle_dennis_breakout.pine",
+    "source_commit": "e448b988caa30fbd090dd8f75bb4bef4d3dc9feb",
+    "license": "MIT",
+    "sha256": "25ab4ff55e3fb0b8599c94554f765baa626479b1894e3247ec1c80e2f96104e4"
+  }
+]

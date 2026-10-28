@@ -1,0 +1,17 @@
+[
+  {
+    "path": "asymmetric-coinbase-premium-indicator-tradingview.sh",
+    "kind": "indicator",
+    "title_zh": "Coinbase 与 Binance 溢价指标",
+    "original_description": "// Calculate the premium (absolute and percentage)",
+    "description_zh": "计算价差的绝对值与百分比。",
+    "crypto_relevance": "源码根据图表基础币种构造 Coinbase 美元与 Binance USDT 交易对，例如 BTC。",
+    "notes": "原文件扩展名为 .sh，实际为 Pine v5。需要两个交易所对应行情；比较 USD 与 USDT 报价，稳定币偏离和数据可用性可能影响结果。作者在 Gist 评论声明 MIT 与 Apache 2.0 双许可，原文件未附许可全文；未经 TradingView 编译。",
+    "source_url": "https://gist.github.com/joemccann/716d647941a4c018eb1f2da0d54a812c/4cb29e6b5a658d45b1203d2becce191bd7244290",
+    "description_source_url": "https://gist.github.com/joemccann/716d647941a4c018eb1f2da0d54a812c/4cb29e6b5a658d45b1203d2becce191bd7244290",
+    "license_source_url": "https://gist.github.com/joemccann/716d647941a4c018eb1f2da0d54a812c?permalink_comment_id=5372099",
+    "source_commit": "4cb29e6b5a658d45b1203d2becce191bd7244290",
+    "license": "作者评论声明 MIT / Apache 2.0 双许可",
+    "sha256": "408f38996372f9554144a6f158ac4d223956aef01dd58905b8c1e5b5667b97e2"
+  }
+]

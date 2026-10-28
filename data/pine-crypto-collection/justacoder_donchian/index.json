@@ -1,0 +1,16 @@
+[
+  {
+    "path": "donchian_breakout.pine",
+    "title_zh": "唐奇安通道突破与 ATR 风险管理策略",
+    "kind": "strategy",
+    "original_description": "A simple trend-following breakout strategy using a Donchian Channel (range breakout), ATR-based regime filter, and ATR-based risk management (stop + optional trailing stop).",
+    "description_zh": "使用唐奇安通道区间突破、ATR 行情状态过滤和 ATR 风险管理（止损及可选追踪止损）的趋势跟踪策略。",
+    "crypto_relevance": "作者提供 BTC 日线参数及 BTC 周线回测示例，也可用于其他市场。",
+    "notes": "作者的回测效果未经独立验证，费用、滑点和数据窗口需自行检查。",
+    "source_url": "https://github.com/JustACoder279/Donchian-Breakout-ATR-Risk-TradingView/blob/b58e642e97bd06bcce804d0ee0e2b513b517a78a/donchian_breakout.pine",
+    "description_source_url": "https://github.com/JustACoder279/Donchian-Breakout-ATR-Risk-TradingView/blob/b58e642e97bd06bcce804d0ee0e2b513b517a78a/README.md",
+    "source_commit": "b58e642e97bd06bcce804d0ee0e2b513b517a78a",
+    "license": "MIT",
+    "sha256": "69d5cc0497c05fab87088aaf1150603ef15d47595aecb85006c39eca83b42a6f"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "path": "indicators/03-mtf-divergence/mtf-divergence.pine",
+    "kind": "indicator",
+    "title_zh": "多周期 RSI / MACD 背离扫描",
+    "original_description": "Multi-timeframe RSI / MACD divergence detector for TradingView — regular and hidden divergences across up to three timeframes in a single Pine Script v6 script.",
+    "description_zh": "TradingView 多周期 RSI / MACD 背离检测指标，在单个 Pine Script v6 脚本中识别最多三个周期的常规背离和隐藏背离。",
+    "crypto_relevance": "作者称套件源自加密货币、外汇和贵金属的交易经验；该指标为通用技术分析工具。",
+    "notes": "背离依赖已确认的枢轴点，会有右侧 K 线确认延迟；高周期使用已收盘数据。作者说法尚未独立验证或回测。",
+    "source_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/03-mtf-divergence/mtf-divergence.pine",
+    "description_source_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/03-mtf-divergence/README.md",
+    "source_commit": "e4ce7f4c4676dd43b2fb54cb53c0143ca585f549",
+    "license": "MPL 2.0",
+    "sha256": "1859db1cc8faae69094f4fa85b557dfa661425b783a4f8b8c571f1e75fef90ba"
+  }
+]

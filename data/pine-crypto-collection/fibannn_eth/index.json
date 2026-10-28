@@ -1,0 +1,15 @@
+[
+  {
+    "path": "ETH_champion_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "ETH 多周期 EMA 趋势策略",
+    "original_description": "A Python backtesting and optimization engine for a multi-timeframe EMA trend-following strategy, built to replace manual TradingView parameter testing with systematic, automated search",
+    "description_zh": "项目围绕 ETH 多周期 EMA 趋势跟踪策略，提供 Python 回测与参数搜索工具；这里收录其原始 Pine 策略源码。",
+    "source_commit": "9057f99fbd30fd089d15811a1e71f6012b9bdf1f",
+    "source_url": "https://github.com/fibannn/ETH-USD-multi-timeframe-backtester/blob/9057f99fbd30fd089d15811a1e71f6012b9bdf1f/ETH_champion_strategy.pine",
+    "description_source_url": "https://github.com/fibannn/ETH-USD-multi-timeframe-backtester/blob/9057f99fbd30fd089d15811a1e71f6012b9bdf1f/README.md",
+    "license": "MIT",
+    "sha256": "486313554a64a18ebde1cf40087e6aa33a9cbe0c7dc965db581c30f4ee699b7e",
+    "notes": "作者将项目定位为研究作品而非经过证实的交易系统；多周期数据实时行为需要独立核验。"
+  }
+]

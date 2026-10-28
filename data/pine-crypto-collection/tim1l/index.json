@@ -1,0 +1,72 @@
+[
+  {
+    "path": "D1_bb90_on_m15.pine",
+    "kind": "indicator",
+    "title": "D1 Bollinger Bands (Period 90) on M15 (Forward Shifted)",
+    "title_zh": "日线布林带叠加到 15 分钟图",
+    "original_description": "Displays Bollinger Bands from D1 on M15 charts.",
+    "description_zh": "在 15 分钟图上显示日线布林带。",
+    "description_source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/README.md",
+    "source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/D1_bb90_on_m15.pine",
+    "source_commit": "424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4",
+    "sha256": "e9f5ca076c8a15dd751e3153018702375007b669d5a142d486816bbae09c27a8",
+    "license": "MIT",
+    "author": "Tim1l"
+  },
+  {
+    "path": "h1_bb_on_m15_shifted.pine",
+    "kind": "indicator",
+    "title": "H1 Bollinger Bands on M15 (Forward Shifted)",
+    "title_zh": "1 小时布林带位移叠加到 15 分钟图",
+    "original_description": "Shifted Bollinger Bands from H1 on M15 for trend analysis.",
+    "description_zh": "在 15 分钟图上显示经过位移的 1 小时布林带，用于趋势分析。",
+    "description_source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/README.md",
+    "source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/h1_bb_on_m15_shifted.pine",
+    "source_commit": "424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4",
+    "sha256": "bf00ff0c310468708eb9ca98653763d4fdf33f924443df78de290bcc8fd60c68",
+    "license": "MIT",
+    "author": "Tim1l"
+  },
+  {
+    "path": "h1_candles_on_m15.pine",
+    "kind": "indicator",
+    "title": "H1 Candle as True Shadow on M15",
+    "title_zh": "1 小时 K 线叠加到 15 分钟图",
+    "original_description": "Overlays H1 candles on M15 for multi-timeframe context.",
+    "description_zh": "在 15 分钟图上叠加 1 小时 K 线，提供多周期背景。",
+    "description_source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/README.md",
+    "source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/h1_candles_on_m15.pine",
+    "source_commit": "424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4",
+    "sha256": "110f808eb39a493f872b2930f12a2e40d5c468a79961265be5f472d532728b77",
+    "license": "MIT",
+    "author": "Tim1l"
+  },
+  {
+    "path": "strategy1.pine",
+    "kind": "strategy",
+    "title": "Basic Long Entry System",
+    "title_zh": "基础做多入场系统",
+    "original_description": "Basic long entry system based on H4 timeframe conditions and RSI signals.",
+    "description_zh": "基于 4 小时周期条件及 RSI 信号的基础做多入场系统。",
+    "description_source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/README.md",
+    "source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/strategy1.pine",
+    "source_commit": "424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4",
+    "sha256": "48b78f211b4046d3f1ad04d542862abd2eb59cf5e35bd7fa0903f7a3ba794602",
+    "license": "MIT",
+    "author": "Tim1l"
+  },
+  {
+    "path": "strategy2.pine",
+    "kind": "strategy",
+    "title": "Basic Long Entry System 2",
+    "title_zh": "基础做多入场系统 2",
+    "original_description": "Similar system but tuned for H1 timeframe, focusing on pullback entries.",
+    "description_zh": "类似的系统，但针对 1 小时周期调整，侧重回调入场。",
+    "description_source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/README.md",
+    "source_url": "https://github.com/Tim1l/PineCryptoStrategies/blob/424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4/strategy2.pine",
+    "source_commit": "424ddd3f2ebbdddefeabb24ae1d5f4dc6b6601a4",
+    "sha256": "8909fa09cb7766e253298cee3e1b68bd7cd95669fd17e16b8c49b4065acf2a9b",
+    "license": "MIT",
+    "author": "Tim1l"
+  }
+]

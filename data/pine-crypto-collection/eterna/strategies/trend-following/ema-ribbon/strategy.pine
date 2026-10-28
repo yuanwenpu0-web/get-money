@@ -1,0 +1,63 @@
+//@version=5
+strategy("EMA Ribbon (9/21/55) - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+emaFast = input.int(9, "Fast EMA", minval=1)
+emaMid = input.int(21, "Mid EMA", minval=1)
+emaSlow = input.int(55, "Slow EMA", minval=1)
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+// Eterna Webhook Settings
+enableWebhook = input.bool(true, "Enable Webhook Alerts", group="Webhook")
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", 
+                               group="Webhook")
+
+// ==================== Indicators ====================
+ema9 = ta.ema(close, emaFast)
+ema21 = ta.ema(close, emaMid)
+ema55 = ta.ema(close, emaSlow)
+
+// ==================== Entry Conditions ====================
+// Bullish: All EMAs aligned (9 > 21 > 55) and price crosses above fast EMA
+bullishAlignment = ema9 > ema21 and ema21 > ema55
+longCondition = bullishAlignment and ta.crossover(close, ema9)
+
+// Bearish: All EMAs aligned (9 < 21 < 55) and price crosses below fast EMA
+bearishAlignment = ema9 < ema21 and ema21 < ema55
+shortCondition = bearishAlignment and ta.crossunder(close, ema9)
+
+// Exit when alignment breaks
+exitLong = ta.crossunder(ema9, ema21)
+exitShort = ta.crossover(ema9, ema21)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+plot(ema9, "EMA 9", color=color.new(color.green, 0), linewidth=2)
+plot(ema21, "EMA 21", color=color.new(color.orange, 0), linewidth=2)
+plot(ema55, "EMA 55", color=color.new(color.red, 0), linewidth=2)
+
+plotshape(longCondition, "Long", shape.triangleup, location.belowbar, color.green, size=size.small)
+plotshape(shortCondition, "Short", shape.triangledown, location.abovebar, color.red, size=size.small)
+
+// Ribbon coloring
+bgcolor(bullishAlignment ? color.new(color.green, 95) : bearishAlignment ? color.new(color.red, 95) : na)

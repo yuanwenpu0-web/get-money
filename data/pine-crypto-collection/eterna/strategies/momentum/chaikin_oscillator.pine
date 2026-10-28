@@ -1,0 +1,99 @@
+//@version=5
+strategy("Chaikin Oscillator - Eterna MCP", 
+         shorttitle="Chaikin",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+fastLength = input.int(3, "Fast EMA Length", minval=1)
+slowLength = input.int(10, "Slow EMA Length", minval=1)
+signalThreshold = input.float(0, "Signal Threshold", step=0.0001)
+divergenceLookback = input.int(5, "Divergence Lookback", minval=3)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// ACCUMULATION/DISTRIBUTION LINE
+// ============================================
+// Money Flow Multiplier
+mfm = ((close - low) - (high - close)) / (high - low)
+// Money Flow Volume
+mfv = mfm * volume
+// Accumulation/Distribution Line
+ad = ta.cum(mfv)
+
+// ============================================
+// CHAIKIN OSCILLATOR CALCULATION
+// ============================================
+fastEMA = ta.ema(ad, fastLength)
+slowEMA = ta.ema(ad, slowLength)
+chaikin = fastEMA - slowEMA
+
+// ============================================
+// SIGNAL GENERATION
+// ============================================
+// Zero-line crossovers
+bullishCross = ta.crossover(chaikin, signalThreshold)
+bearishCross = ta.crossunder(chaikin, signalThreshold)
+
+// Momentum confirmation
+bullishMomentum = chaikin > chaikin[1] and chaikin[1] > chaikin[2]
+bearishMomentum = chaikin < chaikin[1] and chaikin[1] < chaikin[2]
+
+// Divergence detection
+priceLow = ta.lowest(low, divergenceLookback)
+priceHigh = ta.highest(high, divergenceLookback)
+chaikinLow = ta.lowest(chaikin, divergenceLookback)
+chaikinHigh = ta.highest(chaikin, divergenceLookback)
+
+// Bullish divergence: lower price, higher Chaikin
+bullishDiv = low == priceLow and chaikin > chaikinLow and chaikin < 0
+// Bearish divergence: higher price, lower Chaikin
+bearishDiv = high == priceHigh and chaikin < chaikinHigh and chaikin > 0
+
+// Combined entry signals
+buySignal = (bullishCross and bullishMomentum) or bullishDiv
+sellSignal = (bearishCross and bearishMomentum) or bearishDiv
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if buySignal and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if sellSignal and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite signal
+if sellSignal and strategy.position_size > 0
+    strategy.close("Long")
+
+if buySignal and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+plot(chaikin, "Chaikin Oscillator", color=chaikin >= 0 ? color.green : color.red, linewidth=2, style=plot.style_histogram)
+hline(signalThreshold, "Zero Line", color=color.gray, linestyle=hline.style_solid, linewidth=2)
+
+// Momentum line overlay
+plot(chaikin, "Chaikin Line", color=color.blue, linewidth=1)
+
+// Signals
+plotshape(buySignal, "Buy", shape.triangleup, location.bottom, color.green, size=size.normal)
+plotshape(sellSignal, "Sell", shape.triangledown, location.top, color.red, size=size.normal)
+
+// Divergence markers
+plotshape(bullishDiv, "Bullish Div", shape.diamond, location.bottom, color.lime, size=size.small)
+plotshape(bearishDiv, "Bearish Div", shape.diamond, location.top, color.orange, size=size.small)
+
+// Trend background
+bgcolor(chaikin > 0 and bullishMomentum ? color.new(color.green, 97) : 
+        chaikin < 0 and bearishMomentum ? color.new(color.red, 97) : na)

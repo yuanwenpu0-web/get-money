@@ -1,0 +1,91 @@
+//@version=5
+strategy("Chandelier Exit - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+atrLength = input.int(22, "ATR Length", minval=1)
+atrMultiplier = input.float(3.0, "ATR Multiplier", minval=0.5, step=0.1)
+trendEMA = input.int(50, "Trend Filter EMA", minval=1)
+useTrendFilter = input.bool(true, "Use EMA Trend Filter")
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", group="Webhook")
+
+// ==================== Chandelier Calculation ====================
+atrValue = ta.atr(atrLength)
+
+// Chandelier Exit Long: Highest high - (ATR × Multiplier)
+highestHigh = ta.highest(high, atrLength)
+chandelierLong = highestHigh - (atrValue * atrMultiplier)
+
+// Chandelier Exit Short: Lowest low + (ATR × Multiplier)
+lowestLow = ta.lowest(low, atrLength)
+chandelierShort = lowestLow + (atrValue * atrMultiplier)
+
+// Trend filter
+emaFilter = ta.ema(close, trendEMA)
+uptrend = close > emaFilter
+downtrend = close < emaFilter
+
+// ==================== Entry Conditions ====================
+// Long entry: Price crosses above Chandelier Long line
+longBreakout = ta.crossover(close, chandelierLong)
+longCondition = useTrendFilter ? (longBreakout and uptrend) : longBreakout
+
+// Short entry: Price crosses below Chandelier Short line
+shortBreakdown = ta.crossunder(close, chandelierShort)
+shortCondition = useTrendFilter ? (shortBreakdown and downtrend) : shortBreakdown
+
+// Exit: Price crosses back through respective Chandelier line
+exitLong = ta.crossunder(close, chandelierLong)
+exitShort = ta.crossover(close, chandelierShort)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+// Plot Chandelier lines
+longStopPlot = plot(chandelierLong, "Chandelier Long Stop", color=color.green, linewidth=2, style=plot.style_stepline)
+shortStopPlot = plot(chandelierShort, "Chandelier Short Stop", color=color.red, linewidth=2, style=plot.style_stepline)
+
+// Plot trend filter
+plot(useTrendFilter ? emaFilter : na, "Trend EMA", color=color.orange, linewidth=1)
+
+// Entry signals
+plotshape(longCondition, "Long Entry", shape.triangleup, location.belowbar, color.green, size=size.normal)
+plotshape(shortCondition, "Short Entry", shape.triangledown, location.abovebar, color.red, size=size.normal)
+
+// Exit signals
+plotshape(exitLong and strategy.position_size > 0, "Long Exit", shape.xcross, location.abovebar, color.red, size=size.small)
+plotshape(exitShort and strategy.position_size < 0, "Short Exit", shape.xcross, location.belowbar, color.green, size=size.small)
+
+// Fill between chandelier lines
+fill(longStopPlot, shortStopPlot, color=color.new(color.gray, 90))
+
+// Background color based on position
+positionBg = strategy.position_size > 0 ? color.new(color.green, 95) : strategy.position_size < 0 ? color.new(color.red, 95) : color.new(color.gray, 98)
+bgcolor(positionBg)
+
+// Show ATR value
+var label atrLabel = na
+if bar_index % 30 == 0
+    label.delete(atrLabel)
+    atrLabel := label.new(bar_index, low, "ATR: " + str.tostring(atrValue, "#.##"), 
+                          color=color.blue, textcolor=color.white, size=size.small, style=label.style_label_up)

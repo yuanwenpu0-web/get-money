@@ -1,0 +1,84 @@
+//@version=5
+strategy("RSI Divergence Strategy - Eterna MCP", 
+         shorttitle="RSI Div",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+rsiLength = input.int(14, "RSI Length", minval=1)
+rsiOverbought = input.int(70, "RSI Overbought", minval=50, maxval=100)
+rsiOversold = input.int(30, "RSI Oversold", minval=0, maxval=50)
+pivotLookback = input.int(5, "Pivot Lookback", minval=1)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// RSI CALCULATION
+// ============================================
+rsi = ta.rsi(close, rsiLength)
+
+// ============================================
+// DIVERGENCE DETECTION
+// ============================================
+// Pivot highs and lows
+pivotHigh = ta.pivothigh(rsi, pivotLookback, pivotLookback)
+pivotLow = ta.pivotlow(rsi, pivotLookback, pivotLookback)
+pricePivotHigh = ta.pivothigh(high, pivotLookback, pivotLookback)
+pricePivotLow = ta.pivotlow(low, pivotLookback, pivotLookback)
+
+// Store pivot points
+var float lastRsiHigh = na
+var float lastPriceHigh = na
+var float lastRsiLow = na
+var float lastPriceLow = na
+
+if not na(pivotHigh)
+    lastRsiHigh := pivotHigh
+    lastPriceHigh := pricePivotHigh
+
+if not na(pivotLow)
+    lastRsiLow := pivotLow
+    lastPriceLow := pricePivotLow
+
+// Bullish divergence: price makes lower low, RSI makes higher low
+bullishDiv = not na(lastRsiLow) and not na(lastPriceLow) and 
+             low < lastPriceLow and rsi > lastRsiLow and 
+             rsi < rsiOversold
+
+// Bearish divergence: price makes higher high, RSI makes lower high
+bearishDiv = not na(lastRsiHigh) and not na(lastPriceHigh) and 
+             high > lastPriceHigh and rsi < lastRsiHigh and 
+             rsi > rsiOverbought
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if bullishDiv and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if bearishDiv and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite signal
+if bearishDiv and strategy.position_size > 0
+    strategy.close("Long")
+
+if bullishDiv and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+plot(rsi, "RSI", color=color.blue, linewidth=2)
+hline(rsiOverbought, "Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(rsiOversold, "Oversold", color=color.green, linestyle=hline.style_dashed)
+hline(50, "Midline", color=color.gray, linestyle=hline.style_dotted)
+
+plotshape(bullishDiv, "Bullish Divergence", shape.triangleup, location.bottom, color.green, size=size.small)
+plotshape(bearishDiv, "Bearish Divergence", shape.triangledown, location.top, color.red, size=size.small)

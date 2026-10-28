@@ -1,0 +1,122 @@
+//@version=5
+indicator("Multi-Timeframe Trend Detector", overlay=true)
+
+// ============================================
+// SETTINGS
+// ============================================
+tf1 = input.timeframe("5", "Timeframe 1")
+tf2 = input.timeframe("15", "Timeframe 2")
+tf3 = input.timeframe("60", "Timeframe 3")
+tf4 = input.timeframe("240", "Timeframe 4")
+tf5 = input.timeframe("D", "Timeframe 5")
+emaLength = input.int(50, "EMA Length", minval=1)
+
+// ============================================
+// TREND CALCULATION
+// ============================================
+getTrend(tf) =>
+    emaValue = request.security(syminfo.tickerid, tf, ta.ema(close, emaLength))
+    closeValue = request.security(syminfo.tickerid, tf, close)
+    closeValue > emaValue ? 1 : closeValue < emaValue ? -1 : 0
+
+// Get trends for all timeframes
+trend1 = getTrend(tf1)
+trend2 = getTrend(tf2)
+trend3 = getTrend(tf3)
+trend4 = getTrend(tf4)
+trend5 = getTrend(tf5)
+
+// Calculate overall trend strength
+trendScore = trend1 + trend2 + trend3 + trend4 + trend5
+trendStrength = math.abs(trendScore) / 5 * 100
+
+// Determine overall bias
+overallTrend = trendScore > 2 ? "STRONG BULLISH" : trendScore > 0 ? "BULLISH" : trendScore < -2 ? "STRONG BEARISH" : trendScore < 0 ? "BEARISH" : "NEUTRAL"
+
+// ============================================
+// DASHBOARD
+// ============================================
+var table dashboard = table.new(position.top_right, 3, 8, border_width=2)
+
+if barstate.islast
+    // Header
+    table.cell(dashboard, 0, 0, "📊 MTF TREND", text_color=color.white, bgcolor=color.new(color.blue, 30), text_size=size.normal)
+    table.merge_cells(dashboard, 0, 0, 2, 0)
+    
+    // Column headers
+    table.cell(dashboard, 0, 1, "Timeframe", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    table.cell(dashboard, 1, 1, "Trend", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    table.cell(dashboard, 2, 1, "Signal", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    
+    // TF1
+    table.cell(dashboard, 0, 2, tf1, text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    tf1Color = trend1 > 0 ? color.new(color.green, 60) : trend1 < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    tf1Text = trend1 > 0 ? "Bullish" : trend1 < 0 ? "Bearish" : "Neutral"
+    tf1Signal = trend1 > 0 ? "🟢" : trend1 < 0 ? "🔴" : "⚪"
+    table.cell(dashboard, 1, 2, tf1Text, text_color=color.white, bgcolor=tf1Color, text_size=size.small)
+    table.cell(dashboard, 2, 2, tf1Signal, text_color=color.white, bgcolor=tf1Color, text_size=size.normal)
+    
+    // TF2
+    table.cell(dashboard, 0, 3, tf2, text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    tf2Color = trend2 > 0 ? color.new(color.green, 60) : trend2 < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    tf2Text = trend2 > 0 ? "Bullish" : trend2 < 0 ? "Bearish" : "Neutral"
+    tf2Signal = trend2 > 0 ? "🟢" : trend2 < 0 ? "🔴" : "⚪"
+    table.cell(dashboard, 1, 3, tf2Text, text_color=color.white, bgcolor=tf2Color, text_size=size.small)
+    table.cell(dashboard, 2, 3, tf2Signal, text_color=color.white, bgcolor=tf2Color, text_size=size.normal)
+    
+    // TF3
+    table.cell(dashboard, 0, 4, tf3, text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    tf3Color = trend3 > 0 ? color.new(color.green, 60) : trend3 < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    tf3Text = trend3 > 0 ? "Bullish" : trend3 < 0 ? "Bearish" : "Neutral"
+    tf3Signal = trend3 > 0 ? "🟢" : trend3 < 0 ? "🔴" : "⚪"
+    table.cell(dashboard, 1, 4, tf3Text, text_color=color.white, bgcolor=tf3Color, text_size=size.small)
+    table.cell(dashboard, 2, 4, tf3Signal, text_color=color.white, bgcolor=tf3Color, text_size=size.normal)
+    
+    // TF4
+    table.cell(dashboard, 0, 5, tf4, text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    tf4Color = trend4 > 0 ? color.new(color.green, 60) : trend4 < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    tf4Text = trend4 > 0 ? "Bullish" : trend4 < 0 ? "Bearish" : "Neutral"
+    tf4Signal = trend4 > 0 ? "🟢" : trend4 < 0 ? "🔴" : "⚪"
+    table.cell(dashboard, 1, 5, tf4Text, text_color=color.white, bgcolor=tf4Color, text_size=size.small)
+    table.cell(dashboard, 2, 5, tf4Signal, text_color=color.white, bgcolor=tf4Color, text_size=size.normal)
+    
+    // TF5
+    table.cell(dashboard, 0, 6, tf5, text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    tf5Color = trend5 > 0 ? color.new(color.green, 60) : trend5 < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    tf5Text = trend5 > 0 ? "Bullish" : trend5 < 0 ? "Bearish" : "Neutral"
+    tf5Signal = trend5 > 0 ? "🟢" : trend5 < 0 ? "🔴" : "⚪"
+    table.cell(dashboard, 1, 6, tf5Text, text_color=color.white, bgcolor=tf5Color, text_size=size.small)
+    table.cell(dashboard, 2, 6, tf5Signal, text_color=color.white, bgcolor=tf5Color, text_size=size.normal)
+    
+    // Overall trend
+    table.cell(dashboard, 0, 7, "OVERALL", text_color=color.white, bgcolor=color.new(color.gray, 60), text_size=size.small)
+    overallColor = trendScore > 2 ? color.new(color.green, 40) : trendScore > 0 ? color.new(color.green, 60) : trendScore < -2 ? color.new(color.red, 40) : trendScore < 0 ? color.new(color.red, 60) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 7, overallTrend, text_color=color.white, bgcolor=overallColor, text_size=size.normal)
+    strengthText = str.tostring(trendStrength, "#") + "%"
+    table.cell(dashboard, 2, 7, strengthText, text_color=color.white, bgcolor=overallColor, text_size=size.normal)
+
+// ============================================
+// VISUAL SIGNALS
+// ============================================
+// Plot EMA
+ema = ta.ema(close, emaLength)
+plot(ema, "EMA", color=color.new(color.yellow, 30), linewidth=2)
+
+// Background color based on overall trend
+bgColor = trendScore >= 4 ? color.new(color.green, 95) : trendScore >= 2 ? color.new(color.green, 97) : trendScore <= -4 ? color.new(color.red, 95) : trendScore <= -2 ? color.new(color.red, 97) : na
+bgcolor(bgColor)
+
+// Strong confluence signals
+strongBullish = trendScore >= 4
+strongBearish = trendScore <= -4
+
+plotshape(strongBullish and not strongBullish[1], "Strong Bullish", shape.triangleup, location.belowbar, color.new(color.green, 0), size=size.large)
+plotshape(strongBearish and not strongBearish[1], "Strong Bearish", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.large)
+
+// ============================================
+// ALERTS
+// ============================================
+alertcondition(strongBullish and not strongBullish[1], "Strong Bullish Confluence", "All timeframes aligned BULLISH")
+alertcondition(strongBearish and not strongBearish[1], "Strong Bearish Confluence", "All timeframes aligned BEARISH")
+alertcondition(trendScore >= 3 and trendScore[1] < 3, "Bullish Confluence", "Multiple timeframes turned BULLISH")
+alertcondition(trendScore <= -3 and trendScore[1] > -3, "Bearish Confluence", "Multiple timeframes turned BEARISH")

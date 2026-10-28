@@ -1,0 +1,313 @@
+//@version=5
+indicator("MTF Strategy Visual", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500)
+
+// ══════════════════════════════════════════════════════════
+// EMA SETTINGS
+// ══════════════════════════════════════════════════════════
+ema1_period = input.int(5, "EMA 1", group="EMA Settings", minval=1)
+ema2_period = input.int(8, "EMA 2", group="EMA Settings", minval=1)
+ema3_period = input.int(13, "EMA 3", group="EMA Settings", minval=1)
+ema4_period = input.int(21, "EMA 4", group="EMA Settings", minval=1)
+ema5_period = input.int(34, "EMA 5", group="EMA Settings", minval=1)
+ema6_period = input.int(55, "EMA 6", group="EMA Settings", minval=1)
+
+// ══════════════════════════════════════════════════════════
+// ATR FILTER SETTINGS
+// ══════════════════════════════════════════════════════════
+atr_period = input.int(14, "ATR Period", group="ATR Filter", minval=1)
+atr_ma_period = input.int(14, "ATR MA Period", group="ATR Filter", minval=1)
+atr_threshold = input.float(1.0, "ATR Threshold Multiplier", group="ATR Filter", minval=0.1, step=0.1)
+atr_sideways_threshold = input.float(0.8, "Sideways Threshold", group="ATR Filter", minval=0.1, step=0.1)
+
+// ══════════════════════════════════════════════════════════
+// TIMEFRAME SETTINGS
+// ══════════════════════════════════════════════════════════
+htf_timeframe = input.timeframe("60", "Higher Timeframe (HTF)", group="Timeframes")
+mtf_timeframe = input.timeframe("10", "Medium Timeframe (MTF)", group="Timeframes")
+// LTF is current chart timeframe
+
+// ══════════════════════════════════════════════════════════
+// VISUAL SETTINGS
+// ══════════════════════════════════════════════════════════
+bullish_zone_color = input.color(color.new(color.green, 90), "Bullish Zone", group="Colors")
+bearish_zone_color = input.color(color.new(color.red, 90), "Bearish Zone", group="Colors")
+sideways_zone_color = input.color(color.new(color.gray, 85), "Sideways Zone", group="Colors")
+buy_signal_color = input.color(color.new(color.lime, 0), "Buy Signal", group="Colors")
+sell_signal_color = input.color(color.new(color.red, 0), "Sell Signal", group="Colors")
+
+show_ema_zones = input.bool(true, "Show EMA Zones", group="Display Options")
+show_signals = input.bool(true, "Show Entry Signals", group="Display Options")
+show_sideways = input.bool(true, "Show Sideways Detection", group="Display Options")
+show_dashboard = input.bool(true, "Show Dashboard", group="Display Options")
+show_tp_levels = input.bool(true, "Show TP/SL Levels", group="Display Options")
+
+// ══════════════════════════════════════════════════════════
+// RISK MANAGEMENT
+// ══════════════════════════════════════════════════════════
+tp1_multiplier = input.float(1.5, "TP1 Multiplier", group="Risk Management", minval=0.1, step=0.1)
+tp2_multiplier = input.float(2.5, "TP2 Multiplier", group="Risk Management", minval=0.1, step=0.1)
+tp3_multiplier = input.float(4.0, "TP3 Multiplier", group="Risk Management", minval=0.1, step=0.1)
+sl_multiplier = input.float(1.5, "Stop Loss Multiplier", group="Risk Management", minval=0.1, step=0.1)
+
+// ══════════════════════════════════════════════════════════
+// EMA CALCULATIONS
+// ══════════════════════════════════════════════════════════
+
+// Current timeframe (LTF)
+ema1 = ta.ema(close, ema1_period)
+ema2 = ta.ema(close, ema2_period)
+ema3 = ta.ema(close, ema3_period)
+ema4 = ta.ema(close, ema4_period)
+ema5 = ta.ema(close, ema5_period)
+ema6 = ta.ema(close, ema6_period)
+
+// Higher timeframe (HTF)
+htf_ema1 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema1_period))
+htf_ema2 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema2_period))
+htf_ema3 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema3_period))
+htf_ema4 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema4_period))
+htf_ema5 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema5_period))
+htf_ema6 = request.security(syminfo.tickerid, htf_timeframe, ta.ema(close, ema6_period))
+
+// Medium timeframe (MTF)
+mtf_ema1 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema1_period))
+mtf_ema2 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema2_period))
+mtf_ema3 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema3_period))
+mtf_ema4 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema4_period))
+mtf_ema5 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema5_period))
+mtf_ema6 = request.security(syminfo.tickerid, mtf_timeframe, ta.ema(close, ema6_period))
+
+// ══════════════════════════════════════════════════════════
+// EMA ALIGNMENT FUNCTIONS
+// ══════════════════════════════════════════════════════════
+
+// Check if EMAs are in bullish alignment (ascending order)
+is_ema_bullish(e1, e2, e3, e4, e5, e6) =>
+    e1 > e2 and e2 > e3 and e3 > e4 and e4 > e5 and e5 > e6
+
+// Check if EMAs are in bearish alignment (descending order)
+is_ema_bearish(e1, e2, e3, e4, e5, e6) =>
+    e1 < e2 and e2 < e3 and e3 < e4 and e4 < e5 and e5 < e6
+
+// Check if EMAs are converged (sideways market)
+is_ema_converged(e1, e6, threshold_pct = 0.5) =>
+    range = math.abs(e1 - e6)
+    avg_price = (e1 + e6) / 2
+    percent_range = (range / avg_price) * 100
+    percent_range < threshold_pct
+
+// ══════════════════════════════════════════════════════════
+// ATR FILTER FUNCTIONS
+// ══════════════════════════════════════════════════════════
+
+// Calculate ATR and ATR MA
+atr = ta.atr(atr_period)
+atr_ma = ta.sma(atr, atr_ma_period)
+
+// Check if ATR filter is active (sufficient volatility)
+is_atr_active = atr > atr_ma * atr_threshold
+
+// Check if market is sideways (ATR contraction)
+is_atr_contracted = atr < atr_ma * atr_sideways_threshold
+
+// ══════════════════════════════════════════════════════════
+// MULTI-TIMEFRAME ANALYSIS
+// ══════════════════════════════════════════════════════════
+
+// HTF Bias (1 = bullish, -1 = bearish, 0 = sideways)
+htf_bullish = is_ema_bullish(htf_ema1, htf_ema2, htf_ema3, htf_ema4, htf_ema5, htf_ema6)
+htf_bearish = is_ema_bearish(htf_ema1, htf_ema2, htf_ema3, htf_ema4, htf_ema5, htf_ema6)
+htf_bias = htf_bullish ? 1 : htf_bearish ? -1 : 0
+
+// MTF Alignment
+mtf_bullish = is_ema_bullish(mtf_ema1, mtf_ema2, mtf_ema3, mtf_ema4, mtf_ema5, mtf_ema6)
+mtf_bearish = is_ema_bearish(mtf_ema1, mtf_ema2, mtf_ema3, mtf_ema4, mtf_ema5, mtf_ema6)
+mtf_aligned_bullish = htf_bias == 1 and mtf_bullish
+mtf_aligned_bearish = htf_bias == -1 and mtf_bearish
+
+// LTF Entry Triggers
+ltf_bullish = is_ema_bullish(ema1, ema2, ema3, ema4, ema5, ema6)
+ltf_bearish = is_ema_bearish(ema1, ema2, ema3, ema4, ema5, ema6)
+
+// Detect EMA cloud breaks
+price_above_cloud = close > ema1
+price_below_cloud = close < ema1
+cloud_break_up = ta.crossover(close, ema1)
+cloud_break_down = ta.crossunder(close, ema1)
+
+// Sideways market detection
+ema_converged = is_ema_converged(ema1, ema6, 0.5)
+sideways_market = ema_converged or is_atr_contracted or (htf_bias == 0)
+
+// ══════════════════════════════════════════════════════════
+// SIGNAL GENERATION
+// ══════════════════════════════════════════════════════════
+
+// Valid BUY signal conditions
+buy_signal = not sideways_market and 
+             htf_bias == 1 and 
+             mtf_aligned_bullish and 
+             cloud_break_up and 
+             is_atr_active
+
+// Valid SELL signal conditions
+sell_signal = not sideways_market and 
+              htf_bias == -1 and 
+              mtf_aligned_bearish and 
+              cloud_break_down and 
+              is_atr_active
+
+// Calculate TP/SL levels
+var float entry_price = na
+var float stop_loss = na
+var float take_profit_1 = na
+var float take_profit_2 = na
+var float take_profit_3 = na
+
+if buy_signal
+    entry_price := close
+    stop_loss := entry_price - (atr * sl_multiplier)
+    take_profit_1 := entry_price + (atr * tp1_multiplier)
+    take_profit_2 := entry_price + (atr * tp2_multiplier)
+    take_profit_3 := entry_price + (atr * tp3_multiplier)
+
+if sell_signal
+    entry_price := close
+    stop_loss := entry_price + (atr * sl_multiplier)
+    take_profit_1 := entry_price - (atr * tp1_multiplier)
+    take_profit_2 := entry_price - (atr * tp2_multiplier)
+    take_profit_3 := entry_price - (atr * tp3_multiplier)
+
+// ══════════════════════════════════════════════════════════
+// EMA ZONE VISUALIZATION
+// ══════════════════════════════════════════════════════════
+
+if show_ema_zones
+    // Determine zone color based on HTF bias
+    zone_color = htf_bias == 1 ? bullish_zone_color : 
+                 htf_bias == -1 ? bearish_zone_color : 
+                 sideways_market ? sideways_zone_color : na
+    
+    // Apply background color
+    bgcolor(zone_color, title="EMA Zone")
+
+// ══════════════════════════════════════════════════════════
+// SIDEWAYS MARKET DETECTION
+// ══════════════════════════════════════════════════════════
+
+if show_sideways and sideways_market and barstate.isconfirmed
+    // Create box for sideways zone
+    box.new(bar_index - 10, high, bar_index, low, 
+            border_color=color.new(color.red, 50),
+            bgcolor=sideways_zone_color,
+            text="Sideways Market",
+            text_color=color.white,
+            text_size=size.small)
+
+// ══════════════════════════════════════════════════════════
+// SIGNAL LABELS
+// ══════════════════════════════════════════════════════════
+
+if show_signals and buy_signal and barstate.isconfirmed
+    label.new(bar_index, low, "BUY\n" + str.tostring(close, format.mintick),
+              style=label.style_label_up,
+              color=buy_signal_color,
+              textcolor=color.white,
+              size=size.normal)
+
+if show_signals and sell_signal and barstate.isconfirmed
+    label.new(bar_index, high, "SELL\n" + str.tostring(close, format.mintick),
+              style=label.style_label_down,
+              color=sell_signal_color,
+              textcolor=color.white,
+              size=size.normal)
+
+// ══════════════════════════════════════════════════════════
+// TP/SL LEVELS VISUALIZATION
+// ══════════════════════════════════════════════════════════
+
+if show_tp_levels and (buy_signal or sell_signal) and barstate.isconfirmed
+    // Entry line
+    line.new(bar_index, entry_price, bar_index + 10, entry_price,
+             color=color.blue, width=2, style=line.style_solid)
+    
+    // Stop loss line
+    line.new(bar_index, stop_loss, bar_index + 10, stop_loss,
+             color=color.red, width=2, style=line.style_dashed)
+    
+    // TP levels
+    line.new(bar_index, take_profit_1, bar_index + 10, take_profit_1,
+             color=color.green, width=1, style=line.style_dashed)
+    line.new(bar_index, take_profit_2, bar_index + 10, take_profit_2,
+             color=color.green, width=1, style=line.style_dashed)
+    line.new(bar_index, take_profit_3, bar_index + 10, take_profit_3,
+             color=color.green, width=1, style=line.style_dashed)
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+
+if show_dashboard
+    var table dashboard = table.new(position.top_right, 2, 10, 
+                                     bgcolor=color.new(color.black, 20),
+                                     frame_color=color.gray,
+                                     frame_width=1)
+    
+    if barstate.islast
+        // Title
+        table.cell(dashboard, 0, 0, "MTF Strategy", 
+                   text_color=color.white, text_size=size.normal, bgcolor=color.new(color.gray, 50))
+        table.merge_cells(dashboard, 0, 0, 1, 0)
+        
+        // Status
+        status_text = sideways_market ? "Sideways" : is_atr_active ? "Active" : "Waiting"
+        status_color = sideways_market ? color.orange : is_atr_active ? color.lime : color.gray
+        table.cell(dashboard, 0, 1, "Status:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 1, status_text, text_color=status_color, text_size=size.small)
+        
+        // ATR
+        table.cell(dashboard, 0, 2, "ATR:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 2, str.tostring(atr, format.mintick), 
+                   text_color=color.white, text_size=size.small)
+        
+        // Volatility
+        vol_text = is_atr_active ? "Normal" : is_atr_contracted ? "Low" : "Medium"
+        table.cell(dashboard, 0, 3, "Volatility:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 3, vol_text, text_color=color.white, text_size=size.small)
+        
+        // HTF Bias
+        htf_text = htf_bias == 1 ? "Bullish" : htf_bias == -1 ? "Bearish" : "Sideways"
+        htf_color = htf_bias == 1 ? color.lime : htf_bias == -1 ? color.red : color.gray
+        table.cell(dashboard, 0, 4, "HTF:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 4, htf_text, text_color=htf_color, text_size=size.small)
+        
+        // MTF
+        mtf_text = mtf_aligned_bullish ? "Aligned ↑" : mtf_aligned_bearish ? "Aligned ↓" : "Not Aligned"
+        mtf_color = mtf_aligned_bullish ? color.lime : mtf_aligned_bearish ? color.red : color.gray
+        table.cell(dashboard, 0, 5, "MTF:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 5, mtf_text, text_color=mtf_color, text_size=size.small)
+        
+        // LTF
+        ltf_text = ltf_bullish ? "Bullish" : ltf_bearish ? "Bearish" : "Neutral"
+        ltf_color = ltf_bullish ? color.lime : ltf_bearish ? color.red : color.gray
+        table.cell(dashboard, 0, 6, "LTF:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 6, ltf_text, text_color=ltf_color, text_size=size.small)
+        
+        // Last signal
+        last_signal = buy_signal ? "BUY" : sell_signal ? "SELL" : "NONE"
+        signal_color = buy_signal ? color.lime : sell_signal ? color.red : color.gray
+        table.cell(dashboard, 0, 7, "Signal:", text_color=color.white, text_size=size.small)
+        table.cell(dashboard, 1, 7, last_signal, text_color=signal_color, text_size=size.small)
+
+// ══════════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════════
+
+alertcondition(buy_signal, title="Buy Signal", 
+               message="MTF Strategy: BUY signal generated at {{close}}")
+
+alertcondition(sell_signal, title="Sell Signal", 
+               message="MTF Strategy: SELL signal generated at {{close}}")
+
+alertcondition(sideways_market, title="Sideways Market", 
+               message="MTF Strategy: Sideways market detected - no trading")

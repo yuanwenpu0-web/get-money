@@ -1,0 +1,16 @@
+[
+  {
+    "path": "bitcoin_market_regime_detector.pine",
+    "kind": "indicator",
+    "title_zh": "比特币市场状态识别指标",
+    "original_description": "A TradingView indicator that classifies Bitcoin price action into five market regimes — **Bull, Bear, Range, Volatility, and Transition** — directly on your chart.",
+    "description_zh": "在图表上把比特币价格走势划分为牛市、熊市、震荡、波动和过渡五种市场状态。",
+    "source_url": "https://github.com/regimerisk/bitcoin-market-regime-detector/blob/7cd781aeaf835a37f9a79eb7473fb054cdb655b5/bitcoin_market_regime_detector.pine",
+    "description_url": "https://github.com/regimerisk/bitcoin-market-regime-detector/blob/7cd781aeaf835a37f9a79eb7473fb054cdb655b5/README.md",
+    "source_commit": "7cd781aeaf835a37f9a79eb7473fb054cdb655b5",
+    "license": "MPL-2.0",
+    "sha256": "2a469c33ef754a224caad7d94f2213479aacd95e9a1e13d2012f74e56388a988",
+    "crypto_relevance": "作者说明默认参数面向比特币日线及 4 小时图，也适用于其他品种和周期。",
+    "implementation_note_zh": "该脚本为规则型参考实现，并非作者生产系统所使用的机器学习模型。作者 README 中的源码路径前缀 src/ 与仓库实际路径不符，已使用实际路径。"
+  }
+]

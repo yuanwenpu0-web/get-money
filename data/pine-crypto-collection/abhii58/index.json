@@ -1,0 +1,15 @@
+[
+  {
+    "path": "btc_scalping_signals.pinescript",
+    "title_zh": "比特币 1–5 分钟短线信号",
+    "original_description": "This TradingView Pine Script indicator provides high-probability scalping signals for Bitcoin (BTC) on 1 to 5 minute timeframes. It combines multiple technical indicators like EMA crossovers, RSI, and MACD to generate buy/sell signals, making it ideal for short-term crypto traders.",
+    "description_zh": "作者称该指标面向比特币 1 至 5 分钟图，结合 EMA 交叉、RSI 和 MACD 生成买卖信号，供短线交易使用；作者对信号概率的描述未经验证。",
+    "crypto_relevance": "专门针对 BTC。",
+    "source_url": "https://github.com/Abhii58/Btc-trading-1---5-min-strategy-script/blob/826b272f2d15b6c1d7bfa578c63f9f9e8124b657/btc_scalping_signals.pinescript",
+    "description_source_url": "https://github.com/Abhii58/Btc-trading-1---5-min-strategy-script/blob/826b272f2d15b6c1d7bfa578c63f9f9e8124b657/README.md",
+    "source_commit": "826b272f2d15b6c1d7bfa578c63f9f9e8124b657",
+    "sha256": "27ce379a06ed45cb753b7c35c730313f0203cdf9367a38957a1089686c0022cf",
+    "license": "MIT",
+    "author": "Abhii58"
+  }
+]

@@ -1,0 +1,181 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+//@version=6
+// EMA 9/45/200 Trend Strategy — Breakout or Pullback entry
+// Rules:
+//   * Trend filter: Breakout needs EMA9 > EMA45 > EMA200. Pullback needs EMA9 > EMA45 > EMA200 by default
+//     (or EMA9 > EMA45 and close > EMA200) on the pullback bar and at entry; waiting starts on every bullish cross. The first N bars are skipped while the EMAs warm up.
+//   * Breakout: EMA9 crosses above EMA45 -> buy-stop order at the high of the signal bar.
+//   * Pullback: after the cross, the signal bar is either the first bar that touches EMA45 but closes above it,
+//     or the first bar that closes back above EMA45 after closing below it. Buy-stop at the high of that bar.
+//   * A pending buy order is cancelled if EMA9 crosses back below EMA45 before it fills; one trade per cross.
+//   * Stop loss = fill price - k x ATR(14) (ATR of the bar before entry).
+//   * Exit: when EMA9 crosses below EMA45, a sell-stop is placed at the low of that bar;
+//     it is cancelled if EMA9 crosses back above EMA45 before it fills.
+strategy("EMA 9/45/200 Trend Strategy [Breakout / Pullback]", overlay = true, initial_capital = 1000, currency = currency.USD,
+         pyramiding = 0, commission_type = strategy.commission.percent, commission_value = 0.04, slippage = 2,
+         default_qty_type = strategy.fixed, default_qty_value = 1)
+
+// ---------- Inputs ----------
+mode       = input.string("Breakout", "Entry type", options = ["Breakout", "Pullback"])
+pbFilter   = input.string("EMA9 > EMA45 > EMA200", "Pullback trend filter", options = ["Price > EMA200", "EMA9 > EMA45 > EMA200"],
+             tooltip = "Price > EMA200: fast EMA > slow EMA and close > trend EMA (enters earlier in a new trend). EMA9 > EMA45 > EMA200: all three EMAs stacked. Breakout always uses the stacked filter.")
+atrMult    = input.float(2.5, "Stop loss = k x ATR(14)", minval = 0.5, step = 0.5)
+riskPct    = input.float(1.0, "Risk per trade (% of equity)", minval = 0.1, step = 0.1)
+fastLen    = input.int(9, "Fast EMA", minval = 1)
+slowLen    = input.int(45, "Slow EMA", minval = 2)
+trendLen   = input.int(200, "Trend EMA", minval = 2)
+warmupBars = input.int(200, "EMA warm-up bars (no trades)", minval = 0)
+startDate  = input.time(timestamp("2021-01-01T00:00:00"), "Trade from date")
+
+// ---------- Indicators (EMA seeded with the first price, equivalent to pandas ewm(adjust=False)) ----------
+emaSeed(float src, int len) =>
+    float alpha = 2.0 / (len + 1)
+    var float e = na
+    e := na(e) ? src : alpha * src + (1 - alpha) * e
+    e
+
+e9   = emaSeed(close, fastLen)
+e45  = emaSeed(close, slowLen)
+e200 = emaSeed(close, trendLen)
+atr  = emaSeed(ta.tr(true), 14)
+
+up       = e9 > e45
+crossUp  = up and not up[1]
+crossDn  = not up and up[1]
+bool trendOK = mode == "Pullback" and pbFilter == "Price > EMA200" ? close > e200 : e45 > e200
+aligned  = e9 > e45 and trendOK and bar_index >= warmupBars and time >= startDate
+
+// ---------- State ----------
+var float pending     = na     // pending buy-stop level (high of the signal bar)
+var bool  waiting     = false  // Pullback: waiting for price to come back to the slow EMA
+var bool  below       = false  // Pullback: price has closed below the slow EMA
+var float exitLevel   = na     // pending sell-stop level (low of the bearish cross bar)
+var float slDist      = na     // stop distance = k x ATR of the bar before entry
+var float slPrice     = na
+var int   tradeCount  = 0
+
+int  nowCount = strategy.opentrades + strategy.closedtrades
+bool filled   = nowCount > tradeCount   // a new entry filled on this bar
+tradeCount   := nowCount
+bool flat     = strategy.position_size == 0
+
+if filled
+    // entry filled (including fill + stop on the same bar): clear the pending state
+    pending := na
+    waiting := false
+    below   := false
+    slPrice := (not flat ? strategy.position_avg_price : strategy.closedtrades.entry_price(strategy.closedtrades - 1)) - slDist
+
+if flat
+    exitLevel := na
+    if mode == "Breakout"
+        if not na(pending) and crossDn
+            pending := na                       // trend reversed before the breakout -> cancel
+        if crossUp and aligned
+            pending := high
+    else
+        if crossUp   // start waiting on every bullish cross; the trend filter is checked on the pullback bar and at entry
+            waiting := true
+            pending := na
+            below   := false
+        if waiting
+            if crossDn
+                waiting := false
+                pending := na
+                below   := false
+            else if not filled
+                if close < e45
+                    below   := true             // closed below the slow EMA -> wait for the reclaim bar
+                    pending := na
+                else if below and close > e45 and up and aligned
+                    pending := high             // first close back above the slow EMA
+                    below   := false
+                else if not below and na(pending) and low <= e45 and up and aligned
+                    pending := high             // touched the slow EMA and closed above it
+else
+    if not na(exitLevel) and crossUp
+        exitLevel := na                         // EMA9 crossed back up -> cancel the pending exit
+    if crossDn
+        exitLevel := low
+
+// ---------- Orders ----------
+bool canEnter = flat and not na(pending) and aligned and (mode == "Breakout" or up)
+if canEnter
+    slDist := atrMult * atr
+    float qty = strategy.equity * riskPct / 100 / slDist
+    strategy.entry("Long", strategy.long, qty = qty, stop = pending)
+    strategy.exit("Exit", from_entry = "Long", loss = slDist / syminfo.mintick)   // stop from the actual fill price, active on the entry bar
+else
+    strategy.cancel("Long")
+
+if not flat
+    float stopLvl = na(exitLevel) ? slPrice : math.max(slPrice, exitLevel)
+    strategy.exit("Exit", from_entry = "Long", stop = stopLvl)
+
+// ---------- Plots ----------
+plot(e9, "Fast EMA", color = color.new(color.aqua, 0))
+plot(e45, "Slow EMA", color = color.new(color.orange, 0), linewidth = 2)
+plot(e200, "Trend EMA", color = color.new(color.gray, 0), linewidth = 2)
+plot(canEnter ? pending : na, "Pending buy level", color = color.green, style = plot.style_circles, linewidth = 2)
+plot(not flat or filled ? slPrice : na, "Stop loss", color = color.red, style = plot.style_circles, linewidth = 2)
+plot(not flat ? exitLevel : na, "Pending exit level", color = color.fuchsia, style = plot.style_circles, linewidth = 2)
+plotshape(crossUp and aligned, "Bullish cross (trend aligned)", shape.triangleup, location.belowbar, color.green, size = size.tiny)
+plotshape(crossDn, "Bearish cross", shape.triangledown, location.abovebar, color.red, size = size.tiny)
+
+// ---------- Projected stop loss and current levels ----------
+float projSL = canEnter ? pending - atrMult * atr : na   // stop loss if the buy-stop fills exactly at the pending level
+plot(projSL, "Projected stop loss", color = color.new(color.red, 50), style = plot.style_circles, linewidth = 2)
+plot(atr, "ATR(14)", display = display.data_window)
+plot(atrMult * atr, "Stop distance (k x ATR)", display = display.data_window)
+
+// plot() needs two bars to draw a line, so the levels valid for the next bar are also drawn from the latest closed bar to the right
+// (redrawn on every confirmed bar: strategies run on bar close, so barstate.islast is not reliable here)
+drawLevel(line oldLn, label oldLb, float price, color col, string txt) =>
+    line.delete(oldLn)
+    label.delete(oldLb)
+    line  ln = na
+    label lb = na
+    if not na(price)
+        ln := line.new(bar_index, price, bar_index + 1, price, color = col, style = line.style_dashed, width = 2, extend = extend.right)
+        lb := label.new(bar_index + 2, price, txt + " " + str.tostring(price, format.mintick), style = label.style_label_left, color = color.new(col, 85), textcolor = col, size = size.small)
+    [ln, lb]
+
+var line  lnBuy  = na
+var label lbBuy  = na
+var line  lnProj = na
+var label lbProj = na
+var line  lnSL   = na
+var label lbSL   = na
+var line  lnExit = na
+var label lbExit = na
+if barstate.isconfirmed
+    [l1, b1] = drawLevel(lnBuy, lbBuy, canEnter ? pending : na, color.green, "Buy stop")
+    lnBuy := l1
+    lbBuy := b1
+    [l2, b2] = drawLevel(lnProj, lbProj, projSL, color.new(color.red, 30), "Projected SL")
+    lnProj := l2
+    lbProj := b2
+    [l3, b3] = drawLevel(lnSL, lbSL, not flat ? slPrice : na, color.red, "Stop loss")
+    lnSL := l3
+    lbSL := b3
+    [l4, b4] = drawLevel(lnExit, lbExit, not flat ? exitLevel : na, color.fuchsia, "Exit stop")
+    lnExit := l4
+    lbExit := b4
+
+// ---------- Alerts: create an alert on this strategy and choose "alert() function calls only" ----------
+string tag = syminfo.ticker + " " + timeframe.period + ": "
+fmt(float x) => str.tostring(x, format.mintick)
+if canEnter and (not canEnter[1] or pending != pending[1])
+    alert(tag + "BUY STOP " + fmt(pending) + " | projected SL " + fmt(projSL) + " | SL distance " + fmt(atrMult * atr) + " (" + str.tostring(atrMult) + " x ATR)", alert.freq_once_per_bar_close)
+if canEnter[1] and not canEnter and not filled
+    alert(tag + "Buy stop " + fmt(pending[1]) + " cancelled", alert.freq_once_per_bar_close)
+if filled and not flat
+    alert(tag + "LONG FILLED at " + fmt(strategy.position_avg_price) + " | stop loss " + fmt(slPrice) + " | SL distance " + fmt(slDist), alert.freq_once_per_bar_close)
+if filled and flat
+    alert(tag + "Long filled and stopped out on the same bar", alert.freq_once_per_bar_close)
+if not flat and crossDn
+    alert(tag + "EXIT STOP " + fmt(exitLevel) + " | stop loss " + fmt(slPrice) + " | active stop " + fmt(math.max(slPrice, exitLevel)), alert.freq_once_per_bar_close)
+if not flat and crossUp and not na(exitLevel[1])
+    alert(tag + "Exit stop cancelled (EMA9 back above EMA45) | stop loss " + fmt(slPrice), alert.freq_once_per_bar_close)
+if flat and not filled and strategy.closedtrades > strategy.closedtrades[1]
+    alert(tag + "POSITION CLOSED at " + fmt(strategy.closedtrades.exit_price(strategy.closedtrades - 1)), alert.freq_once_per_bar_close)

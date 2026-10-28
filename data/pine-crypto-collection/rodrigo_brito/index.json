@@ -1,0 +1,28 @@
+[
+  {
+    "path": "strategies/setup_9_2.pine",
+    "title_zh": "9.2 均线趋势策略",
+    "original_description": "Trending following with EMA of 9 periods\n\n- Source Code: [strategies/setup_9_2.pine](strategies/setup_9_2.pine)\n- Indicators: EMA\n- Time Frame: Day\n- Long only\n\nPreview in BTC/USDT (period 01/2019 to 05/2020)",
+    "description_zh": "使用 9 周期 EMA 的趋势跟随策略；作者在 BTC/USDT 上提供了日线、多头示例。",
+    "crypto_relevance": "作者展示 BTC/USDT 示例，策略可用于其他市场。",
+    "source_url": "https://github.com/rodrigo-brito/tradingview-strategies/blob/e371048b464637d66db3c1d35f22b2f153feadcb/strategies/setup_9_2.pine",
+    "description_source_url": "https://github.com/rodrigo-brito/tradingview-strategies/blob/e371048b464637d66db3c1d35f22b2f153feadcb/README.md",
+    "source_commit": "e371048b464637d66db3c1d35f22b2f153feadcb",
+    "sha256": "257556af72e7886499596a42eec9ba7da7a98f6180fcce5093d9a8db2a27f003",
+    "license": "MIT",
+    "author": "rodrigo-brito"
+  },
+  {
+    "path": "strategies/scalping_ema9.pine",
+    "title_zh": "3 EMA 短线策略",
+    "original_description": "- Source Code: [strategies/scalping_ema9.pine](strategies/scalping_ema9.pine)\n- Indicators: EMA\n- Time Frame: Hour\n- Long only\n\nPreview in BTC/USDT (period 01/2019 to 05/2020)",
+    "description_zh": "3 EMA 短线策略；作者在 BTC/USDT 上提供了小时线、多头示例。",
+    "crypto_relevance": "作者展示 BTC/USDT 示例，策略可用于其他市场。",
+    "source_url": "https://github.com/rodrigo-brito/tradingview-strategies/blob/e371048b464637d66db3c1d35f22b2f153feadcb/strategies/scalping_ema9.pine",
+    "description_source_url": "https://github.com/rodrigo-brito/tradingview-strategies/blob/e371048b464637d66db3c1d35f22b2f153feadcb/README.md",
+    "source_commit": "e371048b464637d66db3c1d35f22b2f153feadcb",
+    "sha256": "9ddb1a592a5078cbb55074557dd5dd18c7f889b6826642f8f30e68514e53b3a5",
+    "license": "MIT",
+    "author": "rodrigo-brito"
+  }
+]

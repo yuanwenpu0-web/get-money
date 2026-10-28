@@ -1,0 +1,16 @@
+[
+  {
+    "path": "alert-engine-webhook.pine",
+    "kind": "indicator",
+    "title_zh": "收盘时触发的 JSON 告警示例",
+    "original_description": "Alerts that fire once per closed bar, with a JSON payload",
+    "description_zh": "在 K 线收盘时触发一次告警，并提供 JSON 数据。",
+    "crypto_relevance": "作者提供 BINANCE BTCUSDT 告警示例；该脚本是通用演示，并非加密专用。",
+    "implementation_note_zh": "作者说明脚本是工程演示，交叉信号仅为占位示例，不声称存在交易优势，也未验证盈利。告警和 webhook 需用户自行配置。",
+    "source_url": "https://github.com/davlacombe-collab/pine-scripts/blob/1f62525054c79dfd19ceb1fe211ed1183b830086/alert-engine-webhook.pine",
+    "description_source_url": "https://github.com/davlacombe-collab/pine-scripts/blob/1f62525054c79dfd19ceb1fe211ed1183b830086/README.md",
+    "source_commit": "1f62525054c79dfd19ceb1fe211ed1183b830086",
+    "license": "MIT",
+    "sha256": "5589221f5659622f5e6b53412c7bb1aff00d057043c0acbe3ae27ae09ad69494"
+  }
+]

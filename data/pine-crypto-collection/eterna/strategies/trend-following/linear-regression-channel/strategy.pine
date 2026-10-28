@@ -1,0 +1,89 @@
+//@version=5
+strategy("Linear Regression Channel - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+lengthLR = input.int(100, "Linear Regression Length", minval=10)
+deviationMultiplier = input.float(2.0, "Deviation Multiplier", minval=0.5, step=0.1)
+trendEMA = input.int(50, "Trend Filter EMA", minval=1)
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", group="Webhook")
+
+// ==================== Linear Regression Calculation ====================
+linReg = ta.linreg(close, lengthLR, 0)
+
+// Calculate standard deviation for bands
+calcDev() =>
+    sumDev = 0.0
+    for i = 0 to lengthLR - 1
+        sumDev := sumDev + math.pow(close[i] - ta.linreg(close, lengthLR, i), 2)
+    math.sqrt(sumDev / lengthLR)
+
+dev = calcDev()
+upperBand = linReg + (dev * deviationMultiplier)
+lowerBand = linReg - (dev * deviationMultiplier)
+emaFilter = ta.ema(close, trendEMA)
+
+// ==================== Entry Conditions ====================
+// Trend direction based on EMA and linear regression slope
+uptrend = close > emaFilter and linReg > linReg[5]
+downtrend = close < emaFilter and linReg < linReg[5]
+
+// Long: Price bounces off lower band in uptrend
+longBounce = ta.crossover(close, lowerBand) and low <= lowerBand
+longCondition = uptrend and longBounce
+
+// Short: Price rejects from upper band in downtrend
+shortReject = ta.crossunder(close, upperBand) and high >= upperBand
+shortCondition = downtrend and shortReject
+
+// Exit when price crosses back to linear regression line
+exitLong = ta.crossunder(close, linReg)
+exitShort = ta.crossover(close, linReg)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+linRegPlot = plot(linReg, "Linear Regression", color=color.blue, linewidth=2)
+upperPlot = plot(upperBand, "Upper Band", color=color.new(color.green, 0), linewidth=1)
+lowerPlot = plot(lowerBand, "Lower Band", color=color.new(color.red, 0), linewidth=1)
+plot(emaFilter, "Trend EMA", color=color.orange, linewidth=1)
+
+// Fill channel
+fill(upperPlot, lowerPlot, color=color.new(color.blue, 93))
+
+// Entry signals
+plotshape(longCondition, "Long", shape.triangleup, location.belowbar, color.green, size=size.normal)
+plotshape(shortCondition, "Short", shape.triangledown, location.abovebar, color.red, size=size.normal)
+
+// Show regression slope
+slopeUp = linReg > linReg[5]
+bgcolor(slopeUp ? color.new(color.green, 96) : color.new(color.red, 96))
+
+// Plot channel slope angle indicator
+slopeAngle = math.atan((linReg - linReg[10]) / 10) * (180 / math.pi)
+var label slopeLabel = na
+if bar_index % 20 == 0
+    label.delete(slopeLabel)
+    slopeLabel := label.new(bar_index, high, "Slope: " + str.tostring(slopeAngle, "#.#") + "°", 
+                            color=slopeAngle > 0 ? color.green : color.red, 
+                            textcolor=color.white, size=size.small, style=label.style_label_down)

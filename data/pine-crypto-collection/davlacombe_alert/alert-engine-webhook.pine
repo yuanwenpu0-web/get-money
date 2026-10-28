@@ -1,0 +1,63 @@
+//@version=6
+indicator("Alert Engine — Webhook Ready", shorttitle="Alert Engine", overlay=true)
+
+// A minimal but production-shaped alert layer: one signal per closed bar,
+// never twice, with a payload an automation endpoint can parse directly.
+
+// ---------- Inputs ----------
+lenFast     = input.int(21,           "Fast EMA length", minval=1)
+lenSlow     = input.int(50,           "Slow EMA length", minval=1)
+fmt         = input.string("JSON",    "Message format", options = ["JSON", "Plain text"])
+strategyId  = input.string("ema-cross", "Strategy id (sent in the payload)")
+confirmOnly = input.bool(true,        "Fire only on closed bars")
+
+// ---------- Signal ----------
+emaFast = ta.ema(close, lenFast)
+emaSlow = ta.ema(close, lenSlow)
+
+rawBull = ta.crossover(emaFast,  emaSlow)
+rawBear = ta.crossunder(emaFast, emaSlow)
+
+// ---------- Bar gate ----------
+// barstate.isconfirmed is false while the bar is still forming. With the gate
+// enabled, a cross that appears and vanishes intrabar can never reach alert().
+gate = confirmOnly ? barstate.isconfirmed : true
+bull = rawBull and gate
+bear = rawBear and gate
+
+// ---------- Duplicate guard ----------
+// The single most common bug in paid alert scripts: the same bar firing twice.
+// firedOnBar remembers which bar has already produced a signal.
+var int firedOnBar = na
+canFire  = na(firedOnBar) or firedOnBar != bar_index
+fireBull = bull and canFire
+fireBear = bear and canFire
+if fireBull or fireBear
+    firedOnBar := bar_index
+
+// ---------- Payload ----------
+direction = fireBull ? "long" : "short"
+stamp     = str.format_time(time, "yyyy-MM-dd'T'HH:mm:ss", "UTC")
+
+jsonMsg = '{"strategy":"' + strategyId +
+          '","symbol":"'   + syminfo.ticker +
+          '","exchange":"' + syminfo.prefix +
+          '","tf":"'       + timeframe.period +
+          '","side":"'     + direction +
+          '","price":'     + str.tostring(close, format.mintick) +
+          ',"time":"'      + stamp + 'Z"}'
+
+textMsg = syminfo.ticker + " " + timeframe.period + " - " + direction +
+          " @ " + str.tostring(close, format.mintick) + " (" + stamp + " UTC)"
+
+msg = fmt == "JSON" ? jsonMsg : textMsg
+
+// ---------- Fire ----------
+if fireBull or fireBear
+    alert(msg, alert.freq_once_per_bar_close)
+
+// ---------- Visuals ----------
+plot(emaFast, "Fast EMA", color = color.new(color.teal,   0))
+plot(emaSlow, "Slow EMA", color = color.new(color.orange, 0))
+plotshape(fireBull, "Long alert",  shape.triangleup,   location.belowbar, color.teal,   size = size.tiny)
+plotshape(fireBear, "Short alert", shape.triangledown, location.abovebar, color.orange, size = size.tiny)

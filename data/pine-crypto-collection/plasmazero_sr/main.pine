@@ -1,0 +1,242 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © PlasmaZero
+
+//@version=6
+indicator("Support/Resistance & Liquidity Zones", overlay = true, max_lines_count = 500, max_boxes_count = 500)
+
+// Inputs
+leftBars   = input.int(5,  "Pivot Left Bars",  minval = 1, maxval = 20, group = "Pivot Settings")
+rightBars  = input.int(5,  "Pivot Right Bars", minval = 1, maxval = 20, group = "Pivot Settings")
+maxLevels  = input.int(5,  "Max Levels to Show", minval = 1, maxval = 20, group = "Pivot Settings")
+lookback   = input.int(100, "Lookback Period (bars)", minval = 20, maxval = 500, group = "Pivot Settings")
+extendBars = input.int(50,  "Extend Zones Right (bars)", minval = 10, maxval = 200, group = "Pivot Settings")
+
+showSupport    = input.bool(true,  "Show Support Zones (S)", group = "Display")
+showResistance = input.bool(true,  "Show Resistance Zones (R)", group = "Display")
+showLiquidity  = input.bool(true,  "Show Liquidity Zones (L)", group = "Display")
+showLabels     = input.bool(true,  "Show Zone Labels", group = "Display")
+showStrength   = input.bool(true,  "Show Level Strength", group = "Display")
+
+volThreshold   = input.int(150,    "Volume Threshold %", minval = 100, maxval = 300, group = "Liquidity")
+zoneWidth      = input.float(0.5,  "Zone Width %", minval = 0.1, maxval = 5.0, group = "Liquidity")
+
+supColor       = input.color(color.new(color.green, 80), "Support Zone", group = "Colors")
+resColor       = input.color(color.new(color.red, 80),   "Resistance Zone", group = "Colors")
+liqColor       = input.color(color.new(color.blue, 85),  "Liquidity Zone", group = "Colors")
+
+// Pivot detection
+ph = ta.pivothigh(high, leftBars, rightBars)
+pl = ta.pivotlow(low,  leftBars, rightBars)
+
+// Volume stuff
+avgVol = ta.sma(volume, 20)
+highVol = volume > avgVol * (volThreshold / 100)
+
+// Storage arrays
+var box[] resBoxes = array.new_box()
+var box[] supBoxes = array.new_box()
+var box[] liqBoxes = array.new_box()
+
+var label[] resLabels = array.new_label()
+var label[] supLabels = array.new_label()
+var label[] liqLabels = array.new_label()
+
+var float[] resLevels = array.new_float()
+var float[] supLevels = array.new_float()
+var int[]   resTouches = array.new_int()
+var int[]   supTouches = array.new_int()
+
+// Helper functions
+getStrength(touches) =>
+    touches <= 2 ? "●" : touches <= 4 ? "●●" : "●●●"
+
+nearLevel(price, level, tolerance) =>
+    math.abs(price - level) / level < tolerance / 100
+
+// Check if new pivot matches an existing level
+findExistingLevel(levels, newLevel, tolerance) =>
+    int foundIdx = -1
+    if array.size(levels) > 0
+        for i = 0 to array.size(levels) - 1
+            if nearLevel(newLevel, array.get(levels, i), tolerance)
+                foundIdx := i
+                break
+    foundIdx
+
+// Resistance zones
+if showResistance and not na(ph)
+    int   x  = bar_index - rightBars
+    float y  = ph
+    float y2 = y * (1 + zoneWidth / 100)
+    
+    // Only track recent pivots
+    if bar_index - x <= lookback
+        existingIdx = findExistingLevel(resLevels, y, zoneWidth * 2)
+        
+        if existingIdx >= 0
+            // Update the existing level
+            currentTouches = array.get(resTouches, existingIdx)
+            array.set(resTouches, existingIdx, currentTouches + 1)
+            
+            // Update label with new strength
+            if showLabels and array.size(resLabels) > existingIdx
+                oldLabel = array.get(resLabels, existingIdx)
+                label.delete(oldLabel)
+                
+                labelText = "R"
+                if showStrength
+                    labelText := labelText + " " + getStrength(currentTouches + 1)
+                
+                newLabel = label.new(
+                     x = bar_index,
+                     y = array.get(resLevels, existingIdx),
+                     text = labelText,
+                     style = label.style_label_down,
+                     color = color.new(color.red, 30),
+                     textcolor = color.white,
+                     size = size.small
+                 )
+                array.set(resLabels, existingIdx, newLabel)
+        else
+            // New level - check if it's a liquidity zone
+            isLiqZone = highVol and showLiquidity
+            
+            box b = box.new(
+                 left   = x,
+                 top    = y2,
+                 right  = bar_index + extendBars,
+                 bottom = y,
+                 bgcolor = isLiqZone ? liqColor : resColor,
+                 border_color = isLiqZone ? color.new(color.blue, 40) : color.new(color.red, 40),
+                 border_width = isLiqZone ? 2 : 1
+             )
+            array.push(isLiqZone ? liqBoxes : resBoxes, b)
+            
+            array.push(resLevels, y)
+            array.push(resTouches, 1)
+            
+            if showLabels
+                labelText = isLiqZone ? "L" : "R"
+                if showStrength
+                    labelText := labelText + " " + getStrength(1)
+                
+                lbl = label.new(
+                     x = bar_index,
+                     y = y,
+                     text = labelText,
+                     style = label.style_label_down,
+                     color = isLiqZone ? color.new(color.blue, 30) : color.new(color.red, 30),
+                     textcolor = color.white,
+                     size = size.small
+                 )
+                array.push(isLiqZone ? liqLabels : resLabels, lbl)
+            
+            // Clean up old zones
+            if array.size(isLiqZone ? liqBoxes : resBoxes) > maxLevels
+                box old = array.shift(isLiqZone ? liqBoxes : resBoxes)
+                box.delete(old)
+                array.shift(resLevels)
+                array.shift(resTouches)
+                if showLabels
+                    label oldLbl = array.shift(isLiqZone ? liqLabels : resLabels)
+                    label.delete(oldLbl)
+
+// Support zones
+if showSupport and not na(pl)
+    int   x  = bar_index - rightBars
+    float y  = pl
+    float y2 = y * (1 - zoneWidth / 100)
+    
+    // Only track recent pivots
+    if bar_index - x <= lookback
+        existingIdx = findExistingLevel(supLevels, y, zoneWidth * 2)
+        
+        if existingIdx >= 0
+            // Update the existing level
+            currentTouches = array.get(supTouches, existingIdx)
+            array.set(supTouches, existingIdx, currentTouches + 1)
+            
+            // Update label with new strength
+            if showLabels and array.size(supLabels) > existingIdx
+                oldLabel = array.get(supLabels, existingIdx)
+                label.delete(oldLabel)
+                
+                labelText = "S"
+                if showStrength
+                    labelText := labelText + " " + getStrength(currentTouches + 1)
+                
+                newLabel = label.new(
+                     x = bar_index,
+                     y = array.get(supLevels, existingIdx),
+                     text = labelText,
+                     style = label.style_label_up,
+                     color = color.new(color.green, 30),
+                     textcolor = color.white,
+                     size = size.small
+                 )
+                array.set(supLabels, existingIdx, newLabel)
+        else
+            // New level - check if it's a liquidity zone
+            isLiqZone = highVol and showLiquidity
+            
+            box b = box.new(
+                 left   = x,
+                 top    = y,
+                 right  = bar_index + extendBars,
+                 bottom = y2,
+                 bgcolor = isLiqZone ? liqColor : supColor,
+                 border_color = isLiqZone ? color.new(color.blue, 40) : color.new(color.green, 40),
+                 border_width = isLiqZone ? 2 : 1
+             )
+            array.push(isLiqZone ? liqBoxes : supBoxes, b)
+            
+            array.push(supLevels, y)
+            array.push(supTouches, 1)
+            
+            if showLabels
+                labelText = isLiqZone ? "L" : "S"
+                if showStrength
+                    labelText := labelText + " " + getStrength(1)
+                
+                lbl = label.new(
+                     x = bar_index,
+                     y = y,
+                     text = labelText,
+                     style = label.style_label_up,
+                     color = isLiqZone ? color.new(color.blue, 30) : color.new(color.green, 30),
+                     textcolor = color.white,
+                     size = size.small
+                 )
+                array.push(isLiqZone ? liqLabels : supLabels, lbl)
+            
+            // Clean up old zones
+            if array.size(isLiqZone ? liqBoxes : supBoxes) > maxLevels
+                box old = array.shift(isLiqZone ? liqBoxes : supBoxes)
+                box.delete(old)
+                array.shift(supLevels)
+                array.shift(supTouches)
+                if showLabels
+                    label oldLbl = array.shift(isLiqZone ? liqLabels : supLabels)
+                    label.delete(oldLbl)
+
+// Pivot markers
+plotshape(not na(ph) and showResistance, 
+     title = "Pivot High",
+     style = shape.triangledown, 
+     location = location.abovebar,
+     color = color.new(color.red, 20), 
+     size = size.tiny)
+
+plotshape(not na(pl) and showSupport, 
+     title = "Pivot Low",
+     style = shape.triangleup, 
+     location = location.belowbar,
+     color = color.new(color.green, 20), 
+     size = size.tiny)
+
+// Alerts
+breakResistance = ta.crossover(close, ta.highest(high, 20))
+breakSupport = ta.crossunder(close, ta.lowest(low, 20))
+
+alertcondition(breakResistance, "Resistance Break", "Price broke resistance level")
+alertcondition(breakSupport, "Support Break", "Price broke support level")

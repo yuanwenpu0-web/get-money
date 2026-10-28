@@ -1,0 +1,76 @@
+// This Pine Script™ v6 indicator/strategy is subject to the Terms of Usage at https://www.tradingview.com/pine-script-docs/
+// © VWMA17 Trading Strategy
+
+//@version=6
+strategy("VWMA 17 Strategy (Adaptive Filter)", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=100, initial_capital=10000, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// ─── Inputs ───
+vwmaLength      = input.int(17, "VWMA Length", minval=1)
+atrLength       = input.int(14, "ATR Length (for Stop Loss)", minval=1)
+atrMultiplier   = input.float(1.5, "ATR Multiplier (Stop Loss)", minval=0.1, step=0.1)
+tpMultiplier    = input.float(2.0, "Take Profit Multiplier (x ATR)", minval=0.1, step=0.1)
+
+// Adaptive Trend Filter
+erPeriod        = input.int(50, "Efficiency Ratio Lookback", minval=5)
+erThreshold     = input.float(0.3, "ER Threshold (above=trending)", minval=0.05, maxval=0.95, step=0.05)
+smaTrending     = input.int(200, "SMA Period — Trending Regime", minval=10)
+smaChoppy       = input.int(100, "SMA Period — Choppy Regime", minval=10)
+
+useDateFilter   = input.bool(false, "Use Date Range Filter")
+startDate       = input.time(timestamp("2024-01-01"), "Start Date")
+endDate         = input.time(timestamp("2026-12-31"), "End Date")
+
+// ─── Calculations ───
+vwma17  = ta.vwma(close, vwmaLength)
+atr     = ta.atr(atrLength)
+
+// Kaufman Efficiency Ratio: |net change| / sum(|bar-to-bar changes|)
+netChange   = math.abs(close - close[erPeriod])
+sumChanges  = math.sum(math.abs(close - close[1]), erPeriod)
+er          = sumChanges != 0 ? netChange / sumChanges : 0.0
+
+// Adaptive SMA: pick period based on ER
+smaLong     = ta.sma(close, smaTrending)
+smaShort    = ta.sma(close, smaChoppy)
+isTrending  = er > erThreshold
+activeSma   = isTrending ? smaLong : smaShort
+
+// ─── Conditions ───
+inDateRange = not useDateFilter or (time >= startDate and time <= endDate)
+
+// Price crosses above VWMA AND above active SMA → bullish signal
+longCondition  = ta.crossover(close, vwma17) and close > activeSma and inDateRange
+// Price crosses below VWMA AND below active SMA → bearish signal
+shortCondition = ta.crossunder(close, vwma17) and close < activeSma and inDateRange
+
+// ─── Stop Loss & Take Profit ───
+longStop   = close - atr * atrMultiplier
+longTP     = close + atr * tpMultiplier
+shortStop  = close + atr * atrMultiplier
+shortTP    = close - atr * tpMultiplier
+
+// ─── Strategy Execution ───
+if longCondition
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long Exit", "Long", stop=longStop, limit=longTP)
+
+if shortCondition
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short Exit", "Short", stop=shortStop, limit=shortTP)
+
+// ─── Plotting ───
+vwmaPlot  = plot(vwma17, "VWMA 17", color=color.new(color.blue, 0), linewidth=2)
+smaPlot   = plot(activeSma, "Active SMA", color=isTrending ? color.new(color.orange, 0) : color.new(color.purple, 0), linewidth=1, style=plot.style_stepline)
+pricePlot = plot(close, "Close", display=display.none)
+fill(vwmaPlot, pricePlot, color=close > vwma17 ? color.new(color.green, 85) : color.new(color.red, 85))
+
+// ─── Regime Background ───
+bgcolor(isTrending ? color.new(color.orange, 95) : color.new(color.purple, 95), title="Regime")
+
+// ─── Signal Markers ───
+plotshape(longCondition,  title="Long Signal",  location=location.belowbar, style=shape.triangleup,   color=color.green, size=size.small, text="Long")
+plotshape(shortCondition, title="Short Signal", location=location.abovebar, style=shape.triangledown, color=color.red,   size=size.small, text="Short")
+
+// ─── Alerts ───
+alertcondition(longCondition,  title="VWMA17 Long",  message="VWMA17: Long entry — price crossed above VWMA in uptrend")
+alertcondition(shortCondition, title="VWMA17 Short", message="VWMA17: Short entry — price crossed below VWMA in downtrend")

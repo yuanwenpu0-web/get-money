@@ -1,0 +1,16 @@
+[
+  {
+    "path": "trading-bot.pine",
+    "kind": "strategy",
+    "title_zh": "加密货币交易机器人示例策略",
+    "original_description": "This bot trades based on a personal strategy rooted in high-frequency trading.",
+    "description_zh": "作者称该交易机器人使用源于高频交易的个人策略。",
+    "crypto_relevance": "README 将加密货币交易列为使用背景；实际脚本可在其他图表上使用。",
+    "implementation_note_zh": "源码使用固定的 2024 年回测日期输入并引用 TradingView/ta/7 库；README 提及交易所 API 集成，但源码未见交易所 API 连接；version 声明位于 import 之后，未在 TradingView 编译验证。",
+    "source_url": "https://github.com/FedeHide/trading-bot/blob/51e008896ea5b7b30486b241a49b46ed829122c3/trading-bot.pine",
+    "description_source_url": "https://github.com/FedeHide/trading-bot/blob/51e008896ea5b7b30486b241a49b46ed829122c3/README.md",
+    "source_commit": "51e008896ea5b7b30486b241a49b46ed829122c3",
+    "sha256": "199f78910dfc0caa99a4fd5406eed44e723a6f4f7ecf5e23719ed322416cb10a",
+    "license": "MIT"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "path": "Scripts/FibTrend_1%_TP.pine",
+    "kind": "strategy",
+    "title": "Volume + Fibonacci + Trend + ATR Strategy with 1% Take Profit",
+    "title_zh": "成交量、斐波那契、趋势与 ATR 策略（固定 1% 止盈）",
+    "original_description": "This version sets a **fixed 1% take profit** per trade. Ideal for **short-term traders** looking for quick gains.",
+    "description_zh": "此版本为每笔交易设置固定 1% 的止盈，面向希望较快获利的短线交易者。",
+    "crypto_relevance": "作者声明适用于加密、股票和外汇市场。",
+    "description_source_url": "https://github.com/11Muhil/FibTrend-Pro-Strategy_Pinescript/blob/1b4b64c95bb3275304add103227553414e58365c/README.md",
+    "source_url": "https://github.com/11Muhil/FibTrend-Pro-Strategy_Pinescript/blob/1b4b64c95bb3275304add103227553414e58365c/Scripts/FibTrend_1%25_TP.pine",
+    "source_commit": "1b4b64c95bb3275304add103227553414e58365c",
+    "sha256": "850d0973bf7d88480464db466efbc9854591310669ffa5e37a1940830a3b2387",
+    "license": "MIT",
+    "author": "11Muhil"
+  },
+  {
+    "path": "Scripts/FibTrend_ATR.pine",
+    "kind": "strategy",
+    "title": "Optimized Volume + Fibonacci + Trend + ATR Strategy",
+    "title_zh": "优化版成交量、斐波那契、趋势与 ATR 策略",
+    "original_description": "This version **dynamically adjusts take profit** based on **market volatility (ATR)**. Best for **adaptive risk management**.",
+    "description_zh": "此版本根据市场波动性（ATR）动态调整止盈，适合自适应风险管理。",
+    "crypto_relevance": "作者声明适用于加密、股票和外汇市场。",
+    "description_source_url": "https://github.com/11Muhil/FibTrend-Pro-Strategy_Pinescript/blob/1b4b64c95bb3275304add103227553414e58365c/README.md",
+    "source_url": "https://github.com/11Muhil/FibTrend-Pro-Strategy_Pinescript/blob/1b4b64c95bb3275304add103227553414e58365c/Scripts/FibTrend_ATR.pine",
+    "source_commit": "1b4b64c95bb3275304add103227553414e58365c",
+    "sha256": "1d72855cc5d5e2814f7f6868b0069cea2994abc66b6561fc51ccb707620cf7f4",
+    "license": "MIT",
+    "author": "11Muhil"
+  }
+]

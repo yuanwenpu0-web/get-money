@@ -1,0 +1,368 @@
+//@version=5
+indicator("Live Market Scanner - V7", overlay=true, max_boxes_count=10, max_labels_count=20, max_lines_count=50)
+
+// ============================================
+// SETTINGS
+// ============================================
+sensitivity = input.string("Medium", "Signal Sensitivity", options=["Low", "Medium", "High"])
+showPrediction = input.bool(true, "Show Future Candles")
+showLevels = input.bool(true, "Show TP/SL Levels")
+showDashboard = input.bool(true, "Show Live Dashboard")
+
+// Convert sensitivity to threshold
+minConfidence = sensitivity == "High" ? 55 : sensitivity == "Medium" ? 65 : 75
+
+// ============================================
+// CORE INDICATORS
+// ============================================
+// MACD
+[macdLine, signalLine, hist] = ta.macd(close, 12, 26, 9)
+macdBullish = macdLine > signalLine and hist > hist[1]
+macdBearish = macdLine < signalLine and hist < hist[1]
+macdCrossUp = ta.crossover(macdLine, signalLine)
+macdCrossDown = ta.crossunder(macdLine, signalLine)
+
+// RSI
+rsi = ta.rsi(close, 14)
+rsiOversold = rsi < 35
+rsiOverbought = rsi > 65
+rsiRising = rsi > rsi[1] and rsi > rsi[2]
+rsiFalling = rsi < rsi[1] and rsi < rsi[2]
+
+// EMAs
+ema9 = ta.ema(close, 9)
+ema21 = ta.ema(close, 21)
+ema50 = ta.ema(close, 50)
+emaBullish = ema9 > ema21
+emaBearish = ema9 < ema21
+emaCrossUp = ta.crossover(ema9, ema21)
+emaCrossDown = ta.crossunder(ema9, ema21)
+
+// Volume
+volAvg = ta.sma(volume, 20)
+volSpike = volume > volAvg * 1.3
+volRising = volume > volume[1]
+
+// ATR
+atr = ta.atr(14)
+
+// Price momentum
+priceUp = close > open and close > close[1]
+priceDown = close < open and close < close[1]
+strongBullCandle = (close - open) > atr * 0.3
+strongBearCandle = (open - close) > atr * 0.3
+
+// Trend
+trend = ta.ema(close, 50)
+bullTrend = close > trend
+bearTrend = close < trend
+
+// Linear regression (calculate always)
+linreg = ta.linreg(close, 20, 0)
+slope = linreg - linreg[1]
+
+// ============================================
+// CONTINUOUS SIGNAL CALCULATION
+// ============================================
+
+// LONG SCORE (calculated every bar)
+longScore = 0
+
+if macdCrossUp
+    longScore += 30
+else if macdBullish
+    longScore += 20
+
+if rsiOversold and rsiRising
+    longScore += 25
+else if rsiRising
+    longScore += 15
+
+if emaCrossUp
+    longScore += 25
+else if emaBullish
+    longScore += 15
+
+if volSpike and priceUp
+    longScore += 15
+else if volRising and priceUp
+    longScore += 10
+
+if strongBullCandle
+    longScore += 10
+else if priceUp
+    longScore += 5
+
+if bullTrend
+    longScore += 5
+
+// SHORT SCORE (calculated every bar)
+shortScore = 0
+
+if macdCrossDown
+    shortScore += 30
+else if macdBearish
+    shortScore += 20
+
+if rsiOverbought and rsiFalling
+    shortScore += 25
+else if rsiFalling
+    shortScore += 15
+
+if emaCrossDown
+    shortScore += 25
+else if emaBearish
+    shortScore += 15
+
+if volSpike and priceDown
+    shortScore += 15
+else if volRising and priceDown
+    shortScore += 10
+
+if strongBearCandle
+    shortScore += 10
+else if priceDown
+    shortScore += 5
+
+if bearTrend
+    shortScore += 5
+
+// Determine current signal
+validLong = longScore >= minConfidence
+validShort = shortScore >= minConfidence
+
+// Market status
+marketStatus = validLong ? "LONG" : validShort ? "SHORT" : longScore > shortScore ? "WAIT (Bullish)" : shortScore > longScore ? "WAIT (Bearish)" : "NEUTRAL"
+marketColor = validLong ? color.green : validShort ? color.red : longScore > shortScore ? color.new(color.green, 50) : shortScore > longScore ? color.new(color.red, 50) : color.gray
+
+// ============================================
+// LIVE DASHBOARD - TOP RIGHT
+// ============================================
+var table dashboard = table.new(position.top_right, 2, 12, border_width=2, border_color=color.new(color.gray, 50), bgcolor=color.new(color.black, 10))
+
+if barstate.islast and showDashboard
+    // Header
+    table.cell(dashboard, 0, 0, "📊 LIVE MARKET SCANNER", text_color=color.white, bgcolor=color.new(color.blue, 30), text_size=size.normal)
+    table.merge_cells(dashboard, 0, 0, 1, 0)
+    
+    // Current Signal
+    signalBg = validLong ? color.new(color.green, 70) : validShort ? color.new(color.red, 70) : color.new(color.gray, 80)
+    signalText = validLong ? "🚀 ENTER LONG NOW" : validShort ? "🔻 ENTER SHORT NOW" : "⏳ WAIT FOR SIGNAL"
+    table.cell(dashboard, 0, 1, signalText, text_color=color.white, bgcolor=signalBg, text_size=size.large)
+    table.merge_cells(dashboard, 0, 1, 1, 1)
+    
+    // Confidence Scores
+    table.cell(dashboard, 0, 2, "Long Confidence", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    longConfColor = longScore >= minConfidence ? color.new(color.green, 50) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 2, str.tostring(longScore) + "%", text_color=color.white, bgcolor=longConfColor, text_size=size.normal)
+    
+    table.cell(dashboard, 0, 3, "Short Confidence", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    shortConfColor = shortScore >= minConfidence ? color.new(color.red, 50) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 3, str.tostring(shortScore) + "%", text_color=color.white, bgcolor=shortConfColor, text_size=size.normal)
+    
+    // Separator
+    table.cell(dashboard, 0, 4, "════════════════", text_color=color.gray, bgcolor=color.new(color.black, 10), text_size=size.small)
+    table.merge_cells(dashboard, 0, 4, 1, 4)
+    
+    // Entry/Exit Levels
+    if validLong or validShort
+        table.cell(dashboard, 0, 5, "📍 ENTRY PRICE", text_color=color.white, bgcolor=color.new(color.blue, 70), text_size=size.small)
+        table.cell(dashboard, 1, 5, str.tostring(close, "#.#####"), text_color=color.yellow, bgcolor=color.new(color.blue, 70), text_size=size.normal)
+        
+        // Calculate levels
+        tp1 = validLong ? close + (atr * 1.5) : close - (atr * 1.5)
+        tp2 = validLong ? close + (atr * 3.0) : close - (atr * 3.0)
+        tp3 = validLong ? close + (atr * 4.5) : close - (atr * 4.5)
+        sl = validLong ? close - (atr * 1.5) : close + (atr * 1.5)
+        
+        table.cell(dashboard, 0, 6, "🎯 TP1 (1.5R)", text_color=color.white, bgcolor=color.new(color.green, 80), text_size=size.small)
+        table.cell(dashboard, 1, 6, str.tostring(tp1, "#.#####"), text_color=color.lime, bgcolor=color.new(color.green, 80), text_size=size.small)
+        
+        table.cell(dashboard, 0, 7, "🎯 TP2 (3.0R)", text_color=color.white, bgcolor=color.new(color.green, 80), text_size=size.small)
+        table.cell(dashboard, 1, 7, str.tostring(tp2, "#.#####"), text_color=color.lime, bgcolor=color.new(color.green, 80), text_size=size.small)
+        
+        table.cell(dashboard, 0, 8, "🎯 TP3 (4.5R)", text_color=color.white, bgcolor=color.new(color.green, 80), text_size=size.small)
+        table.cell(dashboard, 1, 8, str.tostring(tp3, "#.#####"), text_color=color.lime, bgcolor=color.new(color.green, 80), text_size=size.small)
+        
+        table.cell(dashboard, 0, 9, "🛑 STOP LOSS", text_color=color.white, bgcolor=color.new(color.red, 70), text_size=size.small)
+        table.cell(dashboard, 1, 9, str.tostring(sl, "#.#####"), text_color=color.orange, bgcolor=color.new(color.red, 70), text_size=size.normal)
+    else
+        table.cell(dashboard, 0, 5, "⏳ Waiting for Setup...", text_color=color.gray, bgcolor=color.new(color.black, 10), text_size=size.small)
+        table.merge_cells(dashboard, 0, 5, 1, 5)
+        
+        table.cell(dashboard, 0, 6, "Long Score: " + str.tostring(longScore) + "% (Need " + str.tostring(minConfidence) + "%)", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.merge_cells(dashboard, 0, 6, 1, 6)
+        
+        table.cell(dashboard, 0, 7, "Short Score: " + str.tostring(shortScore) + "% (Need " + str.tostring(minConfidence) + "%)", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.merge_cells(dashboard, 0, 7, 1, 7)
+    
+    // Separator
+    table.cell(dashboard, 0, 10, "════════════════", text_color=color.gray, bgcolor=color.new(color.black, 10), text_size=size.small)
+    table.merge_cells(dashboard, 0, 10, 1, 10)
+    
+    // Market Indicators
+    rsiColor = rsi > 65 ? color.new(color.red, 50) : rsi < 35 ? color.new(color.green, 50) : color.new(color.gray, 70)
+    table.cell(dashboard, 0, 11, "RSI: " + str.tostring(rsi, "#.#"), text_color=color.white, bgcolor=rsiColor, text_size=size.small)
+    
+    macdColor = macdBullish ? color.new(color.green, 70) : macdBearish ? color.new(color.red, 70) : color.new(color.gray, 80)
+    macdText = macdBullish ? "MACD: Bullish" : macdBearish ? "MACD: Bearish" : "MACD: Neutral"
+    table.cell(dashboard, 1, 11, macdText, text_color=color.white, bgcolor=macdColor, text_size=size.small)
+
+// ============================================
+// PRICE PROJECTION - FIXED SPACING
+// ============================================
+var box[] predictionBoxes = array.new<box>()
+var line[] predictionLines = array.new<line>()
+var line[] tpLines = array.new<line>()
+var line[] slLines = array.new<line>()
+
+// Clear old drawings
+if array.size(predictionBoxes) > 0
+    for i = 0 to array.size(predictionBoxes) - 1
+        box.delete(array.get(predictionBoxes, i))
+    array.clear(predictionBoxes)
+
+if array.size(predictionLines) > 0
+    for i = 0 to array.size(predictionLines) - 1
+        line.delete(array.get(predictionLines, i))
+    array.clear(predictionLines)
+
+if array.size(tpLines) > 0
+    for i = 0 to array.size(tpLines) - 1
+        line.delete(array.get(tpLines, i))
+    array.clear(tpLines)
+
+if array.size(slLines) > 0
+    for i = 0 to array.size(slLines) - 1
+        line.delete(array.get(slLines, i))
+    array.clear(slLines)
+
+// Draw prediction with proper spacing
+if barstate.islast and showPrediction and (validLong or validShort)
+    score = validLong ? longScore : shortScore
+    momentum = slope * (score / 50) * 1.5
+    
+    // Draw 3 separate prediction boxes with spacing
+    for i = 1 to 3
+        // Each box starts 2 bars apart: bar 1-2, bar 3-4, bar 5-6
+        futureBarStart = bar_index + (i * 2) - 1
+        futureBarEnd = bar_index + (i * 2)
+        
+        predictedMove = momentum * i * (1.3 - (i - 1) * 0.2)
+        predictedClose = close + predictedMove
+        
+        // Calculate high/low for prediction box
+        float predHigh = na
+        float predLow = na
+        
+        if validLong
+            predHigh := predictedClose + (atr * 0.7)
+            predLow := close + (predictedMove * 0.3)
+        else
+            predHigh := close + (predictedMove * 0.3)
+            predLow := predictedClose - (atr * 0.7)
+        
+        boxColor = validLong ? color.new(color.green, 85) : color.new(color.red, 85)
+        borderColor = validLong ? color.new(color.green, 50) : color.new(color.red, 50)
+        
+        predBox = box.new(
+            left=futureBarStart,
+            top=predHigh,
+            right=futureBarEnd,
+            bottom=predLow,
+            border_color=borderColor,
+            bgcolor=boxColor,
+            border_width=2,
+            border_style=line.style_dashed
+        )
+        array.push(predictionBoxes, predBox)
+        
+        closeLine = line.new(
+            x1=futureBarStart,
+            y1=predictedClose,
+            x2=futureBarEnd,
+            y2=predictedClose,
+            color=validLong ? color.new(color.green, 30) : color.new(color.red, 30),
+            width=3
+        )
+        array.push(predictionLines, closeLine)
+
+// ============================================
+// TP/SL LEVELS ON CHART
+// ============================================
+if barstate.islast and showLevels and (validLong or validShort)
+    if validLong
+        tp1 = close + (atr * 1.5)
+        tp2 = close + (atr * 3.0)
+        tp3 = close + (atr * 4.5)
+        sl = close - (atr * 1.5)
+        
+        tp1Line = line.new(bar_index, tp1, bar_index + 8, tp1, color=color.new(color.green, 40), width=1, style=line.style_dotted)
+        tp2Line = line.new(bar_index, tp2, bar_index + 8, tp2, color=color.new(color.green, 40), width=1, style=line.style_dotted)
+        tp3Line = line.new(bar_index, tp3, bar_index + 8, tp3, color=color.new(color.green, 40), width=1, style=line.style_dotted)
+        slLine = line.new(bar_index, sl, bar_index + 8, sl, color=color.new(color.red, 40), width=2, style=line.style_solid)
+        
+        array.push(tpLines, tp1Line)
+        array.push(tpLines, tp2Line)
+        array.push(tpLines, tp3Line)
+        array.push(slLines, slLine)
+        
+    else if validShort
+        tp1 = close - (atr * 1.5)
+        tp2 = close - (atr * 3.0)
+        tp3 = close - (atr * 4.5)
+        sl = close + (atr * 1.5)
+        
+        tp1Line = line.new(bar_index, tp1, bar_index + 8, tp1, color=color.new(color.red, 40), width=1, style=line.style_dotted)
+        tp2Line = line.new(bar_index, tp2, bar_index + 8, tp2, color=color.new(color.red, 40), width=1, style=line.style_dotted)
+        tp3Line = line.new(bar_index, tp3, bar_index + 8, tp3, color=color.new(color.red, 40), width=1, style=line.style_dotted)
+        slLine = line.new(bar_index, sl, bar_index + 8, sl, color=color.new(color.green, 40), width=2, style=line.style_solid)
+        
+        array.push(tpLines, tp1Line)
+        array.push(tpLines, tp2Line)
+        array.push(tpLines, tp3Line)
+        array.push(slLines, slLine)
+
+// ============================================
+// ENTRY SIGNALS ON CHART
+// ============================================
+plotshape(
+    validLong and barstate.islast,
+    "LONG",
+    shape.triangleup,
+    location.belowbar,
+    color.new(color.green, 0),
+    text="LONG",
+    textcolor=color.white,
+    size=size.huge
+)
+
+plotshape(
+    validShort and barstate.islast,
+    "SHORT",
+    shape.triangledown,
+    location.abovebar,
+    color.new(color.red, 0),
+    text="SHORT",
+    textcolor=color.white,
+    size=size.huge
+)
+
+// ============================================
+// PLOT EMAs
+// ============================================
+plot(ema9, "EMA 9", color.new(color.blue, 90), 1)
+plot(ema21, "EMA 21", color.new(color.orange, 90), 1)
+plot(ema50, "EMA 50", color.new(color.red, 90), 1)
+
+// ============================================
+// BACKGROUND
+// ============================================
+bgColor = validLong ? color.new(color.green, 96) : validShort ? color.new(color.red, 96) : na
+bgcolor(bgColor)
+
+// ============================================
+// ALERTS
+// ============================================
+alertcondition(validLong, "Long Entry", "LONG Entry Signal")
+alertcondition(validShort, "Short Entry", "SHORT Entry Signal")

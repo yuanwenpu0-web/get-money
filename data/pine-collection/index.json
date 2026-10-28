@@ -1,0 +1,902 @@
+[
+  {
+    "path": "indicators/composite/commodity_heat_reversal/commodity_heat_reversal.pine",
+    "kind": "indicator",
+    "title": "Commodity Heat Reversal [WavesUnchained]",
+    "original_description": "Score-based mean-reversion reversal and pullback-continuation signals for commodity futures (4H).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/composite/commodity_heat_reversal/commodity_heat_reversal.pine",
+    "sha256": "de2d23e986a3b1874207ea40aa378ed005c208fb2a3aec958ed3a6f24f279fdb",
+    "description_zh": "基于评分，为商品期货（4 小时周期）生成均值回归反转及回调后延续信号。"
+  },
+  {
+    "path": "indicators/composite/commodity_pulse_matrix/commodity_pulse_matrix_v4.pine",
+    "kind": "indicator",
+    "title": "Commodity Pulse Matrix v4 [WavesUnchained]",
+    "original_description": "Chart-timeframe entry engine with multi-timeframe confluence context. Slimmed down from v3 (~7200 lines) to focus on filtered signal generation.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/composite/commodity_pulse_matrix/commodity_pulse_matrix_v4.pine",
+    "sha256": "5a8c61d5c5a295048728e5017d6546f995b28779a5002b7eb0a8296a0b9306b7",
+    "description_zh": "基于图表周期的入场引擎，包含多时间周期汇合背景。从约 7200 行的 v3 精简而来，专注于经过滤的信号生成。"
+  },
+  {
+    "path": "indicators/composite/futures_context_module/futures_context_module.pine",
+    "kind": "indicator",
+    "title": "Futures Context Module [WavesUnchained]",
+    "original_description": "Daily-only, non-price futures context module: Open Interest, ΔOI read against the front contract's own price change, and front/next term structure (Contango/Backwardation, curve trend) for an explicitly configured futures pair. Pure context display — it never compares the chart symbol's price against the futures price. The front/next spread is two legs of the same futures feed and is therefore internally consistent.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/composite/futures_context_module/futures_context_module.pine",
+    "sha256": "f6544e5aa5361815df6a12024753befeab598c241e0b6383291c506af68f73c7",
+    "description_zh": "仅用于日线的非价格期货背景模块：显示未平仓合约量，以及相对于近月合约自身价格变化的未平仓量变化，并展示明确配置的期货合约对的近月／次月期限结构（正向／反向市场及曲线趋势）。纯背景展示，从不比较图表品种价格与期货价格。近月／次月价差的两条腿来自同一套期货数据，因此内部一致。"
+  },
+  {
+    "path": "indicators/composite/signal_quality_engine/signal_quality_engine.pine",
+    "kind": "indicator",
+    "title": "Signal Quality Engine [WavesUnchained]",
+    "original_description": "One thing done well: a range-fade signal engine for commodities, futures, stocks and indices. It fades the range edges — long the exhausted lows, short the exhausted highs — when price is stretched, structure says \"edge\", and a candle rejects. Built for ranging markets: a regime gate (ADX + EMA slope) stands the tool down in strong trends, so it never fades a trend pullback. No regime switching, no MTF, no divergence, no pivot signals.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/composite/signal_quality_engine/signal_quality_engine.pine",
+    "sha256": "2d7e08c44397a4579848c67a28661247671f8a26d1c7c491006204a1186f9af3",
+    "description_zh": "专注于区间反向交易的信号引擎，适用于商品、期货、股票和指数。当价格过度延伸、结构显示处于边缘且 K 线出现拒绝时，在已衰竭的区间低位做多、高位做空。面向区间行情：市场状态门控（ADX 加 EMA 斜率）在强趋势中停用工具，因此不会对趋势回调做反向交易。不进行状态切换，也不包含多周期、背离或枢轴信号。"
+  },
+  {
+    "path": "indicators/composite/trade_permission_engine/trade_permission_engine_v1.pine",
+    "kind": "indicator",
+    "title": "Trade Permission Engine [WavesUnchained]",
+    "original_description": "Answers \"does the market currently permit trading Long or Short here\", not \"how probable is this specific setup\" - the successor to Directional Probability Engine (archived; see archive/indicators/directional_probability_engine/), whose five iterations (v1-v3.5) settled on a rule-based read of setup readiness rather than a calibrated probability. This indicator keeps that entire architecture (alternating confirmed swing as the reference leg, unified Continuation/Reversal Maturity on one retracement ratio, separated impulse-vs-counter-move Exhaustion, a Trigger state machine, scenario-aware Target/Invalidation) and adds two mechanisms aimed specifically at the permission framing:",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/composite/trade_permission_engine/trade_permission_engine_v1.pine",
+    "sha256": "f544066f4e2a0a1ac9311af179b95f7ac5ae4f65e677a302e0d74e8c5deb5a9d",
+    "description_zh": "回答“市场目前在此处是否允许做多或做空”，而不是“这个具体形态的概率是多少”。它是已归档的 Directional Probability Engine 的后续版本；后者经过 v1 至 v3.5 共五次迭代，最终采用基于规则的形态准备程度读数，而非经过校准的概率。本指标保留其完整架构：以交替确认的波段为参考走势，在同一回撤比率上统一衡量延续／反转成熟度，分离推动与反向走势的衰竭，使用触发状态机，以及考虑情景的目标／失效条件，并增加两项专为交易许可设计的机制："
+  },
+  {
+    "path": "indicators/market_structure/auto_trendlines/auto_trendlines.pine",
+    "kind": "indicator",
+    "title": "Auto Trendlines [WavesUnchained]",
+    "original_description": "Automatically fits trendlines through confirmed pivot highs and lows, validated by minimum touch count and ATR-based tolerance.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/auto_trendlines/auto_trendlines.pine",
+    "sha256": "fb30e5de0b237156c6c71be0f6c3cf5fa6d1eee640011e345c95e43d5b9b3bc0",
+    "description_zh": "自动拟合穿过已确认枢轴高点和低点的趋势线，并以最少触及次数及基于 ATR 的容差进行验证。"
+  },
+  {
+    "path": "indicators/market_structure/broadening_wedge_scanner_pro/broadening_wedge_scanner_pro.pine",
+    "kind": "indicator",
+    "title": "Broadening Wedge Scanner Pro [WavesUnchained]",
+    "original_description": "Slides a fixed-size window of confirmed swings across the search depth and fits two boundary lines (upper from the window's outer highs, lower from its outer lows) to find EXPANDING wedges — descending broadening (both lines fall, lower faster — bullish bias), ascending broadening (both lines rise, upper faster — bearish bias), or symmetric broadening (upper rising, lower falling — direction-neutral \"megaphone\"). Every distinct, non-overlapping valid wedge is tracked independently until a confirmed breakout resolves it.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/broadening_wedge_scanner_pro/broadening_wedge_scanner_pro.pine",
+    "sha256": "d6e3354843de3f9a7fa715f46e7817c975b2ef67572cce0ccca7c306eec9e549",
+    "description_zh": "在搜索范围内滑动固定大小的已确认波段窗口，通过窗口外侧高点拟合上边界、外侧低点拟合下边界，寻找扩张楔形：下降扩张形（两线下降、下线更快，偏多）、上升扩张形（两线上升、上线更快，偏空）和对称扩张形（上线升、下线降，方向中性的喇叭形）。每个不同且互不重叠的有效楔形独立跟踪，直到确认突破而结束。"
+  },
+  {
+    "path": "indicators/market_structure/candle_story_engine/candle_story_engine.pine",
+    "kind": "indicator",
+    "title": "Candle Story Engine [WavesUnchained]",
+    "original_description": "Interprets candle behaviour as a weighted multi-candle sequence (pressure, quality, dominance, persistence, deceleration, exhaustion) instead of relying on isolated candlestick patterns.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/candle_story_engine/candle_story_engine.pine",
+    "sha256": "66fd39b1e3298f31a0e25d65e196bf9cbceb993151340c1dd1422916c4822a75",
+    "description_zh": "将 K 线行为解释为加权的多根 K 线序列，包括压力、质量、主导性、持续性、减速和衰竭，而非依赖孤立的 K 线形态。"
+  },
+  {
+    "path": "indicators/market_structure/coilforge_zones/coilforge_zones_v1.pine",
+    "kind": "indicator",
+    "title": "CoilForge Zones v1.2.2 [WavesUnchained]",
+    "original_description": "Detects price compression zones using ATR, ADX, volume, impulse, and historical S/R context, then tracks confirmed breakouts for a configurable window after the zone ends.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/coilforge_zones/coilforge_zones_v1.pine",
+    "sha256": "b8ef9e3e7913da1d7033857b8c413c2f09e91fa69a1f736605b89e6045d1b03a",
+    "description_zh": "使用 ATR、ADX、成交量、推动走势和历史支持／阻力背景检测价格压缩区域，并在区域结束后按可配置窗口跟踪已确认突破。"
+  },
+  {
+    "path": "indicators/market_structure/edge_atlas/edge_atlas.pine",
+    "kind": "indicator",
+    "title": "Edge Atlas [WavesUnchained]",
+    "original_description": "Right-edge price-level atlas.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/edge_atlas/edge_atlas.pine",
+    "sha256": "10e9e843e7afa80b4f6bc5bc13eeb9527bf98f698655caceb5ae31a1cb82b318",
+    "description_zh": "图表右边缘价格水平图谱。"
+  },
+  {
+    "path": "indicators/market_structure/elliott_wave_radar/elliott_wave_radar.pine",
+    "kind": "indicator",
+    "title": "Elliott Wave Radar [WavesUnchained]",
+    "original_description": "Rule-validated Elliott Wave counting on ZigZag pivots. Labels impulses (1-5) and zigzag corrections (A-B-C) only when the hard EW rules hold, scores each count by Fibonacci guideline adherence, projects targets for the developing wave and checks sub-wave structure on a finer pivot degree. Shows \"no valid count\" instead of forcing a count onto the chart.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/elliott_wave_radar/elliott_wave_radar.pine",
+    "sha256": "7ed97ec7fcb01d38f2a11069f220967b5b0cacc1c050721570964f5942000dfa",
+    "description_zh": "在 ZigZag 枢轴点上进行符合规则的艾略特波浪计数。只有满足严格波浪规则时才标记推动浪（1–5）和锯齿修正浪（A–B–C），根据斐波那契指引的符合程度评分，为正在发展的浪投射目标，并在更细的枢轴级别检查子浪结构。当没有有效计数时会明确显示，而不是强行在图表上计数。"
+  },
+  {
+    "path": "indicators/market_structure/fib_reaction_memory/fib_reaction_memory.pine",
+    "kind": "indicator",
+    "title": "Fib Reaction Memory [WavesUnchained]",
+    "original_description": "Scores Fibonacci retracement levels of an active A->B reference leg by confirmed local price reactions that occurred INSIDE that leg, instead of by geometric proximity alone.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/fib_reaction_memory/fib_reaction_memory.pine",
+    "sha256": "4889e33af5c3dbb55718a433067cf7fcc85c5cc2b0a01b40fed4877195696e1f",
+    "description_zh": "根据当前 A→B 参考走势内部已确认的局部价格反应，对其斐波那契回撤位评分，而不是只依赖几何距离。"
+  },
+  {
+    "path": "indicators/market_structure/jma_struct/jma_struct.pine",
+    "kind": "indicator",
+    "title": "JMA Cluster Entries with Market Structure [WavesUnchained]",
+    "original_description": "Multi-timeframe JMA cluster analysis with market structure detection (Wyckoff, Smart Money Concepts) and an optional bonus/penalty quality model",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/jma_struct/jma_struct.pine",
+    "sha256": "25ab6af6ac59a6e493c4555eb1e20c319da486e8d69c21077cc3a8fd785cea73",
+    "description_zh": "多时间周期 JMA 聚集分析，结合威科夫、聪明钱概念等市场结构检测，并提供可选的加分／扣分质量模型。"
+  },
+  {
+    "path": "indicators/market_structure/liquidity_hunter/liquidity_hunter.pine",
+    "kind": "indicator",
+    "title": "Liquidity Hunter [WavesUnchained]",
+    "original_description": "Focused premium liquidity tool.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/liquidity_hunter/liquidity_hunter.pine",
+    "sha256": "5a7e238dbc4e16591d103ecbbbc479dfc9adbf0eac517ce6437d89bd9d947bc2",
+    "description_zh": "专注型高级流动性工具。"
+  },
+  {
+    "path": "indicators/market_structure/market_motion_dna/market_motion_dna_v1.pine",
+    "kind": "indicator",
+    "title": "Market Motion DNA [WavesUnchained]",
+    "original_description": "Objective movement-character engine. It does NOT count Elliott waves. It classifies each confirmed and developing pivot-to-pivot leg as primarily impulsive, corrective, or neutral using measurable price-action properties.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/market_motion_dna/market_motion_dna_v1.pine",
+    "sha256": "9e85d62b8a4de36f3d39792deb8ab8fe38685479c16f1dcbb97973e841004813",
+    "description_zh": "客观运动特征引擎，不进行艾略特波浪计数；它使用可量化的价格行为特征，将每段已确认及正在发展的枢轴间走势分类为主要推动、修正或中性。"
+  },
+  {
+    "path": "indicators/market_structure/market_scenario_projector/market_scenario_projector.pine",
+    "kind": "indicator",
+    "title": "Market Scenario Projector [WavesUnchained]",
+    "original_description": "Scores the current impulse, swing structure, nearest decision zone and rejection evidence into three forward scenarios (direct continuation, pullback-then-continuation, structural failure) and draws their projected paths as a dominance-ranked scenario tree from a single origin. Optionally records each case's entry features + eventual outcome for offline calibration of the currently heuristic scenario weights.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/market_scenario_projector/market_scenario_projector.pine",
+    "sha256": "dd018413dbd41aa372eaf0f7aa714cef9fa9e110f5c2cc6c80bf4246a4d0052c",
+    "description_zh": "对当前推动走势、波段结构、最近决策区域和拒绝证据评分，形成直接延续、回调后延续和结构失败三种前瞻情景，并从同一原点绘制按主导程度排序的情景树。可选择记录每个案例的入场特征与最终结果，以离线校准目前基于启发式方法的情景权重。"
+  },
+  {
+    "path": "indicators/market_structure/market_structure_advanced/market_structure_advanced.pine",
+    "kind": "indicator",
+    "title": "Market Structure Advanced [WavesUnchained]",
+    "original_description": "Swing-pivot classification (HH/HL/LH/LL) mapped to a bounded score oscillator. Provides a continuous structural bias reading without pattern-matching or labels.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/market_structure_advanced/market_structure_advanced.pine",
+    "sha256": "0884c8e3e59b43c11993f27cb3969eb0e8da8f20c2e3fd75f4a254bad67b3186",
+    "description_zh": "将波段枢轴分类（高高、高低、低高、低低）映射为有界得分振荡器，连续显示结构偏向，不进行形态匹配或显示标签。"
+  },
+  {
+    "path": "indicators/market_structure/market_structure_pivot_map/market_structure_pivot_map.pine",
+    "kind": "indicator",
+    "title": "Market Structure Pivot Map [WavesUnchained]",
+    "original_description": "Location-role structure map: draws pivot levels for any timeframe (or the chart's own), CPR, previous range, and ADR/ATR projections, then reports where price sits.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/market_structure_pivot_map/market_structure_pivot_map.pine",
+    "sha256": "a2c85337d61696062c6c1bdca530c049e35f55aede0e37f67b41e576e7e6f5fb",
+    "description_zh": "以位置为核心的结构图：绘制任意时间周期或当前图表周期的枢轴价位、中央枢轴区间（CPR）、前一区间及 ADR／ATR 投影，然后报告价格所处位置。"
+  },
+  {
+    "path": "indicators/market_structure/market_tradability_engine/market_tradability_engine_v2.pine",
+    "kind": "indicator",
+    "title": "Market Tradability Engine v2 [WavesUnchained]",
+    "original_description": "Market quality and no-trade filter - v2 research build.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/market_tradability_engine/market_tradability_engine_v2.pine",
+    "sha256": "4798b7311710d1110bbc8246a6a4168b6be400afbbf364de1bf4dcd52b81fb11",
+    "description_zh": "市场质量与禁止交易过滤器，v2 研究版本。"
+  },
+  {
+    "path": "indicators/market_structure/modern_wyckoff_state_machine_visual/modern_wyckoff_state_machine_visual.pine",
+    "kind": "indicator",
+    "title": "Modern Wyckoff State Machine Lite [WavesUnchained]",
+    "original_description": "Lightweight Wyckoff state machine for range context, A-E phase tracking, accumulation/distribution scoring, event labels and visual phase state.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/modern_wyckoff_state_machine_visual/modern_wyckoff_state_machine_visual.pine",
+    "sha256": "69954b9ae9e5fc6ec391a6b84df38d613083c929f26fb3b5ef5fe4be136b0546",
+    "description_zh": "轻量级威科夫状态机，提供区间背景、A–E 阶段跟踪、吸筹／派发评分、事件标签和可视化阶段状态。"
+  },
+  {
+    "path": "indicators/market_structure/mtf_structure_bias/mtf_structure_bias.pine",
+    "kind": "indicator",
+    "title": "MTF Structure Bias [WavesUnchained]",
+    "original_description": "Classifies market structure across four timeframes by comparing the rolling highest high and lowest low against their values N bars ago — no oscillators, pure price geometry. Each TF: both rising = bullish (+1), both falling = bearish (−1), else mixed (0).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/mtf_structure_bias/mtf_structure_bias.pine",
+    "sha256": "8ad41da0d6610a95da8315424995f10c0f1c83b0b03f72774706adf8462aaf20",
+    "description_zh": "将滚动最高价和最低价与 N 根 K 线前的对应值比较，对四个时间周期的市场结构分类；不使用振荡器，仅依据价格几何结构。每个周期中，两者均上升为看涨（+1），均下降为看跌（−1），其余为混合（0）。"
+  },
+  {
+    "path": "indicators/market_structure/reversal_type_classifier/reversal_type_classifier_v1.pine",
+    "kind": "indicator",
+    "title": "Reversal Type Classifier v1 [WavesUnchained]",
+    "original_description": "Ex-post diagnostic: classifies confirmed pivot reversals by outcome type and computes filter-parameter statistics for indicator tuning.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/reversal_type_classifier/reversal_type_classifier_v1.pine",
+    "sha256": "15a1498f7cdc85f6b764dddf1bd5981846cc9e8c2f6589d8281c8bb43cd4097d",
+    "description_zh": "事后诊断工具：按结果类型分类已确认的枢轴反转，并计算过滤参数统计数据，以便调校指标。"
+  },
+  {
+    "path": "indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine",
+    "kind": "indicator",
+    "title": "SMC Structure & Expectation [WavesUnchained]",
+    "original_description": "Context & Confirmation Tool: Market Structure + Expectation + BOS Validation + Professional Order Block System",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine",
+    "sha256": "9f656aca0d9912ac637222dcfd976049edd8358035d98db89351ff52f3d1d992",
+    "description_zh": "背景与确认工具：市场结构、预期、结构突破（BOS）验证及专业订单块系统。"
+  },
+  {
+    "path": "indicators/market_structure/sr_zones_mtf_v2/sr_zones_mtf_v2.pine",
+    "kind": "indicator",
+    "title": "S/R Zones MTF [WavesUnchained]",
+    "original_description": "Multi-timeframe S/R zones built from ATR-reversal structure swings with scoring and merging.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/sr_zones_mtf_v2/sr_zones_mtf_v2.pine",
+    "sha256": "ac859034fa2758f25a4ae3e3ab8aeeaed2fd085fef5eab777df53753434694d4",
+    "description_zh": "基于 ATR 反转结构波段构建多时间周期支持／阻力区域，并进行评分和合并。"
+  },
+  {
+    "path": "indicators/market_structure/structural_wave_field/structural_wave_field.pine",
+    "kind": "indicator",
+    "title": "Structural Wave Field [WavesUnchained]",
+    "original_description": "A chart-native market-structure visualization. It does NOT draw a classical oscillator. Instead, it converts structural flow, internal wave energy, correction pressure, maturity, re-synchronization and exhaustion into an adaptive aligned/counter gradient field on a shared axis below price.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/structural_wave_field/structural_wave_field.pine",
+    "sha256": "feccc53adad53c0963fc9e854f10d2e9302d35e9a0253947a2c5581694779c67",
+    "description_zh": "原生于图表的市场结构可视化工具，不绘制传统振荡器，而是将结构流、内部波浪能量、修正压力、成熟度、重新同步及衰竭转换成价格下方同一轴上的自适应顺向／逆向渐变场。"
+  },
+  {
+    "path": "indicators/market_structure/structure_break_risk/structure_break_risk.pine",
+    "kind": "indicator",
+    "title": "Structure Break Risk [WavesUnchained]",
+    "original_description": "Indicator that answers: how close is the PREVAILING trend's structure to breaking — and against WHICH level? Symmetric by design — in an uptrend it reads top-break risk, in a downtrend bottom-break risk; the asymmetry comes from the situation (which trend is active), never from a hardcoded long/short.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/structure_break_risk/structure_break_risk.pine",
+    "sha256": "c487b28db490aecbd31501e5b12025910ffb058cccc73fa842046d758d4d795e",
+    "description_zh": "指标回答两个问题：当前主导趋势的结构距离破坏有多近，以及对应哪个价位？设计上保持对称：上涨趋势读取顶部破坏风险，下跌趋势读取底部破坏风险；不对称性来自当前处境，而不是硬编码的做多或做空方向。"
+  },
+  {
+    "path": "indicators/market_structure/support_resistance_zones/support_resistance_zones.pine",
+    "kind": "indicator",
+    "title": "Support & Resistance Zones [WavesUnchained]",
+    "original_description": "Detector-driven support/resistance zone engine: independent zone detectors (pivot clusters, multiple tests, base/supply-demand, order blocks, fair value gaps, price gaps, equal-high/low liquidity) feed candidates into a central registry that merges, scores, confluences and tracks each zone through touch/reaction/break/flip lifecycle states. Detectors never draw directly — only the registry decides what becomes a zone and how it is rendered, which keeps detection, scoring and visualization independently testable and reusable for a future library extraction.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/support_resistance_zones/support_resistance_zones.pine",
+    "sha256": "6803f893cebdefd766e81f81689d6f4d6ee11742132696d2d1e8faacb2532737",
+    "description_zh": "检测器驱动的支持／阻力区域引擎：独立检测枢轴聚集、多次测试、底部／供需、订单块、公允价值缺口、价格缺口和相等高低点流动性，向中央注册表提供候选区域；注册表合并、评分、评估汇合，并跟踪每个区域的触及、反应、突破和角色反转生命周期。检测器本身不直接绘图，由注册表决定哪些候选成为区域以及如何显示，从而使检测、评分和可视化可以独立测试，并可供未来抽取为库时复用。"
+  },
+  {
+    "path": "indicators/market_structure/swing_conviction_radar/swing_conviction_radar.pine",
+    "kind": "indicator",
+    "title": "Swing Conviction Radar [WavesUnchained]",
+    "original_description": "Scores each price swing (pivot-to-pivot leg) by three conviction factors: speed (ATR-normalized distance per bar), cleanliness (fraction of on-trend bars in the leg), and volume gradient (volume rising toward the pivot). Divergences between successive price extremes and conviction are early reversal warnings: price extends further but the swing drives it less hard.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/swing_conviction_radar/swing_conviction_radar.pine",
+    "sha256": "ebc9eee323b35e5353eacd9cf9c6bfeb173e3d35e45f180c66854594dd893070",
+    "description_zh": "根据三个确信度因素为每段价格波动（枢轴间走势）评分：速度（每根 K 线的 ATR 标准化距离）、流畅度（顺趋势 K 线占该段的比例）和成交量梯度（接近枢轴时成交量是否增加）。连续价格极值与确信度之间的背离是反转早期警示：价格继续延伸，但推动这一走势的力度减弱。"
+  },
+  {
+    "path": "indicators/market_structure/trading_range_state_machine/trading_range_state_machine.pine",
+    "kind": "indicator",
+    "title": "Trading Range State Machine [WavesUnchained]",
+    "original_description": "Detects and classifies active trading ranges via a weighted, multi-factor score and progresses them through a state machine (Inactive → Building → Confirmed → Mature → Breaking).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/trading_range_state_machine/trading_range_state_machine.pine",
+    "sha256": "5b7fad60614b03f856b24936fc400484e82e4a6c229ec2eb483c1aa58e1bfeaf",
+    "description_zh": "通过加权多因素得分检测并分类当前交易区间，使其依次经过未激活、形成中、已确认、成熟和破坏中状态。"
+  },
+  {
+    "path": "indicators/market_structure/triangle_compression_scanner_pro/triangle_compression_scanner_pro.pine",
+    "kind": "indicator",
+    "title": "Triangle Compression Scanner Pro [WavesUnchained]",
+    "original_description": "Slides a fixed-size window of confirmed swings across the search depth and fits two boundary lines (upper from the window's outer highs, lower from its outer lows) to find compressing triangles — symmetric, ascending, or descending. Every distinct, non-overlapping valid triangle is tracked independently until a confirmed breakout resolves it.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/triangle_compression_scanner_pro/triangle_compression_scanner_pro.pine",
+    "sha256": "4da44bd52098a9ccde02ff319c03d3f69da0fdbed1fe3c0cdbc2545c7f799ca5",
+    "description_zh": "在搜索范围内滑动固定大小的已确认波段窗口，通过窗口外侧高点拟合上边界、外侧低点拟合下边界，寻找收敛三角形：对称、上升或下降。每个不同且互不重叠的有效三角形独立跟踪，直到确认突破而结束。"
+  },
+  {
+    "path": "indicators/market_structure/tweezer_kangaroo_zones/tweezer_kangaroo_zones.pine",
+    "kind": "indicator",
+    "title": "Tweezer & Kangaroo Zones [WavesUnchained]",
+    "original_description": "Modular pattern detection with zone scoring, structure context, and confluence analysis",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/tweezer_kangaroo_zones/tweezer_kangaroo_zones.pine",
+    "sha256": "caab1e39a599492005f393a4b3fb07e26a11bf7a0dbdbeba11fb773ceaeb9829",
+    "description_zh": "模块化形态检测，包含区域评分、结构背景和汇合分析。"
+  },
+  {
+    "path": "indicators/market_structure/wolfe_wave_scanner_pro/wolfe_wave_scanner_pro.pine",
+    "kind": "indicator",
+    "title": "Wolfe Wave Scanner Pro [WavesUnchained]",
+    "original_description": "Searches a depth window of confirmed swings for every non-overlapping valid 5-point Wolfe Wave wedge (not just the single highest-scoring one), projects each one's dynamic EPA target, and tracks each independently until the target is hit, the setup invalidates, or its ETA lifecycle expires.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/wolfe_wave_scanner_pro/wolfe_wave_scanner_pro.pine",
+    "sha256": "332cc0def1590cc6f3098c982180ee09e19f0030dfdfafc28347dcdeff29b30b",
+    "description_zh": "在已确认波段的搜索窗口内，寻找所有互不重叠的有效五点沃尔夫波浪楔形，而不只是得分最高的一个；为每个形态投射动态 EPA 目标，并分别跟踪至目标触及、形态失效或预计到达时间生命周期结束。"
+  },
+  {
+    "path": "indicators/market_structure/wyckoff_schematics/wyckoff_schematics.pine",
+    "kind": "indicator",
+    "title": "Wyckoff Schematics [WavesUnchained]",
+    "original_description": "Volume/spread-based Wyckoff schematic detector with A–E phase heuristics, event labeling (PS/PSY, SC, BC, AR, ST, Spring, Test, SOS, LPS, UTAD, SOW, LPSY), confidence/range scoring, pivot-confirmed LPS/LPSY (pivot-bar volume), multi-timeframe bias (EMA + slope), phase-anchored VWAP, and combined quality alerts.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/wyckoff_schematics/wyckoff_schematics.pine",
+    "sha256": "dbe4237649865314d4fd046d38ac1934d3829994f4ae41ac7d1c86274adfd5b2",
+    "description_zh": "基于成交量和价格跨度的威科夫图式检测器，提供 A–E 阶段启发式判断、事件标签（PS／PSY、SC、BC、AR、ST、Spring、Test、SOS、LPS、UTAD、SOW、LPSY）、置信度／区间评分、经枢轴确认的 LPS／LPSY（使用枢轴 K 线成交量）、多周期偏向（EMA 和斜率）、阶段锚定 VWAP 及综合质量提醒。"
+  },
+  {
+    "path": "indicators/market_structure/zigzag_core/zigzag_core.pine",
+    "kind": "indicator",
+    "title": "ZigZag Core [WavesUnchained]",
+    "original_description": "Configurable ZigZag engine — depth/deviation/backstep filtering, Percent/ ATR/Hybrid reversal modes, true higher- AND lower-timeframe pivot projection, an optional recursive Level-2 ZigZag, and an optional independent Secondary ZigZag (Structural + Internal dual view).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/zigzag_core/zigzag_core.pine",
+    "sha256": "2bafc008777e86e6b6e21146c52eea73b814d4c65d06445a0ca551e3bf040d9c",
+    "description_zh": "可配置 ZigZag 引擎：提供深度／偏差／回退过滤、百分比／ATR／混合反转模式、真实高时间周期及低时间周期枢轴投影、可选递归二级 ZigZag，以及可选的独立次级 ZigZag（结构与内部双视图）。"
+  },
+  {
+    "path": "indicators/market_structure/zigzag_fibo_pullback_map/zigzag_fibo_pullback_map.pine",
+    "kind": "indicator",
+    "title": "ZigZag Fibo Pullback Map [WavesUnchained]",
+    "original_description": "Confirmed ZigZag pivots with pullback-to-fibo labeling and active fib fan.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/zigzag_fibo_pullback_map/zigzag_fibo_pullback_map.pine",
+    "sha256": "5a3082df397c5b6e77654b337f170fcc749a76f3ef1b194d82392fdede3ef9a2",
+    "description_zh": "显示已确认的 ZigZag 枢轴，并标注回调对应的斐波那契水平及当前斐波那契扇形线。"
+  },
+  {
+    "path": "indicators/market_structure/zigzag_patterns_framework/zigzag_patterns_framework.pine",
+    "kind": "indicator",
+    "title": "ZigZag Patterns [WavesUnchained]",
+    "original_description": "ZigZag pivot engine with ABC, triangle, Wolfe, 1-2-3 reversal detection, and smart pivot labels.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/market_structure/zigzag_patterns_framework/zigzag_patterns_framework.pine",
+    "sha256": "e28a366932abff258848bc935ebc06daa9dde892e7f14c19af84a082d2a3d218",
+    "description_zh": "ZigZag 枢轴引擎，检测 ABC、三角形、沃尔夫波浪和 1-2-3 反转，并提供智能枢轴标签。"
+  },
+  {
+    "path": "indicators/mean_reversion/anchored_vwap/anchored_vwap.pine",
+    "kind": "indicator",
+    "title": "Anchored VWAP [WavesUnchained]",
+    "original_description": "Volume-weighted average price anchored to a selectable origin (swing pivot, session / week / month / year, or a manual date) with volume-weighted σ bands. Stage-4 \"fair value zone\" location sensor for the reversal pipeline: it reports how stretched price is from value (distance in σ), it never fires a long/short trigger.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/mean_reversion/anchored_vwap/anchored_vwap.pine",
+    "sha256": "bcb098979d02f867491fd9403182897c29bbac31e9e3f1b927a5ee0515ddce56",
+    "description_zh": "将成交量加权平均价格锚定到可选起点：波段枢轴、交易时段／周／月／年或手动日期，并显示成交量加权标准差带。它是反转流程第四阶段的“公允价值区”位置传感器，报告价格偏离价值的程度（以标准差衡量），不会触发做多／做空信号。"
+  },
+  {
+    "path": "indicators/mean_reversion/midas_curves/midas_curves.pine",
+    "kind": "indicator",
+    "title": "MIDAS 2.0 [WavesUnchained]",
+    "original_description": "Anchored MIDAS support/resistance curve (launch-anchored volume-weighted price) with a true topfinder / bottomfinder accelerated curve — an accelerated exhaustion estimate, not a forecast. Location + Exhaustion sensor: it reports where price sits relative to the MIDAS curve/bands and how far the launched move has run toward its projected end. Context markers are Setup-level evidence, not hard entries.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/mean_reversion/midas_curves/midas_curves.pine",
+    "sha256": "73e8eb43000e139897a8f1b3bb63c791f1b54ef8b8230d409b76c944f5616820",
+    "description_zh": "锚定 MIDAS 支持／阻力曲线，即从走势起点锚定的成交量加权价格，并配有真正的顶部／底部探测加速曲线；这是加速衰竭估计，不是预测。位置与衰竭传感器报告价格相对于 MIDAS 曲线／带的位置，以及启动的走势距离预计终点还有多远。背景标记属于形态准备阶段的证据，不是明确入场信号。"
+  },
+  {
+    "path": "indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine",
+    "kind": "indicator",
+    "title": "Oscillator Cycle Statistics [WavesUnchained]",
+    "original_description": "Empirical cycle statistics for bounded oscillators. Tracks the full cycle from one extreme (overbought/oversold) to the opposite extreme as a state machine, stores every completed attempt, and reports how often the opposite extreme was historically reached — conditioned on progress already made and on market regime.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine",
+    "sha256": "9ce9b2ab30d72058a2eb47295d025138fc2c5c8e8f792589e3a2584e000aa36f",
+    "description_zh": "针对有界振荡器的实证周期统计：以状态机跟踪从一个极端（超买／超卖）到相反极端的完整周期，保存每次完成的尝试，并根据已经达到的进度和市场状态，报告历史上到达另一极端的频率。"
+  },
+  {
+    "path": "indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine",
+    "kind": "indicator",
+    "title": "VWAP Cross Visuals [WavesUnchained]",
+    "original_description": "Advanced VWAP cross detection with multi-timeframe zone management, bias context, and ranked confluence zones.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine",
+    "sha256": "defcaec3e7d153cd1557b3cb64413c933c76dc33cc28256a1d46d48e40345e4e",
+    "description_zh": "高级 VWAP 交叉检测，包含多时间周期区域管理、方向偏向背景和排序后的汇合区域。"
+  },
+  {
+    "path": "indicators/momentum/cci_advanced/cci_advanced.pine",
+    "kind": "indicator",
+    "title": "CCI Advanced [WavesUnchained]",
+    "original_description": "CCI with pluggable smoothing, adaptive scaling, and rich visualization. Designed as a standalone oscillator and as context layer for hybrid setups.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/cci_advanced/cci_advanced.pine",
+    "sha256": "cdc691e2a8475f863f69288add3bd71bab73126d2eb4e9f5a101142e9ba9c6ed",
+    "description_zh": "CCI 指标，支持可替换平滑、自适应缩放和丰富可视化；既可作为独立振荡器，也可作为混合形态的背景层。"
+  },
+  {
+    "path": "indicators/momentum/elder_ray_pressure_engine/elder_ray_pressure_engine.pine",
+    "kind": "indicator",
+    "title": "Elder Ray Pressure Engine [WavesUnchained]",
+    "original_description": "Derives Bull/Bear pressure from Alexander Elder's Bull Power / Bear Power concept, but keeps price excursion, pressure, dominance, exhaustion, and divergence as separate readouts instead of blending them into one score.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/elder_ray_pressure_engine/elder_ray_pressure_engine.pine",
+    "sha256": "6f27876450b62e472eb4c0ca2901c86abf6566def55c8b67053f7f8bdb4cc161",
+    "description_zh": "基于 Alexander Elder 的多头力量／空头力量概念推导多空压力，但分别显示价格偏离、压力、主导性、衰竭和背离，而不是混合成单一得分。"
+  },
+  {
+    "path": "indicators/momentum/exhaustion_scanner/exhaustion_scanner.pine",
+    "kind": "indicator",
+    "title": "Exhaustion Scanner [WavesUnchained]",
+    "original_description": "Role-separated overextension / reversal-risk context. Three distinct role scores — Stretch (location), Exhaustion (momentum), Reaction (trigger) — combined into one score, scaled by a volatility multiplier and framed by a regime classifier. The regime does not block: it shifts the threshold and re-labels the signal as Continuation Risk / Trend Exhaustion / Range Fade.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/exhaustion_scanner/exhaustion_scanner.pine",
+    "sha256": "e7b175dcccb20f4720411317331c9448bf84ad1241afae64c9e217ed8606ddfb",
+    "description_zh": "按作用分离的过度延伸／反转风险背景：将拉伸（位置）、衰竭（动量）和反应（触发）三项不同角色的评分合成为一个分数，按波动率乘数缩放，并由市场状态分类器解释。市场状态不会直接阻止信号，而是调整阈值，并将信号重新标记为延续风险、趋势衰竭或区间反向交易。"
+  },
+  {
+    "path": "indicators/momentum/fisher_transform_advanced/fisher_transform_advanced.pine",
+    "kind": "indicator",
+    "title": "Fisher Transform Advanced [WavesUnchained]",
+    "original_description": "Fisher Transform with trend context, stall/absorption, conviction markers, and directional long/short coloring on a zero-centered reversal core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/fisher_transform_advanced/fisher_transform_advanced.pine",
+    "sha256": "634b1b9123855a2ccfed4b9d6ab9aca50d4d2bdb9012ab5a5dba6c11192dbedf",
+    "description_zh": "以零轴为中心的反转核心上显示 Fisher Transform，并提供趋势背景、停滞／吸收、确信度标记及多空方向着色。"
+  },
+  {
+    "path": "indicators/momentum/market_exhaustion/market_exhaustion.pine",
+    "kind": "indicator",
+    "title": "Market Exhaustion [WavesUnchained]",
+    "original_description": "MFI + StochRSI fusion with optional JMA smoothing, HTF context, signals, and divergences",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/market_exhaustion/market_exhaustion.pine",
+    "sha256": "a6b336fe64b1af1582d607695e04fe67fd1730e7b064db1a30092bed17d856b1",
+    "description_zh": "融合 MFI 和 StochRSI，提供可选 JMA 平滑、高时间周期背景、信号及背离。"
+  },
+  {
+    "path": "indicators/momentum/market_pressure_scale/market_pressure_scale.pine",
+    "kind": "indicator",
+    "title": "Market Pressure Scale [WavesUnchained]",
+    "original_description": "Two-component oscillator separating setup pressure (compression + S/R proximity) from impulse pressure (range expansion + volume + body + trend), with phase classification, a Move Strength column gauge for the expected magnitude of the eventual move, and a DMI-free Reversal signal.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/market_pressure_scale/market_pressure_scale.pine",
+    "sha256": "327e7f83efbe1c351a09f05e1f6ca7ab913e3eaf762126ad1885fc00233e6591",
+    "description_zh": "双组成部分振荡器：区分形态准备压力（压缩及接近支持／阻力）与推动压力（区间扩张、成交量、实体及趋势）；包含阶段分类、表示最终走势预期幅度的走势强度柱形量表，以及不依赖 DMI 的反转信号。"
+  },
+  {
+    "path": "indicators/momentum/market_stress_oscillator/market_stress_oscillator.pine",
+    "kind": "indicator",
+    "title": "MSO - Market Stress Oscillator [WavesUnchained]",
+    "original_description": "Bi-directional WVF stress oscillator with JMA trend context and ADX quality display.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/market_stress_oscillator/market_stress_oscillator.pine",
+    "sha256": "61c62c221a28f9f800b372fbde5649ed58c95ec3e7d6cda9f9461e4ca1bac17c",
+    "description_zh": "双向 Williams VIX Fix（WVF）压力振荡器，带 JMA 趋势背景和 ADX 质量显示。"
+  },
+  {
+    "path": "indicators/momentum/momentum_profile/momentum_profile.pine",
+    "kind": "indicator",
+    "title": "Momentum Profile [WavesUnchained]",
+    "original_description": "Analog to Money Flow Delta Profile but for momentum: maps average WaveTrend and MFI values per price zone to identify dominant-momentum levels (strong moves backed by oscillator conviction) vs mixed levels (fragile zones likely to be revisited).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/momentum_profile/momentum_profile.pine",
+    "sha256": "fc07dc5928ea8aba3e47285251aa02f2a5a11e273d1ea37eecf55abb7edf5749",
+    "description_zh": "与 Money Flow Delta Profile 类似，但用于动量：映射各价格区域的 WaveTrend 和 MFI 平均值，以区分动量主导的价位（得到振荡器确信度支持的强走势）与混合价位（可能被再次触及的脆弱区域）。"
+  },
+  {
+    "path": "indicators/momentum/momentum_trajectory/momentum_trajectory.pine",
+    "kind": "indicator",
+    "title": "Momentum Trajectory [WavesUnchained]",
+    "original_description": "Treats WaveTrend, StochRSI and MFI as movement vectors and decomposes them into direction, velocity (1st derivative) and acceleration (2nd derivative).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/momentum_trajectory/momentum_trajectory.pine",
+    "sha256": "367aeda90acea7b0b0fb95183edcfe25469fd9ba89cf11134a82f4607d629d88",
+    "description_zh": "将 WaveTrend、StochRSI 和 MFI 视为运动向量，分解为方向、速度（一阶导数）和加速度（二阶导数）。"
+  },
+  {
+    "path": "indicators/momentum/mtf_stochrsi_pair_score/mtf_stochrsi_pair_score.pine",
+    "kind": "indicator",
+    "title": "MTF StochRSI Pair Score [WavesUnchained]",
+    "original_description": "Multi-timeframe StochRSI confluence scorer — pair-weighted with sync bonus and conflict penalty.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/mtf_stochrsi_pair_score/mtf_stochrsi_pair_score.pine",
+    "sha256": "df62f16fb479a4316e6600e118af8a36213ae5ec1f3f2172a9461689a41c278b",
+    "description_zh": "多时间周期 StochRSI 汇合评分器：按周期对加权，并对同步加分、对冲突扣分。"
+  },
+  {
+    "path": "indicators/momentum/mtf_wavetrend_confluence/mtf_wavetrend_confluence.pine",
+    "kind": "indicator",
+    "title": "MTF WaveTrend — Tide / Wave / Ripple [WavesUnchained]",
+    "original_description": "Markets are nested cycles, so the timeframes contradict each other by nature — that is information, not error. This reads WaveTrend across three FIXED-role horizons and decodes the nesting instead of forcing one \"optimal\" signal:",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/mtf_wavetrend_confluence/mtf_wavetrend_confluence.pine",
+    "sha256": "ca94df7ca8c15c02291b048a752f9b3b4fa5bbfe57883f0dba2ffb4a2baec332",
+    "description_zh": "市场是嵌套的周期，因此不同时间周期自然会出现相互矛盾的情况；这提供了信息，并非错误。本指标读取三个角色固定的时间尺度上的 WaveTrend，解析周期嵌套，而非强求一个“最优”信号。"
+  },
+  {
+    "path": "indicators/momentum/mtf_wavetrend_opportunity_hunter/mtf_wavetrend_opportunity_hunter.pine",
+    "kind": "indicator",
+    "title": "MTF WaveTrend Opportunity Hunter [WavesUnchained]",
+    "original_description": "MTF confluence pane around WaveTrend — shows WHY a signal fires (or doesn't) over time via a net confluence histogram plus per-layer heat ribbons, and fires on a slim three-condition gate instead of stacked score thresholds.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/mtf_wavetrend_opportunity_hunter/mtf_wavetrend_opportunity_hunter.pine",
+    "sha256": "3e85650da828f0845ee16835f4d2bf5cfa02857e130a6c5907d26626b0f7daf7",
+    "description_zh": "围绕 WaveTrend 的多周期共振面板：通过净共振直方图和各层热度带，随时间展示信号触发或未触发的原因；采用精简的三条件门槛，而非层层叠加的评分阈值。"
+  },
+  {
+    "path": "indicators/momentum/oscillator_divergence_zones/oscillator_divergence_zones.pine",
+    "kind": "indicator",
+    "title": "Oscillator Divergence Zones [WavesUnchained]",
+    "original_description": "Detects regular and hidden divergences for RSI, CCI, MFI, Fisher Transform, TSI, Schaff Trend Cycle, DPO, Ehlers Roofing Filter or Ehlers Cyber Cycle.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/oscillator_divergence_zones/oscillator_divergence_zones.pine",
+    "sha256": "3f859a91c92d2d72d2ff1382085932a6e1eaf13caaa0c8ad370bead1af130af5",
+    "description_zh": "检测 RSI、CCI、MFI、Fisher 变换、TSI、Schaff 趋势周期、DPO、Ehlers Roofing 滤波器或 Ehlers Cyber Cycle 的常规背离和隐藏背离。"
+  },
+  {
+    "path": "indicators/momentum/oscillator_topology/oscillator_topology.pine",
+    "kind": "indicator",
+    "title": "Oscillator Topology [WavesUnchained]",
+    "original_description": "Analyzes the SHAPE of oscillator movements rather than their magnitude or direction. Curvature, spike width, symmetry and flatness encode information not visible in the raw oscillator value.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/oscillator_topology/oscillator_topology.pine",
+    "sha256": "945b30faa6c32033a5b4b6721aee2eae5ce8f5336eb8c3e69826472f8db84c02",
+    "description_zh": "分析振荡器运动的形态，而非幅度或方向。曲率、尖峰宽度、对称性和平坦程度反映了原始振荡器数值中看不到的信息。"
+  },
+  {
+    "path": "indicators/momentum/pivot_momentum_structure/pivot_momentum_structure.pine",
+    "kind": "indicator",
+    "title": "Pivot Momentum Structure [WavesUnchained]",
+    "original_description": "Structure-oriented oscillator:",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/pivot_momentum_structure/pivot_momentum_structure.pine",
+    "sha256": "bb834480339ed76afc390230da5356cbd1ff48ac131eec100ace7baa24cd7c9d",
+    "description_zh": "面向结构的振荡器。"
+  },
+  {
+    "path": "indicators/momentum/reversal_engine_score/reversal_engine_score_v1.pine",
+    "kind": "indicator",
+    "title": "Reversal Engine Score v1 [WavesUnchained]",
+    "original_description": "Score-based liquidity sweep reversal detector with HTF trend confluence.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/reversal_engine_score/reversal_engine_score_v1.pine",
+    "sha256": "73023727e859c6ee06a34217e75a50b653a1e3b8a96badc2463d007ec037274e",
+    "description_zh": "基于评分的流动性扫荡反转检测器，结合高时间周期趋势共振。"
+  },
+  {
+    "path": "indicators/momentum/roc_advanced/roc_advanced.pine",
+    "kind": "indicator",
+    "title": "ROC Advanced [WavesUnchained]",
+    "original_description": "Rate of Change with trend context, stall/absorption, conviction markers, and directional long/short coloring on a zero-centered momentum core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/roc_advanced/roc_advanced.pine",
+    "sha256": "ce642a0a6d6007cac10521dbe5ccf9f29a35f15d28607b84e9e8628ca80f033f",
+    "description_zh": "以零轴为中心的变动率动量指标，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/momentum/rsi_advanced/rsi_advanced.pine",
+    "kind": "indicator",
+    "title": "RSI Advanced [WavesUnchained]",
+    "original_description": "RSI with trend context, stall/absorption, conviction markers, and directional long/short coloring on a bounded 0-100 oscillator core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/rsi_advanced/rsi_advanced.pine",
+    "sha256": "91048c788f47e4e8957a5d8a6416a27d6fa248d69d20e211cb1556e490809bf3",
+    "description_zh": "以 0–100 有界振荡器为核心的 RSI，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine",
+    "kind": "indicator",
+    "title": "Stoch RSI Advanced [WavesUnchained]",
+    "original_description": "Stoch RSI with trend context, stall/absorption, conviction markers, and directional long/short coloring on a bounded 0-100 oscillator core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine",
+    "sha256": "a2335c592f02a664c8a92360db6bd55256bf56237a34ca1361af5860bb019bc0",
+    "description_zh": "以 0–100 有界振荡器为核心的随机 RSI，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/momentum/tsi_advanced/tsi_advanced.pine",
+    "kind": "indicator",
+    "title": "TSI Advanced [WavesUnchained]",
+    "original_description": "True Strength Index with trend context, stall/absorption, conviction markers, and directional long/short coloring on a zero-centered momentum core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/tsi_advanced/tsi_advanced.pine",
+    "sha256": "4ebfc6a226e2bc550dd2c16be09eab2094cc6148801e4a2f72fb3241a8491a30",
+    "description_zh": "以零轴为中心的真实强度指数，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/momentum/wavetrend/wavetrend_v3.pine",
+    "kind": "indicator",
+    "title": "WaveTrend v3 [WavesUnchained]",
+    "original_description": "Composite-Indikator. Nicht mehr \"WaveTrend optimiert\" sondern ein eigenes Konzept das mehrere Bausteine kombiniert:",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/wavetrend/wavetrend_v3.pine",
+    "sha256": "dcb2bcf7e5635fd8d8f087c278a5a8d4587b03243b53648975737e40502d84d4",
+    "description_zh": "复合指标：不再只是“优化的 WaveTrend”，而是组合多个模块的独立概念。"
+  },
+  {
+    "path": "indicators/momentum/wavetrend_advanced_smoothing/wavetrend_advanced_smoothing.pine",
+    "kind": "indicator",
+    "title": "WaveTrend Advanced Smoothing [WavesUnchained]",
+    "original_description": "WaveTrend oscillator with pluggable smoothing kernels and rich visualization.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/wavetrend_advanced_smoothing/wavetrend_advanced_smoothing.pine",
+    "sha256": "d043eb1b66e1cd8dd9407bd5b6abbd8ae531834081fcb9fc87182db9720ea0a7",
+    "description_zh": "具有可插拔平滑核和丰富可视化的 WaveTrend 振荡器。"
+  },
+  {
+    "path": "indicators/momentum/williams_r_advanced/williams_r_advanced.pine",
+    "kind": "indicator",
+    "title": "Williams %R Advanced [WavesUnchained]",
+    "original_description": "Williams %R with trend context, stall/absorption, conviction markers, and directional long/short coloring on a normalized 0-100 oscillator core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/momentum/williams_r_advanced/williams_r_advanced.pine",
+    "sha256": "883bc1b7451f912ba9f1ec6d940ff294cfe3d88170162b09deabc6fca07eec59",
+    "description_zh": "以归一化 0–100 振荡器为核心的 Williams %R，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/money_flow/candle_pressure_index/candle_pressure_index.pine",
+    "kind": "indicator",
+    "title": "Candle Pressure Index [WavesUnchained]",
+    "original_description": "Measures buying vs. selling pressure from raw candle microstructure — no derived oscillators, only price geometry and relative volume. Per-bar pressure = (2 × close_location − 1) × body_ratio × volume_rank.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/candle_pressure_index/candle_pressure_index.pine",
+    "sha256": "b69b316fabab3c091b7bd164e72c7f538e6434cf181a90ce042e6632bdc65b04",
+    "description_zh": "从原始 K 线微观结构衡量买卖压力，不使用衍生振荡器，只使用价格形态和相对成交量。每根 K 线压力 =（2 × 收盘位置 − 1）× 实体比例 × 成交量排名。"
+  },
+  {
+    "path": "indicators/money_flow/commodity_flow_trend/commodity_flow_trend.pine",
+    "kind": "indicator",
+    "title": "Commodity FlowTrend [WavesUnchained]",
+    "original_description": "MFI + CCI composite oscillator tuned for commodity markets. Combines money-flow momentum (MFI) with cycle-sensitive trend context (CCI) to identify flow regimes: expansion, accumulation, distribution, and reversal.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/commodity_flow_trend/commodity_flow_trend.pine",
+    "sha256": "c8e3940a0555c274431a62dcd285312e7c4fd69ac001a0f00fb60a750b83933f",
+    "description_zh": "针对商品市场调校的 MFI 与 CCI 复合振荡器，结合资金流动量和对周期敏感的趋势背景，识别扩张、吸筹、派发和反转等资金流状态。"
+  },
+  {
+    "path": "indicators/money_flow/cvd_bias/cvd_bias.pine",
+    "kind": "indicator",
+    "title": "CVD Bias [WavesUnchained]",
+    "original_description": "Estimates a price-weighted volume balance over a rolling window. This is NOT real Cumulative Volume Delta — OHLCV data carries no aggressor-side trade classification, so \"buying\" and \"selling\" volume are inferred only from where price closed within the bar's range, never from actual trade direction. Real Delta/CVD requires request.footprint() (out of scope here). Within that heuristic, the per-bar signed-volume proxy is accumulated as a running total rather than smoothed into an EMA, showing whether the price-weighted balance has been persistently skewed bullish or bearish and whether that skew is building or fading.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/cvd_bias/cvd_bias.pine",
+    "sha256": "18ac36245f3705f0d5ca3622a8daa7f27964c25cf41107cbb9a9993b1bc8919c",
+    "description_zh": "估算滚动窗口内按价格加权的成交量平衡，并非真实累计成交量差值（CVD）。OHLCV 不含主动买卖方分类，因此买卖量仅根据收盘价在 K 线区间中的位置推断，并非实际成交方向。真实 Delta／CVD 需要 request.footprint()，不在本指标范围内。在此启发式方法内，逐 K 线有符号成交量代理值以累计总量呈现，而非用 EMA 平滑，以显示价格加权平衡是否持续偏多或偏空，以及这种偏向正在增强还是减弱。"
+  },
+  {
+    "path": "indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine",
+    "kind": "indicator",
+    "title": "Klinger Volume Force Map [WavesUnchained]",
+    "original_description": "Volume-force analysis based on Stephen J. Klinger's original 1997 concept.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine",
+    "sha256": "a303031d8fcae4e022e2029187d2fabb5fac84f4011475143f906d5432bae0a4",
+    "description_zh": "基于 Stephen J. Klinger 1997 年原始概念的成交量力分析。"
+  },
+  {
+    "path": "indicators/money_flow/mfi_advanced/mfi_advanced.pine",
+    "kind": "indicator",
+    "title": "MFI Advanced [WavesUnchained]",
+    "original_description": "Money Flow Index with trend context, stall/absorption, conviction markers, and directional long/short coloring on a bounded 0-100 oscillator core.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/mfi_advanced/mfi_advanced.pine",
+    "sha256": "fcfca6c3afc874c3775faab0d8f573137f8b5917ca549e893ee83ba96eecf5fb",
+    "description_zh": "以 0–100 有界振荡器为核心的资金流量指数，提供趋势背景、停滞／吸收、确信度标记以及多空方向着色。"
+  },
+  {
+    "path": "indicators/money_flow/money_flow_delta_profile/money_flow_delta_profile.pine",
+    "kind": "indicator",
+    "title": "Money Flow Delta Profile [WavesUnchained]",
+    "original_description": "Directional volume/money flow profile: a gray reference bar (total flow) and a colored delta bar share a left anchor and both extend right — green when buyers dominated a price level, red when sellers dominated.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/money_flow_delta_profile/money_flow_delta_profile.pine",
+    "sha256": "90d9a3b75d398a5ee083239b9c29388417d82d34ce0615786ab42480a6ae58f0",
+    "description_zh": "方向性成交量／资金流分布：灰色参考条表示总流量，彩色差值条与其共用左侧起点并向右延伸；价格水平由买方主导时显示绿色，由卖方主导时显示红色。"
+  },
+  {
+    "path": "indicators/money_flow/volume_strata/volume_strata.pine",
+    "kind": "indicator",
+    "title": "Volume Strata [WavesUnchained]",
+    "original_description": "Fixed-range volume profile anchored to the right, with POC, VAH/VAL, HVN/LVN zones, Value Area fill, naked POC tracking, expanded context table, and alerts.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/money_flow/volume_strata/volume_strata.pine",
+    "sha256": "99ff9558c616a6576bb3848ecbd0ac66b7dd6aa89e9b13f7924f59dd773ecacd",
+    "description_zh": "右侧锚定的固定区间成交量分布，包含 POC、VAH／VAL、高／低成交量节点区域、价值区填充、未回测 POC 跟踪、扩展背景表和警报。"
+  },
+  {
+    "path": "indicators/relative_strength/relative_leg_efficiency/relative_leg_efficiency.pine",
+    "kind": "indicator",
+    "title": "Relative Leg Efficiency [WavesUnchained]",
+    "original_description": "Pivot-to-pivot leg quality scoring with path, time, and counter-pressure efficiency",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/relative_strength/relative_leg_efficiency/relative_leg_efficiency.pine",
+    "sha256": "49ff5c92cf0665e1c4a8c254660f5e5609cc9a5ca808c8df566435dda365fe7b",
+    "description_zh": "对枢轴点之间的价格段质量评分，考量路径、时间及反向压力效率。"
+  },
+  {
+    "path": "indicators/relative_strength/relative_strength_line/relative_strength_line.pine",
+    "kind": "indicator",
+    "title": "Relative Strength Line [WavesUnchained]",
+    "original_description": "Relative strength of the chart symbol vs. a benchmark (SPY / QQQ / any), turned into an ACTIONABLE signal: a long/short mark fires only when relative strength AND the stock's own price trend agree (confluence) — so a signal can never contradict the chart (no \"green while price falls\").",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/relative_strength/relative_strength_line/relative_strength_line.pine",
+    "sha256": "5f67387f4f1aaffdf0dc3d437984437f0dd07e2e9df67c8d6120b61f06f8bb54",
+    "description_zh": "将图表品种相对基准（SPY、QQQ 或任意基准）的相对强度转为可操作信号：仅当相对强度和股票自身价格趋势一致时才触发多空标记，因此信号不会与图表方向矛盾。"
+  },
+  {
+    "path": "indicators/trend_direction/adaptive_arithmetic_candles/adaptive_arithmetic_candles.pine",
+    "kind": "indicator",
+    "title": "Adaptive Arithmetic Candles + Quality Score [WavesUnchained]",
+    "original_description": "Kaufman-efficiency-adaptive candle transform blended with a linear regression anchor, overlaid with a 0-100 Trend Quality Score.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/adaptive_arithmetic_candles/adaptive_arithmetic_candles.pine",
+    "sha256": "75ee9e58e54773dddf4e6f5bbb5bd158273c36ed428d4bb33ad708cf8f3fbcc6",
+    "description_zh": "根据 Kaufman 效率自适应的 K 线变换，结合线性回归锚点，并叠加 0–100 的趋势质量评分。"
+  },
+  {
+    "path": "indicators/trend_direction/chandelier_flip_radar/chandelier_flip_radar.pine",
+    "kind": "indicator",
+    "title": "Chandelier Flip Radar [WavesUnchained]",
+    "original_description": "ATR-based trailing stop with a directional, multi-level trend state. Trend weakening becomes visible before the actual direction change through progressive bar coloring and configurable warning/danger zones.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/chandelier_flip_radar/chandelier_flip_radar.pine",
+    "sha256": "b040f81aec9618d4f0e3713179df139661f20d119a00224e1d6592e004b74084",
+    "description_zh": "基于 ATR 的移动止损，具有方向性多级趋势状态。通过渐进式 K 线着色和可配置的警告／危险区域，在实际方向改变之前显示趋势减弱。"
+  },
+  {
+    "path": "indicators/trend_direction/ma_cascade_engine/ma_cascade_engine.pine",
+    "kind": "indicator",
+    "title": "MA Cascade Engine [WavesUnchained]",
+    "original_description": "Moving averages are not treated as isolated crossover signals.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/ma_cascade_engine/ma_cascade_engine.pine",
+    "sha256": "3f77807bdfa9d323b9fc2684c809e310fcb482b982e857fc153ab2b7280cb975",
+    "description_zh": "不将移动平均线视为孤立的交叉信号。"
+  },
+  {
+    "path": "indicators/trend_direction/ma_regime_bands/ma_regime_bands.pine",
+    "kind": "indicator",
+    "title": "MA Regime Bands [WavesUnchained]",
+    "original_description": "Regime overlay using multi-MA alignment with ATR-based stop bands and normalized trend strength.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/ma_regime_bands/ma_regime_bands.pine",
+    "sha256": "c14c12da8a8c8e34b524773a0eaa476a9a1544eb29279d233656fa4d3ac1bf9d",
+    "description_zh": "利用多条均线排列、基于 ATR 的止损带和归一化趋势强度的市场状态叠加指标。"
+  },
+  {
+    "path": "indicators/trend_direction/market_average_relationship_engine/market_average_relationship_engine.pine",
+    "kind": "indicator",
+    "title": "Market–Average Relationship Engine [WavesUnchained]",
+    "original_description": "Evaluates the current relationship between price and ONE consistently selected moving-average family. The MA is treated as a market reference, not as a standalone crossover signal.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/market_average_relationship_engine/market_average_relationship_engine.pine",
+    "sha256": "af8f1a77f5f8bd4bd1d5d63630760a4aa6186c2dc9bb456b587717efd9a3224b",
+    "description_zh": "评估价格与一个始终一致选定的移动平均线族之间的当前关系。均线被视为市场参考，而非独立交叉信号。"
+  },
+  {
+    "path": "indicators/trend_direction/modern_trend_regime/modern_trend_regime.pine",
+    "kind": "indicator",
+    "title": "Modern Trend Regime [WavesUnchained]",
+    "original_description": "Vereinfachtes Trend- und Range-System ohne Ichimoku-Begriffe.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/modern_trend_regime/modern_trend_regime.pine",
+    "sha256": "df8d5ed5485e4a2ab8cbc0c77b6893415ea5eaa8bf23487f8f6716cbdc13054d",
+    "description_zh": "不使用一目均衡术语的简化趋势和区间系统。"
+  },
+  {
+    "path": "indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine",
+    "kind": "indicator",
+    "title": "Smooth Trend Radar [WavesUnchained]",
+    "original_description": "Double-smoothed Supertrend baseline for trend direction, with live baseline rejection signals at the baseline, statistical overextension highlighting, and automatic SL/TP level visualization on flips.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine",
+    "sha256": "cbd095d52da3c204ef9bfd8ab57199bf3da5ad709a4499e3d9ffda59c8e14b49",
+    "description_zh": "双重平滑的 Supertrend 基准线用于判断趋势方向，附实时基准线拒绝信号、统计性过度延伸高亮，以及趋势切换时自动显示止损／止盈水平。"
+  },
+  {
+    "path": "indicators/trend_direction/vein/vein_accumulation_phase.pine",
+    "kind": "indicator",
+    "title": "Vein Accumulation Phase 4H [WavesUnchained]",
+    "original_description": "Detects bottom formation / accumulation phases on 4H NatGas. Not a point signal — a process state over time.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/vein/vein_accumulation_phase.pine",
+    "sha256": "1aef3522f1cd251d4eab531ba1e60f682599be234560a86c92d24dda699830fb",
+    "description_zh": "检测 4 小时天然气市场的底部形成／吸筹阶段。这是随时间演变的过程状态，而非单点信号。"
+  },
+  {
+    "path": "indicators/trend_direction/vein/vein_reversal_zones/vein_reversal_zones.pine",
+    "kind": "indicator",
+    "title": "Vein: Reversal Zones [WavesUnchained]",
+    "original_description": "S/R zones from forward-validated reversal bars + live signal engine. Zones show only the nearest N supports/resistances within ATR range. Nearby zones merge; touch counter tracks revisits.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_direction/vein/vein_reversal_zones/vein_reversal_zones.pine",
+    "sha256": "ee1414151116d2333c79e0364f15a25934d38cb40f5c8dff74f5fba3908f597d",
+    "description_zh": "根据经后续验证的反转 K 线生成支撑／阻力区域，并带实时信号引擎。仅显示 ATR 范围内最近的 N 个支撑／阻力区域；邻近区域会合并，触碰计数器记录再次触及。"
+  },
+  {
+    "path": "indicators/trend_strength/adaptive_cycle_detector/adaptive_cycle_detector.pine",
+    "kind": "indicator",
+    "title": "Adaptive Cycle Detector [WavesUnchained]",
+    "original_description": "Estimates the dominant market cycle from WT/StochRSI zero-crossing frequency and recommends adaptive indicator lengths. Fast markets (frequent oscillator crossings) get shorter lengths; slow swing markets get longer lengths.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/adaptive_cycle_detector/adaptive_cycle_detector.pine",
+    "sha256": "ebc6d39ffa516ec096dc4aedf0b7bbdea3cb859f6d69db66517c11e71468e1b6",
+    "description_zh": "根据 WT／Stoch RSI 穿越零轴的频率估算市场主导周期，并推荐自适应指标长度。快速市场（振荡器频繁交叉）使用较短长度，缓慢波段市场使用较长长度。"
+  },
+  {
+    "path": "indicators/trend_strength/adx_advanced/adx_advanced.pine",
+    "kind": "indicator",
+    "title": "ADX Advanced [WavesUnchained]",
+    "original_description": "ADX with DI± lines, smoothed ADX, gradient fills, and configurable alerts. Designed for trend-strength context across all asset classes and timeframes.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/adx_advanced/adx_advanced.pine",
+    "sha256": "dbf5f889953cefe655cf6d0c22b52cb34445e1b627d889edc7bbed34b72c8e5a",
+    "description_zh": "ADX 指标包含 DI± 线、平滑 ADX、渐变填充和可配置警报，旨在为各资产类别和时间周期提供趋势强度背景。"
+  },
+  {
+    "path": "indicators/trend_strength/bayesian_trend_factor/bayesian_trend_factor.pine",
+    "kind": "indicator",
+    "title": "Bayesian Trend Factor [WavesUnchained]",
+    "original_description": "Bayesian-inspired probabilistic trend-quality engine. Output: Trend Factor -100..+100 + Confidence 0..100.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/bayesian_trend_factor/bayesian_trend_factor.pine",
+    "sha256": "c0ef9aeb13c97b9daa47b9295185f6de3916a365d69adc9c1aba24322ccd1dd8",
+    "description_zh": "受贝叶斯方法启发的概率型趋势质量引擎，输出 −100 至 +100 的趋势因子和 0 至 100 的置信度。"
+  },
+  {
+    "path": "indicators/trend_strength/market_memory_decay_oscillator/market_memory_decay_oscillator.pine",
+    "kind": "indicator",
+    "title": "Market Memory & Decay Oscillator [WavesUnchained]",
+    "original_description": "Signed oscillator fusing impulse-autocorrelation half-life, a Hurst-exponent approximation, path efficiency and range expansion into a single carry/decay read on how long the current impulse is likely to persist before mean-reverting.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/market_memory_decay_oscillator/market_memory_decay_oscillator.pine",
+    "sha256": "f36292a8f823b01e0c7b1541271f9b3ea2cdbfc1d696cbe57c3c176acd67338e",
+    "description_zh": "有符号振荡器，将冲动自相关半衰期、Hurst 指数近似、路径效率和区间扩张合为一个持续／衰减读数，用于估计当前冲动在均值回归前可能持续多久。"
+  },
+  {
+    "path": "indicators/trend_strength/market_state_engine/market_state_engine.pine",
+    "kind": "indicator",
+    "title": "Market State Engine [WavesUnchained]",
+    "original_description": "Context engine that classifies market state, value location, structural bias, and energy phase — instead of generating a standalone buy/sell signal.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/market_state_engine/market_state_engine.pine",
+    "sha256": "775f4f8c96be0d5269f7e178223a49feb6196b86f2fbf6f8364a2a5e214ac706",
+    "description_zh": "背景引擎，分类市场状态、价值位置、结构偏向和能量阶段，不生成独立买卖信号。"
+  },
+  {
+    "path": "indicators/trend_strength/markov_state_engine/markov_state_engine.pine",
+    "kind": "indicator",
+    "title": "Markov State Engine [WavesUnchained]",
+    "original_description": "Regime RESOLUTION map (not a price forecast): classifies every bar into one of six market states (Up Trend, Up Weak, Compression, Down Trend, Down Weak, Expansion/Chaos), then measures — from history — where SIMILAR states resolved WHEN they ended. Self-transitions are reported separately as Persistence. It is a Quality/context layer (reversal-pipeline Stage 1) — it never fires a raw trend trigger on its own.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/markov_state_engine/markov_state_engine.pine",
+    "sha256": "2bd9a3fb041139e1b7faaebe1f928b83be9fc0799eab103d11ff26a912643f7f",
+    "description_zh": "市场状态结束后的走向图，并非价格预测：将每根 K 线分为上涨趋势、上涨减弱、压缩、下跌趋势、下跌减弱、扩张／混沌六种状态，再从历史中衡量相似状态结束时走向何处。同状态转移作为持续性单独报告。它是反转流程第一阶段的质量／背景层，不能自行触发原始趋势信号。"
+  },
+  {
+    "path": "indicators/trend_strength/predictability_regime_index/predictability_regime_index.pine",
+    "kind": "indicator",
+    "title": "Predictability Regime Index [WavesUnchained]",
+    "original_description": "Classifies whether price action currently rewards momentum/trend-following or mean-reversion, by fusing four statistical predictability sensors onto one signed axis.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/predictability_regime_index/predictability_regime_index.pine",
+    "sha256": "abb4ba505f54cc4466acd79979f5bdf8a6cb1fbcc5c6eef91cda028ac6faa909",
+    "description_zh": "将四个统计可预测性传感器合并到一条有符号轴，分类当前价格行为更有利于动量／趋势跟随还是均值回归。"
+  },
+  {
+    "path": "indicators/trend_strength/regime_classifier/regime_classifier.pine",
+    "kind": "indicator",
+    "title": "Regime Classifier [WavesUnchained]",
+    "original_description": "Stage-1 regime filter for the reversal pipeline: fuses Fractal Dimension Index, Kaufman Efficiency Ratio and the Choppiness Index into one Trend / Range / Chaos classification. It is a Quality/context layer — it answers \"is a reversal even sensible here?\", it never fires a long/short trigger.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/regime_classifier/regime_classifier.pine",
+    "sha256": "a65022e8abcfc38d82a9a8b31ab9abc75ee929e4e641c584a415c6e6b2e6f98b",
+    "description_zh": "反转流程第一阶段的状态过滤器：将分形维数指数、Kaufman 效率比和震荡指数合成趋势／区间／混沌分类。它是质量／背景层，用于判断此处考虑反转是否合理，不触发多空信号。"
+  },
+  {
+    "path": "indicators/trend_strength/regime_detector/regime_detector.pine",
+    "kind": "indicator",
+    "title": "Regime Detector (MA Zones Overlay) [WavesUnchained]",
+    "original_description": "MA-zone based trend regime overlay with adaptive sensitivity and HTF gate. v1.1 adds a second dimension (volatility), regime maturity / transition warnings, a plain-language playbook, and an optional RS-vs-benchmark modifier.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/regime_detector/regime_detector.pine",
+    "sha256": "e4eb68f0add3f293e211e6d4bfaca32edd45926d8e3258db1764bef36dc6def7",
+    "description_zh": "基于均线区域的趋势状态叠加指标，具有自适应灵敏度和高时间周期过滤。v1.1 增加波动率维度、状态成熟度／转换警告、通俗操作指引和可选的相对基准强度修正。"
+  },
+  {
+    "path": "indicators/trend_strength/regime_transition_engine/regime_transition_engine.pine",
+    "kind": "indicator",
+    "title": "Regime Transition Engine [WavesUnchained]",
+    "original_description": "Classifies the market into one of seven regime states (Noise, Compression, Expansion, Trend Up, Trend Down, Exhaustion, Reversion) and derives a directional transition-pressure oscillator toward the next expected state.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/regime_transition_engine/regime_transition_engine.pine",
+    "sha256": "37505a450593c2fc397c573c4e6bbf396bad7f9207639994e124963cea99475b",
+    "description_zh": "将市场分类为噪声、压缩、扩张、上涨趋势、下跌趋势、衰竭、回归七种状态，并推导朝下一预期状态变化的方向性转换压力振荡器。"
+  },
+  {
+    "path": "indicators/trend_strength/trend_persistence_score/trend_persistence_score.pine",
+    "kind": "indicator",
+    "title": "Trend Persistence Score [WavesUnchained]",
+    "original_description": "Single-role trend-strength oscillator: how persistent, clean and durable is the current trend? Fuses four trend-efficiency sensors (Regression R², Kaufman Efficiency Ratio, ADX strength+slope, Fractal Dimension) onto one graded 0-100 persistence axis. Direction-agnostic by design — it grades the magnitude of trendiness; direction is shown as visual context only.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/trend_strength/trend_persistence_score/trend_persistence_score.pine",
+    "sha256": "f8c2a4948aa70805ff1ae46196a20019c6c0ecfe176d0efba25c3f8bcab395d9",
+    "description_zh": "单一用途的趋势强度振荡器，用于衡量当前趋势的持续性、平稳性和耐久性。将回归 R²、Kaufman 效率比、ADX 强度与斜率、分形维数四个趋势效率传感器合并到 0–100 分级持续性轴。设计上不区分方向，只评估趋势程度，方向仅作为可视背景。"
+  },
+  {
+    "path": "indicators/volatility/atr_advanced/atr_advanced.pine",
+    "kind": "indicator",
+    "title": "ATR Advanced [WavesUnchained]",
+    "original_description": "ATR in four display modes: Raw, ATR%, Normalized (z-score), and Percentile. Designed to give actionable volatility context across asset classes.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/volatility/atr_advanced/atr_advanced.pine",
+    "sha256": "8686b90bb4284ab926b1e6d73e4bb48ae60d49150516aebc1247152af340cbc7",
+    "description_zh": "ATR 的四种显示模式：原始值、ATR 百分比、标准化 z 分数和百分位，旨在为不同资产类别提供可操作的波动率背景。"
+  },
+  {
+    "path": "indicators/volatility/compression_fractal_release/compression_fractal_release.pine",
+    "kind": "indicator",
+    "title": "Compression Fractal Release [WavesUnchained]",
+    "original_description": "Detects a compressed, corrective coil inside a higher-timeframe trend and trades the moment it resolves into a clean directional break (the \"release\"). The band break is the only trigger; coil strength and release dynamics are scored as weighted evidence (not a hard AND-chain), and a single choppiness veto gates low-quality breaks. The HTF regime decides whether a break is a continuation (Release) or a structural change out of a base (Base Break).",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/volatility/compression_fractal_release/compression_fractal_release.pine",
+    "sha256": "88ad5ec8a1d04a8df9c1048f435459c32c510f4f7319fd080efab4fe09c9dbe9",
+    "description_zh": "检测高时间周期趋势内压缩的修正盘整，并在其形成清晰方向突破（“释放”）时交易。通道突破是唯一触发条件；盘整强度和释放动态作为加权证据评分，而非必须全部满足的硬性条件链；单个震荡度否决条件过滤低质量突破。高时间周期状态决定突破属于延续（释放）还是从底部发生结构变化（底部突破）。"
+  },
+  {
+    "path": "indicators/volatility/time_to_react_volatility_time/time_to_react_volatility_time.pine",
+    "kind": "indicator",
+    "title": "Time-to-React + Volatility-Time (BOS / Sweep / OB) [Scores + Candle Color] [WavesUnchained]",
+    "original_description": "Event reaction scoring (BOS/Sweep/OB) with volatility activity and candle coloring",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/volatility/time_to_react_volatility_time/time_to_react_volatility_time.pine",
+    "sha256": "78cf5fc40ff1fe997d468e0f8e9f58088666aae5fb04345c20915dd15af5e8a9",
+    "description_zh": "使用波动活动与 K 线着色，对 BOS／扫荡／订单块事件的反应进行评分。"
+  },
+  {
+    "path": "indicators/volatility/williams_vix_fix_advanced/williams_vix_fix_advanced.pine",
+    "kind": "indicator",
+    "title": "Williams VIX Fix Advanced [WavesUnchained]",
+    "original_description": "Synthetic fear gauge (Williams VIX Fix) with dual-direction signals, StdDev and percentile bands, stall/absorption context, slow-WVF trend context, divergence wedge, and gradient coloring on a bounded 0–100 panel.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/indicators/volatility/williams_vix_fix_advanced/williams_vix_fix_advanced.pine",
+    "sha256": "05d02a7b3ec0929493070c61f9e13f03bd90a3c90219f3a2d1f22976c6255cf1",
+    "description_zh": "合成恐慌指标 Williams VIX Fix，提供双向信号、标准差和百分位带、停滞／吸收背景、慢速 WVF 趋势背景、背离楔形及 0–100 有界面板渐变着色。"
+  },
+  {
+    "path": "strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine",
+    "kind": "strategy",
+    "title": "Chandelier Flip Radar [WavesUnchained] — Strategy (standalone)",
+    "original_description": "ATR-based trailing stop with a directional, multi-level trend state. Trend weakening becomes visible before the actual direction change through progressive bar coloring and configurable warning/danger zones.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine",
+    "sha256": "95a37a04bf162cba8b8328ecad1440b9037ac27341e262a546abbca48578ad66",
+    "description_zh": "基于 ATR 的移动止损，具有方向性多级趋势状态。通过渐进式 K 线着色和可配置的警告／危险区域，在实际方向改变之前显示趋势减弱。"
+  },
+  {
+    "path": "strategies/commodity_pulse_matrix/commodity_pulse_matrix_v4_strategy.pine",
+    "kind": "strategy",
+    "title": "Commodity Pulse Matrix v4 [WavesUnchained] — Strategy (standalone)",
+    "original_description": "Chart-timeframe entry engine with multi-timeframe confluence context. Slimmed down from v3 (~7200 lines) to focus on filtered signal generation.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/strategies/commodity_pulse_matrix/commodity_pulse_matrix_v4_strategy.pine",
+    "sha256": "6bc53bc03a52b4713ec35dc57f6fc3b9aadeef4175ff805ad69aee80dc4ead10",
+    "description_zh": "图表时间周期的入场引擎，结合多时间周期共振背景。从 v3 的约 7200 行精简，聚焦过滤后的信号生成。"
+  },
+  {
+    "path": "strategies/market_average_relationship_engine/market_average_relationship_engine_strategy.pine",
+    "kind": "strategy",
+    "title": "Market–Average Relationship Engine [WavesUnchained] — Strategy (standalone)",
+    "original_description": "Evaluates the current relationship between price and ONE consistently selected moving-average family. The MA is treated as a market reference, not as a standalone crossover signal.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/strategies/market_average_relationship_engine/market_average_relationship_engine_strategy.pine",
+    "sha256": "0d3d364bbc8480b683b3aa0272cfc37482bcee4160de1472572c6453aefe1569",
+    "description_zh": "评估价格与一个始终一致选定的移动平均线族之间的当前关系。均线被视为市场参考，而非独立交叉信号。"
+  },
+  {
+    "path": "strategies/oscillator_divergence_zones/oscillator_divergence_zones_strategy.pine",
+    "kind": "strategy",
+    "title": "Oscillator Divergence Zones [WavesUnchained] — Strategy (standalone)",
+    "original_description": "Detects regular and hidden divergences for RSI, CCI, or MFI.",
+    "source_url": "https://github.com/casoon/pine-scripts/blob/c7368182c246853f246911831171bc8258bc356a/strategies/oscillator_divergence_zones/oscillator_divergence_zones_strategy.pine",
+    "sha256": "50b4e8607211fb32453bb255dba5e51e7d1e3654beccf3c91699d5d7f830e6ba",
+    "description_zh": "检测 RSI、CCI 或 MFI 的常规背离和隐藏背离。"
+  }
+]

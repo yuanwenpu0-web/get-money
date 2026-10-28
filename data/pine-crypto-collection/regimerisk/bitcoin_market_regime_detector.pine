@@ -1,0 +1,79 @@
+//@version=5
+// ─────────────────────────────────────────────────────────────────────────────
+//  Bitcoin Market Regime Detector [RegimeRisk] — Open Reference
+//
+//  A transparent, rule-based baseline that classifies price action into five
+//  market regimes: Bull, Bear, Range, Volatility, and Transition.
+//
+//  This is an intentionally simplified, open reference implementation. The
+//  production system at https://regimerisk.com uses an ensemble ML model
+//  (gradient-boosted trees + an LSTM meta-ensemble) trained against a
+//  proprietary labelling scheme — NOT the heuristics below.
+//
+//  Author:   RegimeRisk / Nexus AI Labs
+//  Site:     https://regimerisk.com
+//  License:  This source code is subject to the terms of the Mozilla Public
+//            License 2.0 at https://mozilla.org/MPL/2.0/
+//  @version: 1.0.0
+// ─────────────────────────────────────────────────────────────────────────────
+indicator("Bitcoin Market Regime Detector [RegimeRisk] — Reference", shorttitle="Regime [RR]", overlay=true)
+
+// ── Inputs ───────────────────────────────────────────────────────────────────
+trendLen   = input.int(100, "Trend EMA length",             minval=10, group="Trend")
+slopeLen   = input.int(20,  "Trend slope lookback",         minval=2,  group="Trend")
+volLen     = input.int(20,  "Volatility (ATR) length",      minval=2,  group="Volatility")
+volRankLen = input.int(200, "Volatility percentile window", minval=20, group="Volatility")
+volHi      = input.float(80, "High-volatility percentile",  minval=50, maxval=100, group="Volatility")
+adxLen     = input.int(14,  "ADX length",                   minval=2,  group="Range")
+adxRange   = input.float(20, "ADX range threshold (below = range)",    minval=5,  group="Range")
+adxTrend   = input.float(25, "ADX trend threshold (above = trending)", minval=10, group="Range")
+showTable  = input.bool(true, "Show regime panel", group="Display")
+
+// ── Components ───────────────────────────────────────────────────────────────
+ema      = ta.ema(close, trendLen)
+emaSlope = (ema - ema[slopeLen]) / ema[slopeLen] * 100        // % slope over lookback
+aboveEma = close > ema
+
+atrPct   = ta.atr(volLen) / close * 100
+volRank  = ta.percentrank(atrPct, volRankLen)                 // 0–100 percentile of current vol
+
+[_diPlus, _diMinus, adx] = ta.dmi(adxLen, adxLen)
+
+// ── Regime logic (priority order) ────────────────────────────────────────────
+// 1) Volatility overrides everything when realised vol is in its top band.
+// 2) Range when directional movement is weak (low ADX).
+// 3) Bull / Bear when trend is established AND directional movement is strong.
+// 4) Transition otherwise — conflicting or not-yet-confirmed signals.
+isVol   = volRank >= volHi
+isRange = not isVol and adx < adxRange
+isBull  = not isVol and not isRange and aboveEma     and emaSlope > 0 and adx >= adxTrend
+isBear  = not isVol and not isRange and not aboveEma and emaSlope < 0 and adx >= adxTrend
+isTrans = not (isVol or isRange or isBull or isBear)
+
+regime = isVol   ? "Volatility" :
+         isRange ? "Range"      :
+         isBull  ? "Bull"       :
+         isBear  ? "Bear"       :
+                   "Transition"
+
+// ── Colours ──────────────────────────────────────────────────────────────────
+cBull  = color.new(#26a69a, 0)
+cBear  = color.new(#ef5350, 0)
+cRange = color.new(#787b86, 0)
+cVol   = color.new(#f7a600, 0)
+cTrans = color.new(#5b9cf6, 0)
+
+regimeColor = isVol ? cVol : isRange ? cRange : isBull ? cBull : isBear ? cBear : cTrans
+bgcolor(color.new(regimeColor, 88))
+
+// ── Regime panel ─────────────────────────────────────────────────────────────
+var table t = table.new(position.top_right, 1, 2, border_width=1)
+if showTable and barstate.islast
+    table.cell(t, 0, 0, "Market Regime", text_color=color.white, bgcolor=color.new(color.black, 20))
+    table.cell(t, 0, 1, regime,          text_color=color.white, bgcolor=regimeColor, text_size=size.large)
+
+// ── Alerts ───────────────────────────────────────────────────────────────────
+regimeChanged = regime != regime[1]
+alertcondition(regimeChanged, "Regime change", "Bitcoin market regime changed")
+if regimeChanged
+    alert("Bitcoin market regime → " + regime, alert.freq_once_per_bar_close)

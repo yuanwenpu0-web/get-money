@@ -1,0 +1,58 @@
+[
+  {
+    "path": "indicators/live-market-scanner-v7.pine",
+    "kind": "indicator",
+    "title_zh": "实时市场扫描指标",
+    "original_description": "Real-time market analysis with live dashboard, confidence scoring, and predictive candles.",
+    "description_zh": "作者描述为实时市场分析，包含仪表盘、置信度评分和预测 K 线。",
+    "crypto_relevance": "作者将项目用于加密货币和外汇；指标本身适用于多种市场。",
+    "source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/indicators/live-market-scanner-v7.pine",
+    "description_source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/README.md",
+    "source_commit": "d7cd358943e84fbf43422852f4473d6ea9d32faf",
+    "sha256": "61bc6ef3e7d75ca94ac9569f4878d09a3a5dbebced6168ad1ec4e786db151700",
+    "license": "MIT，原许可证附交易免责声明。",
+    "implementation_note_zh": "README 列举十项指标，但该固定版本仅含四个源码文件；作者的效果描述未经独立验证。"
+  },
+  {
+    "path": "indicators/smart-money-concepts.pine",
+    "kind": "indicator",
+    "title_zh": "聪明钱概念指标",
+    "original_description": "Institutional trading zones, order blocks, and liquidity analysis.",
+    "description_zh": "标记交易区域、订单块并分析流动性。",
+    "crypto_relevance": "作者将项目用于加密货币和外汇；指标本身适用于多种市场。",
+    "source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/indicators/smart-money-concepts.pine",
+    "description_source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/README.md",
+    "source_commit": "d7cd358943e84fbf43422852f4473d6ea9d32faf",
+    "sha256": "1451d915d7960bf597884f824b118a9c8d50933b4504cd35cd45f423c3318076",
+    "license": "MIT，原许可证附交易免责声明。",
+    "implementation_note_zh": "README 列举十项指标，但该固定版本仅含四个源码文件；作者的效果描述未经独立验证。"
+  },
+  {
+    "path": "indicators/multi-timeframe-trend.pine",
+    "kind": "indicator",
+    "title_zh": "多周期趋势检测指标",
+    "original_description": "Analyze trends across multiple timeframes simultaneously.",
+    "description_zh": "同时分析多个时间周期的趋势。",
+    "crypto_relevance": "作者将项目用于加密货币和外汇；指标本身适用于多种市场。",
+    "source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/indicators/multi-timeframe-trend.pine",
+    "description_source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/README.md",
+    "source_commit": "d7cd358943e84fbf43422852f4473d6ea9d32faf",
+    "sha256": "00fc364a880fd7e0a9d7de787f5ad4c3cc2e96b0c963f8e2cc4d0d2c674734db",
+    "license": "MIT，原许可证附交易免责声明。",
+    "implementation_note_zh": "README 列举十项指标，但该固定版本仅含四个源码文件；作者的效果描述未经独立验证。"
+  },
+  {
+    "path": "indicators/support-resistance.pine",
+    "kind": "indicator",
+    "title_zh": "支撑阻力位识别指标",
+    "original_description": "Automatic detection of key support and resistance levels.",
+    "description_zh": "自动识别关键支撑位与阻力位。",
+    "crypto_relevance": "作者将项目用于加密货币和外汇；指标本身适用于多种市场。",
+    "source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/indicators/support-resistance.pine",
+    "description_source_url": "https://github.com/IamTamheedNazir/tradingview-indicators-pro/blob/d7cd358943e84fbf43422852f4473d6ea9d32faf/README.md",
+    "source_commit": "d7cd358943e84fbf43422852f4473d6ea9d32faf",
+    "sha256": "e33f4a0492c5c7a1aefcc5aa9ef1defedc0ab1944553a4dd81830a1e7c94a3aa",
+    "license": "MIT，原许可证附交易免责声明。",
+    "implementation_note_zh": "README 列举十项指标，但该固定版本仅含四个源码文件；作者的效果描述未经独立验证。"
+  }
+]

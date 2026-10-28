@@ -1,0 +1,38 @@
+//@version=6
+strategy("CrossMACD Scalper ⚡", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// === INPUTS ===
+fastLength   = input.int(9, title="Fast EMA")
+slowLength   = input.int(21, title="Slow EMA")
+macdFast     = input.int(12, title="MACD Fast Length")
+macdSlow     = input.int(26, title="MACD Slow Length")
+macdSignal   = input.int(9, title="MACD Signal Length")
+tpPerc       = input.float(1.2, title="Take Profit %")
+slPerc       = input.float(0.6, title="Stop Loss %")
+
+// === MOVING AVERAGES ===
+emaFast = ta.ema(close, fastLength)
+emaSlow = ta.ema(close, slowLength)
+
+// === MACD HISTOGRAM ===
+[macdLine, signalLine, _] = ta.macd(close, macdFast, macdSlow, macdSignal)
+macdHist = macdLine - signalLine
+
+// === ENTRY CONDITIONS ===
+longSignal  = ta.crossover(emaFast, emaSlow) and macdHist > 0
+shortSignal = ta.crossunder(emaFast, emaSlow) and macdHist < 0
+
+// === EXECUTE TRADES ===
+if longSignal
+    strategy.entry("Long", strategy.long)
+
+if shortSignal
+    strategy.entry("Short", strategy.short)
+
+// === EXITS ===
+strategy.exit("Exit Long", from_entry="Long", profit=tpPerc, loss=slPerc)
+strategy.exit("Exit Short", from_entry="Short", profit=tpPerc, loss=slPerc)
+
+// === PLOT ===
+plot(emaFast, title="Fast EMA", color=color.orange)
+plot(emaSlow, title="Slow EMA", color=color.blue)

@@ -1,0 +1,64 @@
+//@version=5
+strategy("Donchian Channel Breakout - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+channelLength = input.int(20, "Channel Length", minval=1)
+breakoutConfirm = input.int(1, "Breakout Confirmation Bars", minval=0, maxval=5)
+useMiddleLine = input.bool(true, "Exit at Middle Line")
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", group="Webhook")
+
+// ==================== Donchian Channel Calculation ====================
+upperBand = ta.highest(high, channelLength)
+lowerBand = ta.lowest(low, channelLength)
+middleLine = (upperBand + lowerBand) / 2
+
+// ==================== Entry Conditions ====================
+// Breakout above upper band
+longBreakout = close > upperBand[breakoutConfirm]
+longCondition = longBreakout and not longBreakout[1]
+
+// Breakdown below lower band
+shortBreakout = close < lowerBand[breakoutConfirm]
+shortCondition = shortBreakout and not shortBreakout[1]
+
+// Exit conditions
+exitLong = useMiddleLine ? ta.crossunder(close, middleLine) : ta.crossunder(close, lowerBand)
+exitShort = useMiddleLine ? ta.crossover(close, middleLine) : ta.crossover(close, upperBand)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+upperPlot = plot(upperBand, "Upper Band", color=color.green, linewidth=2)
+lowerPlot = plot(lowerBand, "Lower Band", color=color.red, linewidth=2)
+plot(middleLine, "Middle Line", color=color.blue, linewidth=1, style=plot.style_circles)
+
+// Fill channel
+fill(upperPlot, lowerPlot, color=color.new(color.blue, 95))
+
+// Entry signals
+plotshape(longCondition, "Long Breakout", shape.triangleup, location.belowbar, color.green, size=size.normal)
+plotshape(shortCondition, "Short Breakdown", shape.triangledown, location.abovebar, color.red, size=size.normal)
+
+// Highlight breakout zones
+bgcolor(close > upperBand ? color.new(color.green, 90) : close < lowerBand ? color.new(color.red, 90) : na)

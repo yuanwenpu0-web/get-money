@@ -1,0 +1,16 @@
+[
+  {
+    "path": "other/01-btc-arbitrage.pine",
+    "kind": "indicator",
+    "title_zh": "比特币 CME 与韩国市场溢价",
+    "original_description": "Displays CME futures premium and Korean Upbit kimchi premium vs Binance",
+    "description_zh": "显示 CME 比特币期货相对于币安的溢价，以及韩国 Upbit 相对于币安的“泡菜溢价”。",
+    "crypto_relevance": "专门计算比特币不同市场之间的价差。",
+    "notes": "源码版权头署名 syoungs，合集发布者 KayK-Pips；源仓库无独立许可证文件，源码声明 MPL 2.0。需要 CME、币安、Upbit 和美元兑韩元数据；不同市场时间及报价可能影响价差。",
+    "source_url": "https://github.com/KayK-Pips/tradingview-indicatorz/blob/5df3055fe8a3e7c52993241204a865130f60236b/other/01-btc-arbitrage.pine",
+    "description_source_url": "https://github.com/KayK-Pips/tradingview-indicatorz/blob/5df3055fe8a3e7c52993241204a865130f60236b/README.md",
+    "source_commit": "5df3055fe8a3e7c52993241204a865130f60236b",
+    "license": "MPL 2.0（源码声明；LICENSE-MPL-2.0 为同许可标准文本）",
+    "sha256": "6edafaeea38aa0d456659dd7f354ffa6ad159483e03ef2d435d3aa27d2176167"
+  }
+]

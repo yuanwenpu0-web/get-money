@@ -1,0 +1,15 @@
+[
+  {
+    "path": "volume-flow-anomaly.pine",
+    "kind": "indicator",
+    "title_zh": "加密货币成交量异常指标",
+    "original_description": "It surfaces anomalous volume events using rolling z-scores, trend cleanliness, and relative price impact.",
+    "description_zh": "利用滚动 Z 分数、趋势整洁度和相对价格冲击识别异常成交量事件。",
+    "source_url": "https://github.com/MateuszPu/tradingview-vfa-indicator/blob/4f45a373559b654b06311ff10130c6247a40141d/volume-flow-anomaly.pine",
+    "description_source_url": "https://github.com/MateuszPu/tradingview-vfa-indicator/blob/4f45a373559b654b06311ff10130c6247a40141d/README.md",
+    "source_commit": "4f45a373559b654b06311ff10130c6247a40141d",
+    "license": "README 声明 MIT，未提供独立 LICENSE。",
+    "sha256": "0df9bbc7162ad2d32ba48347116404c954fa7ad1e5953742904e77a3c14f1b89",
+    "implementation_note_zh": "买卖量拆分使用 K 线几何近似，不是真实逐笔主动买卖数据；源码版本声明写为 // @version=6，与官方格式不同，未经编译验证。"
+  }
+]

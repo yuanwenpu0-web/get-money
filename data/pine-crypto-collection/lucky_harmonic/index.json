@@ -1,0 +1,15 @@
+[
+  {
+    "path": "src/harmonic_patterns.pine",
+    "kind": "indicator",
+    "title_zh": "加密市场谐波形态识别指标",
+    "original_description": "The **pinescript-harmonic-detector** is a TradingView Pine Script™ indicator specifically designed to automatically identify and provide trading signals for harmonic chart patterns in cryptocurrency markets.",
+    "description_zh": "面向加密货币市场的谐波形态识别指标，用于自动识别谐波图形并提供交易信号。",
+    "source_url": "https://github.com/luckyJeffy/pinescript-harmonic-detector/blob/2a57002185424382e5377e649bdc6485dbb1c691/src/harmonic_patterns.pine",
+    "description_source_url": "https://github.com/luckyJeffy/pinescript-harmonic-detector/blob/2a57002185424382e5377e649bdc6485dbb1c691/README.md",
+    "source_commit": "2a57002185424382e5377e649bdc6485dbb1c691",
+    "license": "MIT",
+    "sha256": "522a57c0cbb75a06027ba044818822e2636e792a1e40b550ad7002946af0ef5f",
+    "implementation_note_zh": "作者说明形态可能随新价格数据调整；源码版本声明写为 // @version=5，与官方 //@version=5 格式不同，未经编译验证。"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "001",
+    "path": "indicator.pine",
+    "kind": "indicator",
+    "title": "SM Radar — Smart Money Concepts indicator for crypto",
+    "title_zh": "SM Radar：加密货币聪明钱概念指标",
+    "author": "Investisseur 2.0 (Cedric & Julien)",
+    "repository": "https://github.com/CedInvest/sm-radar-pine",
+    "commit": "65f84dc339c909c6244dde7fc3deac7ec9fa51ac",
+    "source_url": "https://github.com/CedInvest/sm-radar-pine/blob/65f84dc339c909c6244dde7fc3deac7ec9fa51ac/indicator.pine",
+    "description_url": "https://github.com/CedInvest/sm-radar-pine/blob/65f84dc339c909c6244dde7fc3deac7ec9fa51ac/README.md",
+    "original_description": "A free, open source Pine Script indicator that detects Smart Money Concepts (SMC) on any crypto chart. Built for Bitcoin, Ethereum and major altcoins. Marks Order Blocks, Fair Value Gaps, liquidity zones and structural changes (BOS / CHoCH) automatically.",
+    "description_zh": "一款免费开源的 Pine Script 指标，用于在加密货币图表中识别聪明钱概念（SMC），面向比特币、以太坊和主要山寨币设计。它会自动标记订单块、公允价值缺口、流动性区域以及市场结构变化（BOS / CHoCH）。",
+    "description_type": "作者 README 原文翻译；功能为作者描述，未独立验证",
+    "license": "README 声明 MPL 2.0；原 LICENSE 不含完整许可证全文，且 README 另有商业使用联系作者的要求，详见中文目录。",
+    "sha256": "6fd5dde095685ecd4fef21bc1f784b8d9d0caac9c35a246b29ede3fa94320c7a",
+    "notes": "源码原样保存。其首行为 // @version=6，与官方版本声明 //@version=6 不同；未在 TradingView 编译验证。"
+  }
+]

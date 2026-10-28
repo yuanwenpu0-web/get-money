@@ -1,0 +1,16 @@
+[
+  {
+    "path": "pine/TheStratSuite_v3.1.1.pine",
+    "kind": "indicator",
+    "title_zh": "TheStrat 多周期价格行为指标",
+    "original_description": "Multi-timeframe price action indicator (Pine Script v6), implementing Rob Smith's TheStrat methodology. Six configurable timeframes on one chart: bar classification, signal detection with magnitude and exhaustion targets, Full Timeframe Continuity, stop levels, Domino detection, consolidated alerts, and a live multi-timeframe data table.",
+    "description_zh": "基于 Rob Smith 的 TheStrat 方法，在一个图表上显示六个可配置周期，涵盖 K 线分类、带目标位的信号检测、全周期连续性、止损位、Domino 检测、综合提醒和实时多周期表格。",
+    "crypto_relevance": "作者提供 Futures/Crypto 预设，工具也适用于其他市场。",
+    "implementation_note_zh": "使用 TradingView 已发布库 SpinTrades/TheStratGrammar/1；另保存同仓库 grammar/TheStratGrammar.pine 供参考，不保证本地库与已发布版本完全一致。作者要求使用普通 K 线，不适用于 Heikin-Ashi。",
+    "source_url": "https://github.com/natebking/thestrat-suite/blob/413e39466193917ccf83790862bd8add2003c011/pine/TheStratSuite_v3.1.1.pine",
+    "description_source_url": "https://github.com/natebking/thestrat-suite/blob/413e39466193917ccf83790862bd8add2003c011/README.md",
+    "source_commit": "413e39466193917ccf83790862bd8add2003c011",
+    "license": "MPL-2.0",
+    "sha256": "9a42b12adfb143f2f82b5edf7e0a811b608541e3af706b6945d794d431ffe3c1"
+  }
+]

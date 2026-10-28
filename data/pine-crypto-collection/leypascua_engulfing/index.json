@@ -1,0 +1,16 @@
+[
+  {
+    "path": "leypascua.bullish.engulfing.strategy.pine",
+    "kind": "strategy",
+    "title_zh": "看涨吞没、MACD 与布林带策略",
+    "original_description": "// works best in crypto, 4h chart",
+    "description_zh": "作者称此策略适用于加密货币 4 小时图；其效果未经独立验证。",
+    "crypto_relevance": "源码注释明确提及加密货币 4 小时图。",
+    "notes": "Pine Script v4；作者原文件未提供独立许可证，源码头声明 MPL 2.0；本地 LICENSE-MPL-2.0 为该许可标准文本。源码使用看涨吞没与 MACD、布林带条件，含止盈止损逻辑；尚未在 TradingView 编译或回测。",
+    "source_url": "https://gist.github.com/leypascua/1145a107d00dc5d717ad8a9597cadd42/689fc8bab0ba9341b1f8cd456bfa4c9a6b53609a",
+    "description_source_url": "https://gist.github.com/leypascua/1145a107d00dc5d717ad8a9597cadd42/689fc8bab0ba9341b1f8cd456bfa4c9a6b53609a",
+    "source_commit": "689fc8bab0ba9341b1f8cd456bfa4c9a6b53609a",
+    "license": "MPL 2.0（源码声明）",
+    "sha256": "9a8a5aa6e4b63d0f2139813919ce110faee5d811fafe471ead81c6ea5718db50"
+  }
+]

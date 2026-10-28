@@ -1,0 +1,102 @@
+//@version=5
+strategy("Awesome Oscillator - Eterna MCP", 
+         shorttitle="AO",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+fastLength = input.int(5, "Fast SMA Length", minval=1)
+slowLength = input.int(34, "Slow SMA Length", minval=1)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// AWESOME OSCILLATOR CALCULATION
+// ============================================
+// Median price
+medianPrice = (high + low) / 2
+
+// Fast and slow SMAs
+fastSMA = ta.sma(medianPrice, fastLength)
+slowSMA = ta.sma(medianPrice, slowLength)
+
+// Awesome Oscillator
+ao = fastSMA - slowSMA
+
+// ============================================
+// SIGNAL GENERATION
+// ============================================
+// Zero-line cross
+bullishZeroCross = ta.crossover(ao, 0)
+bearishZeroCross = ta.crossunder(ao, 0)
+
+// Twin Peaks (divergence pattern)
+// Bullish Twin Peaks: two lows below zero, second higher than first
+twinPeakBullish = ao < 0 and ao > ao[2] and ao[2] < ao[4] and ao > 0[1]
+
+// Bearish Twin Peaks: two highs above zero, second lower than first
+twinPeakBearish = ao > 0 and ao < ao[2] and ao[2] > ao[4] and ao < 0[1]
+
+// Saucer pattern (momentum shift)
+// Bullish Saucer: three consecutive bars, middle lowest, last green
+saucerBullish = ao > 0 and ao < ao[1] and ao[1] < ao[2] and ao > ao[1]
+
+// Bearish Saucer: three consecutive bars, middle highest, last red
+saucerBearish = ao < 0 and ao > ao[1] and ao[1] > ao[2] and ao < ao[1]
+
+// Color change (early momentum signal)
+aoGreen = ao > ao[1]
+aoRed = ao < ao[1]
+
+// Consecutive color bars
+consecutiveGreen = aoGreen and aoGreen[1] and ao > 0
+consecutiveRed = aoRed and aoRed[1] and ao < 0
+
+// Combined entry signals
+buySignal = bullishZeroCross or twinPeakBullish or (saucerBullish and consecutiveGreen)
+sellSignal = bearishZeroCross or twinPeakBearish or (saucerBearish and consecutiveRed)
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if buySignal and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if sellSignal and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite signal
+if sellSignal and strategy.position_size > 0
+    strategy.close("Long")
+
+if buySignal and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+// Histogram with color coding
+aoColor = ao > ao[1] ? color.green : color.red
+plot(ao, "Awesome Oscillator", color=aoColor, style=plot.style_histogram, linewidth=3)
+
+// Zero line
+hline(0, "Zero Line", color=color.gray, linestyle=hline.style_solid, linewidth=2)
+
+// Signals
+plotshape(buySignal, "Buy", shape.triangleup, location.bottom, color.lime, size=size.normal)
+plotshape(sellSignal, "Sell", shape.triangledown, location.top, color.red, size=size.normal)
+
+// Pattern markers
+plotshape(twinPeakBullish, "Twin Peak Buy", shape.diamond, location.bottom, color.aqua, size=size.small)
+plotshape(twinPeakBearish, "Twin Peak Sell", shape.diamond, location.top, color.orange, size=size.small)
+plotshape(saucerBullish, "Saucer Buy", shape.circle, location.bottom, color.green, size=size.tiny)
+plotshape(saucerBearish, "Saucer Sell", shape.circle, location.top, color.maroon, size=size.tiny)
+
+// Background zone
+bgcolor(ao > 0 ? color.new(color.green, 98) : color.new(color.red, 98))

@@ -1,0 +1,221 @@
+//@version=5
+indicator("Support & Resistance Finder", overlay=true, max_lines_count=50)
+
+// ============================================
+// SETTINGS
+// ============================================
+lookback = input.int(20, "Lookback Period", minval=5, maxval=100)
+strength = input.int(3, "Level Strength", minval=1, maxval=10)
+maxLevels = input.int(5, "Max Levels to Show", minval=1, maxval=10)
+showBreakouts = input.bool(true, "Show Breakouts")
+showRetests = input.bool(true, "Show Retests")
+
+// ============================================
+// SUPPORT & RESISTANCE DETECTION
+// ============================================
+// Find pivot highs and lows
+pivotHigh = ta.pivothigh(high, strength, strength)
+pivotLow = ta.pivotlow(low, strength, strength)
+
+// Store levels
+var float[] resistanceLevels = array.new<float>()
+var float[] supportLevels = array.new<float>()
+var int[] resistanceStrength = array.new<int>()
+var int[] supportStrength = array.new<int>()
+
+// Add new resistance level
+if not na(pivotHigh)
+    levelExists = false
+    tolerance = (high - low) * 0.01 // 1% tolerance
+    
+    // Check if level already exists
+    for i = 0 to array.size(resistanceLevels) - 1
+        existingLevel = array.get(resistanceLevels, i)
+        if math.abs(pivotHigh - existingLevel) < tolerance
+            // Increase strength of existing level
+            currentStrength = array.get(resistanceStrength, i)
+            array.set(resistanceStrength, i, currentStrength + 1)
+            levelExists := true
+            break
+    
+    // Add new level if doesn't exist
+    if not levelExists
+        array.push(resistanceLevels, pivotHigh)
+        array.push(resistanceStrength, 1)
+        
+        // Keep only strongest levels
+        if array.size(resistanceLevels) > maxLevels
+            minStrength = array.min(resistanceStrength)
+            minIndex = array.indexof(resistanceStrength, minStrength)
+            array.remove(resistanceLevels, minIndex)
+            array.remove(resistanceStrength, minIndex)
+
+// Add new support level
+if not na(pivotLow)
+    levelExists = false
+    tolerance = (high - low) * 0.01
+    
+    for i = 0 to array.size(supportLevels) - 1
+        existingLevel = array.get(supportLevels, i)
+        if math.abs(pivotLow - existingLevel) < tolerance
+            currentStrength = array.get(supportStrength, i)
+            array.set(supportStrength, i, currentStrength + 1)
+            levelExists := true
+            break
+    
+    if not levelExists
+        array.push(supportLevels, pivotLow)
+        array.push(supportStrength, 1)
+        
+        if array.size(supportLevels) > maxLevels
+            minStrength = array.min(supportStrength)
+            minIndex = array.indexof(supportStrength, minStrength)
+            array.remove(supportLevels, minIndex)
+            array.remove(supportStrength, minIndex)
+
+// ============================================
+// DRAW LEVELS
+// ============================================
+var line[] resistanceLines = array.new<line>()
+var line[] supportLines = array.new<line>()
+
+// Clear old lines
+if barstate.islast
+    for i = 0 to array.size(resistanceLines) - 1
+        line.delete(array.get(resistanceLines, i))
+    array.clear(resistanceLines)
+    
+    for i = 0 to array.size(supportLines) - 1
+        line.delete(array.get(supportLines, i))
+    array.clear(supportLines)
+    
+    // Draw resistance levels
+    for i = 0 to array.size(resistanceLevels) - 1
+        level = array.get(resistanceLevels, i)
+        levelStrength = array.get(resistanceStrength, i)
+        lineWidth = math.min(levelStrength, 4)
+        
+        resLine = line.new(
+            bar_index - lookback,
+            level,
+            bar_index + 10,
+            level,
+            color=color.new(color.red, 30),
+            width=lineWidth,
+            style=line.style_solid
+        )
+        array.push(resistanceLines, resLine)
+    
+    // Draw support levels
+    for i = 0 to array.size(supportLevels) - 1
+        level = array.get(supportLevels, i)
+        levelStrength = array.get(supportStrength, i)
+        lineWidth = math.min(levelStrength, 4)
+        
+        supLine = line.new(
+            bar_index - lookback,
+            level,
+            bar_index + 10,
+            level,
+            color=color.new(color.green, 30),
+            width=lineWidth,
+            style=line.style_solid
+        )
+        array.push(supportLines, supLine)
+
+// ============================================
+// BREAKOUT DETECTION
+// ============================================
+var bool resistanceBreakout = false
+var bool supportBreakout = false
+
+if showBreakouts
+    // Check resistance breakouts
+    for i = 0 to array.size(resistanceLevels) - 1
+        level = array.get(resistanceLevels, i)
+        if close > level and close[1] <= level
+            resistanceBreakout := true
+            label.new(
+                bar_index,
+                high,
+                "BREAKOUT ↑",
+                color=color.new(color.green, 20),
+                textcolor=color.white,
+                style=label.style_label_down,
+                size=size.small
+            )
+    
+    // Check support breakouts
+    for i = 0 to array.size(supportLevels) - 1
+        level = array.get(supportLevels, i)
+        if close < level and close[1] >= level
+            supportBreakout := true
+            label.new(
+                bar_index,
+                low,
+                "BREAKDOWN ↓",
+                color=color.new(color.red, 20),
+                textcolor=color.white,
+                style=label.style_label_up,
+                size=size.small
+            )
+
+// ============================================
+// RETEST DETECTION
+// ============================================
+if showRetests
+    tolerance = (high - low) * 0.02
+    
+    // Check resistance retests
+    for i = 0 to array.size(resistanceLevels) - 1
+        level = array.get(resistanceLevels, i)
+        if math.abs(close - level) < tolerance and close < level
+            label.new(
+                bar_index,
+                high,
+                "RETEST",
+                color=color.new(color.orange, 40),
+                textcolor=color.white,
+                style=label.style_label_down,
+                size=size.tiny
+            )
+    
+    // Check support retests
+    for i = 0 to array.size(supportLevels) - 1
+        level = array.get(supportLevels, i)
+        if math.abs(close - level) < tolerance and close > level
+            label.new(
+                bar_index,
+                low,
+                "RETEST",
+                color=color.new(color.blue, 40),
+                textcolor=color.white,
+                style=label.style_label_up,
+                size=size.tiny
+            )
+
+// ============================================
+// DASHBOARD
+// ============================================
+var table dashboard = table.new(position.bottom_right, 2, 4, border_width=1)
+
+if barstate.islast
+    table.cell(dashboard, 0, 0, "📊 S/R LEVELS", text_color=color.white, bgcolor=color.new(color.blue, 30), text_size=size.small)
+    table.merge_cells(dashboard, 0, 0, 1, 0)
+    
+    table.cell(dashboard, 0, 1, "Resistance", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.tiny)
+    table.cell(dashboard, 1, 1, str.tostring(array.size(resistanceLevels)), text_color=color.white, bgcolor=color.new(color.red, 60), text_size=size.tiny)
+    
+    table.cell(dashboard, 0, 2, "Support", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.tiny)
+    table.cell(dashboard, 1, 2, str.tostring(array.size(supportLevels)), text_color=color.white, bgcolor=color.new(color.green, 60), text_size=size.tiny)
+    
+    table.cell(dashboard, 0, 3, "Status", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.tiny)
+    statusText = resistanceBreakout ? "Breakout ↑" : supportBreakout ? "Breakdown ↓" : "Range"
+    statusColor = resistanceBreakout ? color.new(color.green, 50) : supportBreakout ? color.new(color.red, 50) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 3, statusText, text_color=color.white, bgcolor=statusColor, text_size=size.tiny)
+
+// ============================================
+// ALERTS
+// ============================================
+alertcondition(resistanceBreakout, "Resistance Breakout", "Price broke above resistance")
+alertcondition(supportBreakout, "Support Breakdown", "Price broke below support")

@@ -1,0 +1,44 @@
+[
+  {
+    "path": "indicators/01-smc-toolkit/smc-toolkit.pine",
+    "kind": "indicator",
+    "title_zh": "SMC 订单块、缺口与市场结构",
+    "original_description": "Smart Money Concepts indicator for TradingView — Order Blocks, Fair Value Gaps, Liquidity Sweeps, and Market Structure (BoS/CHoCH) in a single Pine Script v6 script.",
+    "description_zh": "在一个 Pine Script v6 指标中显示订单块、公允价值缺口、流动性扫掠以及市场结构（BoS/CHoCH）。",
+    "source_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/01-smc-toolkit/smc-toolkit.pine",
+    "description_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/01-smc-toolkit/README.md",
+    "source_commit": "e4ce7f4c4676dd43b2fb54cb53c0143ca585f549",
+    "license": "MPL-2.0",
+    "sha256": "9677095a073f8b0346557dc9bd5a626dcadaee66de5e2f94b85ccc4cbb24d377",
+    "crypto_relevance": "作者说明该系列用于加密货币、外汇和金属市场，并非加密专用。",
+    "implementation_note_zh": ""
+  },
+  {
+    "path": "indicators/02-volume-profile-plus/volume-profile-plus.pine",
+    "kind": "indicator",
+    "title_zh": "成交量分布增强指标",
+    "original_description": "Session-based Volume Profile for TradingView — POC, Value Area (VAH/VAL), and HVN/LVN nodes in a single Pine Script v6 script.",
+    "description_zh": "按交易时段绘制成交量分布、控制点、价值区域上下界以及高／低成交量节点。",
+    "source_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/02-volume-profile-plus/volume-profile-plus.pine",
+    "description_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/02-volume-profile-plus/README.md",
+    "source_commit": "e4ce7f4c4676dd43b2fb54cb53c0143ca585f549",
+    "license": "MPL-2.0",
+    "sha256": "997ecea0ac72d62599d270b3d1bdaeab71f55679c77954e98b842ba06c886802",
+    "crypto_relevance": "作者说明该系列用于加密货币、外汇和金属市场，并非加密专用。",
+    "implementation_note_zh": "作者说明该成交量分布基于普通 OHLCV 近似计算，并非逐笔成交量分布。"
+  },
+  {
+    "path": "indicators/04-atr-helper/atr-helper.pine",
+    "kind": "indicator",
+    "title_zh": "ATR 交易规划助手",
+    "original_description": "ATR-based trade planning tool for TradingView — dynamic stop-loss, R-multiple targets, risk/reward zones, and position sizing in a single Pine Script v6 script.",
+    "description_zh": "基于 ATR 的交易规划工具，显示动态止损、按风险倍数计算的目标、风险收益区域与仓位规模。",
+    "source_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/04-atr-helper/atr-helper.pine",
+    "description_url": "https://github.com/btankutt/smc-pine-suite/blob/e4ce7f4c4676dd43b2fb54cb53c0143ca585f549/indicators/04-atr-helper/README.md",
+    "source_commit": "e4ce7f4c4676dd43b2fb54cb53c0143ca585f549",
+    "license": "MPL-2.0",
+    "sha256": "a0c94c2c50d35901a84f45eb540331a06f5e3c4455f4137f7ad90f9daabb018a",
+    "crypto_relevance": "作者说明该系列用于加密货币、外汇和金属市场，并非加密专用。",
+    "implementation_note_zh": ""
+  }
+]

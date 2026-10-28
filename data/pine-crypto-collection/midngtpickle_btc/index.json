@@ -1,0 +1,44 @@
+[
+  {
+    "path": "scalping_strategies/camarilla_range_bounce.pine",
+    "kind": "strategy",
+    "title_zh": "卡玛利拉区间反弹短线策略",
+    "original_description": "**Mean-Reversion Thesis**: Fades touches of Camarilla S3 (long) and R3 (short) during low-volatility/ranging market conditions, targeting the central pivot (PP) and opposite boundaries with stops beyond S4/R4.",
+    "description_zh": "在低波动或震荡行情中，价格触及卡玛利拉 S3 时尝试做多、触及 R3 时尝试做空；目标包括中心枢轴点和另一侧边界，止损设在 S4/R4 之外。",
+    "crypto_relevance": "作者明确针对比特币交易场景设计。",
+    "notes": "作者面向比特币 5 分钟及 15 分钟图设计；历史表现未经独立回测。",
+    "source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/scalping_strategies/camarilla_range_bounce.pine",
+    "description_source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/README.md",
+    "source_commit": "ff45244b63af44fddfcd86d77b8f728e7432f2fe",
+    "license": "MPL 2.0",
+    "sha256": "1054b622abae8ff5f330632dea3d696615c431059420c7e9797ce4f8d12624b1"
+  },
+  {
+    "path": "scalping_strategies/ema_pullback_continuation.pine",
+    "kind": "strategy",
+    "title_zh": "EMA 9/21 回调延续短线策略",
+    "original_description": "**Trend-Following Thesis**: Arms on a pullback to the 9 EMA inside an established 9/21 trend, then enters on the resumption candle.",
+    "description_zh": "在 9/21 EMA 已形成趋势后，等待价格回调至 9 EMA，再于恢复趋势的 K 线上入场。",
+    "crypto_relevance": "作者明确针对比特币交易场景设计。",
+    "notes": "作者面向比特币 5 分钟及 15 分钟图设计；历史表现未经独立回测。",
+    "source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/scalping_strategies/ema_pullback_continuation.pine",
+    "description_source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/README.md",
+    "source_commit": "ff45244b63af44fddfcd86d77b8f728e7432f2fe",
+    "license": "MPL 2.0",
+    "sha256": "c221306d1b191642fc7ca266677e35dbfeb625eb795112c017834e2850a7dd02"
+  },
+  {
+    "path": "scalping_strategies/btc_asia_sweep/midnight_pickle_asia_sweep_v1.pine",
+    "kind": "strategy",
+    "title_zh": "比特币亚洲时段区间扫荡与回归",
+    "original_description": "Liquidity sweep and mean-reversion strategy specifically designed for Bitcoin perpetual contracts during the post-US close / early Asian session.",
+    "description_zh": "针对比特币永续合约在美股收盘后至亚洲早盘时段的流动性扫荡与均值回归策略。",
+    "crypto_relevance": "作者明确针对比特币交易场景设计。",
+    "notes": "需关注交易时段和时区参数；作者的策略效果未经独立回测。",
+    "source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/scalping_strategies/btc_asia_sweep/midnight_pickle_asia_sweep_v1.pine",
+    "description_source_url": "https://github.com/midngtpickle/trading-view-scripts/blob/ff45244b63af44fddfcd86d77b8f728e7432f2fe/README.md",
+    "source_commit": "ff45244b63af44fddfcd86d77b8f728e7432f2fe",
+    "license": "MPL 2.0",
+    "sha256": "b8d34f8ce0922e29630020253265ce2a63543751c91f2dc37490d9c3898ab95f"
+  }
+]

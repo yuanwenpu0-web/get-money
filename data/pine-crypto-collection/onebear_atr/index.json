@@ -1,0 +1,16 @@
+[
+  {
+    "path": "src/rsi_stoch_vol_atr_trailing.pine",
+    "kind": "strategy",
+    "title_zh": "RSI、随机指标、成交量与 ATR 跟踪止损策略",
+    "original_description": "Long-only, volatility-aware trend-following strategy for TradingView, combining **EMA trend**, **volume confirmation**, **RSI + Stochastic entries**, and an **ATR-based trailing stop**.",
+    "description_zh": "只做多的波动率自适应趋势跟踪策略，结合 EMA 趋势、成交量确认、RSI 与随机指标入场，以及 ATR 跟踪止损。",
+    "crypto_relevance": "作者称适用于加密货币、指数与外汇等波动性趋势市场，并非加密专用。",
+    "source_url": "https://github.com/1xBear/rsi-stoch-vol-atr-trailing-strategy/blob/2b0f4f933ba2e52debfc684bea9df9697a334e42/src/rsi_stoch_vol_atr_trailing.pine",
+    "description_source_url": "https://github.com/1xBear/rsi-stoch-vol-atr-trailing-strategy/blob/2b0f4f933ba2e52debfc684bea9df9697a334e42/README.md",
+    "source_commit": "2b0f4f933ba2e52debfc684bea9df9697a334e42",
+    "license": "README 声明 MIT，但 LICENSE 文件仅含版权声明；详见原文件。",
+    "sha256": "acfae9357554dcf7ed76630efc0745b92360810bd1cc00e1ad3d37d46776548d",
+    "notes": "作者声明适用于加密市场；策略效果未经独立回测。"
+  }
+]

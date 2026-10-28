@@ -1,0 +1,73 @@
+//@version=5
+strategy("Stochastic RSI Crossover - Eterna MCP", 
+         shorttitle="Stoch RSI",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+rsiLength = input.int(14, "RSI Length", minval=1)
+stochLength = input.int(14, "Stochastic Length", minval=1)
+smoothK = input.int(3, "K Smoothing", minval=1)
+smoothD = input.int(3, "D Smoothing", minval=1)
+upperLevel = input.int(80, "Overbought Level", minval=50, maxval=100)
+lowerLevel = input.int(20, "Oversold Level", minval=0, maxval=50)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// STOCHASTIC RSI CALCULATION
+// ============================================
+rsi = ta.rsi(close, rsiLength)
+stochRSI = ta.stoch(rsi, rsi, rsi, stochLength)
+k = ta.sma(stochRSI, smoothK)
+d = ta.sma(k, smoothD)
+
+// ============================================
+// SIGNAL GENERATION
+// ============================================
+// Bullish: K crosses above D in oversold zone
+bullishCross = ta.crossover(k, d) and k < lowerLevel
+
+// Bearish: K crosses below D in overbought zone
+bearishCross = ta.crossunder(k, d) and k > upperLevel
+
+// Additional confirmation: momentum direction
+bullishMomentum = k > k[1] and d > d[1]
+bearishMomentum = k < k[1] and d < d[1]
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if bullishCross and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if bearishCross and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit conditions
+if bearishCross and strategy.position_size > 0
+    strategy.close("Long")
+
+if bullishCross and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+plot(k, "K", color=color.blue, linewidth=2)
+plot(d, "D", color=color.orange, linewidth=2)
+hline(upperLevel, "Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(lowerLevel, "Oversold", color=color.green, linestyle=hline.style_dashed)
+hline(50, "Midline", color=color.gray, linestyle=hline.style_dotted)
+
+bgcolor(bullishCross ? color.new(color.green, 90) : na)
+bgcolor(bearishCross ? color.new(color.red, 90) : na)
+
+plotshape(bullishCross, "Buy Signal", shape.triangleup, location.bottom, color.green, size=size.small)
+plotshape(bearishCross, "Sell Signal", shape.triangledown, location.top, color.red, size=size.small)

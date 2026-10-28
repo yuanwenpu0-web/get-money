@@ -1,0 +1,30 @@
+[
+  {
+    "path": "pine/pineflow_orb_strategy.pine",
+    "title_zh": "开盘区间突破策略",
+    "kind": "strategy",
+    "original_description": "- a configurable opening range and trading session;\n- confirmed local-bar breakouts;\n- fast/slow EMA, DMI/ADX, and confirmed higher-timeframe EMA filters;\n- ATR-derived stops and equity-risk position sizing;\n- two 50% take-profit orders;\n- maximum daily loss, maximum drawdown, and daily trade limits;\n- optional flattening when the trading session ends;\n- an on-chart status dashboard.",
+    "description_zh": "作者说明：使用可配置开盘区间和交易时段、已确认 K 线突破、EMA 与 DMI/ADX 及高周期过滤、ATR 止损和基于权益风险的仓位管理，设两个各占 50% 的止盈单，并可限制日亏损、回撤和日交易次数。",
+    "source_url": "https://github.com/loveyuanfandj-glitch/pineflow-v6/blob/256e11dd91248bb5b932a58438e7a01dbbe83de6/pine/pineflow_orb_strategy.pine",
+    "description_url": "https://github.com/loveyuanfandj-glitch/pineflow-v6/blob/256e11dd91248bb5b932a58438e7a01dbbe83de6/README.md",
+    "source_commit": "256e11dd91248bb5b932a58438e7a01dbbe83de6",
+    "license": "MIT",
+    "sha256": "9663678edd70d2e573db3660e86e85c10aadf9a8d217c31907efab92d76cdf6b",
+    "crypto_relevance": "项目面向加密交易，亦可能适用其他市场。",
+    "implementation_note_zh": "项目支持 Binance USDⓈ-M 永续与其他市场，策略并非加密货币专用；源码带 TradingView 告警，连接执行系统前应核对配置。"
+  },
+  {
+    "path": "pine/pineflow_ict_fvg_strategy.pine",
+    "title_zh": "多周期 ICT 公允价值缺口策略",
+    "kind": "strategy",
+    "original_description": "- confirmed 4H EMA bias and expansion/pullback state;\n- the latest confirmed three-candle 4H fair value gap;\n- a 15m FVG touch, liquidity sweep, and MSS or CISD confirmation;\n- a retrace into the confirmed 15m FVG;\n- a 1m liquidity sweep followed by a 1m FVG and MSS/CISD break;\n- a sweep-based stop and opposing 15m liquidity target with an R fallback.",
+    "description_zh": "作者说明：结合 4 小时 EMA 方向和公允价值缺口、15 分钟缺口触碰与流动性扫掠，以及 1 分钟结构确认，采用基于扫掠的止损和 15 分钟流动性目标；作者建议在 1 分钟图运行。",
+    "source_url": "https://github.com/loveyuanfandj-glitch/pineflow-v6/blob/256e11dd91248bb5b932a58438e7a01dbbe83de6/pine/pineflow_ict_fvg_strategy.pine",
+    "description_url": "https://github.com/loveyuanfandj-glitch/pineflow-v6/blob/256e11dd91248bb5b932a58438e7a01dbbe83de6/README.md",
+    "source_commit": "256e11dd91248bb5b932a58438e7a01dbbe83de6",
+    "license": "MIT",
+    "sha256": "992a9dcf5caaa495b018c861d19616ed2ae6304462d575652f43a4e2c2665094",
+    "crypto_relevance": "项目面向加密交易，亦可能适用其他市场。",
+    "implementation_note_zh": "项目支持 Binance USDⓈ-M 永续与其他市场，策略并非加密货币专用；源码带 TradingView 告警，连接执行系统前应核对配置。"
+  }
+]

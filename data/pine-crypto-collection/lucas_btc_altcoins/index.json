@@ -1,0 +1,16 @@
+[
+  {
+    "path": "script.pine",
+    "kind": "indicator",
+    "title_zh": "比特币与山寨币多周期趋势指标",
+    "original_description": "A **TradingView Pine Script** indicator to analyze **Bitcoin trends** and their impact on **altcoins** across multiple timeframes and exchanges.",
+    "description_zh": "跨多个时间周期和交易所分析比特币趋势及山寨币走势的 TradingView 指标。",
+    "crypto_relevance": "作者专为比特币趋势和山寨币行为设计。",
+    "source_url": "https://github.com/lucasveneno/tradingview-btc-trend-altcoins-behavior-indicator/blob/3efbe6601261059563d366a492838afd4263db88/script.pine",
+    "description_source_url": "https://github.com/lucasveneno/tradingview-btc-trend-altcoins-behavior-indicator/blob/3efbe6601261059563d366a492838afd4263db88/README.md",
+    "source_commit": "3efbe6601261059563d366a492838afd4263db88",
+    "license": "源码文件头声明 MPL 2.0，README 同样声明；无独立 LICENSE 文件。",
+    "sha256": "619f9e1765596d8ab050afb1064cf4aa59b056910c7cd4f752e73f879f9cb769",
+    "implementation_note_zh": "依赖交易所 BTCUSDT 品种及 CRYPTOCAP:BTC.D；源码统一拼接 BTCUSDT，可能与作者文档中部分交易所的 BTCUSD 或 XBTUSD 品种不一致，需核对数据源可用性。未在 TradingView 编译验证。"
+  }
+]

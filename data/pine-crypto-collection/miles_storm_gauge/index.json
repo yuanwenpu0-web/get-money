@@ -1,0 +1,16 @@
+[
+  {
+    "path": "pine-script/storm-gauge.pine",
+    "kind": "indicator",
+    "title_zh": "波动率状态与仓位监测仪",
+    "original_description": "the gauge uses *realized* vol (Pine-native math).",
+    "description_zh": "该指标使用 Pine 原生计算的已实现波动率。",
+    "crypto_relevance": "作者提供加密资产日线参数：每年 365 个周期；也可用于股票等市场。",
+    "implementation_note_zh": "Pine 指标计算已实现波动率，README 说明 GARCH 预测位于项目的其他部分，指标自身不输出该预测；仓位参数需自行配置，未编译或回测。",
+    "source_url": "https://github.com/milesdeutscher/garchmethod/blob/e1e93d9bbced22ca74fc61858a62e4ca9e4a0607/pine-script/storm-gauge.pine",
+    "description_source_url": "https://github.com/milesdeutscher/garchmethod/blob/e1e93d9bbced22ca74fc61858a62e4ca9e4a0607/README.md",
+    "source_commit": "e1e93d9bbced22ca74fc61858a62e4ca9e4a0607",
+    "license": "MIT",
+    "sha256": "46760b4b5f726c8bb21196e67530e48db5a7304ea4eac8f3e4a43965592e3c25"
+  }
+]

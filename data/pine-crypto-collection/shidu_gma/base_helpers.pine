@@ -1,0 +1,88 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © diegonavarromartinez
+
+//@version=5
+
+// @description Base Helpers for 27k Trading System
+library("base_helpers")
+
+// --- BEGIN UTILITY FUNCTIONS {
+
+// @function Gets the percentage change between 2 float values over a given lookback period
+// @param float value1 The first value to reference
+// @param float value2 The second value to reference
+// @param int lookback The lookback period to analyze
+export getPctChange(float value1, float value2, int lookback) =>
+    vChange = value1 - value2
+    vDiff   = vChange - vChange[lookback]
+    (vDiff / vChange) * 100
+
+
+// @function Returns how many bars since the first position was created. Returns 'na'
+// when the strategy has no open position.
+export barsSinceFirstEntry() =>
+    strategy.opentrades > 0 ? bar_index - strategy.opentrades.entry_bar_index(0) : na
+
+// @function Returns how many bars since the last open position was created. Returns 'na'
+// when the strategy has no open position.
+export barsSinceLastEntry() =>
+    strategy.opentrades > 0 ? bar_index - strategy.opentrades.entry_bar_index(strategy.opentrades - 1) : na
+
+
+// @function Returns how many bars since the first closed position was created. Returns 'na'
+// when the strategy has no closed position.
+export barsSinceFirstClosedEntry() =>
+    strategy.closedtrades > 0 ? bar_index - strategy.closedtrades.entry_bar_index(0) : na
+
+// @function Returns how many bars since the last closed position was created. Returns 'na'
+// when the strategy has no closed position.
+export barsSinceLastClosedEntry() =>
+    strategy.closedtrades > 0 ? bar_index - strategy.closedtrades.entry_bar_index(strategy.closedtrades - 1) : na
+
+// @function truncate a float number
+// @param float _number to parse
+// @param int _decimalPlaces how many decimals you want 
+export truncate(float _number, int _decimalPlaces) =>
+    _factor = math.pow(10, _decimalPlaces)
+    int(_number * _factor) / _factor
+
+// @function This updates the given table's cell with the given values
+// @param table tableID The table ID to update
+// @param int column The column to update
+// @param int row The row to update
+// @param string title The title of this cell
+// @param string value The value of this cell
+// @param color bgcolor The background color of this cell
+// @param color txtcolor The text color of this cell
+// @returns A boolean - true if the current bar falls within the given dates
+export fillCell(table tableID, int column, int row, string title, string value, color bgcolor, color txtcolor) =>
+    cellText = title + "\n" + value
+    table.cell(tableID, column, row, cellText, bgcolor=bgcolor, text_color=txtcolor)
+
+
+// @function This returns a well formed JSON object alert message suitable to send over webhooks. Use with placeholders
+// see: https://www.tradingcode.net/tradingview/strategy-alert-standard-placeholders/ 
+// @param string webhookAccessToken the passphrase to be validated at webhook backend
+// @param string sessionId the id of this trading session. All orders and trades will be stored with this id
+// @param bool isProduction set to true to send orders to exchange or broker, set false to debug or simulation purposes
+// @returns A string with well formed json object to send in alert.
+export generateWebhookAlertMessage(string webhookAccessToken, string strategyId, string sessionId, bool isProduction) =>
+    _message = "{\"passphrase\": \"" + webhookAccessToken + "\", \"sessionId\": \"" + sessionId +"\","
+    _message += "\"isProduction\":\""+str.tostring(isProduction)+"\",\"time\": \"{{timenow}}\","
+    _message += "\"strategy\": {"
+    _message += "\"strategy_id\" : \"" + strategyId + "\","
+    _message += "\"position_size\" : \"{{strategy.position_size}}\","
+    _message += "\"order_action\" : \"{{strategy.order.action}}\","
+    _message += "\"order_price\" : \"{{strategy.order.price}}\","
+    _message += "\"order_contracts\": \"{{strategy.order.contracts}}\","
+    _message += "\"order_comments\":\"{{strategy.order.comment}}\","
+    _message += "\"market_position\": \"{{strategy.market_position}}\","
+    _message += "\"market_position_size\":\"{{strategy.market_position_size}}\","
+    _message += "\"prev_market_position\":\"{{strategy.prev_market_position}}\","
+    _message += "\"prev_market_position_size\":\"{{strategy.prev_market_position_size}}\","
+    _message += "\"order_id\":\"{{strategy.order.id}}\""
+    _message += "}"
+    _message += "}"
+    _message
+
+// } END UTILITY FUNCTIONS

@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Capital41 Crypto Perp Stress",
+    "title_zh": "加密货币永续合约压力指标",
+    "path": "Capital41_Crypto_Perp_Stress/Capital41_Crypto_Perp_Stress.pine",
+    "source_url": "https://github.com/damianpitt/capital41-indicators/blob/ce64522f7f747abb00b37503c00e2955a6d687d2/Capital41_Crypto_Perp_Stress/Capital41_Crypto_Perp_Stress.pine",
+    "source_commit": "ce64522f7f747abb00b37503c00e2955a6d687d2",
+    "license": "MIT",
+    "sha256": "262a8db41dfa939ef7a225cf2541d7011d9adb6aef3e5616394f6e07a074f872",
+    "original_description": "// Copyright (c) 2026 Capital41 | MIT License\n// CAPITAL41 CRYPTO PERP STRESS\n\n// What it does:\n// - Detects crypto-specific stress using perp basis, OI impulse, and\n//   liquidation wick behavior.\n// - Flags long-squeeze risk, short-squeeze risk, cascade starts, and reset\n//   completion.\n// - Includes weekend sensitivity controls for 24/7 markets.\n//\n// TradingView setup:\n// 1) Open TradingView -> Pine Editor.\n// 2) Paste this script, Save, and Add to chart.\n// 3) Use intraday or 4h on liquid perp pairs.\n// 4) Set Spot/Perp/OI symbols for your exchange.\n//\n// Usage guide:\n// - Long-squeeze risk: crowded longs + OI build + downside liquidation wick.\n// - Short-squeeze risk: crowded shorts + OI build + upside liquidation wick.\n// - Cascade tags: stress + break of prior bar extreme.\n// - Reset complete: basis normalizes, OI flushes, and volatility compresses.",
+    "description_zh": "利用永续合约基差、未平仓量（OI）变化和类似爆仓的影线行为检测加密市场压力；标记多头挤压、空头挤压、连锁走势开始与重置完成，并支持全天候市场的周末灵敏度调整。作者建议在流动性较好的永续合约上使用日内或 4 小时周期，并设置交易所的现货、永续和 OI 品种。多头或空头挤压结合对应方向的拥挤、OI 增长及影线判断；连锁标记还要求突破前一根 K 线极值；重置要求基差正常化、OI 下降和波动率压缩。",
+    "implementation_note_zh": "现货和永续输入默认相同，需分别配置；未设置 OI 时默认使用成交量变化替代，不是真实 OI；爆仓影线由价格和成交量推断，不是实际爆仓数据；源码未读取资金费率。"
+  }
+]

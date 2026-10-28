@@ -1,0 +1,16 @@
+[
+  {
+    "path": "FV.pine",
+    "kind": "strategy",
+    "title_zh": "BTC 15 分钟 FV 策略（改版）",
+    "original_description": "// © Bunghole, Flawless Victory Strategy - 15min BTC Machine Learning Strategy",
+    "description_zh": "源码标题将其称为 15 分钟比特币机器学习策略。",
+    "crypto_relevance": "作者源码标题明确标示 BTC 与 15 分钟周期。",
+    "notes": "Gist 发布者为 zii，源码保留 Bunghole 和 gamcat 署名，发布者与原作者身份是否相同未核实。源码头声明 MPL 2.0，未提供单独许可文件；虽标题提及机器学习，当前可见代码主要使用 RSI、MFI 和布林带条件，未核实训练模型。源码默认仓位参数为 100%，作者效果描述未经独立验证。",
+    "source_url": "https://gist.github.com/zii/16df056e82790602b41f2daf9bf42db7/d8f47e2d68cc491fad0cbe799b12ad9bbab337e8",
+    "description_source_url": "https://gist.github.com/zii/16df056e82790602b41f2daf9bf42db7/d8f47e2d68cc491fad0cbe799b12ad9bbab337e8",
+    "source_commit": "d8f47e2d68cc491fad0cbe799b12ad9bbab337e8",
+    "license": "MPL 2.0（源码声明）",
+    "sha256": "4ac2c25ed15dcbf3c174c94313e77273ff2e55cc6d0bf16629d5422590a7e4fe"
+  }
+]

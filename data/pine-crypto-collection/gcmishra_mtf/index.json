@@ -1,0 +1,16 @@
+[
+  {
+    "path": "MTF_Strategy_Visual/indicator.pine",
+    "kind": "indicator",
+    "title_zh": "多周期 EMA 云图和 ATR 波动率过滤指标",
+    "original_description": "A professional Pine Script indicator for TradingView that implements a multi-timeframe EMA cloud strategy with ATR volatility filtering.",
+    "description_zh": "TradingView 多周期 EMA 云图指标，使用 ATR 过滤波动率。",
+    "crypto_relevance": "作者在说明中提供 BTCUSD、ETHUSD 3 分钟图的参数建议；也提供外汇和股票参数，非加密专用。",
+    "source_url": "https://github.com/gcmishra7/pinescript-indicators/blob/129d627d2b3b59552b9bf1518fd72b3cc640b266/MTF_Strategy_Visual/indicator.pine",
+    "description_source_url": "https://github.com/gcmishra7/pinescript-indicators/blob/129d627d2b3b59552b9bf1518fd72b3cc640b266/MTF_Strategy_Visual/README.md",
+    "source_commit": "129d627d2b3b59552b9bf1518fd72b3cc640b266",
+    "license": "根 README 声明 MIT；未提供独立 LICENSE 文件。",
+    "sha256": "a6f3e6b17b3b57aa66d213ef7f8f2ca5e59d0a34969fcefc7c4f812640432e0a",
+    "notes": "尚未编译或回测；仅为指标，作者所述信号效果未独立验证。"
+  }
+]

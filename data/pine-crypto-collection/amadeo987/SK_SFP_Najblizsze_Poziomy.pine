@@ -1,0 +1,1296 @@
+// [ad] SFP + FVG / IFVG v5.17
+// Radar aktualnych pul płynności (WATCH), na których może powstać SFP.
+// Poziom kandydujący pochodzi wyłącznie z potwierdzonego i jakościowego swingu.
+// Sweep knotem i powrót korpusu tworzą RAW. Domyślny sygnał CONF powstaje dopiero po późniejszym
+// zamknięciu ceny poza przeciwnym ekstremum świecy SFP (break struktury).
+//
+// Nie jest to rekomendacja inwestycyjna ani obietnica reakcji ceny.
+
+//@version=6
+indicator("[ad] SFP + FVG / IFVG v5.17", shorttitle = "adSFP 5.17", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 60, max_bars_back = 5000, dynamic_requests = true)
+
+// ==================== PROSTE USTAWIENIA ====================
+string grupaFunkcji = "Features"
+string grupaFvg = "FVG timeframes"
+string grupaSrednie = "Moving averages"
+string grupaVwap = "Dual Auto VWAP"
+string grupaPvp = "PVP naked POC"
+string grupaWatermarkMain = "Watermark • Main text"
+string grupaWatermarkSecond = "Watermark • Second line"
+string grupaWatermarkPosition = "Watermark • Position"
+bool wlaczSfp = input.bool(true, "SFP levels and confirmations", group = grupaFunkcji, display = display.data_window)
+bool pokazSfpRaw = input.bool(true, "Show SFP RAW after a valid sweep", group = grupaFunkcji, tooltip = "A thin dashed line appears after a wick sweep and a confirmed close back behind the level. RAW is not yet a structure confirmation.", display = display.data_window)
+bool wlaczFvg = input.bool(true, "FVG / IFVG nearest zones", group = grupaFunkcji, display = display.data_window)
+bool wlaczDni = input.bool(true, "Day / month separators", group = grupaFunkcji, tooltip = "Intraday charts show Warsaw weekdays. Daily, weekly, and monthly charts show month markers instead.", display = display.data_window)
+
+// CRYPTOCAP:TOTAL/TOTAL2/TOTAL3 są indeksami obserwacyjnymi, a nie instrumentami
+// do bezpośredniego wejścia. Zostawiamy na nich radar SFP i FVG, ale bez
+// kierunkowych czerwonych/zielonych linii RAW/CONF wyglądających jak sygnał.
+bool indeksKapitalizacjiKrypto = syminfo.prefix == "CRYPTOCAP"
+bool pokazKierunkoweSfp = wlaczSfp and not indeksKapitalizacjiKrypto
+
+string trybTfFvg = input.string("Match chart", "Timeframe mode", options = ["Match chart", "Custom set"], group = grupaFvg, tooltip = "Match chart follows the open chart timeframe. Custom set can show one, two, or three independent confirmed-timeframe zone books at once.", display = display.data_window)
+bool wlaczTfA = input.bool(true, "Use", inline = "tfA", group = grupaFvg, display = display.data_window)
+string tfAInput = input.timeframe("60", "Timeframe 1", inline = "tfA", group = grupaFvg, display = display.data_window)
+bool wlaczTfB = input.bool(true, "Use", inline = "tfB", group = grupaFvg, display = display.data_window)
+string tfBInput = input.timeframe("240", "Timeframe 2", inline = "tfB", group = grupaFvg, display = display.data_window)
+bool wlaczTfC = input.bool(true, "Use", inline = "tfC", group = grupaFvg, display = display.data_window)
+string tfCInput = input.timeframe("1D", "Timeframe 3", inline = "tfC", group = grupaFvg, display = display.data_window)
+int ileFvgNadCena = input.int(2, "Nearest zones above per timeframe", minval = 1, maxval = 8, group = grupaFvg, display = display.data_window)
+int ileFvgPodCena = input.int(6, "Nearest zones below per timeframe", minval = 1, maxval = 8, group = grupaFvg, tooltip = "Shows a deeper stack of still-active FVG/IFVG zones below price so lower imbalances are not hidden by the nearest-zone limit.", display = display.data_window)
+
+bool pokazEma200 = input.bool(true, "EMA 200", inline = "ema200", group = grupaSrednie, tooltip = "Uses close prices and the current chart timeframe.", display = display.data_window)
+color kolorEma200 = input.color(color.rgb(33, 150, 243), "Color", inline = "ema200", group = grupaSrednie, display = display.data_window)
+bool pokazEma100 = input.bool(false, "EMA 100", inline = "ema100", group = grupaSrednie, tooltip = "Uses close prices and the current chart timeframe.", display = display.data_window)
+color kolorEma100 = input.color(color.rgb(255, 152, 0), "Color", inline = "ema100", group = grupaSrednie, display = display.data_window)
+bool pokazEma50 = input.bool(false, "EMA 50", inline = "ema50", group = grupaSrednie, tooltip = "Uses close prices and the current chart timeframe.", display = display.data_window)
+color kolorEma50 = input.color(color.rgb(156, 39, 176), "Color", inline = "ema50", group = grupaSrednie, display = display.data_window)
+bool pokazEmaWlasna = input.bool(false, "Custom EMA", inline = "emaCustom", group = grupaSrednie, tooltip = "Optional EMA from close on the current chart timeframe.", display = display.data_window)
+int dlugoscEmaWlasna = input.int(21, "Length", minval = 1, maxval = 2000, inline = "emaCustom", group = grupaSrednie, display = display.data_window)
+color kolorEmaWlasna = input.color(color.rgb(255, 235, 59), "Color", inline = "emaCustom", group = grupaSrednie, display = display.data_window)
+int gruboscEma = input.int(2, "Line width", minval = 1, maxval = 4, group = grupaSrednie, display = display.data_window)
+
+bool pokazVwapSzybki = input.bool(true, "Fast VWAP", inline = "vwapFast", group = grupaVwap, tooltip = "Auto anchor: session/day on intraday charts, month on 1D, quarter on 2D-10D, year on 11D-60D, then decade.", display = display.data_window)
+color kolorVwapSzybki = input.color(color.rgb(38, 166, 154), "Color", inline = "vwapFast", group = grupaVwap, display = display.data_window)
+bool pokazVwapWolny = input.bool(true, "Slow VWAP", inline = "vwapSlow", group = grupaVwap, tooltip = "Auto anchor: week on intraday charts, quarter on 1D, year on 2D-10D, decade on 11D-60D, then century.", display = display.data_window)
+color kolorVwapWolny = input.color(color.rgb(126, 87, 194), "Color", inline = "vwapSlow", group = grupaVwap, display = display.data_window)
+int gruboscVwap = input.int(1, "Line width", minval = 1, maxval = 4, group = grupaVwap, tooltip = "Both VWAPs use hlc3 = (high + low + close) / 3. No bands or VWAP alerts are generated.", display = display.data_window)
+
+bool pokazPvp = input.bool(true, "PVP naked POC", group = grupaPvp, tooltip = "Shows untouched POC levels from completed Daily, Weekly and Monthly profiles. The calculation is an OHLCV approximation of Periodic Volume Profile, not TradingView's internal tick profile.", display = display.data_window)
+string pvpTfProbek = input.timeframe("60", "Profile sample timeframe", options = ["15", "30", "60", "120", "240"], group = grupaPvp, tooltip = "Lower sampling is more precise but uses more history and processing. 1H is the balanced default.", display = display.data_window)
+int pvpLiczbaRzedow = input.int(24, "PVP rows", minval = 5, maxval = 200, group = grupaPvp, tooltip = "Match this to the Number Of Rows setting used in Periodic Volume Profile.", display = display.data_window)
+bool pvpPokazD = input.bool(true, "Daily", inline = "pvpD", group = grupaPvp, display = display.data_window)
+int pvpNajblizszeD = input.int(8, "Nearest", minval = 1, maxval = 30, inline = "pvpD", group = grupaPvp, display = display.data_window)
+color pvpKolorD = input.color(color.white, "Color", inline = "pvpD", group = grupaPvp, display = display.data_window)
+bool pvpPokazW = input.bool(true, "Weekly", inline = "pvpW", group = grupaPvp, display = display.data_window)
+int pvpNajblizszeW = input.int(14, "Nearest", minval = 1, maxval = 40, inline = "pvpW", group = grupaPvp, display = display.data_window)
+color pvpKolorW = input.color(color.white, "Color", inline = "pvpW", group = grupaPvp, display = display.data_window)
+bool pvpPokazM = input.bool(true, "Monthly", inline = "pvpM", group = grupaPvp, display = display.data_window)
+int pvpNajblizszeM = input.int(20, "Nearest", minval = 1, maxval = 60, inline = "pvpM", group = grupaPvp, display = display.data_window)
+color pvpKolorM = input.color(color.white, "Color", inline = "pvpM", group = grupaPvp, display = display.data_window)
+bool pvpPokazEtykiety = input.bool(true, "Labels", inline = "pvpStyle", group = grupaPvp, display = display.data_window)
+int pvpPrzesuniecieEtykiet = input.int(80, "Right offset", minval = 1, maxval = 450, inline = "pvpStyle", group = grupaPvp, tooltip = "Label offset in current chart bars.", display = display.data_window)
+
+const string WM_FONT_SYSTEM = "System"
+const string WM_FONT_MONO = "Monospace"
+const string WM_FONT_SERIF = "𝐒𝐞𝐫𝐢𝐟"
+const string WM_FONT_SERIF_ITALIC = "𝑺𝒆𝒓𝒊𝒇 𝑰𝒕𝒂𝒍𝒊𝒄"
+const string WM_FONT_SANS = "𝗦𝗮𝗻𝘀"
+const string WM_FONT_SANS_ITALIC = "𝙎𝙖𝙣𝙨 𝙄𝙩𝙖𝙡𝙞𝙘"
+const string WM_FONT_SCRIPT = "𝓢𝓬𝓻𝓲𝓹𝓽"
+const string WM_FONT_FRAKTUR = "𝕱𝖗𝖆𝖐𝖙𝖚𝖗"
+const string WM_FONT_DOUBLE = "𝔻𝕠𝕦𝕓𝕝𝕖-𝕤𝕥𝕣𝕦𝕔𝕜"
+const string WM_LINE_NONE = "None"
+const string WM_LINE_UNDERLINE = "Underline"
+const string WM_LINE_STRIKE = "Strikethrough"
+const string WM_POS_TOP_CENTER = "Top center"
+const string WM_POS_TOP_LEFT = "Top left"
+const string WM_POS_TOP_RIGHT = "Top right"
+const string WM_POS_MIDDLE = "Middle center"
+const string WM_POS_BOTTOM_CENTER = "Bottom center"
+const string WM_POS_BOTTOM_LEFT = "Bottom left"
+const string WM_POS_BOTTOM_RIGHT = "Bottom right"
+
+bool wmPokaz = input.bool(true, "Show watermark", group = grupaWatermarkMain, display = display.none)
+string wmTekstGlowny = input.string("ig: amadeusz.dyrek", "Text", group = grupaWatermarkMain, tooltip = "Text fixed to the chart viewport. Emoji are supported.", display = display.none)
+string wmFontGlowny = input.string(WM_FONT_SYSTEM, "Font", options = [WM_FONT_SYSTEM, WM_FONT_MONO, WM_FONT_SERIF, WM_FONT_SERIF_ITALIC, WM_FONT_SANS, WM_FONT_SANS_ITALIC, WM_FONT_SCRIPT, WM_FONT_FRAKTUR, WM_FONT_DOUBLE], group = grupaWatermarkMain, display = display.none)
+bool wmBoldGlowny = input.bool(true, "Bold", inline = "wmMainFmt", group = grupaWatermarkMain, display = display.none)
+bool wmItalicGlowny = input.bool(false, "Italic", inline = "wmMainFmt", group = grupaWatermarkMain, display = display.none)
+string wmLiniaGlowna = input.string(WM_LINE_NONE, "Line", options = [WM_LINE_NONE, WM_LINE_UNDERLINE, WM_LINE_STRIKE], group = grupaWatermarkMain, display = display.none)
+int wmRozmiarGlowny = input.int(14, "Size (pt)", minval = 8, maxval = 120, inline = "wmMainLook", group = grupaWatermarkMain, display = display.none)
+color wmKolorGlowny = input.color(color.new(#434651, 25), "Color", inline = "wmMainLook", group = grupaWatermarkMain, display = display.none)
+
+string wmTekstDrugi = input.string("", "Text", group = grupaWatermarkSecond, tooltip = "Smaller text below the main line. Leave empty to hide.", display = display.none)
+string wmFontDrugi = input.string(WM_FONT_SYSTEM, "Font", options = [WM_FONT_SYSTEM, WM_FONT_MONO, WM_FONT_SERIF, WM_FONT_SERIF_ITALIC, WM_FONT_SANS, WM_FONT_SANS_ITALIC, WM_FONT_SCRIPT, WM_FONT_FRAKTUR, WM_FONT_DOUBLE], group = grupaWatermarkSecond, display = display.none)
+bool wmBoldDrugi = input.bool(false, "Bold", inline = "wmSecondFmt", group = grupaWatermarkSecond, display = display.none)
+bool wmItalicDrugi = input.bool(false, "Italic", inline = "wmSecondFmt", group = grupaWatermarkSecond, display = display.none)
+string wmLiniaDruga = input.string(WM_LINE_NONE, "Line", options = [WM_LINE_NONE, WM_LINE_UNDERLINE, WM_LINE_STRIKE], group = grupaWatermarkSecond, display = display.none)
+int wmRozmiarDrugi = input.int(12, "Size (pt)", minval = 6, maxval = 60, inline = "wmSecondLook", group = grupaWatermarkSecond, display = display.none)
+color wmKolorDrugi = input.color(color.new(#434651, 35), "Color", inline = "wmSecondLook", group = grupaWatermarkSecond, display = display.none)
+
+string wmPozycja = input.string(WM_POS_TOP_RIGHT, "Location", options = [WM_POS_TOP_CENTER, WM_POS_TOP_LEFT, WM_POS_TOP_RIGHT, WM_POS_MIDDLE, WM_POS_BOTTOM_CENTER, WM_POS_BOTTOM_LEFT, WM_POS_BOTTOM_RIGHT], group = grupaWatermarkPosition, display = display.none)
+float wmOdsuniecie = input.float(7.0, "Edge offset (% of height)", minval = 0, maxval = 40, step = 0.5, group = grupaWatermarkPosition, tooltip = "Moves the text away from the top or bottom edge.", display = display.none)
+
+// Parametry zaawansowane są celowo stałe, żeby panel Inputs pozostał prosty.
+string tryb = "Selektywny"
+int swieceSwingu = 10
+float minReakcjaAtr = 1.25
+float laczenieAtr = 0.50
+int okresAtr = 14
+int maksWiek = 400
+float maksOdlegloscAtr = 15.0
+int ileNadCena = wlaczSfp ? 3 : 0
+int ilePodCena = wlaczSfp ? 3 : 0
+bool pokazNazwy = wlaczSfp
+color kolorHigh = color.rgb(41, 98, 255)
+color kolorLow = color.rgb(41, 98, 255)
+bool pokazDotkniete = wlaczSfp
+int pamiecDotknietych = 12
+float usunDotknietyPoAtr = 5.0
+int ileDotknietychNaStrone = 2
+
+bool calyKorpus = true
+float minSweepAtr = 0.10
+float maxSweepAtr = 1.00
+float minZakresSetupAtr = 1.20
+string sposobPotwierdzenia = "Break struktury"
+int oknoPotwierdzenia = 3
+float buforUniewaznieniaAtr = 0.10
+bool filtrWolumenu = false
+int okresWolumenu = 20
+float mnoznikWolumenu = 1.20
+bool pokazOstatniSygnal = pokazKierunkoweSfp
+// CONF jest historycznym potwierdzeniem rozegranego setupu, a nie poziomem
+// wejscia przy pozniejszym powrocie ceny. Pokazujemy go tylko na swiecy CONF.
+int waznoscSygnalu = 0
+int waznoscRaw = 12
+color kolorShort = color.rgb(239, 83, 80)
+color kolorLong = color.rgb(38, 166, 154)
+
+float minWielkoscFvgAtr = 0.12
+int maksWiekStrefFvg = 300
+int maksWiekStrefIfvg = 72
+color kolorStrefyFvg = color.rgb(255, 193, 7)
+int przezroczystoscFvg = 72
+
+bool pokazDniTygodnia = wlaczDni
+bool pokazSeparatoryDni = wlaczDni
+string strefaCzasowaDni = "Europe/Warsaw"
+int przezroczystoscDni = 45
+int przezroczystoscSeparatorow = 55
+color kolorNazwDni = color.silver
+color kolorSeparatorow = color.white
+
+// ==================== ŚREDNIE KROCZĄCE ====================
+// Wszystkie EMA liczą się bezpośrednio z zamknięć na aktualnym interwale wykresu.
+float ema200 = ta.ema(close, 200)
+float ema100 = ta.ema(close, 100)
+float ema50 = ta.ema(close, 50)
+float emaWlasna = ta.ema(close, dlugoscEmaWlasna)
+
+plot(pokazEma200 ? ema200 : na, title = "EMA 200", color = kolorEma200, linewidth = gruboscEma)
+plot(pokazEma100 ? ema100 : na, title = "EMA 100", color = kolorEma100, linewidth = gruboscEma)
+plot(pokazEma50 ? ema50 : na, title = "EMA 50", color = kolorEma50, linewidth = gruboscEma)
+plot(pokazEmaWlasna ? emaWlasna : na, title = "Custom EMA", color = kolorEmaWlasna, linewidth = gruboscEma)
+
+// ==================== DUAL AUTO VWAP ====================
+// Szybka i wolna kotwica zmieniają okres automatycznie wraz z interwałem wykresu.
+// Na intraday odpowiadają odpowiednio bieżącej sesji/dniu i bieżącemu tygodniowi.
+// Obie linie korzystają z typowej ceny hlc3 i nie emitują żadnych alertów.
+float sekundyWykresu = timeframe.in_seconds()
+float sekundyJednegoDnia = timeframe.in_seconds("1D")
+float sekundyDziesieciuDni = timeframe.in_seconds("10D")
+float sekundySzesdziesieciuDni = timeframe.in_seconds("60D")
+bool interwalIntraday = timeframe.isintraday
+bool interwalJednodniowy = not interwalIntraday and sekundyWykresu <= sekundyJednegoDnia
+bool interwalDoDziesieciuDni = not interwalIntraday and not interwalJednodniowy and sekundyWykresu <= sekundyDziesieciuDni
+bool interwalDoSzesdziesieciuDni = not interwalIntraday and not interwalJednodniowy and not interwalDoDziesieciuDni and sekundyWykresu <= sekundySzesdziesieciuDni
+bool nowaDekada = barstate.isfirst or (year != year[1] and year % 10 == 0)
+bool noweStulecie = barstate.isfirst or (year != year[1] and year % 100 == 0)
+
+bool resetVwapSzybki = barstate.isfirst or (interwalIntraday ? timeframe.change("1D") : interwalJednodniowy ? timeframe.change("1M") : interwalDoDziesieciuDni ? timeframe.change("3M") : interwalDoSzesdziesieciuDni ? timeframe.change("12M") : nowaDekada)
+bool resetVwapWolny = barstate.isfirst or (interwalIntraday ? timeframe.change("1W") : interwalJednodniowy ? timeframe.change("3M") : interwalDoDziesieciuDni ? timeframe.change("12M") : interwalDoSzesdziesieciuDni ? nowaDekada : noweStulecie)
+
+float vwapSzybki = ta.vwap(hlc3, resetVwapSzybki)
+float vwapWolny = ta.vwap(hlc3, resetVwapWolny)
+
+// Nie ukrywamy świecy resetu. ta.vwap() zwraca już na niej pierwszy punkt nowej
+// kotwicy, więc linia nie dostaje sztucznej jednoswiecowej dziury.
+plot(pokazVwapSzybki ? vwapSzybki : na, title = "Fast Auto VWAP", color = kolorVwapSzybki, linewidth = gruboscVwap, style = plot.style_linebr)
+plot(pokazVwapWolny ? vwapWolny : na, title = "Slow Auto VWAP", color = kolorVwapWolny, linewidth = gruboscVwap, style = plot.style_linebr)
+
+// ==================== PAMIĘĆ JAKOŚCIOWYCH SWINGÓW ====================
+var float[] cenyHigh = array.new_float()
+var int[] baryHigh = array.new_int()
+var float[] jakoscHigh = array.new_float()
+var float[] cenyLow = array.new_float()
+var int[] baryLow = array.new_int()
+var float[] jakoscLow = array.new_float()
+var float[] dotknieteHigh = array.new_float()
+var int[] dotknieteHighPivotBar = array.new_int()
+var int[] dotknieteHighBar = array.new_int()
+var float[] dotknieteLow = array.new_float()
+var int[] dotknieteLowPivotBar = array.new_int()
+var int[] dotknieteLowBar = array.new_int()
+// Ostatnia zuzyta pula po każdej stronie. Stary poziom nie może wrócić do
+// radaru po CONF; poziom o zbliżonej cenie staje się ponownie ważny dopiero,
+// gdy po potwierdzeniu powstanie nowy pivot.
+var float ostatniZuzytyHigh = na
+var int ostatniZuzytyHighBar = na
+var float ostatniZuzytyLow = na
+var int ostatniZuzytyLowBar = na
+
+f_dodaj_lub_polacz(float[] ceny, int[] bary, float[] jakosci, float nowaCena, int nowyBar, float nowaJakosc, float progLaczenia) =>
+    int indeks = -1
+    if array.size(ceny) > 0
+        for i = 0 to array.size(ceny) - 1
+            if math.abs(nowaCena - array.get(ceny, i)) <= progLaczenia
+                indeks := i
+                break
+    if indeks >= 0
+        float staraJakosc = array.get(jakosci, indeks)
+        int staryBar = array.get(bary, indeks)
+        if nowaJakosc > staraJakosc or (nowaJakosc == staraJakosc and nowyBar > staryBar)
+            array.set(ceny, indeks, nowaCena)
+            array.set(bary, indeks, nowyBar)
+            array.set(jakosci, indeks, nowaJakosc)
+    else
+        array.push(ceny, nowaCena)
+        array.push(bary, nowyBar)
+        array.push(jakosci, nowaJakosc)
+    while array.size(ceny) > 100
+        array.shift(ceny)
+        array.shift(bary)
+        array.shift(jakosci)
+
+f_zapamietaj_dotkniety(float[] ceny, int[] baryPivot, int[] baryDotkniecia, float cena, int pivotBar) =>
+    array.push(ceny, cena)
+    array.push(baryPivot, pivotBar)
+    array.push(baryDotkniecia, bar_index)
+    while array.size(ceny) > 20
+        array.shift(ceny)
+        array.shift(baryPivot)
+        array.shift(baryDotkniecia)
+
+f_usun_dotkniety(float[] ceny, int[] baryPivot, int[] baryDotkniecia, float cena) =>
+    if array.size(ceny) > 0
+        for i = array.size(ceny) - 1 to 0
+            if math.abs(array.get(ceny, i) - cena) <= syminfo.mintick
+                array.remove(ceny, i)
+                array.remove(baryPivot, i)
+                array.remove(baryDotkniecia, i)
+
+f_usun_aktywna_pule(float[] ceny, int[] bary, float[] jakosci, float cena, int pivotBar) =>
+    if array.size(ceny) > 0
+        for i = array.size(ceny) - 1 to 0
+            bool tenSamPivot = array.get(bary, i) == pivotBar
+            bool tenSamPoziom = math.abs(array.get(ceny, i) - cena) <= syminfo.mintick
+            if tenSamPivot or tenSamPoziom
+                array.remove(ceny, i)
+                array.remove(bary, i)
+                array.remove(jakosci, i)
+
+float atr = ta.atr(okresAtr)
+float pivotHigh = ta.pivothigh(high, swieceSwingu, swieceSwingu)
+float pivotLow = ta.pivotlow(low, swieceSwingu, swieceSwingu)
+float atrSwingu = nz(atr[swieceSwingu], atr)
+float progLaczenia = math.max(syminfo.mintick, atrSwingu * laczenieAtr)
+float najnizszyPoHigh = ta.lowest(low, swieceSwingu + 1)
+float najwyzszyPoLow = ta.highest(high, swieceSwingu + 1)
+
+if not na(pivotHigh) and atrSwingu > 0
+    float reakcja = (pivotHigh - najnizszyPoHigh) / atrSwingu
+    if reakcja >= minReakcjaAtr
+        f_dodaj_lub_polacz(cenyHigh, baryHigh, jakoscHigh, pivotHigh, bar_index - swieceSwingu, reakcja, progLaczenia)
+
+if not na(pivotLow) and atrSwingu > 0
+    float reakcja = (najwyzszyPoLow - pivotLow) / atrSwingu
+    if reakcja >= minReakcjaAtr
+        f_dodaj_lub_polacz(cenyLow, baryLow, jakoscLow, pivotLow, bar_index - swieceSwingu, reakcja, progLaczenia)
+
+// Pierwsze dotknięcie jest wykrywane na otwartej świecy, zanim potwierdzona świeca
+// przeniesie zużyty poziom z aktywnego radaru do pamięci poziomów dotkniętych.
+// Dzięki temu alert nie czeka na zamknięcie świecy.
+float cenaOdniesieniaRadaru = barstate.isconfirmed ? close : nz(close[1], close)
+float limitOdleglosciRadaru = atr * maksOdlegloscAtr
+bool dotkniecieHighTeraz = false
+float dotkniecieHighPoziom = na
+float dotkniecieHighOdleglosc = 1e20
+bool dotkniecieLowTeraz = false
+float dotkniecieLowPoziom = na
+float dotkniecieLowOdleglosc = 1e20
+
+if array.size(cenyHigh) > 0
+    for i = 0 to array.size(cenyHigh) - 1
+        float poziom = array.get(cenyHigh, i)
+        int pivotBar = array.get(baryHigh, i)
+        float odleglosc = math.abs(cenaOdniesieniaRadaru - poziom)
+        bool aktywny = bar_index > pivotBar and bar_index - pivotBar <= maksWiek and odleglosc <= limitOdleglosciRadaru
+        if aktywny and high >= poziom and odleglosc < dotkniecieHighOdleglosc
+            dotkniecieHighTeraz := true
+            dotkniecieHighPoziom := poziom
+            dotkniecieHighOdleglosc := odleglosc
+
+if array.size(cenyLow) > 0
+    for i = 0 to array.size(cenyLow) - 1
+        float poziom = array.get(cenyLow, i)
+        int pivotBar = array.get(baryLow, i)
+        float odleglosc = math.abs(cenaOdniesieniaRadaru - poziom)
+        bool aktywny = bar_index > pivotBar and bar_index - pivotBar <= maksWiek and odleglosc <= limitOdleglosciRadaru
+        if aktywny and low <= poziom and odleglosc < dotkniecieLowOdleglosc
+            dotkniecieLowTeraz := true
+            dotkniecieLowPoziom := poziom
+            dotkniecieLowOdleglosc := odleglosc
+
+bool dotkniecieShortAlert = dotkniecieHighTeraz and (not dotkniecieLowTeraz or dotkniecieHighOdleglosc <= dotkniecieLowOdleglosc)
+bool dotkniecieLongAlert = dotkniecieLowTeraz and not dotkniecieShortAlert
+
+// ==================== SWEEP = SETUP, BREAK STRUKTURY = CONF ====================
+float sredniWolumen = ta.sma(volume, okresWolumenu)
+bool wolumenOk = not filtrWolumenu or (not na(volume) and not na(sredniWolumen) and volume >= sredniWolumen * mnoznikWolumenu)
+float minSweep = atr * minSweepAtr
+float maxSweep = maxSweepAtr == 0.0 ? 1e20 : atr * maxSweepAtr
+
+bool bearishSetup = false
+float bearishSetupPoziom = na
+int bearishSetupPivotBar = na
+float bearishSetupWybicie = na
+bool bullishSetup = false
+float bullishSetupPoziom = na
+int bullishSetupPivotBar = na
+float bullishSetupWybicie = na
+
+if barstate.isconfirmed and array.size(cenyHigh) > 0
+    for i = array.size(cenyHigh) - 1 to 0
+        float poziom = array.get(cenyHigh, i)
+        int pivotBar = array.get(baryHigh, i)
+        bool wygasl = bar_index - pivotBar > maksWiek
+        bool naruszony = high >= poziom
+        if wygasl or naruszony
+            if naruszony
+                if pokazDotkniete
+                    f_zapamietaj_dotkniety(dotknieteHigh, dotknieteHighPivotBar, dotknieteHighBar, poziom, pivotBar)
+                float wybicie = high - poziom
+                bool zakresOk = minZakresSetupAtr == 0.0 or high - low >= atr * minZakresSetupAtr
+                bool setup = close < poziom and (not calyKorpus or open < poziom) and wybicie >= minSweep and wybicie <= maxSweep and wolumenOk and zakresOk
+                if setup and (not bearishSetup or poziom < bearishSetupPoziom)
+                    bearishSetup := true
+                    bearishSetupPoziom := poziom
+                    bearishSetupPivotBar := pivotBar
+                    bearishSetupWybicie := wybicie
+            array.remove(cenyHigh, i)
+            array.remove(baryHigh, i)
+            array.remove(jakoscHigh, i)
+
+if barstate.isconfirmed and array.size(cenyLow) > 0
+    for i = array.size(cenyLow) - 1 to 0
+        float poziom = array.get(cenyLow, i)
+        int pivotBar = array.get(baryLow, i)
+        bool wygasl = bar_index - pivotBar > maksWiek
+        bool naruszony = low <= poziom
+        if wygasl or naruszony
+            if naruszony
+                if pokazDotkniete
+                    f_zapamietaj_dotkniety(dotknieteLow, dotknieteLowPivotBar, dotknieteLowBar, poziom, pivotBar)
+                float wybicie = poziom - low
+                bool zakresOk = minZakresSetupAtr == 0.0 or high - low >= atr * minZakresSetupAtr
+                bool setup = close > poziom and (not calyKorpus or open > poziom) and wybicie >= minSweep and wybicie <= maxSweep and wolumenOk and zakresOk
+                if setup and (not bullishSetup or poziom > bullishSetupPoziom)
+                    bullishSetup := true
+                    bullishSetupPoziom := poziom
+                    bullishSetupPivotBar := pivotBar
+                    bullishSetupWybicie := wybicie
+            array.remove(cenyLow, i)
+            array.remove(baryLow, i)
+            array.remove(jakoscLow, i)
+
+// Po pierwszym naruszeniu poziom trafia do krótkiej pamięci. Drugi osobny retest
+// (cena musi najpierw wrócić na właściwą stronę) usuwa go natychmiast, żeby stara
+// pula płynności nie wisiała na wykresie po wielokrotnym przykryciu.
+float limitDotknietych = atr * usunDotknietyPoAtr
+if barstate.isconfirmed and array.size(dotknieteHigh) > 0
+    for i = array.size(dotknieteHigh) - 1 to 0
+        float poziom = array.get(dotknieteHigh, i)
+        bool zaStary = bar_index - array.get(dotknieteHighBar, i) > pamiecDotknietych
+        bool zaDaleko = math.abs(close - poziom) > limitDotknietych
+        bool drugiRetest = bar_index > array.get(dotknieteHighBar, i) and high >= poziom and high[1] < poziom
+        if not pokazDotkniete or zaStary or zaDaleko or drugiRetest
+            array.remove(dotknieteHigh, i)
+            array.remove(dotknieteHighPivotBar, i)
+            array.remove(dotknieteHighBar, i)
+
+if barstate.isconfirmed and array.size(dotknieteLow) > 0
+    for i = array.size(dotknieteLow) - 1 to 0
+        float poziom = array.get(dotknieteLow, i)
+        bool zaStary = bar_index - array.get(dotknieteLowBar, i) > pamiecDotknietych
+        bool zaDaleko = math.abs(close - poziom) > limitDotknietych
+        bool drugiRetest = bar_index > array.get(dotknieteLowBar, i) and low <= poziom and low[1] > poziom
+        if not pokazDotkniete or zaStary or zaDaleko or drugiRetest
+            array.remove(dotknieteLow, i)
+            array.remove(dotknieteLowPivotBar, i)
+            array.remove(dotknieteLowBar, i)
+
+var bool oczekujeBear = false
+var float oczekujeBearPoziom = na
+var int oczekujeBearPivotBar = na
+var float oczekujeBearHigh = na
+var float oczekujeBearLow = na
+var float oczekujeBearAtr = na
+var float oczekujeBearWybicie = na
+var int oczekujeBearBar = na
+var bool oczekujeBull = false
+var float oczekujeBullPoziom = na
+var int oczekujeBullPivotBar = na
+var float oczekujeBullHigh = na
+var float oczekujeBullLow = na
+var float oczekujeBullAtr = na
+var float oczekujeBullWybicie = na
+var int oczekujeBullBar = na
+
+bool bearishSfp = false
+float bearishPoziom = na
+int bearishPivotBar = na
+float bearishWybicie = na
+bool bullishSfp = false
+float bullishPoziom = na
+int bullishPivotBar = na
+float bullishWybicie = na
+
+if barstate.isconfirmed and sposobPotwierdzenia == "Break struktury"
+    if oczekujeBear and bar_index > oczekujeBearBar
+        bool uniewazniony = high > oczekujeBearHigh + oczekujeBearAtr * buforUniewaznieniaAtr
+        bool wygasl = bar_index - oczekujeBearBar > oknoPotwierdzenia
+        bool potwierdzony = close < oczekujeBearLow
+        if uniewazniony or wygasl
+            oczekujeBear := false
+        else if potwierdzony
+            bearishSfp := true
+            bearishPoziom := oczekujeBearPoziom
+            bearishPivotBar := oczekujeBearPivotBar
+            bearishWybicie := oczekujeBearWybicie
+            oczekujeBear := false
+    if oczekujeBull and bar_index > oczekujeBullBar
+        bool uniewazniony = low < oczekujeBullLow - oczekujeBullAtr * buforUniewaznieniaAtr
+        bool wygasl = bar_index - oczekujeBullBar > oknoPotwierdzenia
+        bool potwierdzony = close > oczekujeBullHigh
+        if uniewazniony or wygasl
+            oczekujeBull := false
+        else if potwierdzony
+            bullishSfp := true
+            bullishPoziom := oczekujeBullPoziom
+            bullishPivotBar := oczekujeBullPivotBar
+            bullishWybicie := oczekujeBullWybicie
+            oczekujeBull := false
+
+if bearishSetup
+    if sposobPotwierdzenia == "Sam powrót świecy"
+        bearishSfp := true
+        bearishPoziom := bearishSetupPoziom
+        bearishPivotBar := bearishSetupPivotBar
+        bearishWybicie := bearishSetupWybicie
+    else
+        oczekujeBear := true
+        oczekujeBearPoziom := bearishSetupPoziom
+        oczekujeBearPivotBar := bearishSetupPivotBar
+        oczekujeBearHigh := high
+        oczekujeBearLow := low
+        oczekujeBearAtr := atr
+        oczekujeBearWybicie := bearishSetupWybicie
+        oczekujeBearBar := bar_index
+
+if bullishSetup
+    if sposobPotwierdzenia == "Sam powrót świecy"
+        bullishSfp := true
+        bullishPoziom := bullishSetupPoziom
+        bullishPivotBar := bullishSetupPivotBar
+        bullishWybicie := bullishSetupWybicie
+    else
+        oczekujeBull := true
+        oczekujeBullPoziom := bullishSetupPoziom
+        oczekujeBullPivotBar := bullishSetupPivotBar
+        oczekujeBullHigh := high
+        oczekujeBullLow := low
+        oczekujeBullAtr := atr
+        oczekujeBullWybicie := bullishSetupWybicie
+        oczekujeBullBar := bar_index
+
+// Potwierdzony setup jest już rozegranym zdarzeniem. Usuwamy jego poziom z
+// pamięci dotkniętych pul przed rysowaniem radaru, żeby nie wyglądał później
+// jak aktualny poziom wejścia przy retescie.
+if bearishSfp
+    ostatniZuzytyHigh := bearishPoziom
+    ostatniZuzytyHighBar := bar_index
+    f_usun_aktywna_pule(cenyHigh, baryHigh, jakoscHigh, bearishPoziom, bearishPivotBar)
+    f_usun_dotkniety(dotknieteHigh, dotknieteHighPivotBar, dotknieteHighBar, bearishPoziom)
+if bullishSfp
+    ostatniZuzytyLow := bullishPoziom
+    ostatniZuzytyLowBar := bar_index
+    f_usun_aktywna_pule(cenyLow, baryLow, jakoscLow, bullishPoziom, bullishPivotBar)
+    f_usun_dotkniety(dotknieteLow, dotknieteLowPivotBar, dotknieteLowBar, bullishPoziom)
+
+// ==================== WYBÓR TYLKO NAJBLIŻSZYCH POZIOMÓW ====================
+var float[] wybraneHigh = array.new_float()
+var int[] wybraneHighBar = array.new_int()
+var float[] wybraneLow = array.new_float()
+var int[] wybraneLowBar = array.new_int()
+array.clear(wybraneHigh)
+array.clear(wybraneHighBar)
+array.clear(wybraneLow)
+array.clear(wybraneLowBar)
+
+float limitOdleglosci = limitOdleglosciRadaru
+
+if ileNadCena > 0 and array.size(cenyHigh) > 0
+    for i = 0 to array.size(cenyHigh) - 1
+        float poziom = array.get(cenyHigh, i)
+        int pivotBar = array.get(baryHigh, i)
+        bool zuzytyPrzedConf = not na(ostatniZuzytyHigh) and pivotBar <= ostatniZuzytyHighBar and math.abs(poziom - ostatniZuzytyHigh) <= progLaczenia
+        if not zuzytyPrzedConf and poziom > cenaOdniesieniaRadaru and poziom - cenaOdniesieniaRadaru <= limitOdleglosci
+            int pozycja = array.size(wybraneHigh)
+            if array.size(wybraneHigh) > 0
+                for j = 0 to array.size(wybraneHigh) - 1
+                    if poziom < array.get(wybraneHigh, j)
+                        pozycja := j
+                        break
+            array.insert(wybraneHigh, pozycja, poziom)
+            array.insert(wybraneHighBar, pozycja, array.get(baryHigh, i))
+            while array.size(wybraneHigh) > ileNadCena
+                array.pop(wybraneHigh)
+                array.pop(wybraneHighBar)
+
+if ilePodCena > 0 and array.size(cenyLow) > 0
+    for i = 0 to array.size(cenyLow) - 1
+        float poziom = array.get(cenyLow, i)
+        int pivotBar = array.get(baryLow, i)
+        bool zuzytyPrzedConf = not na(ostatniZuzytyLow) and pivotBar <= ostatniZuzytyLowBar and math.abs(poziom - ostatniZuzytyLow) <= progLaczenia
+        if not zuzytyPrzedConf and poziom < cenaOdniesieniaRadaru and cenaOdniesieniaRadaru - poziom <= limitOdleglosci
+            int pozycja = array.size(wybraneLow)
+            if array.size(wybraneLow) > 0
+                for j = 0 to array.size(wybraneLow) - 1
+                    if poziom > array.get(wybraneLow, j)
+                        pozycja := j
+                        break
+            array.insert(wybraneLow, pozycja, poziom)
+            array.insert(wybraneLowBar, pozycja, array.get(baryLow, i))
+            while array.size(wybraneLow) > ilePodCena
+                array.pop(wybraneLow)
+                array.pop(wybraneLowBar)
+
+// ==================== CZYSTE RYSOWANIE RADARU ====================
+var line[] linieRadaru = array.new_line()
+var label[] etykietyRadaru = array.new_label()
+
+if barstate.islast
+    if array.size(linieRadaru) > 0
+        for i = array.size(linieRadaru) - 1 to 0
+            line.delete(array.get(linieRadaru, i))
+    if array.size(etykietyRadaru) > 0
+        for i = array.size(etykietyRadaru) - 1 to 0
+            label.delete(array.get(etykietyRadaru, i))
+    array.clear(linieRadaru)
+    array.clear(etykietyRadaru)
+
+    if array.size(wybraneHigh) > 0
+        for i = 0 to array.size(wybraneHigh) - 1
+            float poziom = array.get(wybraneHigh, i)
+            int pivotBar = array.get(wybraneHighBar, i)
+            int przezroczystosc = i == 0 ? 0 : 25
+            bool dotknietyNaOtwartej = not barstate.isconfirmed and high >= poziom
+            line ln = line.new(pivotBar, poziom, bar_index, poziom, xloc = xloc.bar_index, extend = extend.right, color = color.new(kolorHigh, dotknietyNaOtwartej ? 48 : przezroczystosc), style = dotknietyNaOtwartej ? line.style_dashed : line.style_solid, width = dotknietyNaOtwartej ? 1 : i == 0 ? 2 : 1, force_overlay = true)
+            array.push(linieRadaru, ln)
+            if pokazNazwy
+                string tekst = dotknietyNaOtwartej ? "SFP" : "SFP?"
+                label lb = label.new(bar_index + 1, poziom, tekst, xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_left, color = color.new(kolorHigh, dotknietyNaOtwartej ? 62 : 15), textcolor = color.white, size = size.tiny, force_overlay = true)
+                array.push(etykietyRadaru, lb)
+
+    if array.size(wybraneLow) > 0
+        for i = 0 to array.size(wybraneLow) - 1
+            float poziom = array.get(wybraneLow, i)
+            int pivotBar = array.get(wybraneLowBar, i)
+            int przezroczystosc = i == 0 ? 0 : 25
+            bool dotknietyNaOtwartej = not barstate.isconfirmed and low <= poziom
+            line ln = line.new(pivotBar, poziom, bar_index, poziom, xloc = xloc.bar_index, extend = extend.right, color = color.new(kolorLow, dotknietyNaOtwartej ? 48 : przezroczystosc), style = dotknietyNaOtwartej ? line.style_dashed : line.style_solid, width = dotknietyNaOtwartej ? 1 : i == 0 ? 2 : 1, force_overlay = true)
+            array.push(linieRadaru, ln)
+            if pokazNazwy
+                string tekst = dotknietyNaOtwartej ? "SFP" : "SFP?"
+                label lb = label.new(bar_index + 1, poziom, tekst, xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_left, color = color.new(kolorLow, dotknietyNaOtwartej ? 62 : 15), textcolor = color.white, size = size.tiny, force_overlay = true)
+                array.push(etykietyRadaru, lb)
+
+    if pokazDotkniete and ileDotknietychNaStrone > 0 and array.size(dotknieteHigh) > 0
+        int narysowaneHigh = 0
+        for i = array.size(dotknieteHigh) - 1 to 0
+            if narysowaneHigh < ileDotknietychNaStrone
+                float poziom = array.get(dotknieteHigh, i)
+                int pivotBar = array.get(dotknieteHighPivotBar, i)
+                bool zuzytyPrzedConf = not na(ostatniZuzytyHigh) and pivotBar <= ostatniZuzytyHighBar and math.abs(poziom - ostatniZuzytyHigh) <= progLaczenia
+                if not zuzytyPrzedConf
+                    line ln = line.new(pivotBar, poziom, bar_index, poziom, xloc = xloc.bar_index, extend = extend.right, color = color.new(kolorHigh, 58), style = line.style_dashed, width = 1, force_overlay = true)
+                    array.push(linieRadaru, ln)
+                    if pokazNazwy
+                        label lb = label.new(bar_index + 1, poziom, "SFP", xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_left, color = color.new(kolorHigh, 62), textcolor = color.white, size = size.tiny, force_overlay = true)
+                        array.push(etykietyRadaru, lb)
+                    narysowaneHigh += 1
+
+    if pokazDotkniete and ileDotknietychNaStrone > 0 and array.size(dotknieteLow) > 0
+        int narysowaneLow = 0
+        for i = array.size(dotknieteLow) - 1 to 0
+            if narysowaneLow < ileDotknietychNaStrone
+                float poziom = array.get(dotknieteLow, i)
+                int pivotBar = array.get(dotknieteLowPivotBar, i)
+                bool zuzytyPrzedConf = not na(ostatniZuzytyLow) and pivotBar <= ostatniZuzytyLowBar and math.abs(poziom - ostatniZuzytyLow) <= progLaczenia
+                if not zuzytyPrzedConf
+                    line ln = line.new(pivotBar, poziom, bar_index, poziom, xloc = xloc.bar_index, extend = extend.right, color = color.new(kolorLow, 58), style = line.style_dashed, width = 1, force_overlay = true)
+                    array.push(linieRadaru, ln)
+                    if pokazNazwy
+                        label lb = label.new(bar_index + 1, poziom, "SFP", xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_left, color = color.new(kolorLow, 62), textcolor = color.white, size = size.tiny, force_overlay = true)
+                        array.push(etykietyRadaru, lb)
+                    narysowaneLow += 1
+
+// ==================== FVG / IFVG — CONFIRMED MULTI-TIMEFRAME BOOKS ====================
+// Every source uses the last closed source candle with lookahead_on. This is the
+// non-repainting HTF request pattern: a zone can only change on a confirmed
+// source-timeframe close, never while that source candle is still forming.
+f_tf_label(string tf) =>
+    tf == "1" ? "1m" : tf == "3" ? "3m" : tf == "5" ? "5m" : tf == "15" ? "15m" : tf == "30" ? "30m" : tf == "60" ? "1H" : tf == "120" ? "2H" : tf == "240" ? "4H" : tf == "1D" or tf == "D" ? "1D" : tf == "1W" or tf == "W" ? "1W" : tf
+
+f_clear_book(float[] tops, float[] bottoms, int[] directions, bool[] inversions, int[] startTimes, int[] inversionTimes) =>
+    array.clear(tops)
+    array.clear(bottoms)
+    array.clear(directions)
+    array.clear(inversions)
+    array.clear(startTimes)
+    array.clear(inversionTimes)
+
+f_update_book(float[] tops, float[] bottoms, int[] directions, bool[] inversions, int[] startTimes, int[] inversionTimes, bool enabled, int sourceTime, float sourceHigh, float sourceLow, float sourceClose, float firstHigh, float firstLow, float sourceAtr, int sourceMs) =>
+    bool newBullFvg = false
+    bool newBearFvg = false
+    bool newBullIfvg = false
+    bool newBearIfvg = false
+    float newFvgTop = na
+    float newFvgBottom = na
+    float newIfvgTop = na
+    float newIfvgBottom = na
+    int sourceTimeChange = ta.change(sourceTime)
+    bool newClosedSourceBar = enabled and not na(sourceTime) and sourceTimeChange != 0
+
+    if not enabled
+        f_clear_book(tops, bottoms, directions, inversions, startTimes, inversionTimes)
+
+    if newClosedSourceBar
+        if array.size(tops) > 0
+            for i = array.size(tops) - 1 to 0
+                float zoneTop = array.get(tops, i)
+                float zoneBottom = array.get(bottoms, i)
+                int direction = array.get(directions, i)
+                bool inverted = array.get(inversions, i)
+                int ageStart = inverted and not na(array.get(inversionTimes, i)) ? array.get(inversionTimes, i) : array.get(startTimes, i)
+                int maxAge = inverted ? maksWiekStrefIfvg : maksWiekStrefFvg
+                bool removeZone = sourceTime - ageStart > maxAge * sourceMs
+
+                if not removeZone and not inverted
+                    bool inversion = (direction == 1 and sourceClose < zoneBottom) or (direction == -1 and sourceClose > zoneTop)
+                    bool filled = (direction == 1 and sourceLow <= zoneBottom) or (direction == -1 and sourceHigh >= zoneTop)
+                    if inversion
+                        int newDirection = -direction
+                        bool invertedFilled = (newDirection == 1 and sourceLow <= zoneBottom) or (newDirection == -1 and sourceHigh >= zoneTop)
+                        if invertedFilled
+                            removeZone := true
+                        else
+                            array.set(directions, i, newDirection)
+                            array.set(inversions, i, true)
+                            array.set(inversionTimes, i, sourceTime)
+                            newBullIfvg := newBullIfvg or newDirection == 1
+                            newBearIfvg := newBearIfvg or newDirection == -1
+                            newIfvgTop := zoneTop
+                            newIfvgBottom := zoneBottom
+                    else if filled
+                        removeZone := true
+                else if not removeZone
+                    bool filledIfvg = (direction == 1 and sourceLow <= zoneBottom) or (direction == -1 and sourceHigh >= zoneTop)
+                    if filledIfvg
+                        removeZone := true
+
+                if removeZone
+                    array.remove(tops, i)
+                    array.remove(bottoms, i)
+                    array.remove(directions, i)
+                    array.remove(inversions, i)
+                    array.remove(startTimes, i)
+                    array.remove(inversionTimes, i)
+
+        bool bullCandidate = not na(sourceAtr) and sourceAtr > 0 and sourceLow > firstHigh and sourceLow - firstHigh >= sourceAtr * minWielkoscFvgAtr
+        bool bearCandidate = not na(sourceAtr) and sourceAtr > 0 and sourceHigh < firstLow and firstLow - sourceHigh >= sourceAtr * minWielkoscFvgAtr
+        if bullCandidate or bearCandidate
+            bool bull = bullCandidate
+            float zoneTop = bull ? sourceLow : firstLow
+            float zoneBottom = bull ? firstHigh : sourceHigh
+            array.push(tops, zoneTop)
+            array.push(bottoms, zoneBottom)
+            array.push(directions, bull ? 1 : -1)
+            array.push(inversions, false)
+            array.push(startTimes, sourceTime)
+            array.push(inversionTimes, int(na))
+            newBullFvg := bull
+            newBearFvg := not bull
+            newFvgTop := zoneTop
+            newFvgBottom := zoneBottom
+
+        while array.size(tops) > 60
+            array.shift(tops)
+            array.shift(bottoms)
+            array.shift(directions)
+            array.shift(inversions)
+            array.shift(startTimes)
+            array.shift(inversionTimes)
+
+    [newBullFvg, newBearFvg, newBullIfvg, newBearIfvg, newFvgTop, newFvgBottom, newIfvgTop, newIfvgBottom]
+
+f_draw_book(float[] tops, float[] bottoms, int[] directions, bool[] inversions, int[] startTimes, bool enabled, string tfLabel, float liveHigh, float liveLow, box[] rendered) =>
+    int[] selectedAbove = array.new_int()
+    int[] selectedBelow = array.new_int()
+    if enabled and array.size(tops) > 0
+        int ileSlotow = math.max(ileFvgNadCena, ileFvgPodCena)
+        for slot = 0 to ileSlotow - 1
+            int bestAbove = -1
+            float bestAboveDistance = 1e20
+            int newestAbove = 0
+            int bestBelow = -1
+            float bestBelowDistance = 1e20
+            int newestBelow = 0
+            for i = 0 to array.size(tops) - 1
+                float zoneTop = array.get(tops, i)
+                float zoneBottom = array.get(bottoms, i)
+                int direction = array.get(directions, i)
+                int startTime = array.get(startTimes, i)
+                bool liveFilled = (direction == 1 and liveLow <= zoneBottom) or (direction == -1 and liveHigh >= zoneTop)
+                bool intersects = not liveFilled and close >= zoneBottom and close <= zoneTop
+                bool above = not liveFilled and (zoneBottom > close or (intersects and direction == -1))
+                bool below = not liveFilled and (zoneTop < close or (intersects and direction == 1))
+                float aboveDistance = above ? math.max(zoneBottom - close, 0.0) : 1e20
+                float belowDistance = below ? math.max(close - zoneTop, 0.0) : 1e20
+                bool betterAbove = aboveDistance < bestAboveDistance or (aboveDistance == bestAboveDistance and startTime > newestAbove)
+                bool betterBelow = belowDistance < bestBelowDistance or (belowDistance == bestBelowDistance and startTime > newestBelow)
+                if above and not array.includes(selectedAbove, i) and betterAbove
+                    bestAbove := i
+                    bestAboveDistance := aboveDistance
+                    newestAbove := startTime
+                if below and not array.includes(selectedBelow, i) and betterBelow
+                    bestBelow := i
+                    bestBelowDistance := belowDistance
+                    newestBelow := startTime
+            if slot < ileFvgNadCena and bestAbove >= 0
+                array.push(selectedAbove, bestAbove)
+            if slot < ileFvgPodCena and bestBelow >= 0
+                array.push(selectedBelow, bestBelow)
+
+    if enabled and array.size(selectedAbove) > 0
+        for i = 0 to array.size(selectedAbove) - 1
+            int index = array.get(selectedAbove, i)
+            string zoneText = (array.get(inversions, index) ? "IFVG " : "FVG ") + tfLabel
+            box zone = box.new(left = array.get(startTimes, index), top = array.get(tops, index), right = time_close, bottom = array.get(bottoms, index), xloc = xloc.bar_time, extend = extend.none, border_color = color.new(kolorStrefyFvg, 100), border_width = 0, bgcolor = color.new(kolorStrefyFvg, przezroczystoscFvg), text = zoneText, text_color = color.white, text_size = size.small, text_halign = text.align_center, text_valign = text.align_center)
+            array.push(rendered, zone)
+    if enabled and array.size(selectedBelow) > 0
+        for i = 0 to array.size(selectedBelow) - 1
+            int index = array.get(selectedBelow, i)
+            string zoneText = (array.get(inversions, index) ? "IFVG " : "FVG ") + tfLabel
+            box zone = box.new(left = array.get(startTimes, index), top = array.get(tops, index), right = time_close, bottom = array.get(bottoms, index), xloc = xloc.bar_time, extend = extend.none, border_color = color.new(kolorStrefyFvg, 100), border_width = 0, bgcolor = color.new(kolorStrefyFvg, przezroczystoscFvg), text = zoneText, text_color = color.white, text_size = size.small, text_halign = text.align_center, text_valign = text.align_center)
+            array.push(rendered, zone)
+
+bool matchChart = trybTfFvg == "Match chart"
+string tfA = matchChart ? timeframe.period : tfAInput
+string tfB = tfBInput
+string tfC = tfCInput
+bool useA = wlaczFvg and (matchChart or wlaczTfA)
+bool useB = wlaczFvg and not matchChart and wlaczTfB and (not useA or tfB != tfA)
+bool useC = wlaczFvg and not matchChart and wlaczTfC and (not useA or tfC != tfA) and (not useB or tfC != tfB)
+
+[sourceTimeA, sourceHighA, sourceLowA, sourceCloseA, firstHighA, firstLowA, sourceAtrA] = request.security(syminfo.tickerid, tfA, [time[1], high[1], low[1], close[1], high[3], low[3], ta.atr(14)[1]], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_on)
+[sourceTimeB, sourceHighB, sourceLowB, sourceCloseB, firstHighB, firstLowB, sourceAtrB] = request.security(syminfo.tickerid, tfB, [time[1], high[1], low[1], close[1], high[3], low[3], ta.atr(14)[1]], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_on)
+[sourceTimeC, sourceHighC, sourceLowC, sourceCloseC, firstHighC, firstLowC, sourceAtrC] = request.security(syminfo.tickerid, tfC, [time[1], high[1], low[1], close[1], high[3], low[3], ta.atr(14)[1]], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_on)
+[liveHighA, liveLowA] = request.security(syminfo.tickerid, tfA, [high, low], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off)
+[liveHighB, liveLowB] = request.security(syminfo.tickerid, tfB, [high, low], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off)
+[liveHighC, liveLowC] = request.security(syminfo.tickerid, tfC, [high, low], gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off)
+int sourceMsA = int(timeframe.in_seconds(tfA) * 1000)
+int sourceMsB = int(timeframe.in_seconds(tfB) * 1000)
+int sourceMsC = int(timeframe.in_seconds(tfC) * 1000)
+
+var float[] topsA = array.new_float()
+var float[] bottomsA = array.new_float()
+var int[] directionsA = array.new_int()
+var bool[] inversionsA = array.new_bool()
+var int[] startTimesA = array.new_int()
+var int[] inversionTimesA = array.new_int()
+var float[] topsB = array.new_float()
+var float[] bottomsB = array.new_float()
+var int[] directionsB = array.new_int()
+var bool[] inversionsB = array.new_bool()
+var int[] startTimesB = array.new_int()
+var int[] inversionTimesB = array.new_int()
+var float[] topsC = array.new_float()
+var float[] bottomsC = array.new_float()
+var int[] directionsC = array.new_int()
+var bool[] inversionsC = array.new_bool()
+var int[] startTimesC = array.new_int()
+var int[] inversionTimesC = array.new_int()
+var box[] narysowaneStrefyFvg = array.new_box()
+
+[newBullFvgA, newBearFvgA, newBullIfvgA, newBearIfvgA, newFvgTopA, newFvgBottomA, newIfvgTopA, newIfvgBottomA] = f_update_book(topsA, bottomsA, directionsA, inversionsA, startTimesA, inversionTimesA, useA, sourceTimeA, sourceHighA, sourceLowA, sourceCloseA, firstHighA, firstLowA, sourceAtrA, sourceMsA)
+[newBullFvgB, newBearFvgB, newBullIfvgB, newBearIfvgB, newFvgTopB, newFvgBottomB, newIfvgTopB, newIfvgBottomB] = f_update_book(topsB, bottomsB, directionsB, inversionsB, startTimesB, inversionTimesB, useB, sourceTimeB, sourceHighB, sourceLowB, sourceCloseB, firstHighB, firstLowB, sourceAtrB, sourceMsB)
+[newBullFvgC, newBearFvgC, newBullIfvgC, newBearIfvgC, newFvgTopC, newFvgBottomC, newIfvgTopC, newIfvgBottomC] = f_update_book(topsC, bottomsC, directionsC, inversionsC, startTimesC, inversionTimesC, useC, sourceTimeC, sourceHighC, sourceLowC, sourceCloseC, firstHighC, firstLowC, sourceAtrC, sourceMsC)
+
+if barstate.islast
+    if array.size(narysowaneStrefyFvg) > 0
+        for i = array.size(narysowaneStrefyFvg) - 1 to 0
+            box.delete(array.get(narysowaneStrefyFvg, i))
+    array.clear(narysowaneStrefyFvg)
+    f_draw_book(topsA, bottomsA, directionsA, inversionsA, startTimesA, useA, f_tf_label(tfA), liveHighA, liveLowA, narysowaneStrefyFvg)
+    f_draw_book(topsB, bottomsB, directionsB, inversionsB, startTimesB, useB, f_tf_label(tfB), liveHighB, liveLowB, narysowaneStrefyFvg)
+    f_draw_book(topsC, bottomsC, directionsC, inversionsC, startTimesC, useC, f_tf_label(tfC), liveHighC, liveLowC, narysowaneStrefyFvg)
+
+// ==================== KALENDARZ (CZAS WARSZAWSKI) ====================
+int czasDniaWarszawa = time("D", "0000-2359:1234567", strefaCzasowaDni)
+int zmianaDniaWarszawa = ta.change(czasDniaWarszawa)
+bool poczatekDniaWarszawa = not na(czasDniaWarszawa) and zmianaDniaWarszawa != 0
+int dzienWarszawa = dayofweek(time, strefaCzasowaDni)
+int godzinaWarszawa = hour(time, strefaCzasowaDni)
+int godzinaPoprzedniejSwiecyWarszawa = hour(time[1], strefaCzasowaDni)
+int miesiacWarszawa = month(time, strefaCzasowaDni)
+int rokWarszawa = year(time, strefaCzasowaDni)
+int poprzedniMiesiacWarszawa = month(time[1], strefaCzasowaDni)
+int poprzedniRokWarszawa = year(time[1], strefaCzasowaDni)
+bool trybMiesiecy = timeframe.isdaily or timeframe.isweekly or timeframe.ismonthly
+bool poczatekMiesiacaWarszawa = na(time[1]) or miesiacWarszawa != poprzedniMiesiacWarszawa or rokWarszawa != poprzedniRokWarszawa
+// Nazwa trafia na pierwszą świecę po lokalnym południu, czyli w środek
+// odcinka wyznaczonego przez dwie kolejne północe. Działa także wtedy,
+// gdy wybrany interwał nie ma świecy otwieranej dokładnie o 12:00.
+bool srodekDniaWarszawa = not na(czasDniaWarszawa) and godzinaWarszawa >= 12 and (na(czasDniaWarszawa[1]) or czasDniaWarszawa != czasDniaWarszawa[1] or godzinaPoprzedniejSwiecyWarszawa < 12)
+
+// Intraday: dzień tygodnia. D/W/M: jeden znacznik miesiąca zamiast białego paska na każdej świecy.
+plotchar(pokazDniTygodnia and pokazSeparatoryDni and not trybMiesiecy and poczatekDniaWarszawa, title = "Początek dnia", char = "l", location = location.bottom, color = color.new(kolorSeparatorow, przezroczystoscSeparatorow), size = size.tiny, display = display.pane, force_overlay = true)
+plotchar(pokazDniTygodnia and pokazSeparatoryDni and trybMiesiecy and not timeframe.ismonthly and poczatekMiesiacaWarszawa, title = "Początek miesiąca", char = "l", location = location.bottom, color = color.new(kolorSeparatorow, przezroczystoscSeparatorow), size = size.tiny, display = display.pane, force_overlay = true)
+
+color tloNazwyDnia = color.new(kolorNazwDni, 100)
+color tekstNazwyDnia = color.new(kolorNazwDni, przezroczystoscDni)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.monday, title = "Poniedziałek", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Poniedziałek", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.tuesday, title = "Wtorek", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Wtorek", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.wednesday, title = "Środa", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Środa", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.thursday, title = "Czwartek", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Czwartek", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.friday, title = "Piątek", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Piątek", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.saturday, title = "Sobota", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Sobota", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazDniTygodnia and not trybMiesiecy and srodekDniaWarszawa and dzienWarszawa == dayofweek.sunday, title = "Niedziela", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Niedziela", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+
+bool pokazNazweMiesiaca = pokazDniTygodnia and trybMiesiecy and poczatekMiesiacaWarszawa
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 1, title = "Styczeń", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Sty", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 2, title = "Luty", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Lut", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 3, title = "Marzec", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Mar", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 4, title = "Kwiecień", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Kwi", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 5, title = "Maj", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Maj", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 6, title = "Czerwiec", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Cze", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 7, title = "Lipiec", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Lip", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 8, title = "Sierpień", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Sie", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 9, title = "Wrzesień", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Wrz", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 10, title = "Październik", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Paź", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 11, title = "Listopad", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Lis", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+plotshape(pokazNazweMiesiaca and miesiacWarszawa == 12, title = "Grudzień", style = shape.labelup, location = location.bottom, color = tloNazwyDnia, text = "Gru", textcolor = tekstNazwyDnia, size = size.tiny, display = display.pane, force_overlay = true)
+
+// ==================== TYLKO OSTATNI SFP RAW ====================
+// RAW powstaje dopiero na zamknięciu świecy, gdy knot zamiata potwierdzony
+// swing, a cały korpus wraca za poziom. To nadal setup oczekujący na CONF.
+var line ostatniaRawLinia = na
+var label ostatniaRawEtykieta = na
+var int ostatniRawBar = na
+var float ostatniRawPoziom = na
+var int ostatniRawKierunek = 0  // -1 = SHORT, 1 = LONG
+
+if bearishSetup or bullishSetup
+    if not na(ostatniaRawLinia)
+        line.delete(ostatniaRawLinia)
+        ostatniaRawLinia := na
+    if not na(ostatniaRawEtykieta)
+        label.delete(ostatniaRawEtykieta)
+        ostatniaRawEtykieta := na
+    bool rawShort = bearishSetup
+    float rawPoziom = rawShort ? bearishSetupPoziom : bullishSetupPoziom
+    int rawPivotBar = rawShort ? bearishSetupPivotBar : bullishSetupPivotBar
+    color rawKolor = rawShort ? kolorShort : kolorLong
+    if pokazKierunkoweSfp and pokazSfpRaw
+        ostatniaRawLinia := line.new(rawPivotBar, rawPoziom, bar_index, rawPoziom, xloc = xloc.bar_index, extend = extend.right, color = color.new(rawKolor, 28), style = line.style_dashed, width = 1, force_overlay = true)
+        ostatniaRawEtykieta := label.new(bar_index + 1, rawPoziom, rawShort ? "SFP RAW SHORT" : "SFP RAW LONG", xloc = xloc.bar_index, yloc = yloc.price, style = label.style_none, textcolor = color.new(rawKolor, 8), size = size.tiny, force_overlay = true)
+    ostatniRawBar := bar_index
+    ostatniRawPoziom := rawPoziom
+    ostatniRawKierunek := rawShort ? -1 : 1
+
+if not na(ostatniRawBar) and bar_index - ostatniRawBar > waznoscRaw
+    if not na(ostatniaRawLinia)
+        line.delete(ostatniaRawLinia)
+        ostatniaRawLinia := na
+    if not na(ostatniaRawEtykieta)
+        label.delete(ostatniaRawEtykieta)
+        ostatniaRawEtykieta := na
+    ostatniRawBar := na
+    ostatniRawPoziom := na
+    ostatniRawKierunek := 0
+
+// ==================== TYLKO OSTATNI POTWIERDZONY SFP CONF ====================
+var label ostatniaEtykieta = na
+var int ostatniSygnalBar = na
+var string ostatniSygnal = "Brak"
+var float ostatniPoziom = na
+
+if bearishSfp or bullishSfp
+    if not na(ostatniaEtykieta)
+        label.delete(ostatniaEtykieta)
+    bool shortSignal = bearishSfp
+    float poziom = shortSignal ? bearishPoziom : bullishPoziom
+    int pivotBar = shortSignal ? bearishPivotBar : bullishPivotBar
+    color sygnalKolor = shortSignal ? kolorShort : kolorLong
+    int kierunekSygnalu = shortSignal ? -1 : 1
+    // Ostatni RAW w tym samym kierunku jest poprzednikiem bieżącego CONF.
+    // Nie wymagamy identycznej ceny co do ticka, bo poziom oczekującego setupu
+    // może zostać znormalizowany inaczej między świecą RAW i potwierdzeniem.
+    bool tenSamRaw = ostatniRawKierunek == kierunekSygnalu
+    if tenSamRaw
+        if not na(ostatniaRawLinia)
+            line.delete(ostatniaRawLinia)
+            ostatniaRawLinia := na
+        if not na(ostatniaRawEtykieta)
+            label.delete(ostatniaRawEtykieta)
+            ostatniaRawEtykieta := na
+        ostatniRawBar := na
+        ostatniRawPoziom := na
+        ostatniRawKierunek := 0
+    if pokazOstatniSygnal
+        // CONF to zdarzenie historyczne, nie poziom wejscia przy pozniejszym retescie.
+        // Zostawiamy tylko krotka etykiete na swiecy potwierdzenia, bez poziomej linii.
+        ostatniaEtykieta := label.new(bar_index, poziom, shortSignal ? "SFP CONF SHORT" : "SFP CONF LONG", xloc = xloc.bar_index, yloc = yloc.price, style = label.style_none, textcolor = sygnalKolor, size = size.tiny, force_overlay = true)
+    ostatniSygnalBar := bar_index
+    ostatniSygnal := shortSignal ? "Bearish / SHORT" : "Bullish / LONG"
+    ostatniPoziom := poziom
+
+if not na(ostatniSygnalBar) and bar_index - ostatniSygnalBar > waznoscSygnalu
+    if not na(ostatniaEtykieta)
+        label.delete(ostatniaEtykieta)
+        ostatniaEtykieta := na
+
+// ==================== PVP NAKED POC ====================
+// POC jest deterministycznym przybliżeniem na podstawie OHLCV próbek.
+// Skrypt nie ma dostępu do wewnętrznego, tickowego silnika PVP TradingView.
+int PVP_MASK_D = 1
+int PVP_MASK_W = 2
+int PVP_MASK_M = 4
+int PVP_MAX_LEVELS = 260
+int PVP_REQUEST_BARS = 50000
+
+var float[] pvpCeny = array.new_float()
+var int[] pvpMaski = array.new_int()
+var int[] pvpCzasyStart = array.new_int()
+var int[] pvpCzasyPochodzenia = array.new_int()
+var line[] pvpLinie = array.new_line()
+var label[] pvpEtykiety = array.new_label()
+
+f_pvp_poc(float[] highs, float[] lows, float[] volumes, float[] closes, int requestedRows) =>
+    int sampleCount = array.size(highs)
+    float result = na
+    if sampleCount > 0
+        float profileLow = array.min(lows)
+        float profileHigh = array.max(highs)
+        float profileRange = profileHigh - profileLow
+        if profileRange <= syminfo.mintick
+            result := array.get(closes, sampleCount - 1)
+        else
+            float rawTicksPerRow = profileRange / syminfo.mintick / requestedRows
+            int ticksDown = math.max(1, int(math.floor(rawTicksPerRow)))
+            int ticksUp = math.max(1, int(math.ceil(rawTicksPerRow)))
+            int rowsWithDown = int(math.ceil(profileRange / (ticksDown * syminfo.mintick)))
+            int rowsWithUp = int(math.ceil(profileRange / (ticksUp * syminfo.mintick)))
+            int ticksPerRow = math.abs(rowsWithUp - requestedRows) <= math.abs(rowsWithDown - requestedRows) ? ticksUp : ticksDown
+            float binSize = ticksPerRow * syminfo.mintick
+            int bins = math.max(1, int(math.ceil(profileRange / binSize)))
+            float[] histogram = array.new_float(bins, 0.0)
+            for sampleIndex = 0 to sampleCount - 1
+                float barHigh = array.get(highs, sampleIndex)
+                float barLow = array.get(lows, sampleIndex)
+                float barClose = array.get(closes, sampleIndex)
+                float barVolume = nz(array.get(volumes, sampleIndex), 0.0)
+                float barRange = barHigh - barLow
+                if barRange <= syminfo.mintick
+                    int singleBin = math.max(0, math.min(bins - 1, int(math.floor((barClose - profileLow) / binSize))))
+                    array.set(histogram, singleBin, array.get(histogram, singleBin) + barVolume)
+                else
+                    int firstBin = math.max(0, math.min(bins - 1, int(math.floor((barLow - profileLow) / binSize))))
+                    int lastBin = math.max(0, math.min(bins - 1, int(math.floor((barHigh - profileLow) / binSize))))
+                    for binIndex = firstBin to lastBin
+                        float binLow = profileLow + binIndex * binSize
+                        float binHigh = binLow + binSize
+                        float overlap = math.max(0.0, math.min(barHigh, binHigh) - math.max(barLow, binLow))
+                        array.set(histogram, binIndex, array.get(histogram, binIndex) + barVolume * overlap / barRange)
+            int pocBin = array.indexof(histogram, array.max(histogram))
+            result := profileLow + (pocBin + 0.5) * binSize
+    result
+
+f_pvp_wyczysc_probki(float[] highs, float[] lows, float[] volumes, float[] closes) =>
+    array.clear(highs)
+    array.clear(lows)
+    array.clear(volumes)
+    array.clear(closes)
+
+f_pvp_dodaj_probke(float[] highs, float[] lows, float[] volumes, float[] closes) =>
+    array.push(highs, high)
+    array.push(lows, low)
+    array.push(volumes, volume)
+    array.push(closes, close)
+
+f_pvp_silnik(int rows) =>
+    var float[] dHighs = array.new_float()
+    var float[] dLows = array.new_float()
+    var float[] dVolumes = array.new_float()
+    var float[] dCloses = array.new_float()
+    var float[] wHighs = array.new_float()
+    var float[] wLows = array.new_float()
+    var float[] wVolumes = array.new_float()
+    var float[] wCloses = array.new_float()
+    var float[] mHighs = array.new_float()
+    var float[] mLows = array.new_float()
+    var float[] mVolumes = array.new_float()
+    var float[] mCloses = array.new_float()
+    var float dailyPoc = na
+    var float weeklyPoc = na
+    var float monthlyPoc = na
+    var int dailyEvent = na
+    var int weeklyEvent = na
+    var int monthlyEvent = na
+    var int dailyOrigin = na
+    var int weeklyOrigin = na
+    var int monthlyOrigin = na
+    if timeframe.change("D")
+        if array.size(dHighs) > 0
+            dailyPoc := f_pvp_poc(dHighs, dLows, dVolumes, dCloses, rows)
+            dailyEvent := time
+            dailyOrigin := time("D")[1]
+        f_pvp_wyczysc_probki(dHighs, dLows, dVolumes, dCloses)
+    if timeframe.change("W")
+        if array.size(wHighs) > 0
+            weeklyPoc := f_pvp_poc(wHighs, wLows, wVolumes, wCloses, rows)
+            weeklyEvent := time
+            weeklyOrigin := time("W")[1]
+        f_pvp_wyczysc_probki(wHighs, wLows, wVolumes, wCloses)
+    if timeframe.change("M")
+        if array.size(mHighs) > 0
+            monthlyPoc := f_pvp_poc(mHighs, mLows, mVolumes, mCloses, rows)
+            monthlyEvent := time
+            monthlyOrigin := time("M")[1]
+        f_pvp_wyczysc_probki(mHighs, mLows, mVolumes, mCloses)
+    f_pvp_dodaj_probke(dHighs, dLows, dVolumes, dCloses)
+    f_pvp_dodaj_probke(wHighs, wLows, wVolumes, wCloses)
+    f_pvp_dodaj_probke(mHighs, mLows, mVolumes, mCloses)
+    [dailyPoc, dailyEvent, weeklyPoc, weeklyEvent, monthlyPoc, monthlyEvent, high, low, time, barstate.isconfirmed, dailyOrigin, weeklyOrigin, monthlyOrigin]
+
+f_pvp_ma_maske(int mask, int flag) =>
+    mask % (flag * 2) >= flag
+
+f_pvp_tekst(int mask) =>
+    mask == PVP_MASK_D ? "ndPOC" : mask == PVP_MASK_W ? "nwPOC" : "nmPOC"
+
+f_pvp_kolor(int mask) =>
+    mask == PVP_MASK_D ? pvpKolorD : mask == PVP_MASK_W ? pvpKolorW : pvpKolorM
+
+f_pvp_usun(int index) =>
+    line oldLine = array.get(pvpLinie, index)
+    label oldLabel = array.get(pvpEtykiety, index)
+    if not na(oldLine)
+        line.delete(oldLine)
+    if not na(oldLabel)
+        label.delete(oldLabel)
+    array.remove(pvpCeny, index)
+    array.remove(pvpMaski, index)
+    array.remove(pvpCzasyStart, index)
+    array.remove(pvpCzasyPochodzenia, index)
+    array.remove(pvpLinie, index)
+    array.remove(pvpEtykiety, index)
+
+f_pvp_przytnij() =>
+    while array.size(pvpCeny) > PVP_MAX_LEVELS
+        int farthestIndex = 0
+        float farthestDistance = -1.0
+        for index = 0 to array.size(pvpCeny) - 1
+            float distance = math.abs(array.get(pvpCeny, index) - close)
+            if distance > farthestDistance
+                farthestDistance := distance
+                farthestIndex := index
+        f_pvp_usun(farthestIndex)
+
+f_pvp_dodaj_poziom(float poc, int eventTime, int originTime, int mask, bool enabled) =>
+    if pokazPvp and enabled and not na(poc) and not na(eventTime) and not na(originTime)
+        array.push(pvpCeny, poc)
+        array.push(pvpMaski, mask)
+        array.push(pvpCzasyStart, eventTime)
+        array.push(pvpCzasyPochodzenia, originTime)
+        array.push(pvpLinie, na)
+        array.push(pvpEtykiety, na)
+        f_pvp_przytnij()
+
+f_pvp_dotkniecia(float sourceHigh, float sourceLow, int sourceTime) =>
+    if array.size(pvpCeny) > 0
+        for index = array.size(pvpCeny) - 1 to 0
+            float levelPrice = array.get(pvpCeny, index)
+            int startTime = array.get(pvpCzasyStart, index)
+            if sourceTime >= startTime and sourceLow <= levelPrice and sourceHigh >= levelPrice
+                f_pvp_usun(index)
+
+f_pvp_przetworz(float dPoc, int dEvent, float wPoc, int wEvent, float mPoc, int mEvent, float sourceHigh, float sourceLow, int sourceTime, bool sourceConfirmed, int prevD, int prevW, int prevM, int dOrigin, int wOrigin, int mOrigin) =>
+    int nextD = prevD
+    int nextW = prevW
+    int nextM = prevM
+    if sourceConfirmed
+        if not na(dEvent) and (na(nextD) or dEvent != nextD)
+            f_pvp_dodaj_poziom(dPoc, dEvent, dOrigin, PVP_MASK_D, pvpPokazD)
+            nextD := dEvent
+        if not na(wEvent) and (na(nextW) or wEvent != nextW)
+            f_pvp_dodaj_poziom(wPoc, wEvent, wOrigin, PVP_MASK_W, pvpPokazW)
+            nextW := wEvent
+        if not na(mEvent) and (na(nextM) or mEvent != nextM)
+            f_pvp_dodaj_poziom(mPoc, mEvent, mOrigin, PVP_MASK_M, pvpPokazM)
+            nextM := mEvent
+        f_pvp_dotkniecia(sourceHigh, sourceLow, sourceTime)
+    [nextD, nextW, nextM]
+
+var int pvpOstatniD = na
+var int pvpOstatniW = na
+var int pvpOstatniM = na
+var int pvpOstatniCzasProbki = na
+
+bool pvpUzyjTablicIntrabar = timeframe.in_seconds() > timeframe.in_seconds(pvpTfProbek)
+if pokazPvp and pvpUzyjTablicIntrabar
+    [pvpDPocs, pvpDEvents, pvpWPocs, pvpWEvents, pvpMPocs, pvpMEvents, pvpHighs, pvpLows, pvpTimes, pvpConfirmed, pvpDOrigins, pvpWOrigins, pvpMOrigins] = request.security_lower_tf(syminfo.tickerid, pvpTfProbek, f_pvp_silnik(pvpLiczbaRzedow), ignore_invalid_timeframe = true, calc_bars_count = PVP_REQUEST_BARS)
+    if array.size(pvpTimes) > 0
+        for sourceIndex = 0 to array.size(pvpTimes) - 1
+            [nextD, nextW, nextM] = f_pvp_przetworz(array.get(pvpDPocs, sourceIndex), array.get(pvpDEvents, sourceIndex), array.get(pvpWPocs, sourceIndex), array.get(pvpWEvents, sourceIndex), array.get(pvpMPocs, sourceIndex), array.get(pvpMEvents, sourceIndex), array.get(pvpHighs, sourceIndex), array.get(pvpLows, sourceIndex), array.get(pvpTimes, sourceIndex), array.get(pvpConfirmed, sourceIndex), pvpOstatniD, pvpOstatniW, pvpOstatniM, array.get(pvpDOrigins, sourceIndex), array.get(pvpWOrigins, sourceIndex), array.get(pvpMOrigins, sourceIndex))
+            pvpOstatniD := nextD
+            pvpOstatniW := nextW
+            pvpOstatniM := nextM
+else if pokazPvp
+    [pvpDPoc, pvpDEvent, pvpWPoc, pvpWEvent, pvpMPoc, pvpMEvent, pvpSourceHigh, pvpSourceLow, pvpSourceTime, pvpSourceConfirmed, pvpDOrigin, pvpWOrigin, pvpMOrigin] = request.security(syminfo.tickerid, pvpTfProbek, f_pvp_silnik(pvpLiczbaRzedow), gaps = barmerge.gaps_off, lookahead = barmerge.lookahead_off, calc_bars_count = PVP_REQUEST_BARS)
+    if not na(pvpSourceTime) and (na(pvpOstatniCzasProbki) or pvpSourceTime != pvpOstatniCzasProbki)
+        [nextD, nextW, nextM] = f_pvp_przetworz(pvpDPoc, pvpDEvent, pvpWPoc, pvpWEvent, pvpMPoc, pvpMEvent, pvpSourceHigh, pvpSourceLow, pvpSourceTime, pvpSourceConfirmed, pvpOstatniD, pvpOstatniW, pvpOstatniM, pvpDOrigin, pvpWOrigin, pvpMOrigin)
+        pvpOstatniD := nextD
+        pvpOstatniW := nextW
+        pvpOstatniM := nextM
+        pvpOstatniCzasProbki := pvpSourceTime
+
+int pvpLabelIndex = bar_index + pvpPrzesuniecieEtykiet
+if barstate.islast and array.size(pvpCeny) > 0
+    for index = 0 to array.size(pvpCeny) - 1
+        float levelPrice = array.get(pvpCeny, index)
+        int levelMask = array.get(pvpMaski, index)
+        float ownDistance = math.abs(levelPrice - close)
+        int closerD = 0
+        int closerW = 0
+        int closerM = 0
+        for otherIndex = 0 to array.size(pvpCeny) - 1
+            if otherIndex != index and math.abs(array.get(pvpCeny, otherIndex) - close) < ownDistance
+                int otherMask = array.get(pvpMaski, otherIndex)
+                closerD += f_pvp_ma_maske(otherMask, PVP_MASK_D) ? 1 : 0
+                closerW += f_pvp_ma_maske(otherMask, PVP_MASK_W) ? 1 : 0
+                closerM += f_pvp_ma_maske(otherMask, PVP_MASK_M) ? 1 : 0
+        bool shouldShow = (f_pvp_ma_maske(levelMask, PVP_MASK_D) and closerD < pvpNajblizszeD) or (f_pvp_ma_maske(levelMask, PVP_MASK_W) and closerW < pvpNajblizszeW) or (f_pvp_ma_maske(levelMask, PVP_MASK_M) and closerM < pvpNajblizszeM)
+        line currentLine = array.get(pvpLinie, index)
+        label currentLabel = array.get(pvpEtykiety, index)
+        if shouldShow
+            color drawColor = f_pvp_kolor(levelMask)
+            int futureMs = int(nz(timeframe.in_seconds(), 86400) * 1000) * (pvpPrzesuniecieEtykiet + 500)
+            int lineSecondTime = time_close + futureMs
+            int lineOriginTime = array.get(pvpCzasyPochodzenia, index)
+            if na(currentLine)
+                currentLine := line.new(lineOriginTime, levelPrice, lineSecondTime, levelPrice, xloc = xloc.bar_time, extend = extend.right, color = drawColor, width = 1, force_overlay = true)
+                array.set(pvpLinie, index, currentLine)
+            else
+                line.set_xy1(currentLine, lineOriginTime, levelPrice)
+                line.set_xy2(currentLine, lineSecondTime, levelPrice)
+                line.set_color(currentLine, drawColor)
+                line.set_width(currentLine, 1)
+                line.set_extend(currentLine, extend.right)
+            if pvpPokazEtykiety
+                string labelText = f_pvp_tekst(levelMask)
+                if na(currentLabel)
+                    currentLabel := label.new(pvpLabelIndex, levelPrice, labelText, xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_right, color = chart.bg_color, textcolor = drawColor, size = size.tiny, textalign = text.align_right, force_overlay = true)
+                    array.set(pvpEtykiety, index, currentLabel)
+                else
+                    label.set_xy(currentLabel, pvpLabelIndex, levelPrice)
+                    label.set_text(currentLabel, labelText)
+                    label.set_color(currentLabel, chart.bg_color)
+                    label.set_textcolor(currentLabel, drawColor)
+            else if not na(currentLabel)
+                label.delete(currentLabel)
+                array.set(pvpEtykiety, index, na)
+        else
+            if not na(currentLine)
+                line.delete(currentLine)
+                array.set(pvpLinie, index, na)
+            if not na(currentLabel)
+                label.delete(currentLabel)
+                array.set(pvpEtykiety, index, na)
+
+// ==================== WATERMARK ====================
+const string WM_PLAIN = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+const string WM_MAP_SERIF = "𝐀 𝐁 𝐂 𝐃 𝐄 𝐅 𝐆 𝐇 𝐈 𝐉 𝐊 𝐋 𝐌 𝐍 𝐎 𝐏 𝐐 𝐑 𝐒 𝐓 𝐔 𝐕 𝐖 𝐗 𝐘 𝐙 𝐚 𝐛 𝐜 𝐝 𝐞 𝐟 𝐠 𝐡 𝐢 𝐣 𝐤 𝐥 𝐦 𝐧 𝐨 𝐩 𝐪 𝐫 𝐬 𝐭 𝐮 𝐯 𝐰 𝐱 𝐲 𝐳 𝟎 𝟏 𝟐 𝟑 𝟒 𝟓 𝟔 𝟕 𝟖 𝟗"
+const string WM_MAP_SERIF_ITALIC = "𝑨 𝑩 𝑪 𝑫 𝑬 𝑭 𝑮 𝑯 𝑰 𝑱 𝑲 𝑳 𝑴 𝑵 𝑶 𝑷 𝑸 𝑹 𝑺 𝑻 𝑼 𝑽 𝑾 𝑿 𝒀 𝒁 𝒂 𝒃 𝒄 𝒅 𝒆 𝒇 𝒈 𝒉 𝒊 𝒋 𝒌 𝒍 𝒎 𝒏 𝒐 𝒑 𝒒 𝒓 𝒔 𝒕 𝒖 𝒗 𝒘 𝒙 𝒚 𝒛 𝟎 𝟏 𝟐 𝟑 𝟒 𝟓 𝟔 𝟕 𝟖 𝟗"
+const string WM_MAP_SANS = "𝗔 𝗕 𝗖 𝗗 𝗘 𝗙 𝗚 𝗛 𝗜 𝗝 𝗞 𝗟 𝗠 𝗡 𝗢 𝗣 𝗤 𝗥 𝗦 𝗧 𝗨 𝗩 𝗪 𝗫 𝗬 𝗭 𝗮 𝗯 𝗰 𝗱 𝗲 𝗳 𝗴 𝗵 𝗶 𝗷 𝗸 𝗹 𝗺 𝗻 𝗼 𝗽 𝗾 𝗿 𝘀 𝘁 𝘂 𝘃 𝘄 𝘅 𝘆 𝘇 𝟬 𝟭 𝟮 𝟯 𝟰 𝟱 𝟲 𝟳 𝟴 𝟵"
+const string WM_MAP_SANS_ITALIC = "𝘼 𝘽 𝘾 𝘿 𝙀 𝙁 𝙂 𝙃 𝙄 𝙅 𝙆 𝙇 𝙈 𝙉 𝙊 𝙋 𝙌 𝙍 𝙎 𝙏 𝙐 𝙑 𝙒 𝙓 𝙔 𝙕 𝙖 𝙗 𝙘 𝙙 𝙚 𝙛 𝙜 𝙝 𝙞 𝙟 𝙠 𝙡 𝙢 𝙣 𝙤 𝙥 𝙦 𝙧 𝙨 𝙩 𝙪 𝙫 𝙬 𝙭 𝙮 𝙯 𝟬 𝟭 𝟮 𝟯 𝟰 𝟱 𝟲 𝟳 𝟴 𝟵"
+const string WM_MAP_SCRIPT = "𝓐 𝓑 𝓒 𝓓 𝓔 𝓕 𝓖 𝓗 𝓘 𝓙 𝓚 𝓛 𝓜 𝓝 𝓞 𝓟 𝓠 𝓡 𝓢 𝓣 𝓤 𝓥 𝓦 𝓧 𝓨 𝓩 𝓪 𝓫 𝓬 𝓭 𝓮 𝓯 𝓰 𝓱 𝓲 𝓳 𝓴 𝓵 𝓶 𝓷 𝓸 𝓹 𝓺 𝓻 𝓼 𝓽 𝓾 𝓿 𝔀 𝔁 𝔂 𝔃 𝟎 𝟏 𝟐 𝟑 𝟒 𝟓 𝟔 𝟕 𝟖 𝟗"
+const string WM_MAP_FRAKTUR = "𝕬 𝕭 𝕮 𝕯 𝕰 𝕱 𝕲 𝕳 𝕴 𝕵 𝕶 𝕷 𝕸 𝕹 𝕺 𝕻 𝕼 𝕽 𝕾 𝕿 𝖀 𝖁 𝖂 𝖃 𝖄 𝖅 𝖆 𝖇 𝖈 𝖉 𝖊 𝖋 𝖌 𝖍 𝖎 𝖏 𝖐 𝖑 𝖒 𝖓 𝖔 𝖕 𝖖 𝖗 𝖘 𝖙 𝖚 𝖛 𝖜 𝖝 𝖞 𝖟 𝟎 𝟏 𝟐 𝟑 𝟒 𝟓 𝟔 𝟕 𝟠 𝟡"
+const string WM_MAP_DOUBLE = "𝔸 𝔹 ℂ 𝔻 𝔼 𝔽 𝔾 ℍ 𝕀 𝕁 𝕂 𝕃 𝕄 ℕ 𝕆 ℙ ℚ ℝ 𝕊 𝕋 𝕌 𝕍 𝕎 𝕏 𝕐 ℤ 𝕒 𝕓 𝕔 𝕕 𝕖 𝕗 𝕘 𝕙 𝕚 𝕛 𝕜 𝕝 𝕞 𝕟 𝕠 𝕡 𝕢 𝕣 𝕤 𝕥 𝕦 𝕧 𝕨 𝕩 𝕪 𝕫 𝟘 𝟙 𝟚 𝟛 𝟜 𝟝 𝟞 𝟟 𝟠 𝟡"
+const string WM_EXTRA = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻáàâäãåéèêëíìîïòôöõúùûüñçÁÀÂÄÃÅÉÈÊËÍÌÎÏÒÔÖÕÚÙÛÜÑÇ!#$%&()*+,-./:;<=>?@[]^_{|}~"
+const string WM_UNDERLINE = "̲"
+const string WM_STRIKE = "̶"
+
+f_wm_mapa(string font) =>
+    switch font
+        WM_FONT_SERIF => WM_MAP_SERIF
+        WM_FONT_SERIF_ITALIC => WM_MAP_SERIF_ITALIC
+        WM_FONT_SANS => WM_MAP_SANS
+        WM_FONT_SANS_ITALIC => WM_MAP_SANS_ITALIC
+        WM_FONT_SCRIPT => WM_MAP_SCRIPT
+        WM_FONT_FRAKTUR => WM_MAP_FRAKTUR
+        WM_FONT_DOUBLE => WM_MAP_DOUBLE
+        => ""
+
+f_wm_stylizuj(string source, string font, string lineStyle) =>
+    string mark = lineStyle == WM_LINE_UNDERLINE ? WM_UNDERLINE : lineStyle == WM_LINE_STRIKE ? WM_STRIKE : ""
+    string mapText = f_wm_mapa(font)
+    bool restyle = mapText != ""
+    string[] charMap = restyle ? str.split(mapText, " ") : array.new_string()
+    string result = source
+    if restyle or mark != ""
+        for i = 0 to str.length(WM_PLAIN) - 1
+            string plain = str.substring(WM_PLAIN, i, i + 1)
+            result := str.replace_all(result, plain, (restyle ? array.get(charMap, i) : plain) + mark)
+    if mark != ""
+        for i = 0 to str.length(WM_EXTRA) - 1
+            string extra = str.substring(WM_EXTRA, i, i + 1)
+            result := str.replace_all(result, extra, extra + mark)
+        result := str.replace_all(result, " ", " " + mark)
+    result
+
+f_wm_font(string font) =>
+    font == WM_FONT_MONO ? font.family_monospace : font.family_default
+
+f_wm_format(bool bold, bool italic) =>
+    (bold ? text.format_bold : text.format_none) + (italic ? text.format_italic : text.format_none)
+
+f_wm_position(string choice) =>
+    switch choice
+        WM_POS_TOP_LEFT => position.top_left
+        WM_POS_TOP_RIGHT => position.top_right
+        WM_POS_MIDDLE => position.middle_center
+        WM_POS_BOTTOM_CENTER => position.bottom_center
+        WM_POS_BOTTOM_LEFT => position.bottom_left
+        WM_POS_BOTTOM_RIGHT => position.bottom_right
+        => position.top_center
+
+f_wm_align(string choice) =>
+    choice == WM_POS_TOP_LEFT or choice == WM_POS_BOTTOM_LEFT ? text.align_left : choice == WM_POS_TOP_RIGHT or choice == WM_POS_BOTTOM_RIGHT ? text.align_right : text.align_center
+
+bool wmNaDole = wmPozycja == WM_POS_BOTTOM_CENTER or wmPozycja == WM_POS_BOTTOM_LEFT or wmPozycja == WM_POS_BOTTOM_RIGHT
+bool wmUzyjOdsuniecia = wmOdsuniecie > 0 and wmPozycja != WM_POS_MIDDLE
+bool wmMaGlowny = wmPokaz and str.length(str.trim(wmTekstGlowny)) > 0
+bool wmMaDrugi = wmPokaz and str.length(str.trim(wmTekstDrugi)) > 0
+var table wmTabela = table.new(f_wm_position(wmPozycja), 1, 3, frame_width = 0, border_width = 0)
+var string wmGlownyPoStylu = f_wm_stylizuj(wmTekstGlowny, wmFontGlowny, wmLiniaGlowna)
+var string wmDrugiPoStylu = f_wm_stylizuj(wmTekstDrugi, wmFontDrugi, wmLiniaDruga)
+
+if barstate.islast
+    table.clear(wmTabela, 0, 0, 0, 2)
+    if wmPokaz
+        string align = f_wm_align(wmPozycja)
+        int row = 0
+        if wmUzyjOdsuniecia and not wmNaDole
+            table.cell(wmTabela, 0, row, "", height = wmOdsuniecie)
+            row += 1
+        if wmMaGlowny
+            table.cell(wmTabela, 0, row, wmGlownyPoStylu, text_color = wmKolorGlowny, text_size = wmRozmiarGlowny, text_halign = align, text_font_family = f_wm_font(wmFontGlowny), text_formatting = f_wm_format(wmBoldGlowny, wmItalicGlowny))
+            row += 1
+        if wmMaDrugi
+            table.cell(wmTabela, 0, row, wmDrugiPoStylu, text_color = wmKolorDrugi, text_size = wmRozmiarDrugi, text_halign = align, text_font_family = f_wm_font(wmFontDrugi), text_formatting = f_wm_format(wmBoldDrugi, wmItalicDrugi))
+            row += 1
+        if wmUzyjOdsuniecia and wmNaDole
+            table.cell(wmTabela, 0, row, "", height = wmOdsuniecie)

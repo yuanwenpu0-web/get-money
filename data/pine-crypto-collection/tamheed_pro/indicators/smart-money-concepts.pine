@@ -1,0 +1,244 @@
+//@version=5
+indicator("Smart Money Concepts", overlay=true, max_boxes_count=50, max_lines_count=50)
+
+// ============================================
+// SETTINGS
+// ============================================
+showOrderBlocks = input.bool(true, "Show Order Blocks")
+showFVG = input.bool(true, "Show Fair Value Gaps")
+showBOS = input.bool(true, "Show Break of Structure")
+showLiquidity = input.bool(true, "Show Liquidity Zones")
+obLookback = input.int(20, "Order Block Lookback", minval=5, maxval=100)
+
+// ============================================
+// ORDER BLOCKS DETECTION
+// ============================================
+// Bullish Order Block: Last down candle before strong up move
+isBullishOB = close[1] < open[1] and close > open and (close - open) > (high[1] - low[1]) * 1.5
+
+// Bearish Order Block: Last up candle before strong down move
+isBearishOB = close[1] > open[1] and close < open and (open - close) > (high[1] - low[1]) * 1.5
+
+// Draw Order Blocks
+var box[] bullishOBs = array.new<box>()
+var box[] bearishOBs = array.new<box>()
+
+if showOrderBlocks
+    // Clear old boxes
+    if array.size(bullishOBs) > 20
+        box.delete(array.shift(bullishOBs))
+    if array.size(bearishOBs) > 20
+        box.delete(array.shift(bearishOBs))
+    
+    // Draw new order blocks
+    if isBullishOB
+        obBox = box.new(
+            left=bar_index - 1,
+            top=high[1],
+            right=bar_index + 20,
+            bottom=low[1],
+            border_color=color.new(color.green, 50),
+            bgcolor=color.new(color.green, 90),
+            border_width=1
+        )
+        array.push(bullishOBs, obBox)
+    
+    if isBearishOB
+        obBox = box.new(
+            left=bar_index - 1,
+            top=high[1],
+            right=bar_index + 20,
+            bottom=low[1],
+            border_color=color.new(color.red, 50),
+            bgcolor=color.new(color.red, 90),
+            border_width=1
+        )
+        array.push(bearishOBs, obBox)
+
+// ============================================
+// FAIR VALUE GAPS (FVG)
+// ============================================
+// Bullish FVG: Gap between candle 2 bars ago low and current candle high
+bullishFVG = low > high[2] and close > open
+
+// Bearish FVG: Gap between candle 2 bars ago high and current candle low
+bearishFVG = high < low[2] and close < open
+
+var box[] fvgBoxes = array.new<box>()
+
+if showFVG
+    if array.size(fvgBoxes) > 30
+        box.delete(array.shift(fvgBoxes))
+    
+    if bullishFVG
+        fvgBox = box.new(
+            left=bar_index - 2,
+            top=low,
+            right=bar_index + 15,
+            bottom=high[2],
+            border_color=color.new(color.blue, 60),
+            bgcolor=color.new(color.blue, 95),
+            border_width=1,
+            border_style=line.style_dashed
+        )
+        array.push(fvgBoxes, fvgBox)
+    
+    if bearishFVG
+        fvgBox = box.new(
+            left=bar_index - 2,
+            top=low[2],
+            right=bar_index + 15,
+            bottom=high,
+            border_color=color.new(color.orange, 60),
+            bgcolor=color.new(color.orange, 95),
+            border_width=1,
+            border_style=line.style_dashed
+        )
+        array.push(fvgBoxes, fvgBox)
+
+// ============================================
+// BREAK OF STRUCTURE (BOS)
+// ============================================
+// Calculate swing highs and lows
+swingHigh = ta.pivothigh(high, 5, 5)
+swingLow = ta.pivotlow(low, 5, 5)
+
+var float lastSwingHigh = na
+var float lastSwingLow = na
+
+if not na(swingHigh)
+    lastSwingHigh := swingHigh
+
+if not na(swingLow)
+    lastSwingLow := swingLow
+
+// Bullish BOS: Price breaks above last swing high
+bullishBOS = not na(lastSwingHigh) and close > lastSwingHigh and close[1] <= lastSwingHigh
+
+// Bearish BOS: Price breaks below last swing low
+bearishBOS = not na(lastSwingLow) and close < lastSwingLow and close[1] >= lastSwingLow
+
+if showBOS
+    if bullishBOS
+        label.new(
+            bar_index,
+            low,
+            "BOS ↑",
+            color=color.new(color.green, 20),
+            textcolor=color.white,
+            style=label.style_label_up,
+            size=size.small
+        )
+    
+    if bearishBOS
+        label.new(
+            bar_index,
+            high,
+            "BOS ↓",
+            color=color.new(color.red, 20),
+            textcolor=color.white,
+            style=label.style_label_down,
+            size=size.small
+        )
+
+// ============================================
+// LIQUIDITY ZONES
+// ============================================
+// Equal highs/lows indicate liquidity
+var line[] liquidityLines = array.new<line>()
+
+if showLiquidity
+    // Check for equal highs (sell-side liquidity)
+    if high == high[1] or high == high[2]
+        liqLine = line.new(
+            bar_index - 2,
+            high,
+            bar_index + 10,
+            high,
+            color=color.new(color.red, 40),
+            width=2,
+            style=line.style_dotted
+        )
+        array.push(liquidityLines, liqLine)
+        
+        if array.size(liquidityLines) > 20
+            line.delete(array.shift(liquidityLines))
+    
+    // Check for equal lows (buy-side liquidity)
+    if low == low[1] or low == low[2]
+        liqLine = line.new(
+            bar_index - 2,
+            low,
+            bar_index + 10,
+            low,
+            color=color.new(color.green, 40),
+            width=2,
+            style=line.style_dotted
+        )
+        array.push(liquidityLines, liqLine)
+        
+        if array.size(liquidityLines) > 20
+            line.delete(array.shift(liquidityLines))
+
+// ============================================
+// PREMIUM/DISCOUNT ZONES
+// ============================================
+// Calculate 50% level of recent range
+lookbackPeriod = 50
+rangeHigh = ta.highest(high, lookbackPeriod)
+rangeLow = ta.lowest(low, lookbackPeriod)
+equilibrium = (rangeHigh + rangeLow) / 2
+
+// Premium zone (above 50%)
+premiumZone = close > equilibrium
+
+// Discount zone (below 50%)
+discountZone = close < equilibrium
+
+// Plot equilibrium
+plot(equilibrium, "Equilibrium", color=color.new(color.yellow, 50), linewidth=1, style=plot.style_circles)
+
+// Background coloring
+bgcolor(premiumZone ? color.new(color.red, 97) : discountZone ? color.new(color.green, 97) : na)
+
+// ============================================
+// DASHBOARD
+// ============================================
+var table dashboard = table.new(position.top_left, 2, 6, border_width=1)
+
+if barstate.islast
+    table.cell(dashboard, 0, 0, "💎 SMART MONEY", text_color=color.white, bgcolor=color.new(color.purple, 30), text_size=size.normal)
+    table.merge_cells(dashboard, 0, 0, 1, 0)
+    
+    table.cell(dashboard, 0, 1, "Zone", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    zoneText = premiumZone ? "Premium" : discountZone ? "Discount" : "Equilibrium"
+    zoneColor = premiumZone ? color.new(color.red, 60) : discountZone ? color.new(color.green, 60) : color.new(color.yellow, 60)
+    table.cell(dashboard, 1, 1, zoneText, text_color=color.white, bgcolor=zoneColor, text_size=size.small)
+    
+    table.cell(dashboard, 0, 2, "Structure", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    structureText = bullishBOS ? "Bullish BOS" : bearishBOS ? "Bearish BOS" : "No BOS"
+    structureColor = bullishBOS ? color.new(color.green, 60) : bearishBOS ? color.new(color.red, 60) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 2, structureText, text_color=color.white, bgcolor=structureColor, text_size=size.small)
+    
+    table.cell(dashboard, 0, 3, "Order Block", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    obText = isBullishOB ? "Bullish OB" : isBearishOB ? "Bearish OB" : "None"
+    obColor = isBullishOB ? color.new(color.green, 60) : isBearishOB ? color.new(color.red, 60) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 3, obText, text_color=color.white, bgcolor=obColor, text_size=size.small)
+    
+    table.cell(dashboard, 0, 4, "FVG", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    fvgText = bullishFVG ? "Bullish FVG" : bearishFVG ? "Bearish FVG" : "None"
+    fvgColor = bullishFVG ? color.new(color.blue, 60) : bearishFVG ? color.new(color.orange, 60) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 4, fvgText, text_color=color.white, bgcolor=fvgColor, text_size=size.small)
+    
+    table.cell(dashboard, 0, 5, "Bias", text_color=color.white, bgcolor=color.new(color.gray, 70), text_size=size.small)
+    biasText = discountZone and bullishBOS ? "🟢 LONG" : premiumZone and bearishBOS ? "🔴 SHORT" : "⚪ NEUTRAL"
+    biasColor = discountZone and bullishBOS ? color.new(color.green, 50) : premiumZone and bearishBOS ? color.new(color.red, 50) : color.new(color.gray, 70)
+    table.cell(dashboard, 1, 5, biasText, text_color=color.white, bgcolor=biasColor, text_size=size.normal)
+
+// ============================================
+// ALERTS
+// ============================================
+alertcondition(bullishBOS, "Bullish BOS", "Bullish Break of Structure")
+alertcondition(bearishBOS, "Bearish BOS", "Bearish Break of Structure")
+alertcondition(isBullishOB, "Bullish Order Block", "Bullish Order Block Formed")
+alertcondition(isBearishOB, "Bearish Order Block", "Bearish Order Block Formed")

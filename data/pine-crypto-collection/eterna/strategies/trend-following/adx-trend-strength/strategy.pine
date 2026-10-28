@@ -1,0 +1,68 @@
+//@version=5
+strategy("ADX Trend Strength - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+adxLength = input.int(14, "ADX Length", minval=1)
+adxThreshold = input.int(25, "ADX Threshold", minval=1)
+diLength = input.int(14, "DI Length", minval=1)
+emaLength = input.int(50, "Trend EMA", minval=1)
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", group="Webhook")
+
+// ==================== ADX Calculation ====================
+[diPlus, diMinus, adx] = ta.dmi(diLength, adxLength)
+trendEMA = ta.ema(close, emaLength)
+
+// ==================== Entry Conditions ====================
+// Strong trend: ADX above threshold
+strongTrend = adx > adxThreshold
+
+// Bullish: DI+ crosses above DI- with strong ADX and price above EMA
+bullishDI = ta.crossover(diPlus, diMinus)
+longCondition = bullishDI and strongTrend and close > trendEMA
+
+// Bearish: DI- crosses above DI+ with strong ADX and price below EMA
+bearishDI = ta.crossover(diMinus, diPlus)
+shortCondition = bearishDI and strongTrend and close < trendEMA
+
+// Exit when DI crosses opposite or ADX drops below threshold
+exitLong = ta.crossunder(diPlus, diMinus) or adx < adxThreshold * 0.7
+exitShort = ta.crossover(diPlus, diMinus) or adx < adxThreshold * 0.7
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+plot(trendEMA, "Trend EMA", color=color.orange, linewidth=2)
+
+// Plot ADX in separate pane (will appear as overlay labels)
+plotshape(longCondition, "Long Signal", shape.triangleup, location.belowbar, color.green, size=size.normal, 
+          text="ADX:" + str.tostring(adx, "#.#"))
+plotshape(shortCondition, "Short Signal", shape.triangledown, location.abovebar, color.red, size=size.normal,
+          text="ADX:" + str.tostring(adx, "#.#"))
+
+// Background color based on trend strength
+bgcolor(strongTrend ? (diPlus > diMinus ? color.new(color.green, 92) : color.new(color.red, 92)) : color.new(color.gray, 95))
+
+// Show DI crossovers
+plotshape(bullishDI and strongTrend, "DI+ Cross", shape.circle, location.belowbar, color.new(color.green, 50), size=size.tiny)
+plotshape(bearishDI and strongTrend, "DI- Cross", shape.circle, location.abovebar, color.new(color.red, 50), size=size.tiny)

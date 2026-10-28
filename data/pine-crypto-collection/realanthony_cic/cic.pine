@@ -1,0 +1,127 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © realanthonyc https://www.tradingview.com/u/realanthonyc
+
+//@version=6
+// ----------------------------------------------------------------------
+//  Crypto Intermarket Correlation (CIC)
+//  On GitHub: https://github.com/realanthonyc/Crypto-Intermarket-Correlation
+//  v1.2.0
+// ----------------------------------------------------------------------
+indicator("Crypto Intermarket Correlation", shorttitle="CIC", overlay=false, precision=2)
+
+// Inputs
+
+int    length    = input.int(30, "Correlation Lookback", minval=15, tooltip="Bars used for Pearson r. 30 is a good default. Below 15 r is unstable (±1 noise). Note: r=0.50 needs ~25+ bars to be statistically meaningful; r=0.25 is noise at any short lookback.")
+string sym_btc   = input.symbol("BINANCE:BTCUSDT", "BTC Symbol")
+string sym_eth   = input.symbol("BINANCE:ETHUSDT", "ETH Symbol")
+string sym_bench = input.symbol("CME_MINI:NQ1!", "Benchmark Symbol", tooltip="Any symbol works (NQ1!, SPY, DXY, GOLD, GC1!). WARNING: crypto trades 24/7, TradFi benchmarks don't. On weekends/overnight the benchmark return is flat (0) while crypto moves, which mechanically drags correlation toward 0 / produces na gaps. Interpret daily + low-TF Decouple with care.")
+
+string mode      = input.string("Returns", "Correlation Mode", options=["Returns", "Price"], tooltip="Returns (recommended): correlation of log returns = true co-movement. Price: correlation of raw closes = trend co-direction, but SPURIOUS — any two joint uptrends read ~0.9 even with zero co-movement. Only use Price to check regime trend, never for sync.")
+
+float th_sync     = input.float(0.50, "Sync Threshold (± line)", minval=0.0, maxval=1.0, step=0.05, tooltip="|r| >= this = Sync (positive) / Inverse-Sync (negative).")
+float th_decouple = input.float(0.25, "Decouple Threshold (± line)", minval=0.0, maxval=1.0, step=0.05, tooltip="|r| < this = Decouple. Between Decouple and Sync = Loose (transition).")
+
+bool show_avg_line = input.bool(false, "Show Average Line", tooltip="Shows/hides only the faint gray Fisher-averaged BTC+ETH line. Regime row + background always use the average.")
+bool show_bg   = input.bool(true, "Show Regime Background", tooltip="Background is driven by the smoothed average.")
+string regime_smoothing_mode = input.string("Auto", "Regime Smoothing", options=["Auto", "Manual"], tooltip="Smooths ONLY the regime average (anti-flicker). Lines always show raw r. So the background/label can lag the lines by N bars — intentional.")
+int regime_smoothing_manual = input.int(3, "Manual Regime Smoothing Bars", minval=1, tooltip="Bars used to smooth the average correlation before classifying the regime.")
+
+// Data (non-repainting)
+
+btc_close   = request.security(sym_btc, timeframe.period, close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+eth_close   = request.security(sym_eth, timeframe.period, close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+bench_close = request.security(sym_bench, timeframe.period, close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+
+// Helpers
+
+f_logret(src) => (not na(src) and not na(src[1]) and src > 0 and src[1] > 0) ? math.log(src / src[1]) : na
+f_series(src) => mode == "Returns" ? f_logret(src) : src
+
+// Fisher-z average of two r values (correct way to average correlations).
+// Falls back to the non-na leg when the other is na (e.g. flat benchmark overnight).
+f_corr_avg(a, b) =>
+    if na(a) and na(b)
+        na
+    else if na(a)
+        b
+    else if na(b)
+        a
+    else
+        a_c = math.max(math.min(a, 0.999), -0.999)
+        b_c = math.max(math.min(b, 0.999), -0.999)
+        za = 0.5 * math.log((1.0 + a_c) / (1.0 - a_c))
+        zb = 0.5 * math.log((1.0 + b_c) / (1.0 - b_c))
+        z_avg = (za + zb) / 2.0
+        (math.exp(2.0 * z_avg) - 1.0) / (math.exp(2.0 * z_avg) + 1.0)
+
+f_state(v) =>
+    na(v) ? "NA" : v >= th_sync ? "Sync" : v <= -th_sync ? "Inv Sync" : math.abs(v) >= th_decouple ? "Loose" : "Decouple"
+
+f_bg(v) =>
+    na(v) ? na : v >= th_sync ? color.new(color.teal, 80) : v <= -th_sync ? color.new(color.orange, 80) : math.abs(v) < th_decouple ? color.new(color.gray, 75) : na
+
+f_fmt(v) => na(v) ? "na" : str.tostring(v, "#.##")
+f_ticker(sym) =>
+    parts = str.split(sym, ":")
+    array.size(parts) >= 2 ? array.get(parts, 1) : sym
+
+f_auto_regime_smoothing() =>
+    timeframe.ismonthly or timeframe.isweekly ? 1 :
+     timeframe.isdaily ? 3 :
+     timeframe.isminutes ? (timeframe.multiplier < 5 ? 8 : timeframe.multiplier < 30 ? 5 : 3) :
+     timeframe.isseconds ? 8 : 3
+
+// Correlation
+
+btc_src   = f_series(btc_close)
+eth_src   = f_series(eth_close)
+bench_src = f_series(bench_close)
+
+btc_corr = ta.correlation(btc_src, bench_src, length)
+eth_corr = ta.correlation(eth_src, bench_src, length)
+
+avg_corr  = f_corr_avg(btc_corr, eth_corr)
+regime_smoothing = regime_smoothing_mode == "Auto" ? f_auto_regime_smoothing() : regime_smoothing_manual
+regime_corr = regime_smoothing > 1 ? ta.sma(avg_corr, regime_smoothing) : avg_corr
+
+// Visual — no ±1.0 lock: locking to [-1, 1] squashes the 0–0.6 action zone, so let the pane autoscale
+hline(th_sync, "Sync Threshold", color=color.new(color.gray, 50), linestyle=hline.style_dashed)
+hline(th_decouple, "Decouple Threshold", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
+hline(0,       "Zero",           color=color.new(color.gray, 50), linestyle=hline.style_dashed)
+hline(-th_decouple, "-Decouple Threshold", color=color.new(color.gray, 80), linestyle=hline.style_dotted)
+hline(-th_sync, "-Sync Threshold (Inverse)", color=color.new(color.gray, 50), linestyle=hline.style_dashed)
+
+bgcolor(show_bg ? f_bg(regime_corr) : na)
+
+plot(btc_corr, "BTC Corr", color=color.orange, linewidth=2)
+plot(eth_corr, "ETH Corr", color=color.blue, linewidth=2)
+plot(avg_corr, "Avg Corr (Fisher)", color=color.new(color.gray, 30), linewidth=1, style=plot.style_line, display=show_avg_line ? display.all : display.none)
+
+// Table (last bar only) — opaque light cells + dark text = readable on light AND dark chart themes
+var table t = table.new(position.top_right, 2, 3, border_width=1, border_color=color.new(color.gray, 70), frame_width=1, frame_color=color.new(color.gray, 30))
+
+if barstate.islast
+    bench_tkr = f_ticker(sym_bench)
+    btc_state = f_state(btc_corr)
+    eth_state = f_state(eth_corr)
+    reg_state = f_state(regime_corr)
+    btc_text = f_fmt(btc_corr) + " (" + btc_state + ")"
+    eth_text = f_fmt(eth_corr) + " (" + eth_state + ")"
+    avg_text = f_fmt(regime_corr) + " (" + reg_state + ")"
+
+    color header_bg = #2A2E39
+    color header_tx = color.white
+    color value_bg  = color.white
+    color value_tx  = #131722
+
+    table.cell(t, 0, 0, "BTC / " + bench_tkr, bgcolor=header_bg, text_color=header_tx, text_size=size.small, text_halign=text.align_left)
+    table.cell(t, 1, 0, btc_text,             bgcolor=value_bg,  text_color=value_tx,  text_size=size.small, text_halign=text.align_right)
+
+    table.cell(t, 0, 1, "ETH / " + bench_tkr, bgcolor=header_bg, text_color=header_tx, text_size=size.small, text_halign=text.align_left)
+    table.cell(t, 1, 1, eth_text,             bgcolor=value_bg,  text_color=value_tx,  text_size=size.small, text_halign=text.align_right)
+
+    // Regime cell tinted by state, always dark-text-on-light-bg for contrast
+    color reg_bg = reg_state == "Sync" ? #CCEFE8 : reg_state == "Inv Sync" ? #FFEDD5 : reg_state == "Decouple" ? #DFE3EB : #F1F3F6
+    color reg_tx = reg_state == "Sync" ? #065F46 : reg_state == "Inv Sync" ? #7C2D12 : reg_state == "Decouple" ? #2A2E39 : #434651
+    table.cell(t, 0, 2, "Regime", bgcolor=header_bg, text_color=header_tx, text_size=size.small, text_halign=text.align_left)
+    table.cell(t, 1, 2, avg_text, bgcolor=reg_bg,    text_color=reg_tx,    text_size=size.small, text_halign=text.align_right)

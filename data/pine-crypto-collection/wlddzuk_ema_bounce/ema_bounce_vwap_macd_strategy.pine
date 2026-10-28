@@ -1,0 +1,125 @@
+//@version=6
+strategy("EMA Bounce • VWAP + MACD Strategy (3:1 RR, Long-Only)",
+     overlay=true,
+     initial_capital=1000,
+     commission_type=strategy.commission.percent,
+     commission_value=0.0,              // set your fee, e.g. 0.1 for 0.1%
+     slippage=0,                         // set if you want slippage
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100,              // use 100% of equity per trade
+     pyramiding=0,                       // one position at a time
+     calc_on_order_fills=true,
+     calc_on_every_tick=false)
+
+// ───────── Inputs ─────────
+fastLen   = input.int(9,   "EMA 9 (Fast)",    minval=1)
+medLen    = input.int(20,  "EMA 20 (Medium)", minval=1)
+slowLen   = input.int(200, "EMA 200 (Slow)",  minval=1)
+
+macdFast  = input.int(12,  "MACD Fast")
+macdSlow  = input.int(26,  "MACD Slow")
+macdSig   = input.int(9,   "MACD Signal")
+
+tolPct    = input.float(0.05, "Bounce tolerance % below EMA-9", step=0.01)
+maxWait   = input.int(30,  "Max bars to wait for bounce (0 = unlimited)")
+
+rrMultiple = input.float(3.0, "R:R Multiple (3 = 3:1)", step=0.25)
+rrHorizon  = input.int(40, "Guide length (bars)", minval=5, maxval=500)
+drawRR     = input.bool(true, "Draw 3:1 RR guides")
+
+// ───────── Series ─────────
+ema9   = ta.ema(close, fastLen)
+ema20  = ta.ema(close, medLen)
+ema200 = ta.ema(close, slowLen)
+vwap   = ta.vwap(hlc3)
+[macdLine, signalLine, _] = ta.macd(close, macdFast, macdSlow, macdSig)
+
+// ───────── Structure & crosses ─────────
+bullStack   = ema9 > ema20 and ema20 > ema200               // full bullish alignment
+emaCrossUp  = ta.crossover(ema9, ema20) and ema9 > ema200   // fresh fast/medium cross above slow
+
+// ───────── Bounce definition ─────────
+tolPrice = ema9 * (1 + tolPct / 100.0)
+bounce   = low <= tolPrice and close > ema9
+
+// ───────── Filters ─────────
+priceAboveVWAP = close > vwap
+macdBull       = macdLine > signalLine
+
+// ───────── State machine: wait for bounce after cross ─────────
+var bool waitBounce = false
+var int  barsWaited = na
+
+if emaCrossUp
+    waitBounce := true
+    barsWaited := 0
+else if waitBounce
+    barsWaited += 1
+
+// Abort waiting if stack breaks or timeout reached
+if not bullStack or (maxWait > 0 and barsWaited > maxWait)
+    waitBounce := false
+    barsWaited := na
+
+// ───────── Signal ─────────
+longSignal = waitBounce and bounce and priceAboveVWAP and macdBull
+
+if longSignal
+    waitBounce := false
+    barsWaited := na
+
+// ───────── Order logic (entry on next bar open; SL=signal low; TP=3R) ─────────
+if longSignal
+    entry = close            // defined on signal bar; order will fill next bar by TV engine
+    stop  = low
+    risk  = entry - stop
+    if risk > 0
+        target = entry + rrMultiple * risk
+
+        // Enter long and attach OCO stop/limit
+        strategy.entry("Long", strategy.long, comment="EMA Bounce Long")
+        strategy.exit("Exit Long", from_entry="Long", stop=stop, limit=target)
+
+        // Optional: draw the RR lines/labels to visualize the trade plan
+        if drawRR
+            var line slLine  = na
+            var line enLine  = na
+            var line tpLine  = na
+            var label slLbl  = na
+            var label enLbl  = na
+            var label tpLbl  = na
+            var box riskBox  = na
+            var box rewBox   = na
+
+            line.delete(slLine), line.delete(enLine), line.delete(tpLine)
+            label.delete(slLbl), label.delete(enLbl), label.delete(tpLbl)
+            box.delete(riskBox), box.delete(rewBox)
+
+            x1 = bar_index
+            x2 = bar_index + rrHorizon
+
+            slLine := line.new(x1, stop,   x2, stop,   xloc=xloc.bar_index, extend=extend.none, color=color.new(color.red,   0), width=2)
+            enLine := line.new(x1, entry,  x2, entry,  xloc=xloc.bar_index, extend=extend.none, color=color.new(color.white, 0), width=2)
+            tpLine := line.new(x1, target, x2, target, xloc=xloc.bar_index, extend=extend.none, color=color.new(color.lime,  0), width=2)
+
+            slLbl := label.new(x2, stop,   text="SL",        style=label.style_label_left, textcolor=color.white, color=color.red)
+            enLbl := label.new(x2, entry,  text="Entry",     style=label.style_label_left, textcolor=color.black, color=color.white)
+            tpLbl := label.new(x2, target, text=str.tostring(rrMultiple, "#.##") + "R TP", style=label.style_label_left, textcolor=color.white, color=color.lime)
+
+            riskBox := box.new(x1, entry, x2, stop,   xloc=xloc.bar_index, bgcolor=color.new(color.red, 85),  border_color=color.new(color.red, 0))
+            rewBox  := box.new(x1, target, x2, entry, xloc=xloc.bar_index, bgcolor=color.new(color.lime, 85), border_color=color.new(color.lime, 0))
+
+// ───────── Plots (for context) ─────────
+plot(ema9,   title="EMA 9",   color=color.white, linewidth=2)
+plot(ema20,  title="EMA 20",  color=color.green, linewidth=2)
+plot(ema200, title="EMA 200", color=color.red,   linewidth=2)
+plot(vwap,   title="VWAP",    color=color.yellow, style=plot.style_circles, linewidth=2)
+
+// MACD in same pane (hide if you want)
+plot(macdLine,   title="MACD",   color=color.blue,   linewidth=1)
+plot(signalLine, title="Signal", color=color.orange, linewidth=1)
+
+// Visual signal marker
+plotshape(longSignal, title="Long Signal",
+          style=shape.labelup, location=location.belowbar,
+          color=color.green, text="BUY", size=size.tiny)

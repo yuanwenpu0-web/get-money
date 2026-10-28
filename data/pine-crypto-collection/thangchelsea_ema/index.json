@@ -1,0 +1,16 @@
+[
+  {
+    "path": "tradingview/ema_9_45_200_trend_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "EMA 9 / 45 / 200 突破与回撤多头策略",
+    "original_description": "A long-only trend-following strategy built on three EMAs (9 / 45 / 200), with:",
+    "description_zh": "基于 EMA 9、45 和 200 的只做多趋势跟踪策略。",
+    "crypto_relevance": "作者的研究使用 BTC/USDT 和 PAXG/USDT，也适用于其他市场。",
+    "notes": "包含突破与回撤入场选项，使用 ATR 止损；源码模拟止损单，默认每次风险为权益 1%，作者回测结果未独立验证。",
+    "source_url": "https://github.com/thangchelseakt95-boop/ema-9-45-200-trend-strategy/blob/5f450fdd9897341740252f34f31121cd669e58f3/tradingview/ema_9_45_200_trend_strategy.pine",
+    "description_source_url": "https://github.com/thangchelseakt95-boop/ema-9-45-200-trend-strategy/blob/5f450fdd9897341740252f34f31121cd669e58f3/README.md",
+    "source_commit": "5f450fdd9897341740252f34f31121cd669e58f3",
+    "license": "MPL 2.0",
+    "sha256": "ca24b75fb96039114064c98e0ca22e538fec239b84e0570a2890778287ef2f38"
+  }
+]

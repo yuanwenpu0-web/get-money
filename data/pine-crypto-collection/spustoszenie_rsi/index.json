@@ -1,0 +1,16 @@
+[
+  {
+    "path": "RSI_Trading_Signals.pine",
+    "kind": "indicator",
+    "title_zh": "RSI 买卖信号指标",
+    "original_description": "RSI-based buy/sell signals",
+    "description_zh": "基于 RSI 的买卖信号。",
+    "crypto_relevance": "作者将仓库定位于交易与加密分析；当前指标为通用 RSI，作者将加密专用指标列为未来计划。",
+    "notes": "README 声明 MIT，但仓库没有独立 LICENSE；源码声明 overlay=true，RSI 绘制在价格图层；尚未编译或回测。",
+    "source_url": "https://github.com/spustoszenie/tradingview-indicators/blob/d14393f824684c37d4a77a48192f2126760f9868/RSI_Trading_Signals.pine",
+    "description_source_url": "https://github.com/spustoszenie/tradingview-indicators/blob/d14393f824684c37d4a77a48192f2126760f9868/README.md",
+    "source_commit": "d14393f824684c37d4a77a48192f2126760f9868",
+    "license": "README 声明 MIT；无独立许可证文件",
+    "sha256": "022c0dadf939a0ce8c7c88ec1d6c9e9768c4b88e76a6f0e529afe45c61f13d1a"
+  }
+]

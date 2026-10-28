@@ -1,0 +1,16 @@
+[
+  {
+    "path": "Breakout_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "区间突破及自定义止盈止损策略",
+    "original_description": "This **Breakout Strategy** is an advanced Pine Script implementation for TradingView that identifies bullish and bearish breakouts based on swing highs/lows, enhanced by multiple filtering conditions including EMA, RSI, MACD, ATR, volume, and time-of-day controls.",
+    "description_zh": "该 TradingView Pine 策略根据波段高低点识别向上和向下突破，并结合 EMA、RSI、MACD、ATR、成交量以及时段过滤条件。",
+    "crypto_relevance": "作者称可用于加密、外汇或指数；策略并非加密专用。",
+    "notes": "README 声明 MIT 并明确允许署名后复制、修改和分享；仓库没有独立 LICENSE 文件。源码尚未在 TradingView 编译、回测。",
+    "source_url": "https://github.com/Aksee123/Breakout_Strategy/blob/d826eba0be81fb2d198b5d6f3339ead0e772dd17/Breakout_strategy.pine",
+    "description_source_url": "https://github.com/Aksee123/Breakout_Strategy/blob/d826eba0be81fb2d198b5d6f3339ead0e772dd17/README.md",
+    "source_commit": "d826eba0be81fb2d198b5d6f3339ead0e772dd17",
+    "sha256": "47b9cacfc97f8e4d9f319f31aa3fb79d148ff0829af5ba02e7cf9081c64f2732",
+    "license": "README 声明 MIT（无单独许可证文件）"
+  }
+]

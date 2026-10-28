@@ -1,0 +1,65 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © Bunghole, Flawless Victory Strategy - 15min BTC Machine Learning Strategy
+// © gamcat, FV
+// 本版修复了原作出场不够精确的问题. 此策略在牛市和震荡下有效.
+
+//@version=5
+strategy(overlay=true, shorttitle='FV', default_qty_type=strategy.percent_of_equity, initial_capital=1000, default_qty_value=100, pyramiding=0, title='Flawless Victory Strategy')
+
+////////// ** Inputs ** //////////
+
+// Stoploss and Profits Inputs
+sl1 = input.float(6, title='Stop Loss %', minval=0.01) / 100
+tp1 = input.float(6, title='Take Profit %', minval=0.01) / 100
+
+risk = input.float(1, "RISK%", step=0.1)
+
+////////// ** Indicators ** //////////
+
+// RSI
+rsi = ta.rsi(close, 14)
+
+// MFI
+mfi = ta.mfi(hlc3, 14)
+
+// v1 Bollinger Bands
+length1 = 20
+src1 = close
+mult1 = 1.0
+basis1 = ta.sma(src1, length1)
+dev1 = mult1 * ta.stdev(src1, length1)
+upper1 = basis1 + dev1
+lower1 = basis1 - dev1
+
+////////// ** Triggers and Guards ** //////////
+
+// v3 Strategy Parameters
+
+MFILowerLevel3 = 60
+RSIUpperLevel3 = 65
+MFIUpperLevel3 = 64
+BBBuyTrigger3 = src1 < lower1
+BBSellTrigger3 = src1 > upper1
+mfiBuyGuard3 = mfi < MFILowerLevel3
+rsiSellGuard3 = rsi > RSIUpperLevel3
+mfiSellGuard3 = mfi > MFIUpperLevel3
+
+//////////** Strategy Signals ** //////////
+
+// v3 Signals
+
+Buy_3 = BBBuyTrigger3 and mfiBuyGuard3
+Sell_3 = BBSellTrigger3 and rsiSellGuard3 and mfiSellGuard3
+
+bet(sl)=> 
+    balance = strategy.equity
+    balance * (risk/100) / sl / open
+
+if Buy_3
+    qty = bet(sl1)
+    strategy.entry('buy', strategy.long, qty=qty)
+if Sell_3
+    strategy.close('buy', comment="close")
+tp_percent = close * tp1 / syminfo.mintick
+sl_percent = close * sl1 / syminfo.mintick
+strategy.exit('exit', 'buy', loss=sl_percent, profit=tp_percent, comment_loss="sl", comment_profit="tp")

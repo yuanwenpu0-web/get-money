@@ -1,0 +1,1208 @@
+// @version=5
+indicator("Harmonic Pattern Recognition", overlay=true)
+
+// =====================================================
+// Introduction
+// =====================================================
+/**
+ * Harmonic Pattern Recognition Indicator
+ * 
+ * This indicator identifies and visualizes harmonic price patterns in financial markets.
+ * It detects four common harmonic formations:
+ * - Bat Pattern
+ * - Butterfly Pattern 
+ * - Crab Pattern
+ * - Shark Pattern
+ * 
+ * Each pattern is validated against standard Fibonacci ratio requirements
+ * and provides potential entry, stop loss, and target levels based on
+ * harmonic trading principles.
+ * 
+ * Version: 0.0.1
+ * Release Date: 2025-04-30
+ */
+
+// =====================================================
+// Constants and Default Values
+// =====================================================
+/**
+ * The following section defines all constants used throughout the indicator.
+ * This includes version information, default values, Fibonacci levels,
+ * pattern types, and threshold values for various calculations.
+ */
+
+// Version info
+var string VERSION = "0.0.1"
+var string VERSION_DATE = "2025-04-30"
+
+/**
+ * General default values used for initialization and fallback scenarios
+ */
+var float DEFAULT_TOLERANCE = 0.05
+var float DEFAULT_VALUE_ON_ERROR = 0.0
+var string DEFAULT_STRING_ON_ERROR = "N/A"
+var int DEFAULT_LOOKBACK = 100
+var int DEFAULT_MAX_PATTERNS = 10
+var int MIN_BARS_FOR_PATTERN = 5
+
+/**
+ * Error handling constants
+ */
+var int MAX_RETRY_ATTEMPTS = 3
+var int MAX_ERRORS_TO_TRACK = 50
+
+/**
+ * Standard Fibonacci levels used in harmonic pattern validation
+ */
+var float FIB_LEVEL_0 = 0.0
+var float FIB_LEVEL_236 = 0.236
+var float FIB_LEVEL_382 = 0.382
+var float FIB_LEVEL_5 = 0.5
+var float FIB_LEVEL_618 = 0.618
+var float FIB_LEVEL_786 = 0.786
+var float FIB_LEVEL_886 = 0.886
+var float FIB_LEVEL_1 = 1.0
+var float FIB_LEVEL_1272 = 1.272
+var float FIB_LEVEL_1414 = 1.414
+var float FIB_LEVEL_1618 = 1.618
+var float FIB_LEVEL_2 = 2.0
+var float FIB_LEVEL_2236 = 2.236
+var float FIB_LEVEL_2618 = 2.618
+var float FIB_LEVEL_3618 = 3.618
+var float FIB_LEVEL_4236 = 4.236
+
+/**
+ * Pattern type identifiers
+ */
+var string PATTERN_TYPE_BAT = "Bat"
+var string PATTERN_TYPE_BUTTERFLY = "Butterfly"
+var string PATTERN_TYPE_CRAB = "Crab"
+var string PATTERN_TYPE_SHARK = "Shark"
+
+/**
+ * Market type classifications for potential future use in optimizing pattern detection
+ */
+var string MARKET_TYPE_STOCK = "Stock"
+var string MARKET_TYPE_FOREX = "Forex" 
+var string MARKET_TYPE_CRYPTO = "Crypto"
+var string MARKET_TYPE_COMMODITY = "Commodity"
+var string MARKET_TYPE_UNKNOWN = "Unknown"
+
+/**
+ * Pattern direction constants
+ */
+var int PATTERN_DIRECTION_BULLISH = 1
+var int PATTERN_DIRECTION_BEARISH = -1
+
+/**
+ * Quality threshold definitions for pattern evaluation
+ */
+var float QUALITY_HIGH = 0.8
+var float QUALITY_MEDIUM = 0.5
+var float QUALITY_LOW = 0.3
+
+/**
+ * Pattern age and minimum bar count constraints
+ */
+var int MAX_PATTERN_AGE = 50
+var int MIN_PATTERN_BARS = 10
+
+/**
+ * Standard colors used for visualization
+ */
+var color BULLISH_COLOR = color.green
+var color BEARISH_COLOR = color.red
+var color NEUTRAL_COLOR = color.blue
+var color WARNING_COLOR = color.yellow
+var color ERROR_COLOR = color.red
+var color INFO_COLOR = color.teal
+
+// =====================================================
+// Data Type Definitions
+// =====================================================
+/**
+ * This section defines custom data types used throughout the indicator.
+ * These structured types enhance code organization and maintainability.
+ */
+
+/**
+ * Pattern options structure controls which harmonic patterns are detected
+ */
+type pattern_options
+    bool enable_bat
+    bool enable_butterfly
+    bool enable_crab
+    bool enable_shark
+
+/**
+ * Creates default pattern options
+ * 
+ * @returns A pattern_options object with all patterns enabled
+ */
+create_default_pattern_options() =>
+    pattern_options.new(
+        true,
+        true,
+        true,
+        true
+    )
+
+/**
+ * Display options structure controls visualization parameters
+ */
+type display_options
+    bool show_labels
+    bool show_predictions
+    bool show_prices
+    bool show_quality
+
+/**
+ * Creates default display options
+ * 
+ * @returns A display_options object with standard visual elements enabled
+ */
+create_default_display_options() =>
+    display_options.new(
+        true,
+        true,
+        true,
+        true
+    )
+
+/**
+ * Alert options structure controls alert behavior
+ */
+type alert_options
+    bool alert_on_new_pattern
+    bool alert_on_completion
+    bool alert_near_d
+    float quality_threshold
+
+/**
+ * Creates default alert options
+ * 
+ * @returns An alert_options object with standard alerts enabled
+ */
+create_default_alert_options() =>
+    alert_options.new(
+        true,
+        true,
+        true,
+        0.65
+    )
+
+/**
+ * Style options structure controls visual appearance
+ */
+type style_options
+    color bullish_color
+    color bearish_color
+    color label_color
+    int line_width
+
+/**
+ * Creates default style options
+ * 
+ * @returns A style_options object with standard visual styling
+ */
+create_default_style_options() =>
+    style_options.new(
+        color.new(color.green, 20),
+        color.new(color.red, 20),
+        color.white,
+        2
+    )
+
+/**
+ * Scan options structure controls pattern detection parameters
+ */
+type scan_options
+    int lookback_periods
+    float pivot_sensitivity
+    float tolerance
+
+/**
+ * Creates default scan options
+ * 
+ * @returns A scan_options object with standard detection parameters
+ */
+create_default_scan_options() =>
+    scan_options.new(
+        100,
+        0.5,
+        0.05
+    )
+
+/**
+ * Signal type constants for trade recommendations
+ */
+var string SIGNAL_NONE = "No Signal"
+var string SIGNAL_BUY = "Buy"
+var string SIGNAL_SELL = "Sell"
+var string SIGNAL_EXIT = "Exit"
+
+/**
+ * Trade signal structure encapsulates trading recommendations
+ */
+type trade_signal
+    string type
+    string pattern_name
+    float entry_price
+    float stop_loss
+    float target1
+    float target2
+    int bar_index
+    float quality
+
+// =====================================================
+// Error Handling Tools
+// =====================================================
+/**
+ * This section provides functions for robust error handling throughout the indicator.
+ * These functions help prevent calculation errors, handle edge cases, and provide
+ * fallback mechanisms to ensure the indicator continues functioning even when
+ * unexpected conditions are encountered.
+ */
+
+// Error statistics variables
+var int total_errors = 0
+var int recovered_errors = 0
+var string last_error_message = ""
+var int error_log_count = 0
+
+/**
+ * Retrieves a value safely, returning a default if the value is NA
+ * 
+ * @param value The value to check
+ * @param default_value The value to return if the input is NA
+ * @returns The original value or default if NA
+ */
+safe_value(value, default_value) =>
+    na(value) ? default_value : value
+
+/**
+ * Safely performs division, avoiding division by zero errors
+ * 
+ * @param numerator The dividend
+ * @param denominator The divisor
+ * @param default_value The value to return in case of division by zero
+ * @returns The division result or default_value if denominator is zero or NA
+ */
+safe_divide(numerator, denominator, default_value) =>
+    denominator == 0 or na(denominator) ? default_value : numerator / denominator
+
+/**
+ * Checks if a value is within a specified range
+ * 
+ * @param value The value to check
+ * @param min_value The lower bound (inclusive)
+ * @param max_value The upper bound (inclusive)
+ * @returns Boolean indicating if value is within range
+ */
+in_range(value, min_value, max_value) =>
+    result = true
+    result := na(value) ? false : value >= min_value and value <= max_value
+    result
+
+/**
+ * Attempts to execute an operation multiple times until success
+ * 
+ * @param expression The operation to execute
+ * @param max_attempts Maximum number of retry attempts
+ * @returns The result of the operation or NA if all attempts fail
+ */
+retry_operation(expression, max_attempts) =>
+    result = expression
+    attempt = 1
+    
+    while (na(result) and attempt < max_attempts)
+        result := expression
+        attempt := attempt + 1
+    
+    if result and attempt > 1
+        recovered_errors := recovered_errors + 1
+    
+    result
+
+/**
+ * Logs errors based on configured severity level
+ * 
+ * @param message Error message to log
+ * @param level Error severity level ("Info", "Warning", or "Error")
+ * @returns Boolean indicating if the error was logged
+ */
+log_error(message, level) =>
+    should_log = false
+    
+    if error_log_level == "Disabled"
+        should_log := false
+    else if error_log_level == "Info" and (level == "Info" or level == "Warning" or level == "Error")
+        should_log := true
+    else if error_log_level == "Warning" and (level == "Warning" or level == "Error")
+        should_log := true
+    else if error_log_level == "Error" and level == "Error"
+        should_log := true
+    
+    if should_log
+        total_errors := total_errors + 1
+        last_error_message := message
+        error_log_count := error_log_count + 1
+        
+    should_log
+
+/**
+ * Displays an error message on the chart
+ * 
+ * @param message Error message to display
+ * @param price_pos Vertical position for the error label
+ * @returns Boolean indicating if the error was displayed
+ */
+display_error(message, price_pos) =>
+    if na(message) or message == ""
+        false
+    else
+        label.new(bar_index, price_pos, message, 
+            style=label.style_label_down, 
+            color=color.red, 
+            textcolor=color.white, 
+            size=size.small)
+        true
+
+/**
+ * Attempts to automatically recover from calculation errors
+ * 
+ * @param condition The condition to evaluate
+ * @param operation_name Name of the operation (for error reporting)
+ * @returns Boolean indicating success or failure
+ */
+auto_recover(condition, operation_name) =>
+    if enable_error_recovery
+        success = retry_operation(condition, max_retry_attempts)
+        if not success and log_error(operation_name + " failed after " + str.tostring(max_retry_attempts) + " retries", "Error")
+            display_error(operation_name + " Error", high)
+        success
+    else
+        success = condition
+        if not success and log_error(operation_name + " failed", "Error")
+            display_error(operation_name + " Error", high)
+        success
+
+// =====================================================
+// Helper Functions
+// =====================================================
+/**
+ * This section contains utility functions that support pattern detection and analysis.
+ * These functions handle common calculations like retracements, ratio validation,
+ * and price formatting.
+ */
+
+/**
+ * Calculates the retracement level between two price points
+ * 
+ * @param start_price Starting price point
+ * @param end_price Ending price point
+ * @param current_price Current price to evaluate
+ * @returns Retracement value as a decimal (0.0-1.0) or DEFAULT_VALUE_ON_ERROR on failure
+ */
+safe_retracement(float start_price, float end_price, float current_price) =>
+    if na(start_price) or na(end_price) or na(current_price) or start_price == end_price
+        DEFAULT_VALUE_ON_ERROR
+    else
+        range = end_price - start_price
+        retracement = safe_divide(current_price - end_price, range, DEFAULT_VALUE_ON_ERROR)
+        retracement
+
+/**
+ * Validates if a ratio is within tolerance range of an expected Fibonacci level
+ * 
+ * @param actual_ratio The calculated ratio to validate
+ * @param expected_ratio The expected Fibonacci ratio
+ * @param tolerance The acceptable deviation from the expected ratio
+ * @returns Boolean indicating if the ratio is valid
+ */
+validate_harmonic_ratio(float actual_ratio, float expected_ratio, float tolerance = DEFAULT_TOLERANCE) =>
+    if na(actual_ratio) or na(expected_ratio)
+        false
+    else
+        min_valid = expected_ratio - tolerance
+        max_valid = expected_ratio + tolerance
+        actual_ratio >= min_valid and actual_ratio <= max_valid
+
+/**
+ * Formats price value with appropriate precision based on magnitude
+ * 
+ * @param price The price value to format
+ * @returns Formatted price string with adaptive precision
+ */
+format_price(float price) =>
+    if na(price)
+        "N/A"
+    else if price < 0.1
+        // Higher precision for small values
+        str.tostring(price, "#.#####")
+    else if price < 10
+        // Medium precision
+        str.tostring(price, "#.###")
+    else
+        // Standard precision
+        str.tostring(price, "#.##")
+
+/**
+ * Calculates ratio between two price movements
+ * 
+ * @param move1 First price movement
+ * @param move2 Second price movement
+ * @returns Ratio of move2 to move1 or NA if invalid
+ */
+calculate_ratio(float move1, float move2) =>
+    if na(move1) or na(move2) or move1 == 0
+        float(na)
+    else
+        move2 / move1
+
+/**
+ * Calculates completion percentage of price move
+ * 
+ * @param current_price Current price
+ * @param target_price Target price level
+ * @param start_price Starting price level
+ * @returns Completion percentage as decimal (0.0-1.0) or NA if invalid
+ */
+get_completion_percentage(float current_price, float target_price, float start_price) =>
+    if na(current_price) or na(target_price) or na(start_price) or start_price == target_price
+        float(na)
+    else
+        total_move = math.abs(target_price - start_price)
+        current_move = math.abs(current_price - start_price)
+        completion = current_move / total_move
+        // Cap at 100%
+        math.min(completion, 1.0)
+
+/**
+ * Calculates overall pattern quality based on component metrics
+ * 
+ * @param ratio_quality Quality of Fibonacci ratios (0.0-1.0)
+ * @param symmetry_quality Quality of pattern symmetry (0.0-1.0) 
+ * @param time_quality Quality of time-based aspects (0.0-1.0)
+ * @returns Weighted quality score (0.0-1.0) or NA if invalid
+ */
+calculate_pattern_quality(float ratio_quality, float symmetry_quality, float time_quality) =>
+    if na(ratio_quality) or na(symmetry_quality) or na(time_quality)
+        float(na)
+    else
+        // Weighted average (ratios most important, time least important)
+        weighted_quality = ratio_quality * 0.6 + symmetry_quality * 0.3 + time_quality * 0.1
+        // Constrain to 0.0-1.0 range
+        math.max(0.0, math.min(weighted_quality, 1.0))
+
+// =====================================================
+// Signal Generation Functions
+// =====================================================
+/**
+ * This section contains functions for generating and managing trading signals
+ * based on detected harmonic patterns. These functions create, evaluate, and
+ * format trading recommendations.
+ */
+
+/**
+ * Creates an empty signal structure with default values
+ * 
+ * @returns Initialized empty trade_signal structure
+ */
+create_empty_signal() =>
+    trade_signal.new(
+        SIGNAL_NONE,
+        "",
+        na,
+        na,
+        na,
+        na,
+        0,
+        0.0
+    )
+
+/**
+ * Generates a trading signal based on pattern parameters
+ * 
+ * @param pattern_name Name of the harmonic pattern
+ * @param direction Direction of the pattern (1=bullish, -1=bearish)
+ * @param d_price Price level of the D point (entry price)
+ * @param a_price Price level of the A point (used for target calculation) 
+ * @param quality Pattern quality score (0.0-1.0)
+ * @param risk_percent Risk percentage for stop loss calculation
+ * @param signal_bar_index Bar index for the signal
+ * @returns Populated trade_signal structure
+ */
+generate_trade_signal(string pattern_name, int direction, float d_price, 
+                      float a_price, float quality, float risk_percent = 0.01,
+                      int signal_bar_index = bar_index) =>
+    // Signal type
+    signal_type = direction == 1 ? SIGNAL_BUY : SIGNAL_SELL
+    
+    // Calculate stop loss price (D point moved in reverse direction by risk_percent)
+    stop_loss = direction == 1 ? 
+        d_price * (1 - risk_percent) : 
+        d_price * (1 + risk_percent)
+    
+    // Calculate target prices
+    // Target 1 is usually 0.382 retracement from D to A
+    // Target 2 is usually 0.618 retracement from D to A
+    d_to_a = math.abs(a_price - d_price)
+    target1 = direction == 1 ? 
+        d_price + d_to_a * 0.382 : 
+        d_price - d_to_a * 0.382
+    
+    target2 = direction == 1 ? 
+        d_price + d_to_a * 0.618 : 
+        d_price - d_to_a * 0.618
+    
+    trade_signal.new(
+        signal_type,
+        pattern_name,
+        d_price,
+        stop_loss,
+        target1,
+        target2,
+        signal_bar_index,
+        quality
+    )
+
+/**
+ * Checks if a signal is valid (not empty)
+ * 
+ * @param signal Signal object to evaluate
+ * @returns Boolean indicating if signal contains valid trading recommendation
+ */
+is_valid_signal(trade_signal signal) =>
+    signal.type != SIGNAL_NONE
+
+/**
+ * Calculates risk-reward ratio for a signal
+ * 
+ * @param signal Signal object to evaluate
+ * @param use_target2 Whether to use target 2 (otherwise target 1 is used)
+ * @returns Risk-reward ratio as a decimal or 0.0 if invalid
+ */
+calculate_risk_reward(trade_signal signal, bool use_target2 = false) =>
+    if not is_valid_signal(signal)
+        0.0
+    else
+        risk = math.abs(signal.entry_price - signal.stop_loss)
+        
+        target = use_target2 ? signal.target2 : signal.target1
+        reward = math.abs(signal.entry_price - target)
+        
+        risk == 0 ? 0.0 : reward / risk
+
+/**
+ * Generates descriptive text for a trading signal
+ * 
+ * @param signal Signal object to describe
+ * @returns Formatted text description of the signal
+ */
+get_signal_text(trade_signal signal) =>
+    if not is_valid_signal(signal)
+        "No Trading Signal"
+    else
+        rr1 = str.tostring(calculate_risk_reward(signal, false), "#.##")
+        rr2 = str.tostring(calculate_risk_reward(signal, true), "#.##")
+        quality_text = str.tostring(signal.quality * 100, "#.00") + "%"
+        
+        signal.type + " " + signal.pattern_name + 
+        "\nEntry: " + str.tostring(signal.entry_price, "#.####") + 
+        "\nStop Loss: " + str.tostring(signal.stop_loss, "#.####") + 
+        "\nTarget 1: " + str.tostring(signal.target1, "#.####") + " (RR: " + rr1 + ")" + 
+        "\nTarget 2: " + str.tostring(signal.target2, "#.####") + " (RR: " + rr2 + ")" + 
+        "\nQuality: " + quality_text
+
+/**
+ * Creates a visual label for a trading signal
+ * 
+ * @param signal Signal object to visualize
+ * @param label_bar_index Bar index for label placement
+ */
+draw_signal_label(trade_signal signal, int label_bar_index = bar_index) =>
+    if is_valid_signal(signal)
+        label_color = signal.type == SIGNAL_BUY ? 
+            color.green : color.red
+        
+        label.new(
+            label_bar_index, signal.entry_price,
+            get_signal_text(signal),
+            color = color.new(color.black, 80),
+            textcolor = label_color,
+            style = label.style_label_down,
+            size = size.normal
+        )
+
+// =====================================================
+// UI Settings
+// =====================================================
+/**
+ * This section defines the user interface controls for configuring the indicator.
+ * The settings are organized into logical groups for general configuration,
+ * pattern selection, alerts, visual appearance, and error handling.
+ */
+
+// Input parameter tab definitions
+var string tab_general = "General Settings"
+var string tab_patterns = "Pattern Selection"
+var string tab_alerts = "Alert Settings"
+var string tab_visuals = "Visual Settings"
+var string tab_error = "Error Handling"
+
+/**
+ * General settings control core indicator behavior
+ */
+mode = input.string("Auto Detection", "Recognition Mode", options=["Auto Detection", "Manual Drawing"], group=tab_general)
+lookback = input.int(100, "Lookback Period", minval=20, maxval=500, group=tab_general)
+tolerance = input.float(0.05, "Pattern Tolerance", minval=0.01, step=0.01, group=tab_general, tooltip="Percentage tolerance allowed for Fibonacci levels")
+
+/**
+ * Pattern selection settings control which harmonic patterns are detected
+ */
+enable_bat = input.bool(true, "Bat Pattern", group=tab_patterns)
+enable_butterfly = input.bool(true, "Butterfly Pattern", group=tab_patterns)
+enable_crab = input.bool(true, "Crab Pattern", group=tab_patterns)
+enable_shark = input.bool(true, "Shark Pattern", group=tab_patterns)
+
+/**
+ * Alert settings control notification behavior
+ */
+alert_completion = input.bool(true, "Alert when pattern is about to complete", group=tab_alerts)
+alert_trade_points = input.bool(true, "Alert at trading points", group=tab_alerts)
+min_quality_for_alert = input.float(0.6, "Minimum alert confidence", minval=0.1, maxval=1.0, step=0.1, group=tab_alerts, tooltip="Only trigger alerts for patterns with confidence above this value")
+
+/**
+ * Visual settings control appearance of patterns on the chart
+ */
+show_labels = input.bool(true, "Show Labels", group=tab_visuals)
+show_prices = input.bool(true, "Show Price Levels", group=tab_visuals)
+show_completion = input.bool(true, "Show Completion", group=tab_visuals)
+show_quality = input.bool(true, "Show Confidence", group=tab_visuals)
+quality_color_coding = input.bool(true, "Color code by confidence", group=tab_visuals, tooltip="Change colors based on pattern quality")
+pattern_color = input.color(color.blue, "Pattern Line Color", group=tab_visuals)
+
+/**
+ * Error handling settings control how errors are managed
+ */
+enable_error_recovery = input.bool(true, "Enable Error Recovery", group=tab_error)
+max_retry_attempts = input.int(3, "Maximum Retry Attempts", minval=1, maxval=10, group=tab_error)
+error_log_level = input.string("Warning", "Error Log Level", options=["Disabled", "Info", "Warning", "Error"], group=tab_error)
+show_error_stats = input.bool(false, "Show Error Statistics", group=tab_error)
+
+// =====================================================
+// Harmonic Pattern Detection Logic
+// =====================================================
+/**
+ * This section contains the core logic for detecting pivot points and
+ * identifying potential harmonic patterns in the price series.
+ */
+
+/**
+ * Detects local pivot points (highs and lows) in a price series
+ * 
+ * This function identifies potential reversals by comparing a central point
+ * with surrounding bars. It implements safety checks to handle boundary conditions
+ * and missing values.
+ * 
+ * @param src Source price series
+ * @param length Number of bars to analyze on each side
+ * @returns Array containing [pivot_high, pivot_low] values
+ */
+find_pivots_safe(src, length) =>
+    pivot_high = 0.0
+    pivot_low = 0.0
+    
+    // Use safe checks to handle boundary conditions
+    if not na(src) and length > 0 and bar_index >= length
+        // Look for highs
+        is_pivot_high = true
+        for i = 1 to length
+            if not in_range(i, 1, bar_index) or na(src[i])
+                is_pivot_high := false
+                break
+            if src[0] <= src[i]
+                is_pivot_high := false
+        
+        // Look for lows
+        is_pivot_low = true
+        for i = 1 to length
+            if not in_range(i, 1, bar_index) or na(src[i])
+                is_pivot_low := false
+                break
+            if src[0] >= src[i]
+                is_pivot_low := false
+        
+        // Set results
+        pivot_high := is_pivot_high ? src[0] : 0.0
+        pivot_low := is_pivot_low ? src[0] : 0.0
+    
+    [pivot_high, pivot_low]
+
+// Initialize pivot point arrays
+pivot_length = math.max(5, math.floor(lookback / 10))
+// X coordinates (bar indices)
+var pivot_points_x = array.new_int(0)
+// Y coordinates (prices)
+var pivot_points_y = array.new_float(0)
+// Types (1=high, -1=low)
+var pivot_types = array.new_int(0)
+
+// Check for new pivots
+[ph, pl] = find_pivots_safe(close, pivot_length)
+
+// Add newly discovered pivot points
+if ph > 0
+    array.push(pivot_points_x, bar_index)
+    array.push(pivot_points_y, ph)
+    array.push(pivot_types, 1)
+
+if pl > 0
+    array.push(pivot_points_x, bar_index)
+    array.push(pivot_points_y, pl)
+    array.push(pivot_types, -1)
+
+// Remove too old pivot points
+if array.size(pivot_points_x) > 0
+    oldest_index = array.get(pivot_points_x, 0)
+    if bar_index - oldest_index > lookback
+        array.shift(pivot_points_x)
+        array.shift(pivot_points_y)
+        array.shift(pivot_types)
+
+// =====================================================
+// Drawing Functions
+// =====================================================
+
+/**
+ * Draws a harmonic pattern on the chart with proper styling and labels
+ * 
+ * @param x1 X point bar index
+ * @param y1 X point price
+ * @param x2 A point bar index
+ * @param y2 A point price
+ * @param x3 B point bar index
+ * @param y3 B point price
+ * @param x4 C point bar index
+ * @param y4 C point price
+ * @param pattern_name Name of the harmonic pattern
+ * @param direction Direction of the pattern (1=bullish, -1=bearish)
+ * @param quality Pattern quality score (0.0-1.0)
+ */
+draw_pattern(x1, y1, x2, y2, x3, y3, x4, y4, pattern_name, direction, quality) =>
+    pattern_text = pattern_name + " (" + (direction == 1 ? "Bullish" : "Bearish") + ")"
+    
+    // Quality-based color
+    pattern_color_with_quality = pattern_color
+    if quality_color_coding
+        base_color = direction == 1 ? color.green : color.red
+        transparency = math.round((1 - quality) * 70)
+        pattern_color_with_quality := color.new(base_color, transparency)
+    
+    // Draw XA line
+    line.new(x1, y1, x2, y2, 
+        color=pattern_color_with_quality, 
+        width=1,
+        style=line.style_dashed)
+    
+    // Draw AB line
+    line.new(x2, y2, x3, y3, 
+        color=pattern_color_with_quality, 
+        width=1,
+        style=line.style_dashed)
+    
+    // Draw BC line
+    line.new(x3, y3, x4, y4, 
+        color=pattern_color_with_quality, 
+        width=1,
+        style=line.style_dashed)
+    
+    // Add labels (if enabled)
+    if show_labels
+        quality_text = show_quality ? "\nQuality: " + str.tostring(quality * 100, "#.##") + "%" : ""
+        label.new(
+            x1, y1, 
+            "X\n" + pattern_text + quality_text, 
+            style=label.style_label_down,
+            color=color.new(color.black, 80),
+            textcolor=pattern_color_with_quality)
+        
+        label.new(x2, y2, "A", style=label.style_label_down, color=color.new(color.black, 80), textcolor=pattern_color_with_quality)
+        label.new(x3, y3, "B", style=label.style_label_down, color=color.new(color.black, 80), textcolor=pattern_color_with_quality)
+        label.new(x4, y4, "C", style=label.style_label_down, color=color.new(color.black, 80), textcolor=pattern_color_with_quality)
+
+/**
+ * Draws projection for potential D point with appropriate styling
+ * 
+ * @param x1 X point bar index
+ * @param y1 X point price
+ * @param x4 C point bar index
+ * @param y4 C point price
+ * @param d_price Projected D point price
+ * @param direction Direction of the pattern (1=bullish, -1=bearish)
+ * @param pattern_name Name of the harmonic pattern
+ * @param quality Pattern quality score (0.0-1.0)
+ */
+draw_potential_d(x1, y1, x4, y4, d_price, direction, pattern_name, quality) =>
+    if show_predictions
+        d_x = bar_index + 5
+        d_text = "Potential D\n" + pattern_name + "\nEntry: " + str.tostring(d_price, "#.####")
+        
+        // Draw CD line
+        line.new(x4, y4, d_x, d_price, 
+            color=color.new(pattern_color, 50), 
+            width=1,
+            style=line.style_dotted)
+        
+        // Add D point label
+        label.new(
+            d_x, d_price, 
+            d_text, 
+            style=label.style_label_down,
+            color=color.new(color.black, 80),
+            textcolor=direction == 1 ? color.green : color.red)
+
+/**
+ * Processes pivot points to identify harmonic patterns and generate trading signals
+ * 
+ * This function analyzes recent pivot points to detect valid harmonic patterns,
+ * then generates appropriate trading signals based on the highest quality pattern found.
+ *
+ * @returns A trade_signal object containing the recommended action if a valid pattern is found
+ */
+process_pattern_trading_signals() =>
+    trade_signal signal = create_empty_signal()
+    
+    // Check if there are enough pivot points to detect patterns
+    if array.size(pivot_points_x) >= 4
+        size = array.size(pivot_points_x)
+        
+        // Get the most recent 4 pivot points
+        x_index = array.get(pivot_points_x, size - 4)
+        a_index = array.get(pivot_points_x, size - 3)
+        b_index = array.get(pivot_points_x, size - 2)
+        c_index = array.get(pivot_points_x, size - 1)
+        
+        x_price = array.get(pivot_points_y, size - 4)
+        a_price = array.get(pivot_points_y, size - 3)
+        b_price = array.get(pivot_points_y, size - 2)
+        c_price = array.get(pivot_points_y, size - 1)
+        
+        // Determine pattern direction
+        direction = a_price > x_price ? -1 : 1
+        
+        // Check various harmonic patterns and prioritize highest quality signal
+        best_signal = create_empty_signal()
+        best_quality = 0.0
+        
+        // Bat pattern
+        if enable_bat
+            [is_valid, d_price] = validate_bat_pattern(x_price, a_price, b_price, c_price, tolerance)
+            if is_valid
+                // Simplified quality calculation
+                quality = 0.8
+                if quality >= min_quality_for_alert and quality > best_quality
+                    best_quality := quality
+                    best_signal := generate_trade_signal(
+                        PATTERN_TYPE_BAT, 
+                        direction, 
+                        d_price, 
+                        a_price, 
+                        quality)
+        
+        // Butterfly pattern
+        if enable_butterfly
+            [is_valid, d_price] = validate_butterfly_pattern(x_price, a_price, b_price, c_price, tolerance)
+            if is_valid
+                // Simplified quality calculation
+                quality = 0.75
+                if quality >= min_quality_for_alert and quality > best_quality
+                    best_quality := quality
+                    best_signal := generate_trade_signal(
+                        PATTERN_TYPE_BUTTERFLY, 
+                        direction, 
+                        d_price, 
+                        a_price, 
+                        quality)
+        
+        // Crab pattern
+        if enable_crab
+            [is_valid, d_price] = validate_crab_pattern(x_price, a_price, b_price, c_price, tolerance)
+            if is_valid
+                // Simplified quality calculation
+                quality = 0.85
+                if quality >= min_quality_for_alert and quality > best_quality
+                    best_quality := quality
+                    best_signal := generate_trade_signal(
+                        PATTERN_TYPE_CRAB, 
+                        direction, 
+                        d_price, 
+                        a_price, 
+                        quality)
+        
+        // Shark pattern
+        if enable_shark
+            [is_valid, d_price] = validate_shark_pattern(x_price, a_price, b_price, c_price, tolerance)
+            if is_valid
+                // Simplified quality calculation
+                quality = 0.7
+                if quality >= min_quality_for_alert and quality > best_quality
+                    best_quality := quality
+                    best_signal := generate_trade_signal(
+                        PATTERN_TYPE_SHARK, 
+                        direction, 
+                        d_price, 
+                        a_price, 
+                        quality)
+        
+        // Use highest quality signal
+        if best_quality > 0
+            signal := best_signal
+    
+    signal
+
+// =====================================================
+// Main Calculation Logic
+// =====================================================
+
+/**
+ * Main harmonic pattern detection function
+ * 
+ * This function coordinates the overall pattern recognition process,
+ * from finding pivot points to validating patterns.
+ */
+detect_harmonic_patterns() =>
+    // Detection logic for harmonic patterns
+    // Current implementation uses a modular approach with specialized functions
+
+// Process patterns to generate signals
+signal = process_pattern_trading_signals()
+
+// Display the signal if valid
+if is_valid_signal(signal)
+    draw_signal_label(signal)
+
+// =====================================================
+// Alert Logic
+// =====================================================
+/**
+ * This section handles alert generation based on detected patterns and signals.
+ * Alerts are triggered according to user-defined criteria and thresholds.
+ */
+
+// Generate alerts for valid trading signals
+if alert_trade_points and is_valid_signal(signal) and signal.quality >= min_quality_for_alert
+    alert_message = get_signal_text(signal)
+    alert(alert_message, alert.freq_once_per_bar)
+
+// =====================================================
+// Chart Information Display
+// =====================================================
+/**
+ * This section manages the display of supplementary information on the chart,
+ * including error statistics and debugging information when enabled.
+ */
+
+// Display error statistics when enabled
+if show_error_stats and barstate.islast
+    stats_text = "Errors: " + str.tostring(total_errors) + 
+                 " | Recovered: " + str.tostring(recovered_errors)
+    
+    if last_error_message != ""
+        stats_text := stats_text + "\nLast Error: " + last_error_message
+    
+    label.new(
+        bar_index, low, 
+        stats_text, 
+        style=label.style_label_up,
+        color=color.new(color.gray, 80),
+        textcolor=color.white,
+        size=size.small)
+
+// =====================================================
+// Harmonic Pattern Validation
+// =====================================================
+
+/**
+ * Validate Bat pattern
+ * 
+ * @param x_price X point price
+ * @param a_price A point price 
+ * @param b_price B point price
+ * @param c_price C point price
+ * @param tolerance Tolerance for ratio validation
+ * @returns Array containing [is_valid, d_price]
+ */
+validate_bat_pattern(float x_price, float a_price, float b_price, float c_price, float tolerance = DEFAULT_TOLERANCE) =>
+    is_valid = false
+    d_price = 0.0
+    
+    // Calculate key moves
+    xa = a_price - x_price
+    ab = b_price - a_price
+    bc = c_price - b_price
+    
+    // Check key ratios for bat pattern
+    // Bat pattern key ratios:
+    // - AB = 0.382-0.5 of XA
+    // - BC = 0.382-0.886 of AB
+    // - CD = 1.618-2.618 of BC
+    // - D = 0.886 retracement of XA
+    
+    ab_xa_ratio = calculate_ratio(xa, ab)
+    bc_ab_ratio = calculate_ratio(ab, bc)
+    
+    // Validate AB/XA ratio (should be between 0.382-0.5)
+    ab_xa_valid = validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_382, tolerance) or 
+                  validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_5, tolerance) or
+                  (ab_xa_ratio > FIB_LEVEL_382 - tolerance and ab_xa_ratio < FIB_LEVEL_5 + tolerance)
+    
+    // Validate BC/AB ratio (should be between 0.382-0.886)
+    bc_ab_valid = validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_382, tolerance) or
+                  validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_786, tolerance) or
+                  (bc_ab_ratio > FIB_LEVEL_382 - tolerance and bc_ab_ratio < FIB_LEVEL_786 + tolerance)
+    
+    // Calculate D point (0.886 retracement of XA)
+    d_price := a_price - xa * FIB_LEVEL_886
+    
+    // Check overall pattern validity
+    is_valid := ab_xa_valid and bc_ab_valid
+    
+    [is_valid, d_price]
+
+/**
+ * Validate Butterfly pattern
+ * 
+ * @param x_price X point price
+ * @param a_price A point price 
+ * @param b_price B point price
+ * @param c_price C point price
+ * @param tolerance Tolerance for ratio validation
+ * @returns Array containing [is_valid, d_price]
+ */
+validate_butterfly_pattern(float x_price, float a_price, float b_price, float c_price, float tolerance = DEFAULT_TOLERANCE) =>
+    is_valid = false
+    d_price = 0.0
+    
+    // Calculate key moves
+    xa = a_price - x_price
+    ab = b_price - a_price
+    bc = c_price - b_price
+    
+    // Butterfly pattern key ratios:
+    // - AB = 0.786 of XA
+    // - BC = 0.382-0.886 of AB
+    // - CD = 1.618-2.618 of BC
+    // - D = 1.27-1.618 extension of XA
+    
+    ab_xa_ratio = calculate_ratio(xa, ab)
+    bc_ab_ratio = calculate_ratio(ab, bc)
+    
+    // Validate AB/XA ratio (should be around 0.786)
+    ab_xa_valid = validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_786, tolerance)
+    
+    // Validate BC/AB ratio (should be between 0.382-0.886)
+    bc_ab_valid = validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_382, tolerance) or
+                  validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_886, tolerance) or
+                  (bc_ab_ratio > FIB_LEVEL_382 - tolerance and bc_ab_ratio < FIB_LEVEL_886 + tolerance)
+    
+    // Calculate D point (1.27-1.618 extension of XA)
+    // Using average of the range for simplicity
+    d_price := a_price - xa * FIB_LEVEL_1272
+    
+    // Check overall pattern validity
+    is_valid := ab_xa_valid and bc_ab_valid
+    
+    [is_valid, d_price]
+
+/**
+ * Validate Crab pattern
+ * 
+ * @param x_price X point price
+ * @param a_price A point price 
+ * @param b_price B point price
+ * @param c_price C point price
+ * @param tolerance Tolerance for ratio validation
+ * @returns Array containing [is_valid, d_price]
+ */
+validate_crab_pattern(float x_price, float a_price, float b_price, float c_price, float tolerance = DEFAULT_TOLERANCE) =>
+    is_valid = false
+    d_price = 0.0
+    
+    // Calculate key moves
+    xa = a_price - x_price
+    ab = b_price - a_price
+    bc = c_price - b_price
+    
+    // Crab pattern key ratios:
+    // - AB = 0.382-0.618 of XA
+    // - BC = 0.382-0.886 of AB
+    // - CD = 2.618-3.618 of BC
+    // - D = 1.618 extension of XA
+    
+    ab_xa_ratio = calculate_ratio(xa, ab)
+    bc_ab_ratio = calculate_ratio(ab, bc)
+    
+    // Validate AB/XA ratio (should be between 0.382-0.618)
+    ab_xa_valid = validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_382, tolerance) or
+                  validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_618, tolerance) or
+                  (ab_xa_ratio > FIB_LEVEL_382 - tolerance and ab_xa_ratio < FIB_LEVEL_618 + tolerance)
+    
+    // Validate BC/AB ratio (should be between 0.382-0.886)
+    bc_ab_valid = validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_382, tolerance) or
+                  validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_886, tolerance) or
+                  (bc_ab_ratio > FIB_LEVEL_382 - tolerance and bc_ab_ratio < FIB_LEVEL_886 + tolerance)
+    
+    // Calculate D point (1.618 extension of XA)
+    d_price := a_price - xa * FIB_LEVEL_1618
+    
+    // Check overall pattern validity
+    is_valid := ab_xa_valid and bc_ab_valid
+    
+    [is_valid, d_price]
+
+/**
+ * Validate Shark pattern
+ * 
+ * @param x_price X point price
+ * @param a_price A point price 
+ * @param b_price B point price
+ * @param c_price C point price
+ * @param tolerance Tolerance for ratio validation
+ * @returns Array containing [is_valid, d_price]
+ */
+validate_shark_pattern(float x_price, float a_price, float b_price, float c_price, float tolerance = DEFAULT_TOLERANCE) =>
+    is_valid = false
+    d_price = 0.0
+    
+    // Calculate key moves
+    xa = a_price - x_price
+    ab = b_price - a_price
+    bc = c_price - b_price
+    
+    // Shark pattern key ratios:
+    // - AB = 0.5 of XA
+    // - BC = 1.13-1.618 of AB
+    // - CD = 1.618-2.24 of BC
+    // - D = 0.886-1.13 of XA
+    
+    ab_xa_ratio = calculate_ratio(xa, ab)
+    bc_ab_ratio = calculate_ratio(ab, bc)
+    
+    // Validate AB/XA ratio (should be around 0.5)
+    ab_xa_valid = validate_harmonic_ratio(ab_xa_ratio, FIB_LEVEL_5, tolerance)
+    
+    // Validate BC/AB ratio (should be between 1.13-1.618)
+    bc_ab_valid = validate_harmonic_ratio(bc_ab_ratio, 1.13, tolerance) or
+                  validate_harmonic_ratio(bc_ab_ratio, FIB_LEVEL_1618, tolerance) or
+                  (bc_ab_ratio > 1.13 - tolerance and bc_ab_ratio < FIB_LEVEL_1618 + tolerance)
+    
+    // Calculate D point (0.886-1.13 of XA)
+    // Using average of the range for simplicity
+    d_price := a_price - xa * FIB_LEVEL_886
+    
+    // Check overall pattern validity
+    is_valid := ab_xa_valid and bc_ab_valid
+    
+    [is_valid, d_price] 

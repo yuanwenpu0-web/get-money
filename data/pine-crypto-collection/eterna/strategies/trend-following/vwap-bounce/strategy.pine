@@ -1,0 +1,69 @@
+//@version=5
+strategy("VWAP Bounce - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+vwapDeviation = input.float(0.5, "VWAP Deviation %", minval=0.1, step=0.1)
+trendEMA = input.int(50, "Trend EMA", minval=1)
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+// Eterna Webhook Settings
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", 
+                               group="Webhook")
+
+// ==================== Indicators ====================
+vwapValue = ta.vwap(close)
+ema50 = ta.ema(close, trendEMA)
+
+// VWAP bands
+vwapUpper = vwapValue * (1 + vwapDeviation / 100)
+vwapLower = vwapValue * (1 - vwapDeviation / 100)
+
+// ==================== Entry Conditions ====================
+// Uptrend: Price above EMA and bounces off VWAP support
+uptrend = close > ema50
+longCondition = uptrend and ta.crossover(close, vwapLower) and low <= vwapLower
+
+// Downtrend: Price below EMA and rejects from VWAP resistance
+downtrend = close < ema50
+shortCondition = downtrend and ta.crossunder(close, vwapUpper) and high >= vwapUpper
+
+// Exit conditions
+exitLong = ta.crossunder(close, vwapValue)
+exitShort = ta.crossover(close, vwapValue)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+plot(vwapValue, "VWAP", color=color.blue, linewidth=2)
+plot(vwapUpper, "VWAP Upper", color=color.new(color.blue, 70), style=plot.style_circles)
+plot(vwapLower, "VWAP Lower", color=color.new(color.blue, 70), style=plot.style_circles)
+plot(ema50, "Trend EMA", color=color.orange, linewidth=1)
+
+plotshape(longCondition, "Long", shape.triangleup, location.belowbar, color.green, size=size.small)
+plotshape(shortCondition, "Short", shape.triangledown, location.abovebar, color.red, size=size.small)
+
+// Fill between bands
+upperBand = plot(vwapUpper, display=display.none)
+lowerBand = plot(vwapLower, display=display.none)
+fill(upperBand, lowerBand, color=color.new(color.blue, 95))
+
+bgcolor(uptrend ? color.new(color.green, 97) : color.new(color.red, 97))

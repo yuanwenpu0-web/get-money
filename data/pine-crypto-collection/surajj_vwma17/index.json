@@ -1,0 +1,16 @@
+[
+  {
+    "path": "strategies/vwma17/vwma17_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "VWMA 17 自适应趋势策略",
+    "original_description": "Trend following with adaptive Kaufman Efficiency Ratio filter.",
+    "description_zh": "结合自适应 Kaufman 效率比过滤器的趋势跟随策略。",
+    "crypto_relevance": "作者在项目说明中提供 BTC-USD 运行示例，策略本身为通用策略。",
+    "implementation_note_zh": "BTC 示例针对配套 Python 命令；Pine 文件为对应版本，两个实现一致性和交易表现未经独立验证。",
+    "source_url": "https://github.com/surajjpaul11/tradingview-mcp/blob/b42b196d1395e22bf314dc68ba104a8cb5af0571/strategies/vwma17/vwma17_strategy.pine",
+    "description_source_url": "https://github.com/surajjpaul11/tradingview-mcp/blob/b42b196d1395e22bf314dc68ba104a8cb5af0571/README.md",
+    "source_commit": "b42b196d1395e22bf314dc68ba104a8cb5af0571",
+    "license": "MIT",
+    "sha256": "3c1132e43a98c68107662951b8fba3e521486a74dbafd4cf791ccb677f666d28"
+  }
+]

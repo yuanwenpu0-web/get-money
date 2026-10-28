@@ -1,0 +1,16 @@
+[
+  {
+    "path": "Code",
+    "kind": "strategy",
+    "title_zh": "EMA 交叉与 MACD 短线策略",
+    "original_description": "**CrossMACD Scalper** is a Pine Script strategy designed for **frequent scalping** and **intraday trading** using **EMA crossover signals** confirmed by **MACD histogram momentum**.",
+    "description_zh": "短线与日内交易策略，使用 EMA 交叉信号并通过 MACD 柱状图动量确认。",
+    "crypto_relevance": "作者列出 BTC/USDT、ETH 等示例，同时适用于其他市场。",
+    "notes": "仓库 README 声明 MIT，未提供独立 LICENSE；源码文件原名为 Code。默认止盈 1.2%、止损 0.6%；未验证回测效果。",
+    "source_url": "https://github.com/Loop24Infility/CrossMACD-Scapler/blob/d2db7dd785fb09026274b337891d13809cd76203/Code",
+    "description_source_url": "https://github.com/Loop24Infility/CrossMACD-Scapler/blob/d2db7dd785fb09026274b337891d13809cd76203/README.md",
+    "source_commit": "d2db7dd785fb09026274b337891d13809cd76203",
+    "license": "README 声明 MIT，未提供独立 LICENSE",
+    "sha256": "d9f39286bfd91433b6b38e5a5fa6e0d5b61a34723862b9757fe948a0f9636d9a"
+  }
+]

@@ -1,0 +1,85 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © leypascua (https://twitter.com/leypascua)
+
+//@version=4
+strategy("LeyPascua Bullish Engulfing Entry Strategy", overlay=true)
+
+// works best in crypto, 4h chart
+
+fastATR = atr(5)
+
+// the bollinger band monster (BBM)
+[middleBBM, upperBBM, lowerBBM] = bb(close, 50, 0.2)
+
+// bullish engulfing check
+bodyRange = open > close ? open - close : close - open
+engulfLimit = max(open, close) + bodyRange
+greenCandleWickRange = close > open and close < high ? high - close : 0
+isBullishEngulfing = close > close[1] and close >= engulfLimit[1] and close > high[1] and bodyRange > sma(bodyRange[1], 5) * 1.79 //and (greenCandleWickRange > 0 and greenCandleWickRange / bodyRange < 0.27)
+isBullishEngulfingReversal = isBullishEngulfing[1] and close < open and close < open[1] and low < low[1] and bodyRange > bodyRange[1]
+
+[macdLine, signalLine, histLine] = macd(close, 12, 26, 9)
+isMacdBearish = histLine < 0 or macdLine < signalLine and macdLine
+isMacdOverSignalOnNegativeHisto = macdLine > signalLine and macdLine < 0 and signalLine < 0
+isBullishCandleOnBearishMacd = macdLine > 0 and signalLine > 0 and macdLine < signalLine and isBullishEngulfing and open > lowerBBM and close > upperBBM
+isRisingMacdOverSignal = macdLine > signalLine and macdLine > macdLine[1] and macdLine > 0
+isMacdBullish = histLine >= 0 or isBullishCandleOnBearishMacd or isMacdOverSignalOnNegativeHisto or isRisingMacdOverSignal
+
+priceGainPotential = (bodyRange / open)
+isPriceRangeTradable = isBullishEngulfing and priceGainPotential >= 0.0569
+
+plotshape(isPriceRangeTradable, style = shape.triangleup, location=location.belowbar, color = color.green)
+plotshape(isBullishEngulfingReversal, style = shape.triangledown, location=location.abovebar, color = color.red)
+
+// tp and sl
+var takeProfit = close[1]
+var stopLoss = low[1]
+var buyingPrice = low[1]
+var lossThreshold = low[1]
+
+isDateTradable = time >= timestamp(syminfo.timezone, 2020, 1, 1, 0, 0)
+onBuySignalDetected = isBullishEngulfing and isPriceRangeTradable and isMacdBullish and strategy.position_size <= 0
+
+if (isDateTradable)
+    if (onBuySignalDetected)
+        lossThreshold := close - (close * 0.12)
+        slPad = open - low[1]
+        isHighKissingBBM = open < lowerBBM and close > lowerBBM and high >= middleBBM
+        stopLoss := max(low - slPad, lossThreshold)
+        targetPriceMultiplier = isHighKissingBBM and priceGainPotential < 0.15 ? 5.62 : 1.62
+        takeProfit := close + (bodyRange * targetPriceMultiplier)
+        buyingPrice := close
+        
+    strategy.entry("buy", strategy.long,  when = onBuySignalDetected)
+
+    if (strategy.position_size > 0 and high > takeProfit)
+        strategy.exit("takeProfit", "buy", limit = takeProfit)
+        takeProfit := low
+        stopLoss := low
+        buyingPrice := low
+        lossThreshold := low
+    
+    if (strategy.position_size > 0 and isBullishEngulfingReversal[1])
+        strategy.exit("fakeOutCut", "buy", stop = high[1])
+        stopLoss := low
+        takeProfit := low
+        buyingPrice := low
+        lossThreshold := low
+    
+    isStopLossHit = close < stopLoss and (bodyRange > bodyRange[1] * 2.62 or (low < stopLoss - fastATR)) 
+    isLossThresholdHit = close < buyingPrice and close < lossThreshold
+
+    if (strategy.position_size > 0 and isStopLossHit)
+        strategy.exit("stopLoss", "buy", stop = stopLoss)
+        stopLoss := low
+        takeProfit := low
+        buyingPrice := low
+        lossThreshold := low
+        
+plot(stopLoss, color = color.red)
+plot(takeProfit, color = color.green)
+
+plot(middleBBM, title="middle BBM", color = color.teal)
+bbmL = plot(lowerBBM, title="lower BBM", color = color.teal)
+bbmU = plot(upperBBM, title="upper BBM", color = color.teal)
+fill(bbmL, bbmU, title = "Background BBM", color=color.teal, transp=80)

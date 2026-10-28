@@ -1,0 +1,16 @@
+[
+  {
+    "path": "btc-logarithmic-growth-curves.js",
+    "title_zh": "比特币对数增长曲线（补充上界区间）",
+    "kind": "indicator",
+    "original_description": "I have added the missing zones for the upper range",
+    "description_zh": "作者在原有指标上补充了上界范围中缺失的区域。",
+    "crypto_relevance": "针对比特币对数增长曲线的指标。",
+    "notes": "改版发布者 krzyczak；保留源码中的原作者与版权声明。文件扩展名为 .js，但源码是 Pine Script v4；只显示上界部分，下界区间被注释。源码声明 MPL 2.0，许可证文件为该许可的标准文本。未在 TradingView 编译或核验效果。",
+    "source_url": "https://gist.github.com/krzyczak/954f5a44643d6a853e86cbabdc598b20/c781eccb971cb0461f8754534c9a19cdba87767a",
+    "description_source_url": "https://gist.github.com/krzyczak/954f5a44643d6a853e86cbabdc598b20/c781eccb971cb0461f8754534c9a19cdba87767a",
+    "source_commit": "c781eccb971cb0461f8754534c9a19cdba87767a",
+    "license": "MPL 2.0（源码声明）",
+    "sha256": "f92fde6c7d19a338b1ca972a0e3c380cfc15dd29368aa65c5952562f74c7dd0e"
+  }
+]

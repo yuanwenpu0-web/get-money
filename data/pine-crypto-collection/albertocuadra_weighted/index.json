@@ -1,0 +1,16 @@
+[
+  {
+    "path": "weighted_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "五指标加权交易策略",
+    "original_description": "The algorithm is based on a set of well-documented strategies, each with its own weight (weighted strategy). Currently a set of 5 strategies have been implemented:",
+    "description_zh": "算法基于一组各自赋予权重的交易策略，目前实现了五种：MACD、随机 RSI、RSI、超级趋势和均线交叉。",
+    "crypto_relevance": "作者提供 Binance BTC/USDT 4 小时示例，也说明需针对其他资产调整参数。",
+    "source_url": "https://github.com/AlbertoCuadra/algo_trading_weighted_strategy/blob/2aa80a451afa15b99bda44836e8225b0c0f0b250/weighted_strategy.pine",
+    "description_source_url": "https://github.com/AlbertoCuadra/algo_trading_weighted_strategy/blob/2aa80a451afa15b99bda44836e8225b0c0f0b250/README.md",
+    "source_commit": "2aa80a451afa15b99bda44836e8225b0c0f0b250",
+    "license": "CC BY-NC-SA 4.0：要求署名、非商业使用，演绎作品同方式共享；详见 LICENSE.md。",
+    "sha256": "c5c005f2f77e9db35ad9083534c1250b295b1d8baa44f33035857519d06796ec",
+    "implementation_note_zh": "仓库包含作者 BTC/USDT 示例；作者的策略效果未经独立验证，脚本尚未编译或回测。"
+  }
+]

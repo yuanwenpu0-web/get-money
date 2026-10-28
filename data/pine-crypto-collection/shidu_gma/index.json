@@ -1,0 +1,15 @@
+[
+  {
+    "path": "strategy_example.pine",
+    "kind": "strategy",
+    "title_zh": "BTC/USDT 15 分钟 GMA、RSI、ADX、ATR 策略",
+    "original_description": "This Pine Script strategy, is a working progress of my algotrading journey and learning process and it is designed for trading BTC/USDT on a 15-minute timeframe. It incorporates advanced moving averages and filters, trend confirmation using RSI (Relative Strength Index) and ADX (Average Directional Index), and dynamic risk management based on volatility using the ATR (Average True Range).",
+    "description_zh": "作者将该脚本描述为仍在开发学习中的 BTC/USDT 15 分钟策略：结合均线和过滤器，以 RSI 与 ADX 确认趋势，并使用 ATR 波动率进行动态风险管理。",
+    "description_source_url": "https://github.com/shidu-xie/GMA-ADX-RSI/blob/e60de1c660413725d736e2b77f44f9e8ddb2ed56/README.md",
+    "source_url": "https://github.com/shidu-xie/GMA-ADX-RSI/blob/e60de1c660413725d736e2b77f44f9e8ddb2ed56/strategy_example.pine",
+    "source_commit": "e60de1c660413725d736e2b77f44f9e8ddb2ed56",
+    "sha256": "44491985f41ed31bdc701db8a78f6e1101e0aed8d41b9db0e10728705cfa5163",
+    "license": "脚本头声明 MPL-2.0；仓库根 LICENSE 是 MIT",
+    "notes": "策略导入 TradingView 库 diegonavarromartinez/base_helpers/4；本地附有同仓库 base_helpers.pine，但未确认其与线上第 4 版是否一致。"
+  }
+]

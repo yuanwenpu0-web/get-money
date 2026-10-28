@@ -1,0 +1,16 @@
+[
+  {
+    "path": "GCR_Strategy_Scanner_TradingView.pine",
+    "kind": "indicator",
+    "title_zh": "GCR 逆向拐点扫描指标",
+    "original_description": "Contrarian trading strategy based on GCR's philosophy: **\"Most people are wrong at EXTREME situations\"**",
+    "description_zh": "基于 GCR 逆向交易思路的拐点扫描指标；作者的理念是市场出现极端情况时多数人可能判断错误。",
+    "crypto_relevance": "源码注明适用于有充分成交量的加密货币、股票和 ETF；并非加密专用。",
+    "implementation_note_zh": "README 还列有股票突破扫描器；本目录仅收录作者明确注明适用加密货币的 GCR 指标。该指标不是自动交易系统，未经编译或回测。",
+    "source_url": "https://github.com/jmragsdale/trading-breakout-scanner/blob/103d1bbcbf729ad65f60e0db763da4601948b688/GCR_Strategy_Scanner_TradingView.pine",
+    "description_source_url": "https://github.com/jmragsdale/trading-breakout-scanner/blob/103d1bbcbf729ad65f60e0db763da4601948b688/README.md",
+    "source_commit": "103d1bbcbf729ad65f60e0db763da4601948b688",
+    "license": "README 声明 MIT 并允许使用、修改和分发；上游无独立 LICENSE 文件。",
+    "sha256": "f19c058552dc37a3957b13c909574b7b06fd53e3a0868d66ae376e31659c9dda"
+  }
+]

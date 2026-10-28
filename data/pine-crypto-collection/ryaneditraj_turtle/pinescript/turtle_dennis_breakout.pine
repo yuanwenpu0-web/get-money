@@ -1,0 +1,339 @@
+//@version=5
+// =============================================================================
+// Turtle / Dennis Donchian Breakout Strategy (Pine v5)
+// =============================================================================
+// Thesis: Classic Richard Dennis / Turtle trend-following — Donchian breakouts,
+// ATR (N) sizing, 2N hard stop, optional pyramid, shorter-channel / ATR-trail
+// exits. Edge is in fat-tailed trends, not chop.
+//
+// Markets/TFs: Liquid futures, FX majors, crypto majors, liquid ETFs (SPY).
+// Prefer Daily; 4H OK on majors. Avoid illiquid names.
+//
+// Defaults: S1=20/10, S2=55/20, stop=2N, risk=1%/unit at stop, maxUnits=4,
+// add=0.5N, EMA200 ON, ADX OFF (optional), S1 skip-if-last-won ON.
+//
+// Architecture (v2): single entry IDs "Long"/"Short" so pyramiding + one
+// strategy.exit(stop) always attach. Primary exit is opposite Donchian via
+// strategy.close — prior multi-ID design could leave stops unattached and
+// hold a position indefinitely (e.g. one trade from ~2000→2026).
+//
+// Fair backtest: realistic commission/slippage, multi-regime history, no
+// per-symbol lookback curve-fitting. Judge expectancy & DD, not just PnL.
+//
+// Caveats: Choppy markets lose. Past ≠ future. No guaranteed profit. Pyramid
+// amplifies winners and adverse moves — paper-test first.
+// Edit strategy() slippage= below to match your venue (const int required).
+// =============================================================================
+strategy("Turtle Dennis Breakout (S1/S2)",
+     overlay              = true,
+     initial_capital      = 100000,
+     default_qty_type     = strategy.percent_of_equity,
+     default_qty_value    = 10,
+     pyramiding           = 4,
+     commission_type      = strategy.commission.percent,
+     commission_value     = 0.03,
+     slippage             = 2,
+     process_orders_on_close = true,
+     calc_on_order_fills  = false,
+     max_bars_back        = 500)
+
+// ── Inputs ──────────────────────────────────────────────────────────────────
+string GRP_SYS   = "Systems"
+string GRP_EXIT  = "Exits & Stops"
+string GRP_SIZE  = "Position Sizing"
+string GRP_TREND = "Trend / Regime Filters"
+string GRP_TIME  = "Session Filter"
+string GRP_VIS   = "Visuals"
+
+bool   useSystem1     = input.bool(true,  "Enable System 1 (fast)", group=GRP_SYS)
+int    s1EntryLen     = input.int(20,     "S1 Entry Donchian", minval=5, maxval=100, group=GRP_SYS)
+int    s1ExitLen      = input.int(10,     "S1 Exit Donchian",  minval=2, maxval=50,  group=GRP_SYS)
+bool   s1SkipIfWin    = input.bool(true,  "S1 skip if last trade won (classic)", group=GRP_SYS, tooltip="Turtle System 1: take breakout only if previous trade was a loser. System 2 always fires.")
+
+bool   useSystem2     = input.bool(true,  "Enable System 2 (slow)", group=GRP_SYS)
+int    s2EntryLen     = input.int(55,     "S2 Entry Donchian", minval=10, maxval=200, group=GRP_SYS)
+int    s2ExitLen      = input.int(20,     "S2 Exit Donchian",  minval=5,  maxval=100, group=GRP_SYS)
+
+string exitMode       = input.string("Donchian", "Exit mode", options=["Donchian", "ATR Trail", "Both"], group=GRP_EXIT)
+float  stopN          = input.float(2.0,  "Hard stop (N multiples)", minval=0.5, step=0.1, group=GRP_EXIT)
+float  trailN         = input.float(2.0,  "ATR trail (N multiples)", minval=0.5, step=0.1, group=GRP_EXIT)
+int    atrLen         = input.int(20,     "ATR / N length", minval=5, maxval=100, group=GRP_EXIT)
+
+float  riskPct        = input.float(1.0,  "Risk % equity per unit", minval=0.1, maxval=5.0, step=0.1, group=GRP_SIZE, tooltip="Dollar risk at the hard stop ≈ riskPct% of equity per unit.")
+bool   riskAtStop     = input.bool(true,  "Size so hard-stop = riskPct (recommended)", group=GRP_SIZE, tooltip="On: qty = equity*risk%/ (stopN*N). Off: classic Turtle Unit = equity*risk%/N (≈2× risk at 2N stop).")
+int    maxUnits       = input.int(4,      "Max units (pyramiding)", minval=1, maxval=4, group=GRP_SIZE)
+float  addEveryN      = input.float(0.5,  "Add spacing (N multiples)", minval=0.25, step=0.25, group=GRP_SIZE)
+float  maxHeatPct     = input.float(6.0,  "Max portfolio heat %", minval=1.0, maxval=20.0, step=0.5, group=GRP_SIZE, tooltip="Block new units if open risk (units × riskPct) would exceed this % of equity.")
+float  maxUnitEquityPct = input.float(25.0, "Max notional % equity / unit", minval=5.0, maxval=100.0, step=5.0, group=GRP_SIZE, tooltip="Clamp unit size so one unit cannot notional > this % of equity (portable across stocks/FX/crypto).")
+
+string maType         = input.string("EMA", "Trend MA type", options=["EMA", "SMA"], group=GRP_TREND)
+int    maLen          = input.int(200,    "Trend MA length", minval=50, maxval=400, group=GRP_TREND)
+bool   useTrendFilter = input.bool(true,  "Require price vs MA", group=GRP_TREND)
+
+bool   useAdxFilter   = input.bool(false, "ADX regime filter", group=GRP_TREND, tooltip="Off by default so Daily liquid markets trade at classic Turtle frequency. Enable to skip chop.")
+int    adxLen         = input.int(14,     "ADX length", minval=5, maxval=50, group=GRP_TREND)
+float  adxMin         = input.float(20.0, "Min ADX (trend strength)", minval=5, maxval=50, step=1, group=GRP_TREND)
+
+bool   useAtrRegime   = input.bool(false, "ATR percentile regime filter", group=GRP_TREND)
+int    atrPctLen      = input.int(100,    "ATR percentile lookback", minval=20, maxval=300, group=GRP_TREND)
+float  atrPctMin      = input.float(30.0, "Min ATR percentile", minval=0, maxval=90, group=GRP_TREND)
+float  atrPctMax      = input.float(95.0, "Max ATR percentile", minval=50, maxval=100, group=GRP_TREND, tooltip="Skip extreme vol spikes and dead vol if enabled.")
+
+bool   useSession     = input.bool(false, "Enable session filter", group=GRP_TIME)
+string tradeSession   = input.session("0000-2359", "Session (exchange TZ)", group=GRP_TIME)
+
+bool   showChannels   = input.bool(true,  "Show Donchian channels", group=GRP_VIS)
+bool   showStops      = input.bool(true,  "Show stop / trail levels", group=GRP_VIS)
+bool   showMarkers    = input.bool(true,  "Show entry markers", group=GRP_VIS)
+
+// ── Core series ─────────────────────────────────────────────────────────────
+float N = ta.atr(atrLen)
+
+float s1Hi = ta.highest(high[1], s1EntryLen)
+float s1Lo = ta.lowest(low[1],  s1EntryLen)
+float s2Hi = ta.highest(high[1], s2EntryLen)
+float s2Lo = ta.lowest(low[1],  s2EntryLen)
+
+float s1ExitLo = ta.lowest(low[1],  s1ExitLen)
+float s1ExitHi = ta.highest(high[1], s1ExitLen)
+float s2ExitLo = ta.lowest(low[1],  s2ExitLen)
+float s2ExitHi = ta.highest(high[1], s2ExitLen)
+
+float trendMA = maType == "EMA" ? ta.ema(close, maLen) : ta.sma(close, maLen)
+
+// Pine v5: ADX comes from ta.dmi (there is no ta.adx). Named vars — `_` is invalid.
+[diPlus, diMinus, adxVal] = ta.dmi(adxLen, adxLen)
+float atrPctile = ta.percentrank(N, atrPctLen)
+
+bool inSession = not useSession or not na(time(timeframe.period, tradeSession))
+
+bool trendLongOK  = not useTrendFilter or close > trendMA
+bool trendShortOK = not useTrendFilter or close < trendMA
+bool adxOK        = not useAdxFilter or (adxVal >= adxMin)
+bool atrOK        = not useAtrRegime or (atrPctile >= atrPctMin and atrPctile <= atrPctMax)
+bool regimeOK     = adxOK and atrOK and inSession and not na(N) and N > 0
+
+// ── State: units, last fill, system, S1 filter ──────────────────────────────
+var int   longUnits       = 0
+var int   shortUnits      = 0
+var float lastLongEntry   = na
+var float lastShortEntry  = na
+var float longHardStop    = na
+var float shortHardStop   = na
+var float highestSince    = na
+var float lowestSince     = na
+var int   activeSystem    = 0          // 1 or 2 while in trade (selects exit channel)
+var float lastClosedPnL   = na
+var bool  lastTradeWasWin = false
+
+// Detect closed trade PnL for S1 skip-if-won (S2 never blocked by this)
+if strategy.closedtrades > 0
+    int lastIdx = strategy.closedtrades - 1
+    float pnl = strategy.closedtrades.profit(lastIdx)
+    if barstate.isconfirmed and strategy.closedtrades != strategy.closedtrades[1]
+        lastClosedPnL   := pnl
+        lastTradeWasWin := pnl > 0
+
+bool flat = strategy.position_size == 0
+
+if flat
+    longUnits      := 0
+    shortUnits     := 0
+    lastLongEntry  := na
+    lastShortEntry := na
+    longHardStop   := na
+    shortHardStop  := na
+    highestSince   := na
+    lowestSince    := na
+    activeSystem   := 0
+else
+    // Recover unit count / stop after reload or desync — stop MUST always exist in a position
+    if strategy.position_size > 0 and longUnits == 0
+        longUnits     := 1
+        lastLongEntry := strategy.position_avg_price
+        longHardStop  := strategy.position_avg_price - stopN * N
+        activeSystem  := activeSystem == 0 ? 1 : activeSystem
+    if strategy.position_size < 0 and shortUnits == 0
+        shortUnits     := 1
+        lastShortEntry := strategy.position_avg_price
+        shortHardStop  := strategy.position_avg_price + stopN * N
+        activeSystem   := activeSystem == 0 ? 1 : activeSystem
+    // Ensure hard stop is never na while in position (static stop can lag; keep attached)
+    if strategy.position_size > 0 and na(longHardStop)
+        longHardStop := strategy.position_avg_price - stopN * N
+    if strategy.position_size < 0 and na(shortHardStop)
+        shortHardStop := strategy.position_avg_price + stopN * N
+
+// Track excursion for ATR trail
+if strategy.position_size > 0
+    highestSince := na(highestSince) ? high : math.max(highestSince, high)
+    lowestSince  := na
+else if strategy.position_size < 0
+    lowestSince  := na(lowestSince) ? low : math.min(lowestSince, low)
+    highestSince := na
+
+// ── Position sizing (1 unit) — portable + clamped ───────────────────────────
+float riskDollars = strategy.equity * (riskPct / 100.0)
+float stopDist    = stopN * N
+float unitDenom   = riskAtStop ? stopDist : N
+float rawQty      = unitDenom > 0 and not na(unitDenom) ? riskDollars / unitDenom : na
+
+// Cap notional so qty cannot be insane on low-ATR names or tiny N
+float maxNotional = strategy.equity * (maxUnitEquityPct / 100.0)
+float maxQtyCap   = close > 0 ? maxNotional / close : na
+float minQtyFloor = 0.0001
+
+float unitQty = na
+if not na(rawQty) and rawQty > 0 and not na(maxQtyCap) and maxQtyCap > 0
+    unitQty := math.max(minQtyFloor, math.min(rawQty, maxQtyCap))
+    // Whole shares for equity-like instruments; keep fractional for FX/crypto/futures
+    string symType = syminfo.type
+    bool wholeQty = symType == "stock" or symType == "fund" or symType == "dr" or symType == "right" or symType == "warrant"
+    if wholeQty
+        unitQty := math.max(1.0, math.floor(unitQty))
+
+float openHeatPct = (longUnits + shortUnits) * riskPct
+bool  heatOK      = openHeatPct + riskPct <= maxHeatPct + 1e-6
+
+bool canAddLong  = longUnits  < maxUnits and heatOK and not na(unitQty) and unitQty > 0
+bool canAddShort = shortUnits < maxUnits and heatOK and not na(unitQty) and unitQty > 0
+
+// Pyramid add levels: next add when price advances addEveryN * N from last fill
+bool longAddLevel  = longUnits  > 0 and not na(lastLongEntry)  and close >= lastLongEntry  + addEveryN * N
+bool shortAddLevel = shortUnits > 0 and not na(lastShortEntry) and close <= lastShortEntry - addEveryN * N
+
+// ── Entry signals (no look-ahead: channels use [1]) ─────────────────────────
+bool s1LongBreak  = close > s1Hi
+bool s1ShortBreak = close < s1Lo
+bool s2LongBreak  = close > s2Hi
+bool s2ShortBreak = close < s2Lo
+
+bool s1LongOK  = useSystem1 and s1LongBreak  and trendLongOK  and regimeOK and (not s1SkipIfWin or not lastTradeWasWin)
+bool s1ShortOK = useSystem1 and s1ShortBreak and trendShortOK and regimeOK and (not s1SkipIfWin or not lastTradeWasWin)
+bool s2LongOK  = useSystem2 and s2LongBreak  and trendLongOK  and regimeOK
+bool s2ShortOK = useSystem2 and s2ShortBreak and trendShortOK and regimeOK
+
+// First unit: prefer S2 label if both fire (rarer/stronger); else S1
+bool newLongS2  = flat and s2LongOK
+bool newLongS1  = flat and s1LongOK and not s2LongOK
+bool newShortS2 = flat and s2ShortOK
+bool newShortS1 = flat and s1ShortOK and not s2ShortOK
+bool newLong    = newLongS1 or newLongS2
+bool newShort   = newShortS1 or newShortS2
+
+bool addLong  = strategy.position_size > 0 and canAddLong  and longAddLevel  and regimeOK and trendLongOK
+bool addShort = strategy.position_size < 0 and canAddShort and shortAddLevel and regimeOK and trendShortOK
+
+// ── Entries: single IDs so exits always attach (pyramiding reuses "Long"/"Short") ──
+if newLong and canAddLong
+    strategy.entry("Long", strategy.long, qty=unitQty)
+    longUnits     := 1
+    lastLongEntry := close
+    longHardStop  := close - stopDist
+    highestSince  := high
+    activeSystem  := newLongS2 ? 2 : 1
+
+if newShort and canAddShort
+    strategy.entry("Short", strategy.short, qty=unitQty)
+    shortUnits     := 1
+    lastShortEntry := close
+    shortHardStop  := close + stopDist
+    lowestSince    := low
+    activeSystem   := newShortS2 ? 2 : 1
+
+// Pyramid adds — same entry ID; Turtle: ratchet stop to last add ± 2N
+if addLong
+    strategy.entry("Long", strategy.long, qty=unitQty)
+    longUnits     += 1
+    lastLongEntry := close
+    longHardStop  := close - stopDist
+
+if addShort
+    strategy.entry("Short", strategy.short, qty=unitQty)
+    shortUnits     += 1
+    lastShortEntry := close
+    shortHardStop  := close + stopDist
+
+// ── Exits ───────────────────────────────────────────────────────────────────
+// Exit channel follows the system that opened the trade (S1→10, S2→20).
+// activeSystem 0/1 → S1 exit channel (never leave a position without a channel).
+float donchExitLo = activeSystem == 2 ? s2ExitLo : s1ExitLo
+float donchExitHi = activeSystem == 2 ? s2ExitHi : s1ExitHi
+
+float atrTrailLong  = not na(highestSince) ? highestSince - trailN * N : na
+float atrTrailShort = not na(lowestSince)  ? lowestSince  + trailN * N : na
+
+// Hard stop + optional ATR trail (ratchet only in favor of the trade)
+float finalLongStop  = longHardStop
+float finalShortStop = shortHardStop
+if exitMode == "ATR Trail" or exitMode == "Both"
+    if not na(atrTrailLong) and not na(finalLongStop)
+        finalLongStop := math.max(finalLongStop, atrTrailLong)
+    else if not na(atrTrailLong) and na(finalLongStop)
+        finalLongStop := atrTrailLong
+    if not na(atrTrailShort) and not na(finalShortStop)
+        finalShortStop := math.min(finalShortStop, atrTrailShort)
+    else if not na(atrTrailShort) and na(finalShortStop)
+        finalShortStop := atrTrailShort
+
+bool useDonchExit   = exitMode == "Donchian" or exitMode == "Both"
+bool longDonchExit  = useDonchExit and strategy.position_size > 0 and close < donchExitLo
+bool shortDonchExit = useDonchExit and strategy.position_size < 0 and close > donchExitHi
+
+// Hard stop / trail: ONE exit order per side, always while in position (never gate on na)
+if strategy.position_size > 0
+    float stopL = not na(finalLongStop) ? finalLongStop : strategy.position_avg_price - stopDist
+    if not na(stopL)
+        strategy.exit("XL", from_entry="Long", stop=stopL)
+
+if strategy.position_size < 0
+    float stopS = not na(finalShortStop) ? finalShortStop : strategy.position_avg_price + stopDist
+    if not na(stopS)
+        strategy.exit("XS", from_entry="Short", stop=stopS)
+
+// Primary Turtle exit: opposite Donchian — market close on confirmed channel break
+if longDonchExit
+    strategy.close("Long", comment="Donchian Exit Long")
+
+if shortDonchExit
+    strategy.close("Short", comment="Donchian Exit Short")
+
+// ── Plots ───────────────────────────────────────────────────────────────────
+plot(trendMA, "Trend MA", color=color.new(color.orange, 0), linewidth=2)
+
+plot(showChannels ? s1Hi : na, "S1 High", color=color.new(color.teal, 40), linewidth=1)
+plot(showChannels ? s1Lo : na, "S1 Low",  color=color.new(color.teal, 40), linewidth=1)
+plot(showChannels ? s2Hi : na, "S2 High", color=color.new(color.blue, 55), linewidth=1, style=plot.style_linebr)
+plot(showChannels ? s2Lo : na, "S2 Low",  color=color.new(color.blue, 55), linewidth=1, style=plot.style_linebr)
+
+plot(showStops and strategy.position_size > 0 ? finalLongStop  : na, "Long Stop",  color=color.red,   style=plot.style_linebr, linewidth=2)
+plot(showStops and strategy.position_size < 0 ? finalShortStop : na, "Short Stop", color=color.lime,  style=plot.style_linebr, linewidth=2)
+
+plotshape(showMarkers and newLongS1,  title="S1 Long",  style=shape.triangleup,   location=location.belowbar, color=color.teal,  size=size.small, text="S1")
+plotshape(showMarkers and newLongS2,  title="S2 Long",  style=shape.triangleup,   location=location.belowbar, color=color.blue,  size=size.small, text="S2")
+plotshape(showMarkers and newShortS1, title="S1 Short", style=shape.triangledown, location=location.abovebar, color=color.teal,  size=size.small, text="S1")
+plotshape(showMarkers and newShortS2, title="S2 Short", style=shape.triangledown, location=location.abovebar, color=color.blue,  size=size.small, text="S2")
+plotshape(showMarkers and addLong,    title="Add Long", style=shape.circle,       location=location.belowbar, color=color.aqua,  size=size.tiny)
+plotshape(showMarkers and addShort,   title="Add Short",style=shape.circle,       location=location.abovebar, color=color.aqua,  size=size.tiny)
+
+bgcolor(regimeOK ? na : color.new(color.red, 92), title="Regime blocked")
+
+// Dashboard
+var table dash = table.new(position.top_right, 2, 8, bgcolor=color.new(color.black, 75), border_width=1)
+if barstate.islast
+    table.cell(dash, 0, 0, "N (ATR)",     text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 0, str.tostring(N, format.mintick), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 1, "ADX",         text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 1, str.tostring(adxVal, "#.1"), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 2, "Units L/S",   text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 2, str.tostring(longUnits) + " / " + str.tostring(shortUnits), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 3, "Heat %",      text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 3, str.tostring(openHeatPct, "#.1"), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 4, "Unit qty",    text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 4, na(unitQty) ? "—" : str.tostring(unitQty, "#.####"), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 5, "System",      text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 5, activeSystem == 0 ? "flat" : "S" + str.tostring(activeSystem), text_color=color.white, text_size=size.small)
+    table.cell(dash, 0, 6, "Last trade",  text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 6, na(lastClosedPnL) ? "—" : (lastTradeWasWin ? "WIN" : "LOSS"), text_color=lastTradeWasWin ? color.lime : color.red, text_size=size.small)
+    table.cell(dash, 0, 7, "Regime",      text_color=color.gray, text_size=size.small)
+    table.cell(dash, 1, 7, regimeOK ? "OK" : "BLOCK", text_color=regimeOK ? color.lime : color.red, text_size=size.small)

@@ -1,0 +1,16 @@
+[
+  {
+    "path": "src/viprasol_ma_cross_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "EMA 交叉与多重条件过滤策略",
+    "original_description": "A flagship TradingView Pine Script v6 strategy — EMA crossover with stackable confluence filters, dual stop/target engines, an ATR trailing stop, and an on-chart stats dashboard.",
+    "description_zh": "Pine Script v6 EMA 交叉策略，带可组合条件过滤、双止损止盈模式、ATR 追踪止损和图表统计面板。",
+    "crypto_relevance": "作者明确说明可用于股票、加密货币、外汇和期货；这是通用策略。",
+    "notes": "作者建议根据交易品种调整参数；提供交易告警条件，作者效果未经独立验证。",
+    "source_url": "https://github.com/Viprasol-Tech/pine-script-strategy/blob/5b333426745a8fa2a78ae924e9baa31e52fc0da4/src/viprasol_ma_cross_strategy.pine",
+    "description_source_url": "https://github.com/Viprasol-Tech/pine-script-strategy/blob/5b333426745a8fa2a78ae924e9baa31e52fc0da4/README.md",
+    "source_commit": "5b333426745a8fa2a78ae924e9baa31e52fc0da4",
+    "license": "MIT",
+    "sha256": "60d8f919cdfae0e88f46944b187aee785b094d0fda1e00f3c44f3bc632e8c5b4"
+  }
+]

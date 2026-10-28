@@ -1,0 +1,54 @@
+//@version=5
+indicator("BTC 1–5 min Scalping Signals 😍🅰️🅱️", overlay=true)
+
+// =======================================================
+// 🔔 BTC 1–5 Min Scalping Strategy (Pine Script v5)
+// 📈 Developed for short-term crypto scalping (1–5 min)
+// 🧠 Logic: EMA crossover + RSI + MACD + Candle direction
+// 🛑 DISCLAIMER:
+// This script is for educational purposes only.
+// It is not financial advice. Use at your own risk.
+// =======================================================
+
+// === Inputs
+emaFastLen = input.int(5, title="Fast EMA")
+emaSlowLen = input.int(13, title="Slow EMA")
+rsiLen     = input.int(7, title="RSI Length")
+rsiBuy     = input.int(50, title="RSI Buy Threshold")
+rsiSell    = input.int(50, title="RSI Sell Threshold")
+macdFast   = input.int(8, title="MACD Fast")
+macdSlow   = input.int(21, title="MACD Slow")
+macdSig    = input.int(5, title="MACD Signal")
+
+// === Indicators
+price = close
+emaFast = ta.ema(price, emaFastLen)
+emaSlow = ta.ema(price, emaSlowLen)
+rsi = ta.rsi(price, rsiLen)
+[macdLine, signalLine, _] = ta.macd(price, macdFast, macdSlow, macdSig)
+
+// === Conditions
+longCond = ta.crossover(emaFast, emaSlow) and rsi > rsiBuy and macdLine > signalLine and close > open
+shortCond = ta.crossunder(emaFast, emaSlow) and rsi < rsiSell and macdLine < signalLine and close < open
+
+// === Plotting EMAs
+plot(emaFast, color=color.orange, title="EMA Fast")
+plot(emaSlow, color=color.blue, title="EMA Slow")
+
+// === Plotting Signals
+plotshape(longCond, title="Buy Signal", location=location.belowbar, style=shape.triangleup, size=size.small, color=color.green)
+plotshape(shortCond, title="Sell Signal", location=location.abovebar, style=shape.triangledown, size=size.small, color=color.red)
+
+// === Alerts
+alertcondition(longCond, title="Buy Alert", message="🟢 BUY Signal (BTC 1-min)")
+alertcondition(shortCond, title="Sell Alert", message="🔴 SELL Signal (BTC 1-min)")
+
+// === Draw Labels Once Per Signal (Avoid Clutter)
+var label lastLong = na
+var label lastShort = na
+
+if (longCond)
+    lastLong := label.new(bar_index, low, text="BUY 📈", style=label.style_label_up, color=color.green, textcolor=color.white)
+
+if (shortCond)
+    lastShort := label.new(bar_index, high, text="SELL 📉", style=label.style_label_down, color=color.red, textcolor=color.white)

@@ -1,0 +1,30 @@
+[
+  {
+    "path": "ema_bounce_vwap_macd_strategy.pine",
+    "kind": "strategy",
+    "title_zh": "EMA 回踩、VWAP 和 MACD 策略",
+    "original_description": "EMA Bounce • VWAP + MACD Strategy (3:1 RR, Long-Only)",
+    "description_zh": "EMA 回踩、VWAP 和 MACD 策略，风险收益比 3:1，仅做多。",
+    "crypto_relevance": "作者 README 示例涉及 BTCUSDT、ETHUSDT、ETHBTC、ADAUSDT；方法亦可用于其他市场。",
+    "implementation_note_zh": "默认仓位 100%，手续费和滑点默认为零；需检查历史回测日期和信号告警配置。 源码及作者效果未经编译或回测。",
+    "source_url": "https://github.com/Wlddzuk/TradingView-to-Telegram/blob/a36873bba7c95430aafc471da15a1cc057e5a39b/ema_bounce_vwap_macd_strategy.pine",
+    "description_source_url": "https://github.com/Wlddzuk/TradingView-to-Telegram/blob/a36873bba7c95430aafc471da15a1cc057e5a39b/ema_bounce_vwap_macd_strategy.pine",
+    "source_commit": "a36873bba7c95430aafc471da15a1cc057e5a39b",
+    "license": "README 声明 MIT，但仓库无独立 LICENSE 文件。",
+    "sha256": "017b3efef16ca2436393ff259b392e13a4cd108436659129815e8d7532b7ee3b"
+  },
+  {
+    "path": "multi_symbol_ema_bounce_alerts.pine",
+    "kind": "indicator",
+    "title_zh": "EMA 回踩多币种多周期告警",
+    "original_description": "EMA Bounce • VWAP + MACD • Email-Based Multi-Symbol/TF Alerts + Host-Chart R:R Drawings",
+    "description_zh": "EMA 回踩、VWAP 和 MACD 多币种多周期邮件告警，并在主图绘制风险收益比。",
+    "crypto_relevance": "作者 README 示例涉及 BTCUSDT、ETHUSDT、ETHBTC、ADAUSDT；方法亦可用于其他市场。",
+    "implementation_note_zh": "作者称使用配套策略的状态机逻辑，但并未独立核对；告警外发须自行配置。 源码及作者效果未经编译或回测。",
+    "source_url": "https://github.com/Wlddzuk/TradingView-to-Telegram/blob/a36873bba7c95430aafc471da15a1cc057e5a39b/multi_symbol_ema_bounce_alerts.pine",
+    "description_source_url": "https://github.com/Wlddzuk/TradingView-to-Telegram/blob/a36873bba7c95430aafc471da15a1cc057e5a39b/multi_symbol_ema_bounce_alerts.pine",
+    "source_commit": "a36873bba7c95430aafc471da15a1cc057e5a39b",
+    "license": "README 声明 MIT，但仓库无独立 LICENSE 文件。",
+    "sha256": "c1ab809fa2f2d33380d57b5a68e8a5fdff3ce1edf688e134c705b52dbd6a0cce"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "path": "main.pine",
+    "kind": "indicator",
+    "title_zh": "支撑阻力与流动性区域指标",
+    "original_description": "Automatic S/R level detection using pivot points",
+    "description_zh": "使用枢轴点自动检测支撑和阻力水平。",
+    "crypto_relevance": "作者列出 BTC、ETH 和 SPY 等示例，属于通用指标。",
+    "notes": "源码及 README 声明 MPL 2.0；仓库无独立 LICENSE 文件，许可文本链接见源文件。源码根据成交量阈值和枢轴标记区域，并非交易所实时订单流；作者效果未验证。",
+    "source_url": "https://github.com/PlasmaZero/Support-and-Resistance-Indicator/blob/da7ae3a75319c9ca0091d4d5e92596c5f00c2f3e/main.pine",
+    "description_source_url": "https://github.com/PlasmaZero/Support-and-Resistance-Indicator/blob/da7ae3a75319c9ca0091d4d5e92596c5f00c2f3e/README.md",
+    "source_commit": "da7ae3a75319c9ca0091d4d5e92596c5f00c2f3e",
+    "license": "MPL 2.0，源码及 README 声明；无独立 LICENSE",
+    "sha256": "bf396463cd308953eb0cd83d32f9a510140682f21775ddc1045d2c82c2995508"
+  }
+]

@@ -1,0 +1,113 @@
+//@version=5
+strategy("Momentum Combo Strategy - Eterna MCP", 
+         shorttitle="Momentum Combo",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+rsiLength = input.int(14, "RSI Length", minval=1)
+macdFast = input.int(12, "MACD Fast", minval=1)
+macdSlow = input.int(26, "MACD Slow", minval=1)
+macdSignal = input.int(9, "MACD Signal", minval=1)
+stochLength = input.int(14, "Stochastic Length", minval=1)
+stochK = input.int(3, "Stoch K", minval=1)
+stochD = input.int(3, "Stoch D", minval=1)
+minConfirmations = input.int(2, "Min Confirmations", minval=1, maxval=3)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// INDICATOR CALCULATIONS
+// ============================================
+// RSI
+rsi = ta.rsi(close, rsiLength)
+rsiBullish = rsi < 30 or (ta.crossover(rsi, 30) and rsi < 50)
+rsiBearish = rsi > 70 or (ta.crossunder(rsi, 70) and rsi > 50)
+
+// MACD
+[macdLine, signalLine, macdHist] = ta.macd(close, macdFast, macdSlow, macdSignal)
+macdBullish = ta.crossover(macdLine, signalLine) or (macdLine > signalLine and macdHist > macdHist[1])
+macdBearish = ta.crossunder(macdLine, signalLine) or (macdLine < signalLine and macdHist < macdHist[1])
+
+// Stochastic
+stochRSI = ta.stoch(rsi, rsi, rsi, stochLength)
+k = ta.sma(stochRSI, stochK)
+d = ta.sma(k, stochD)
+stochBullish = (ta.crossover(k, d) and k < 20) or (k > d and k < 30 and k > k[1])
+stochBearish = (ta.crossunder(k, d) and k > 80) or (k < d and k > 70 and k < k[1])
+
+// Momentum (Rate of Change)
+rocLength = 10
+momentum = ta.mom(close, rocLength)
+momentumBullish = momentum > 0 and momentum > momentum[1]
+momentumBearish = momentum < 0 and momentum < momentum[1]
+
+// ============================================
+// CONFLUENCE DETECTION
+// ============================================
+// Count bullish signals
+bullishCount = (rsiBullish ? 1 : 0) + 
+               (macdBullish ? 1 : 0) + 
+               (stochBullish ? 1 : 0) + 
+               (momentumBullish ? 1 : 0)
+
+// Count bearish signals
+bearishCount = (rsiBearish ? 1 : 0) + 
+               (macdBearish ? 1 : 0) + 
+               (stochBearish ? 1 : 0) + 
+               (momentumBearish ? 1 : 0)
+
+// Strong signals require minimum confirmations
+strongBuy = bullishCount >= minConfirmations
+strongSell = bearishCount >= minConfirmations
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if strongBuy and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if strongSell and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite signal
+if strongSell and strategy.position_size > 0
+    strategy.close("Long")
+
+if strongBuy and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+// RSI
+plot(rsi, "RSI", color=color.blue, linewidth=1)
+hline(70, "RSI OB", color=color.red, linestyle=hline.style_dotted)
+hline(30, "RSI OS", color=color.green, linestyle=hline.style_dotted)
+
+// MACD Histogram
+plot(macdHist * 2, "MACD Hist", color=macdHist > 0 ? color.green : color.red, style=plot.style_histogram)
+
+// Stochastic
+plot(k, "Stoch K", color=color.orange, linewidth=1)
+plot(d, "Stoch D", color=color.yellow, linewidth=1)
+
+// Confluence strength indicator
+plot(bullishCount * 20, "Bull Strength", color=color.lime, style=plot.style_area, linewidth=0)
+plot(-bearishCount * 20, "Bear Strength", color=color.maroon, style=plot.style_area, linewidth=0)
+
+// Signal markers
+plotshape(strongBuy, "BUY", shape.triangleup, location.bottom, color.green, size=size.large, text="BUY")
+plotshape(strongSell, "SELL", shape.triangledown, location.top, color.red, size=size.large, text="SELL")
+
+// Confluence meter
+hline(minConfirmations * 20, "Min Confirmation Level", color=color.white, linestyle=hline.style_dashed)
+
+// Background highlight for strong signals
+bgcolor(strongBuy ? color.new(color.green, 85) : strongSell ? color.new(color.red, 85) : na)

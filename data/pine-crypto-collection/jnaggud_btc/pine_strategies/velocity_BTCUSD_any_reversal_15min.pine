@@ -1,0 +1,248 @@
+//@version=6
+strategy("JD Velocity velocity_BTCUSD_any_reversal_15min", overlay=true, initial_capital=100000, default_qty_type=strategy.percent_of_equity, default_qty_value=100, pyramiding=0, commission_type=strategy.commission.percent, commission_value=0.05, slippage=1, process_orders_on_close=true)
+
+// Source: Pattern_FindR/velocity_strategies/velocity_BTC-USD_any_reversal_15min_20260118_132912/velocity_config.json
+// Port note: this is a Pine-native conversion of the Python velocity config. Some Python-only filters that require external state are approximated with chart-native OHLCV calculations.
+
+oscillatorType = input.string("composite_smooth", "Oscillator", options=["composite_smooth", "composite", "arwo", "mji", "ewaf"])
+signalType = input.string("any_reversal", "Signal Type", options=["velocity_crossover_and_zone", "velocity_crossover_or_zone", "zone_only", "momentum", "any_reversal", "double_bottom", "divergence", "breakout", "zone_exit", "velocity_cross", "zone_velocity", "midline_cross"])
+expectedTimeframe = input.string("15m", "Expected timeframe")
+allowShorts = input.bool(false, "Allow shorts")
+velSmoothing = input.int(1, "Velocity smoothing", minval=1, maxval=100)
+oversoldThreshold = input.float(-0.4778494666, "Oversold threshold", step=0.0001)
+overboughtThreshold = input.float(0.5379610987, "Overbought threshold", step=0.0001)
+extremeZoneMult = input.float(2.1096036465, "Extreme zone multiplier", step=0.0001)
+requireAccel = input.bool(true, "Require acceleration")
+accelThreshold = input.float(0.0000000000, "Acceleration threshold", step=0.0001)
+velThreshold = input.float(0.0000000000, "Velocity threshold", step=0.0001)
+rsiFilter = input.string("none", "RSI filter", options=["none", "confirm", "divergence", "oversold_only", "overbought_only", "both"])
+rsiPeriod = input.int(6, "RSI period", minval=2)
+rsiOversold = input.float(16.0000, "RSI oversold")
+rsiOverbought = input.float(61.0000, "RSI overbought")
+useMacdConfirm = input.bool(false, "Use MACD confirmation")
+useBbFilter = input.bool(false, "Use Bollinger filter")
+useRegimeFilter = input.bool(false, "Use regime filter")
+regimeThreshold = input.float(0.000000, "Regime threshold")
+useVolRegimeFilter = input.bool(false, "Use volatility regime filter")
+volRegimeThreshold = input.float(0.250000, "Vol regime threshold")
+minBarsBetween = input.int(1, "Minimum bars between entries", minval=0)
+minHoldBars = input.int(0, "Minimum hold bars", minval=0)
+stopLossPct = input.float(5.2047637417, "Stop loss %", minval=0.0, step=0.01)
+takeProfitPct = input.float(3.5992783021, "Take profit %", minval=0.0, step=0.01)
+exitOnOppositeSignal = input.bool(true, "Exit on opposite signal")
+exitOnMidlineCross = input.bool(false, "Exit on oscillator midline cross")
+useTrailingStop = input.bool(false, "Use trailing stop")
+trailingStopPct = input.float(1.0000000000, "Trailing stop %", minval=0.0, step=0.01)
+trailingActivationPct = input.float(0.3000000000, "Trailing activation %", minval=0.0, step=0.01)
+useBreakevenStop = input.bool(false, "Use breakeven stop")
+breakevenTriggerPct = input.float(0.3000000000, "Breakeven trigger %", minval=0.0, step=0.01)
+breakevenOffsetPct = input.float(0.0500000000, "Breakeven offset %", minval=0.0, step=0.01)
+useAccelExit = input.bool(false, "Use acceleration exit")
+accelExitMinPnl = input.float(0.5000000000, "Accel exit min PnL %")
+showSignals = input.bool(true, "Show chart signals")
+
+f_clip(x, lo, hi) => math.max(lo, math.min(hi, x))
+f_safe_div(a, b) => math.abs(b) > 1e-10 ? a / b : 0.0
+f_norm_minmax(src, len) =>
+    lo = ta.lowest(src, len)
+    hi = ta.highest(src, len)
+    f_clip(f_safe_div(src - lo, hi - lo) * 2.0 - 1.0, -1.0, 1.0)
+f_norm_z(src, len) => f_clip(f_safe_div(src - ta.sma(src, len), nz(ta.stdev(src, len), 1.0)) / 3.0, -1.0, 1.0)
+f_willr(len) => f_safe_div(close - ta.highest(high, len), ta.highest(high, len) - ta.lowest(low, len)) * 100.0
+f_mfi(len) =>
+    tp = hlc3
+    mf = tp * volume
+    pos = tp > tp[1] ? mf : 0.0
+    neg = tp < tp[1] ? mf : 0.0
+    pmf = ta.sma(pos, len) * len
+    nmf = ta.sma(neg, len) * len
+    100.0 - (100.0 / (1.0 + f_safe_div(pmf, nmf)))
+f_obv() => ta.cum(close > close[1] ? volume : close < close[1] ? -volume : 0.0)
+f_slope(src, len) => ta.linreg(src, len, 0) - ta.linreg(src, len, 1)
+f_aroon_osc(len) =>
+    barsHigh = ta.highestbars(high, len)
+    barsLow = ta.lowestbars(low, len)
+    aroonUp = 100.0 * (len + barsHigh) / len
+    aroonDown = 100.0 * (len + barsLow) / len
+    aroonUp - aroonDown
+f_adx_norm(len) =>
+    [_, _, adx] = ta.dmi(len, len)
+    f_clip(adx / 100.0, 0.0, 1.0)
+f_bb_position(len) =>
+    mid = ta.sma(close, len)
+    dev = ta.stdev(close, len)
+    f_clip(f_safe_div(close - mid, 2.0 * dev), -1.0, 1.0)
+f_composite() =>
+    rsi14 = (ta.rsi(close, 14) - 50.0) / 50.0
+    rsi7 = (ta.rsi(close, 7) - 50.0) / 50.0
+    rsi21 = (ta.rsi(close, 21) - 50.0) / 50.0
+    stoch = (ta.stoch(close, high, low, 14) - 50.0) / 50.0
+    willr = (f_willr(14) + 50.0) / 50.0
+    cci = f_clip(ta.cci(hlc3, 20) / 200.0, -1.0, 1.0)
+    roc10 = f_norm_z(ta.roc(close, 10), 50)
+    roc5 = f_norm_z(ta.roc(close, 5), 50)
+    mom10 = f_norm_z(close - close[10], 50)
+    bbp = f_bb_position(20)
+    [plusDI, minusDI, adx] = ta.dmi(14, 14)
+    adxTrend = f_clip((plusDI - minusDI) / 100.0, -1.0, 1.0)
+    mfi = (f_mfi(14) - 50.0) / 50.0
+    volRel = f_safe_div(volume, ta.sma(volume, 20))
+    volVel = f_norm_z(ta.sma(volRel, 5) - ta.sma(volRel, 5)[1], 60)
+    volMom = f_norm_z(ta.roc(volume, 5), 60)
+    raw = (rsi14 + rsi7 + rsi21 + stoch + willr + cci + roc10 + roc5 + mom10 + bbp + adxTrend + mfi + volVel + volMom) / 14.0
+    f_clip(raw, -1.0, 1.0)
+f_arwo() =>
+    regime = f_adx_norm(14)
+    roc10 = f_norm_minmax(ta.roc(close, 10), 50)
+    [macdLine, macdSignal, macdHist] = ta.macd(close, 12, 26, 9)
+    macdNorm = f_norm_minmax(macdHist, 50)
+    aroonNorm = f_aroon_osc(25) / 100.0
+    trend = (roc10 + macdNorm + aroonNorm) / 3.0
+    rsi = (ta.rsi(close, 14) - 50.0) / 50.0
+    stoch = (ta.stoch(close, high, low, 14) - 50.0) / 50.0
+    willr = (f_willr(14) + 50.0) / 50.0
+    f_clip(ta.sma(regime * trend + (1.0 - regime) * ((rsi + stoch + willr) / 3.0), 3), -1.0, 1.0)
+f_mji() =>
+    mom = close - close[10]
+    jerk = (mom - mom[1]) - (mom[1] - mom[2])
+    mjiRaw = ta.ema(jerk, 5) / math.max(ta.atr(14), syminfo.mintick)
+    f_norm_minmax(mjiRaw, 50)
+f_ewaf() =>
+    rsi = (ta.rsi(close, 14) - 50.0) / 50.0
+    stoch = (ta.stoch(close, high, low, 14) - 50.0) / 50.0
+    willr = (f_willr(14) + 50.0) / 50.0
+    cci = f_clip(ta.cci(hlc3, 20) / 200.0, -1.0, 1.0)
+    mfi = (f_mfi(14) - 50.0) / 50.0
+    wrsi = 1.0 / (ta.stdev(rsi, 20) + 0.1)
+    wstoch = 1.0 / (ta.stdev(stoch, 20) + 0.1)
+    wwillr = 1.0 / (ta.stdev(willr, 20) + 0.1)
+    wcci = 1.0 / (ta.stdev(cci, 20) + 0.1)
+    wmfi = 1.0 / (ta.stdev(mfi, 20) + 0.1)
+    raw = (rsi * wrsi + stoch * wstoch + willr * wwillr + cci * wcci + mfi * wmfi) / (wrsi + wstoch + wwillr + wcci + wmfi)
+    f_clip(ta.sma(raw, 3), -1.0, 1.0)
+
+baseOsc = oscillatorType == "arwo" ? f_arwo() : oscillatorType == "mji" ? f_mji() : oscillatorType == "ewaf" ? f_ewaf() : ta.sma(f_composite(), 3)
+osc = velSmoothing > 1 ? ta.sma(baseOsc, velSmoothing) : baseOsc
+velocity = nz(osc - osc[1])
+acceleration = nz(velocity - velocity[1])
+velCrossUp = velocity > 0 and velocity[1] <= 0
+velCrossDown = velocity < 0 and velocity[1] >= 0
+inOversold = osc < oversoldThreshold
+inOverbought = osc > overboughtThreshold
+extremeOversold = osc < oversoldThreshold * extremeZoneMult
+extremeOverbought = osc > overboughtThreshold * extremeZoneMult
+velStd = nz(ta.stdev(velocity, 10), ta.stdev(velocity, 50))
+strongMomentumUp = velocity > velStd * 1.5
+strongMomentumDown = velocity < -velStd * 1.5
+wasOversold = osc[1] < oversoldThreshold
+wasOverbought = osc[1] > overboughtThreshold
+priceLowerLow = close < ta.lowest(close, 5)[1]
+oscHigherLow = osc > ta.lowest(osc, 5)[1]
+priceHigherHigh = close > ta.highest(close, 5)[1]
+oscLowerHigh = osc < ta.highest(osc, 5)[1]
+
+rawBuy = switch signalType
+    "velocity_crossover_and_zone" => velCrossUp and inOversold
+    "velocity_crossover_or_zone" => velCrossUp or extremeOversold
+    "zone_only" => extremeOversold and velocity > 0
+    "momentum" => strongMomentumUp and osc < 0
+    "any_reversal" => velCrossUp or extremeOversold or (strongMomentumUp and inOversold)
+    "double_bottom" => ta.sma(velCrossUp ? 1.0 : 0.0, 10) * 10 >= 2 and inOversold
+    "divergence" => priceLowerLow and oscHigherLow and inOversold
+    "breakout" => osc > oversoldThreshold and osc[1] <= oversoldThreshold
+    "zone_exit" => wasOversold and not inOversold
+    "velocity_cross" => velCrossUp
+    "zone_velocity" => inOversold and velocity > velThreshold
+    "midline_cross" => osc[1] < 0 and osc >= 0
+    => velCrossUp and inOversold
+rawSell = switch signalType
+    "velocity_crossover_and_zone" => velCrossDown and inOverbought
+    "velocity_crossover_or_zone" => velCrossDown or extremeOverbought
+    "zone_only" => extremeOverbought and velocity < 0
+    "momentum" => strongMomentumDown and osc > 0
+    "any_reversal" => velCrossDown or extremeOverbought or (strongMomentumDown and inOverbought)
+    "double_bottom" => ta.sma(velCrossDown ? 1.0 : 0.0, 10) * 10 >= 2 and inOverbought
+    "divergence" => priceHigherHigh and oscLowerHigh and inOverbought
+    "breakout" => osc < overboughtThreshold and osc[1] >= overboughtThreshold
+    "zone_exit" => wasOverbought and not inOverbought
+    "velocity_cross" => velCrossDown
+    "zone_velocity" => inOverbought and velocity < -velThreshold
+    "midline_cross" => osc[1] > 0 and osc <= 0
+    => velCrossDown and inOverbought
+
+rawBuy := velThreshold > 0 ? rawBuy and math.abs(velocity) >= velThreshold : rawBuy
+rawSell := velThreshold > 0 ? rawSell and math.abs(velocity) >= velThreshold : rawSell
+rawBuy := requireAccel ? rawBuy and acceleration > 0 and math.abs(acceleration) >= accelThreshold : rawBuy
+rawSell := requireAccel ? rawSell and acceleration < 0 and math.abs(acceleration) >= accelThreshold : rawSell
+
+rsiValue = ta.rsi(close, rsiPeriod)
+rawBuy := rsiFilter == "confirm" or rsiFilter == "oversold_only" or rsiFilter == "both" ? rawBuy and rsiValue < rsiOversold : rawBuy
+rawSell := rsiFilter == "confirm" or rsiFilter == "overbought_only" or rsiFilter == "both" ? rawSell and rsiValue > rsiOverbought : rawSell
+rawBuy := rsiFilter == "divergence" ? rawBuy or (rsiValue > rsiValue[1] and close < close[1] and inOversold) : rawBuy
+[macdLine2, macdSignal2, macdHist2] = ta.macd(close, 12, 26, 9)
+rawBuy := useMacdConfirm ? rawBuy and macdHist2 > macdHist2[1] : rawBuy
+rawSell := useMacdConfirm ? rawSell and macdHist2 < macdHist2[1] : rawSell
+bbMid = ta.sma(close, 20)
+bbDev = ta.stdev(close, 20)
+rawBuy := useBbFilter ? rawBuy and close < bbMid - 2.0 * bbDev : rawBuy
+rawSell := useBbFilter ? rawSell and close > bbMid + 2.0 * bbDev : rawSell
+regimeScore = f_adx_norm(14) * 2.0 - 1.0
+rawBuy := useRegimeFilter ? rawBuy and regimeScore > regimeThreshold : rawBuy
+rawSell := useRegimeFilter ? rawSell and regimeScore > regimeThreshold : rawSell
+atrPct = ta.atr(14) / close * 100.0
+volRank = ta.percentrank(atrPct, 50) / 100.0
+rawBuy := useVolRegimeFilter ? rawBuy and volRank > volRegimeThreshold : rawBuy
+
+var int lastEntryBar = na
+barsSinceEntry = na(lastEntryBar) ? 100000 : bar_index - lastEntryBar
+buySignal = rawBuy and barsSinceEntry >= minBarsBetween
+sellSignal = rawSell and barsSinceEntry >= minBarsBetween
+if buySignal and strategy.position_size <= 0
+    strategy.entry("Long", strategy.long)
+    lastEntryBar := bar_index
+if sellSignal and allowShorts and strategy.position_size >= 0
+    strategy.entry("Short", strategy.short)
+    lastEntryBar := bar_index
+
+entry = strategy.position_avg_price
+longStop = stopLossPct > 0 ? entry * (1.0 - stopLossPct / 100.0) : na
+longLimit = takeProfitPct > 0 ? entry * (1.0 + takeProfitPct / 100.0) : na
+shortStop = stopLossPct > 0 ? entry * (1.0 + stopLossPct / 100.0) : na
+shortLimit = takeProfitPct > 0 ? entry * (1.0 - takeProfitPct / 100.0) : na
+strategy.exit("Long SL/TP", "Long", stop=longStop, limit=longLimit)
+strategy.exit("Short SL/TP", "Short", stop=shortStop, limit=shortLimit)
+
+var float longHigh = na
+var float shortLow = na
+if strategy.position_size > 0
+    longHigh := na(longHigh) ? high : math.max(longHigh, high)
+else
+    longHigh := na
+if strategy.position_size < 0
+    shortLow := na(shortLow) ? low : math.min(shortLow, low)
+else
+    shortLow := na
+longPnlPct = strategy.position_size > 0 ? (close / entry - 1.0) * 100.0 : 0.0
+shortPnlPct = strategy.position_size < 0 ? (entry / close - 1.0) * 100.0 : 0.0
+heldEnough = na(lastEntryBar) ? true : bar_index - lastEntryBar >= minHoldBars
+longTrail = useTrailingStop and strategy.position_size > 0 and longPnlPct >= trailingActivationPct and close <= longHigh * (1.0 - trailingStopPct / 100.0)
+shortTrail = useTrailingStop and strategy.position_size < 0 and shortPnlPct >= trailingActivationPct and close >= shortLow * (1.0 + trailingStopPct / 100.0)
+longBreakeven = useBreakevenStop and strategy.position_size > 0 and longPnlPct >= breakevenTriggerPct and close <= entry * (1.0 + breakevenOffsetPct / 100.0)
+shortBreakeven = useBreakevenStop and strategy.position_size < 0 and shortPnlPct >= breakevenTriggerPct and close >= entry * (1.0 - breakevenOffsetPct / 100.0)
+longAccelExit = useAccelExit and strategy.position_size > 0 and (longPnlPct >= accelExitMinPnl or longPnlPct < 0) and acceleration < 0
+shortAccelExit = useAccelExit and strategy.position_size < 0 and (shortPnlPct >= accelExitMinPnl or shortPnlPct < 0) and acceleration > 0
+midCrossUnder = ta.crossunder(osc, 0)
+midCrossOver = ta.crossover(osc, 0)
+if heldEnough and strategy.position_size > 0 and ((exitOnOppositeSignal and sellSignal) or (exitOnMidlineCross and midCrossUnder) or longTrail or longBreakeven or longAccelExit)
+    strategy.close("Long")
+if heldEnough and strategy.position_size < 0 and ((exitOnOppositeSignal and buySignal) or (exitOnMidlineCross and midCrossOver) or shortTrail or shortBreakeven or shortAccelExit)
+    strategy.close("Short")
+
+plot(osc, "Velocity Osc", color=color.new(color.aqua, 0), display=display.pane)
+plot(velocity, "Velocity", color=color.new(color.yellow, 0), display=display.pane)
+plot(acceleration, "Acceleration", color=color.new(color.fuchsia, 0), display=display.pane)
+hline(0, "Midline", color=color.gray, linestyle=hline.style_dotted)
+hline(oversoldThreshold, "Oversold", color=color.new(color.lime, 40))
+hline(overboughtThreshold, "Overbought", color=color.new(color.red, 40))
+plotshape(showSignals and buySignal, title="Buy", style=shape.triangleup, location=location.belowbar, color=color.lime, size=size.tiny, text="BUY")
+plotshape(showSignals and sellSignal, title="Sell", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny, text="SELL")

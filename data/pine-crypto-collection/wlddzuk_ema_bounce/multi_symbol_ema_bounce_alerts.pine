@@ -1,0 +1,216 @@
+//@version=6
+// EMA Bounce • VWAP + MACD • Email-Based Multi-Symbol/TF Alerts + Host-Chart R:R Drawings
+// 🎯 USES EXACT STATE MACHINE LOGIC from ema_bounce_vwap_macd_strategy.pine
+// 📧 WORKS WITH TRADINGVIEW FREE: Email alerts → IMAP → Vercel → Telegram
+
+indicator("EMABounce + VWAP + MACD • Multi-Asset Alerts (EXACT Strategy Logic)", overlay=true, shorttitle="EMABnc v6")
+
+// ───────── Inputs (same as your single-symbol script) ─────────
+fastLen     = input.int(9,   "EMA 9 (Fast)",    minval=1)
+medLen      = input.int(20,  "EMA 20 (Medium)", minval=1)
+slowLen     = input.int(200, "EMA 200 (Slow)",  minval=1)
+
+macdFast    = input.int(12,  "MACD Fast")
+macdSlow    = input.int(26,  "MACD Slow")
+macdSig     = input.int(9,   "MACD Signal")
+
+tolPct      = input.float(0.05, "Bounce tolerance % below EMA-9", step=0.01)
+maxWait     = input.int(30,  "Max bars to wait for bounce (0 = unlimited)")
+
+// 3:1 R:R drawing controls for HOST chart only
+rrMultiple    = input.float(3.0, "R:R Multiple (e.g., 3 for 3:1)", step=0.25)
+rrHorizonBars = input.int(40,    "R:R Guide Length (bars)", minval=5, maxval=500)
+showBoxes     = input.bool(true, "Shade Risk (1R) and Reward (R:R) Areas")
+
+// --- Minimal host plots to satisfy Pine indicator requirements ---
+hostEma9 = ta.ema(close, fastLen)
+hostVwap = ta.vwap(hlc3)
+plot(hostEma9, title="EMA 9 (host)", color=color.new(color.white, 70))
+plot(hostVwap, title="VWAP (host)", color=color.new(color.yellow, 70), style=plot.style_circles)
+
+// Optional: explicit alertcondition to avoid editor nudge
+alertcondition(false, title="EMA Bounce BUY (email)", message="Use 'Any alert() function call' + Enable 'Send email'")
+
+// ───────── Universe (1 symbol × 4 timeframes) ─────────
+SYMS = array.from("BINANCE:ETHUSDT")
+TFS  = array.from("15", "60", "240", "D")  // 15m, 1h, 4h, 1D
+
+// ───────── Signal block (runs inside each security context) ─────────
+// EXACT STATE MACHINE LOGIC from working strategy
+// Returns: [hit(bool), entry(float), stop(float), target(float), barTime(int)]
+signalBlock(tolP, mWait, rr) =>
+    ema9   = ta.ema(close, fastLen)
+    ema20  = ta.ema(close, medLen)
+    ema200 = ta.ema(close, slowLen)
+    vwap   = ta.vwap(hlc3)
+    [macdLine, signalLine, _] = ta.macd(close, macdFast, macdSlow, macdSig)
+
+    bullStack  = ema9 > ema20 and ema20 > ema200
+    emaCrossUp = ta.crossover(ema9, ema20) and ema9 > ema200
+
+    tolPrice = ema9 * (1 + tolP / 100.0)
+    bounce   = low <= tolPrice and close > ema9
+
+    priceAboveVWAP = close > vwap
+    macdBull       = macdLine > signalLine
+
+    // ═══ CRITICAL: Use EXACT state machine from working strategy ═══
+    var bool waitBounce = false
+    var int  barsWaited = na
+
+    if emaCrossUp
+        waitBounce := true
+        barsWaited := 0
+    else if waitBounce
+        barsWaited += 1
+
+    // Abort waiting if stack breaks or timeout reached
+    if not bullStack or (mWait > 0 and barsWaited > mWait)
+        waitBounce := false
+        barsWaited := na
+
+    // Signal generation
+    longSignal = waitBounce and bounce and priceAboveVWAP and macdBull
+
+    if longSignal
+        waitBounce := false
+        barsWaited := na
+
+    hit = longSignal and barstate.isconfirmed
+
+    entry  = float(na)
+    stop   = float(na)
+    target = float(na)
+    if hit
+        entry := close
+        stop  := low
+        risk  = entry - stop
+        target := risk > 0 ? entry + rr * risk : na
+
+    [hit, entry, stop, target, time]
+
+// ───────── Host-chart drawing state ─────────
+var line  slLine  = na
+var line  enLine  = na
+var line  tpLine  = na
+var label slLbl   = na
+var label enLbl   = na
+var label tpLbl   = na
+var box   riskBox = na
+var box   rewBox  = na
+
+// Store the last signal details for proper drawing
+var float lastEntry = na
+var float lastStop = na
+var float lastTarget = na
+var int lastSignalBar = na
+
+// For a small on-chart heads-up of the latest fired payload
+var label latestLbl = na
+
+// Standardize host ticker id
+hostId = ticker.standard(syminfo.tickerid)
+
+// ───────── Iterate all combos; alert all; draw when host symbol & TF match ─────────
+if barstate.isconfirmed
+    for i = 0 to array.size(SYMS) - 1
+        sym = array.get(SYMS, i)
+        for j = 0 to array.size(TFS) - 1
+            tf = array.get(TFS, j)
+
+            [hit, e, s, t, tstamp] = request.security(sym, tf, signalBlock(tolPct, maxWait, rrMultiple), 
+                 barmerge.gaps_off, barmerge.lookahead_off)
+
+            if hit and not na(e) and not na(s) and not na(t)
+                cleanSym = str.replace(sym, "BINANCE:", "")
+                
+                // Create structured email message for IMAP parsing
+                emailPayload = "action:ENTRY" +
+                     "|symbol:" + cleanSym +
+                     "|tf:" + tf +
+                     "|bar_time:" + str.tostring(tstamp) +
+                     "|entry:" + str.tostring(e) +
+                     "|stop:" + str.tostring(s) +
+                     "|target:" + str.tostring(t) +
+                     "|rr:" + str.tostring(rrMultiple) +
+                     "|signal_id:" + cleanSym + "_" + tf + "_" + str.tostring(tstamp) +
+                     "|secret:walid-ema-bounce-2025"
+
+                // Send structured message via TradingView email alert
+                alert(emailPayload, alert.freq_once_per_bar_close)
+
+                // Update a small floating label with the latest signal info
+                if barstate.islast
+                    if not na(latestLbl)
+                        label.delete(latestLbl)
+                    latestLbl := label.new(bar_index, high, 
+                         str.format("Last Signal → {0} {1}\nEntry: {2} | SL: {3} | TP({4}R): {5}", 
+                         cleanSym, tf, e, s, rrMultiple, t),
+                         style=label.style_label_down, textcolor=color.white, 
+                         color=color.new(color.blue, 0), size=size.small)
+
+                // If this hit is for the HOST chart symbol & timeframe, store the signal details
+                if (ticker.standard(sym) == hostId) and (tf == timeframe.period)
+                    lastEntry := e
+                    lastStop := s
+                    lastTarget := t
+                    lastSignalBar := bar_index
+
+// ───────── Optional: host-chart status table ─────────
+showStatus = input.bool(true, "Show status table (host chart only)")
+
+// Draw R:R visualization for the most recent signal on the host chart
+if not na(lastSignalBar) and not na(lastEntry) and not na(lastStop) and not na(lastTarget)
+    risk = lastEntry - lastStop
+    if risk > 0
+        // Clean previous drawings
+        line.delete(slLine)
+        line.delete(enLine)
+        line.delete(tpLine)
+        label.delete(slLbl)
+        label.delete(enLbl)
+        label.delete(tpLbl)
+        box.delete(riskBox)
+        box.delete(rewBox)
+        
+        // Draw from the signal bar
+        startBar = lastSignalBar
+        endBar = math.min(bar_index, lastSignalBar + rrHorizonBars)
+        
+        // Create horizontal lines at the price levels
+        slLine := line.new(startBar, lastStop, endBar, lastStop, xloc=xloc.bar_index,
+             color=color.red, width=2, style=line.style_solid)
+        enLine := line.new(startBar, lastEntry, endBar, lastEntry, xloc=xloc.bar_index,
+             color=color.white, width=2, style=line.style_dotted)
+        tpLine := line.new(startBar, lastTarget, endBar, lastTarget, xloc=xloc.bar_index,
+             color=color.lime, width=2, style=line.style_solid)
+        
+        // Place labels with prices
+        labelPos = math.min(bar_index + 2, lastSignalBar + rrHorizonBars)
+        slLbl := label.new(labelPos, lastStop, text="SL: " + str.tostring(lastStop, "#.##"),
+             style=label.style_label_left, textcolor=color.white, color=color.red, size=size.small)
+        enLbl := label.new(labelPos, lastEntry, text="Entry: " + str.tostring(lastEntry, "#.##"),
+             style=label.style_label_left, textcolor=color.black, color=color.white, size=size.small)
+        tpLbl := label.new(labelPos, lastTarget, text=str.tostring(rrMultiple, "#.#") + "R: " + str.tostring(lastTarget, "#.##"),
+             style=label.style_label_left, textcolor=color.white, color=color.lime, size=size.small)
+        
+        // Draw risk/reward boxes
+        if showBoxes
+            riskBox := box.new(startBar, lastEntry, endBar, lastStop, 
+                 bgcolor=color.new(color.red, 92), border_color=color.new(color.red, 70),
+                 border_width=1, xloc=xloc.bar_index)
+            rewBox := box.new(startBar, lastTarget, endBar, lastEntry,
+                 bgcolor=color.new(color.lime, 92), border_color=color.new(color.lime, 70),
+                 border_width=1, xloc=xloc.bar_index)
+
+if showStatus and barstate.islast
+    var table status = na
+    if not na(status)
+        table.delete(status)
+    status := table.new(position.top_right, 2, 3, bgcolor=color.new(color.blue, 90), border_width=1)
+    table.cell(status, 0, 0, "🎯 MONITORING", text_color=color.white, bgcolor=color.blue)
+    table.cell(status, 1, 0, "STATUS", text_color=color.white, bgcolor=color.blue)
+    table.cell(status, 0, 1, "ETHUSDT", text_color=color.yellow)
+    table.cell(status, 1, 1, "15m•1h•4h•1D", text_color=color.white)
+    table.cell(status, 0, 2, "TOTAL", text_color=color.orange)
+    table.cell(status, 1, 2, "4 combos", text_color=color.orange)

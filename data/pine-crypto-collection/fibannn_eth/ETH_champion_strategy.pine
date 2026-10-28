@@ -1,0 +1,148 @@
+//@version=6
+strategy("(ETH) CHAMPION - 1m/15m/30m Stack", overlay=true, max_labels_count=500,
+     initial_capital=10000, default_qty_type=strategy.fixed, default_qty_value=100)
+
+// ============================================================================
+// TUNED CORE PARAMETERS
+// ============================================================================
+ema_length          = input.int(16, title="EMA Length (1m/15m/30m stack)")
+min_points          = input.float(166, title="TP Points")
+stop_loss_points    = input.float(34, title="SL Points")
+show_tp_sl_boxes    = input.bool(true, title="Show TP/SL Boxes")
+
+// ============================================================================
+// TREND STACK -- 1min / 15min / 30min only.
+// 5min removed: proven mathematically redundant (already implied by the
+// bounce condition below, close>ema_5min). 1h/4h removed: every length
+// tested underperformed having no higher-TF filter at all.
+// ============================================================================
+ema_1min  = request.security(syminfo.tickerid, "1",  ta.ema(close, ema_length), lookahead=barmerge.lookahead_off)
+ema_5min  = request.security(syminfo.tickerid, "5",  ta.ema(close, ema_length), lookahead=barmerge.lookahead_off)  // kept only for touch/bounce/confirm below
+ema_15min = request.security(syminfo.tickerid, "15", ta.ema(close, ema_length), lookahead=barmerge.lookahead_off)
+ema_30min = request.security(syminfo.tickerid, "30", ta.ema(close, ema_length), lookahead=barmerge.lookahead_off)
+
+trend_1min_bull  = close > ema_1min
+trend_15min_bull = close > ema_15min
+trend_30min_bull = close > ema_30min
+trend_1min_bear  = close < ema_1min
+trend_15min_bear = close < ema_15min
+trend_30min_bear = close < ema_30min
+
+all_bullish = trend_1min_bull and trend_15min_bull and trend_30min_bull
+all_bearish = trend_1min_bear and trend_15min_bear and trend_30min_bear
+
+// ============================================================================
+// ENTRY TRIGGER -- 5-minute EMA touch/bounce + 2-bar confirm + wick filter.
+// Touch-threshold filter removed: off outperformed every threshold tested.
+// Session filter removed: off outperformed on.
+// 1H trend filter removed: off outperformed on, at every EMA length.
+// Volatility (ATR) filter removed: off outperformed on, at every ratio.
+// Post-trade timeout filter removed: off outperformed on, at every duration.
+// In-trade max-hold force-close: tested and rejected -- no timeout beat
+// letting trades run to full TP/SL (any finite max-hold reduced net points).
+// ============================================================================
+bull_confirm_1 = close[1] > ema_5min[1] and close[2] > ema_5min[2]
+bear_confirm_1 = close[1] < ema_5min[1] and close[2] < ema_5min[2]
+
+body_size    = math.abs(close - open)
+total_range  = high - low
+wick_ratio   = total_range > 0 ? (total_range - body_size) / total_range : 0
+no_excessive_wick = wick_ratio < 0.94   // was 0.7 -- validated: net +6.9%, PF improved
+
+ema_bounce_bull = low  <= ema_5min * 1.0018 and close > ema_5min   // was 1.003 -- re-tuned after wick change
+ema_bounce_bear = high >= ema_5min * 0.9982 and close < ema_5min  // was 0.997 -- combined result: net +13.2%, PF 1.358
+
+buy_condition  = all_bullish and bull_confirm_1 and ema_bounce_bull and no_excessive_wick and not all_bullish[1]
+sell_condition = all_bearish and bear_confirm_1 and ema_bounce_bear and no_excessive_wick and not all_bearish[1]
+
+buy_signal  = buy_condition  and strategy.position_size == 0
+sell_signal = sell_condition and strategy.position_size == 0
+
+if buy_signal
+    strategy.entry("Long", strategy.long)
+if sell_signal
+    strategy.entry("Short", strategy.short)
+
+// ============================================================================
+// EXIT -- fixed TP/SL, wick-based (standard strategy.exit stop= behavior:
+// fires on intrabar touch, not candle close). This is the "Realistic" mode
+// used throughout testing -- no code change needed for it.
+// ============================================================================
+long_tp_price  = strategy.position_avg_price + min_points
+long_sl_price  = strategy.position_avg_price - stop_loss_points
+short_tp_price = strategy.position_avg_price - min_points
+short_sl_price = strategy.position_avg_price + stop_loss_points
+
+strategy.exit("Long TP/SL",  from_entry="Long",  stop=long_sl_price,  limit=long_tp_price)
+strategy.exit("Short TP/SL", from_entry="Short", stop=short_sl_price, limit=short_tp_price)
+
+// ============================================================================
+// VISUALS -- TP/SL boxes (cosmetic, never affects entries/exits)
+// ============================================================================
+var box tp_box = na
+var box sl_box = na
+
+if strategy.position_size == 0
+    if not na(tp_box)
+        box.delete(tp_box)
+        tp_box := na
+    if not na(sl_box)
+        box.delete(sl_box)
+        sl_box := na
+else if show_tp_sl_boxes
+    entry_price = strategy.position_avg_price
+    left_bar  = strategy.opentrades.entry_bar_index(strategy.opentrades - 1)
+    right_bar = bar_index + 1
+
+    float tp_top = na
+    float tp_bottom = na
+    float sl_top = na
+    float sl_bottom = na
+
+    if strategy.position_size > 0
+        tp_top := entry_price + min_points
+        tp_bottom := entry_price
+        sl_top := entry_price
+        sl_bottom := entry_price - stop_loss_points
+    else
+        tp_top := entry_price
+        tp_bottom := entry_price - min_points
+        sl_top := entry_price + stop_loss_points
+        sl_bottom := entry_price
+
+    if na(tp_box)
+        tp_box := box.new(left=left_bar, top=tp_top, right=right_bar, bottom=tp_bottom, xloc=xloc.bar_index, border_color=color.green, bgcolor=color.new(color.green, 80))
+    else
+        box.set_left(tp_box, left_bar)
+        box.set_right(tp_box, right_bar)
+        box.set_top(tp_box, tp_top)
+        box.set_bottom(tp_box, tp_bottom)
+
+    if na(sl_box)
+        sl_box := box.new(left=left_bar, top=sl_top, right=right_bar, bottom=sl_bottom, xloc=xloc.bar_index, border_color=color.red, bgcolor=color.new(color.red, 80))
+    else
+        box.set_left(sl_box, left_bar)
+        box.set_right(sl_box, right_bar)
+        box.set_top(sl_box, sl_top)
+        box.set_bottom(sl_box, sl_bottom)
+
+// ============================================================================
+// STATS LABEL -- cosmetic tracking, never affects entries/exits
+// ============================================================================
+var int total_trades = 0
+var int wins = 0
+
+if strategy.closedtrades != 0 and strategy.closedtrades != strategy.closedtrades[1]
+    new_closed = strategy.closedtrades - strategy.closedtrades[1]
+    total_trades += new_closed
+    for i = 0 to new_closed - 1
+        trade_index = strategy.closedtrades - new_closed + i
+        if strategy.closedtrades.profit(trade_index) > 0
+            wins += 1
+
+if barstate.islast
+    winrate = total_trades > 0 ? (wins / total_trades) * 100 : 0
+    label.new(bar_index, high, text="Trades: " + str.tostring(total_trades) +
+         "\nWin rate: " + str.tostring(winrate, "#.##") + "%" +
+         "\nR:R = " + str.tostring(min_points / stop_loss_points, "#.##") + ":1",
+         style=label.style_label_down, color=color.new(color.blue, 80), textcolor=color.white)

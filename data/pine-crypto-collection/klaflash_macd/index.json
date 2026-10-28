@@ -1,0 +1,16 @@
+[
+  {
+    "path": "MACD_Aggressive",
+    "kind": "strategy",
+    "title_zh": "MACD 动量短线策略",
+    "original_description": "The file MACD_Aggressive contains Pine Script code for an agressive MACD trading strategy. Importing this code into TradingView will allow the strategy to be run on any supported financial instrument including stocks, currency pairs, crypto, etc.",
+    "description_zh": "MACD_Aggressive 是一条 MACD 交易策略，作者称其可用于 TradingView 支持的股票、外汇和加密货币等品种。",
+    "crypto_relevance": "适用于加密货币的通用策略。",
+    "implementation_note_zh": "源文件使用 Pine Script v4；其策略声明的手续费和滑点为零，评估时需要调整成本设置。作者 README 为英文原文，效果尚未独立验证。",
+    "source_url": "https://github.com/klaflash/MACD-Pine-Script/blob/b11c7186e77db14723ddc7df782ce3d7df0f1136/MACD_Aggressive",
+    "description_source_url": "https://github.com/klaflash/MACD-Pine-Script/blob/b11c7186e77db14723ddc7df782ce3d7df0f1136/README.md",
+    "source_commit": "b11c7186e77db14723ddc7df782ce3d7df0f1136",
+    "license": "MIT",
+    "sha256": "052d7a2260ca55f5d574b4e4d694d8273c87bf694e965922bfb6fa037c099f47"
+  }
+]

@@ -1,0 +1,179 @@
+//@version=5
+// ════════════════════════════════════════════════════════════════
+//   Anchored Session VWAP — Strategy (Backtest Companion)
+//   by Serghey Dimitroglo
+//
+//   Strategy version of the Anchored Session VWAP indicator. Same
+//   signal logic — SD band touch + volume confirmation + dedup —
+//   wired into strategy.entry/exit calls so you can run a backtest
+//   on TradingView and see win rate, drawdown, equity curve, etc.
+//
+//   Default behavior: enter on the signal, exit at VWAP (mean
+//   reversion play) or at a fixed stop-loss beyond the next outer
+//   band. Position sizing is fixed-percentage of equity.
+//
+//   This is paired with the indicator file (`Anchored Session VWAP
+//   — SD Bands + Volume Signals`). Use the indicator on live charts
+//   and this strategy for historical validation.
+//
+//   IMPORTANT: This is a backtesting tool, not a recommendation.
+//   Past performance does not guarantee future results. Default
+//   settings are starting points, not optimized parameters.
+//
+// ════════════════════════════════════════════════════════════════
+strategy("Anchored Session VWAP — Strategy",
+     shorttitle             = "ASVWAP-S",
+     overlay                = true,
+     initial_capital        = 10000,
+     default_qty_type       = strategy.percent_of_equity,
+     default_qty_value      = 5,
+     pyramiding             = 0,
+     commission_type        = strategy.commission.percent,
+     commission_value       = 0.025,
+     calc_on_every_tick     = false,
+     process_orders_on_close = true,
+     max_lines_count        = 500)
+
+// ═══════════════════════════ INPUTS ═══════════════════════════
+
+// VWAP settings
+grp_vwap = "VWAP Settings"
+src_input       = input.source(hlc3, "VWAP source", group=grp_vwap)
+session_input   = input.session("0930-1600", "Session (RTH)", group=grp_vwap)
+timezone_input  = input.string("America/New_York", "Session timezone",
+     options=["America/New_York", "Europe/London", "Asia/Tokyo", "UTC"], group=grp_vwap)
+
+// Bands
+grp_bands = "SD Bands"
+sd_mult_1 = input.float(1.0, "1 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+sd_mult_2 = input.float(2.0, "2 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+sd_mult_3 = input.float(3.0, "3 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+
+// Volume filter
+grp_vol = "Volume Filter"
+use_vol_filter = input.bool(true,  "Require volume confirmation", group=grp_vol)
+vol_lookback   = input.int(20,     "Volume MA lookback", minval=5, maxval=200, group=grp_vol)
+vol_mult       = input.float(1.2,  "Volume multiplier", minval=1.0, maxval=5.0, step=0.1, group=grp_vol)
+
+// Signals
+grp_sig = "Signals"
+signal_band = input.string("2 SD", "Signal trigger band",
+     options=["1 SD", "2 SD", "3 SD"], group=grp_sig)
+dedup_bars  = input.int(10, "Dedup window (bars)", minval=1, maxval=200, group=grp_sig)
+
+// Strategy-specific
+grp_strat = "Strategy Rules"
+trade_dir = input.string("Both", "Trade direction",
+     options=["Long only", "Short only", "Both"], group=grp_strat,
+     tooltip="Filter signals by direction. Long = buy at lower band. Short = sell at upper band.")
+
+exit_mode = input.string("VWAP target", "Exit mode",
+     options=["VWAP target", "Opposite band", "Fixed R:R"], group=grp_strat,
+     tooltip="VWAP target = exit when price reaches VWAP. Opposite band = exit at the opposite SD band. Fixed R:R = take profit at N times the risk.")
+
+rr_ratio = input.float(2.0, "R:R ratio (Fixed R:R mode)", minval=0.5, maxval=10.0, step=0.1,
+     group=grp_strat,
+     tooltip="Take-profit distance as a multiple of stop-loss distance. Only used when Exit mode = Fixed R:R.")
+
+stop_band = input.string("3 SD", "Stop-loss beyond band",
+     options=["2 SD", "3 SD"], group=grp_strat,
+     tooltip="Where the stop-loss sits. 3 SD = wider stop, fewer stop-outs but bigger losses when wrong.")
+
+session_close_exit = input.bool(true, "Close all positions at session end",
+     group=grp_strat,
+     tooltip="When ON, any open position is closed at the last bar of the session. Recommended for intraday.")
+
+// ═════════════════════════ COMPUTATIONS ═════════════════════════
+
+in_session  = not na(time(timeframe.period, session_input, timezone_input))
+new_session = in_session and not in_session[1]
+
+[vwap_val, sd1_upper_raw, sd1_lower_raw] = ta.vwap(src_input, new_session, sd_mult_1)
+[_v2,      sd2_upper_raw, sd2_lower_raw] = ta.vwap(src_input, new_session, sd_mult_2)
+[_v3,      sd3_upper_raw, sd3_lower_raw] = ta.vwap(src_input, new_session, sd_mult_3)
+
+vwap      = in_session ? vwap_val      : na
+sd1_upper = in_session ? sd1_upper_raw : na
+sd1_lower = in_session ? sd1_lower_raw : na
+sd2_upper = in_session ? sd2_upper_raw : na
+sd2_lower = in_session ? sd2_lower_raw : na
+sd3_upper = in_session ? sd3_upper_raw : na
+sd3_lower = in_session ? sd3_lower_raw : na
+
+avg_vol = ta.sma(volume[1], vol_lookback)
+vol_ok  = use_vol_filter ? volume > avg_vol * vol_mult : true
+
+// ═══════════════════════════ SIGNALS ═══════════════════════════
+
+upper_trigger = signal_band == "1 SD" ? sd1_upper : signal_band == "2 SD" ? sd2_upper : sd3_upper
+lower_trigger = signal_band == "1 SD" ? sd1_lower : signal_band == "2 SD" ? sd2_lower : sd3_lower
+
+sell_touch = barstate.isconfirmed and not new_session and
+             not na(upper_trigger) and not na(upper_trigger[1]) and
+             high >= upper_trigger and high[1] < upper_trigger[1]
+
+buy_touch  = barstate.isconfirmed and not new_session and
+             not na(lower_trigger) and not na(lower_trigger[1]) and
+             low <= lower_trigger and low[1] > lower_trigger[1]
+
+var int last_sell_bar = na
+var int last_buy_bar  = na
+
+sell_ok_dedup = na(last_sell_bar) or (bar_index - last_sell_bar) >= dedup_bars
+buy_ok_dedup  = na(last_buy_bar)  or (bar_index - last_buy_bar)  >= dedup_bars
+
+allow_long  = trade_dir == "Long only"  or trade_dir == "Both"
+allow_short = trade_dir == "Short only" or trade_dir == "Both"
+
+sell_signal = sell_touch and vol_ok and sell_ok_dedup and allow_short
+buy_signal  = buy_touch  and vol_ok and buy_ok_dedup  and allow_long
+
+if sell_signal
+    last_sell_bar := bar_index
+if buy_signal
+    last_buy_bar  := bar_index
+
+// ═══════════════════════════ STRATEGY ═══════════════════════════
+
+// Compute stop and target levels at signal time. Captured at entry
+// so they don't shift if VWAP/bands move during the trade.
+stop_upper = stop_band == "2 SD" ? sd2_upper : sd3_upper
+stop_lower = stop_band == "2 SD" ? sd2_lower : sd3_lower
+
+// LONG entry
+if buy_signal and strategy.position_size == 0
+    entry_px = close
+    sl_px    = stop_lower
+    tp_px    = exit_mode == "VWAP target" ? vwap : exit_mode == "Opposite band" ? upper_trigger : entry_px + (entry_px - sl_px) * rr_ratio
+    if not na(sl_px) and not na(tp_px) and tp_px > entry_px and sl_px < entry_px
+        strategy.entry("Long", strategy.long, comment="Buy")
+        strategy.exit("Long Exit", from_entry="Long", limit=tp_px, stop=sl_px)
+
+// SHORT entry
+if sell_signal and strategy.position_size == 0
+    entry_px = close
+    sl_px    = stop_upper
+    tp_px    = exit_mode == "VWAP target" ? vwap : exit_mode == "Opposite band" ? lower_trigger : entry_px - (sl_px - entry_px) * rr_ratio
+    if not na(sl_px) and not na(tp_px) and tp_px < entry_px and sl_px > entry_px
+        strategy.entry("Short", strategy.short, comment="Sell")
+        strategy.exit("Short Exit", from_entry="Short", limit=tp_px, stop=sl_px)
+
+// Session-end flat — close any open position when the session is
+// about to end (next bar is out of session).
+session_ending = in_session and (na(in_session[-1]) or not in_session[-1])
+
+if session_close_exit and session_ending and strategy.position_size != 0
+    strategy.close_all(comment="Session end")
+
+// ═══════════════════════════ PLOTS ═══════════════════════════
+
+plot(vwap,      "VWAP",      color=color.orange,             linewidth=2)
+plot(sd1_upper, "1 SD Up",   color=color.new(color.blue,   40))
+plot(sd1_lower, "1 SD Lo",   color=color.new(color.blue,   40))
+plot(sd2_upper, "2 SD Up",   color=color.new(color.purple, 30))
+plot(sd2_lower, "2 SD Lo",   color=color.new(color.purple, 30))
+plot(sd3_upper, "3 SD Up",   color=color.new(color.red,    20))
+plot(sd3_lower, "3 SD Lo",   color=color.new(color.red,    20))
+
+plotshape(buy_signal,  title="Buy",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.tiny, text="B")
+plotshape(sell_signal, title="Sell", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,   0), size=size.tiny, text="S")

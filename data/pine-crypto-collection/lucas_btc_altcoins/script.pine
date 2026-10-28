@@ -1,0 +1,272 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © lucasveneno - Indicador de Tendências do BTC e Comportamento das Altcoins: Análise Baseada em EMA, Valor do BTC e Dominância com Configuração de Exchange
+
+//@version=6
+indicator("Indicador de Tendências do BTC e Altcoins", overlay=true)
+
+trend_type =input.string(defval='2', options=['1', '2'], title='Tipo tendencia', inline='linha 1', group='Tipo de tendencia: 1=Fechamento do BTC 2=Basedo nas EMAs') 
+// '1' representa a análise baseada no valor de fechamento do BTC.
+// '2' representa a análise baseada na EMA (Média Móvel Exponencial).
+
+// Create an input list for exchanges
+exchange = input.string(title="Select Exchange", defval="BYBIT", options=["BINANCE", "BYBIT", "COINBASE", "KRAKEN"])
+// Define the symbol for BTC/USDT on the selected exchange
+btc_usd = exchange + ":BTCUSDT"
+btc_dominance = "CRYPTOCAP:BTC.D"
+
+// Configuração de EMAs
+ema1 = input.int(20, title='EMA 1', inline='linha 31', group='Configuração de EMAs')            // Primeira EMA
+colorEMA1 =input(color.yellow, '', inline='linha 31', group='Configuração de EMAs')           // Cor da primeira EMA
+ema2 = input.int(50, title='EMA 2', inline='linha 31', group='Configuração de EMAs')            // Segunda EMA
+colorEMA2 =input(color.rgb(93,96,107), '', inline='linha 31', group='Configuração de EMAs')   // Cor da segunda EMA
+ema3 = input.int(100, title='EMA 3', inline='linha 32', group='Configuração de EMAs')           // Terceira EMA
+colorEMA3 =input(color.blue, '', inline='linha 32', group='Configuração de EMAs')             // Cor da terceira EMA
+ema4 =input.int(200, title='EMA 4', inline='linha 32', group='Configuração de EMAs')            // Quaarta EMA
+colorEMA4 =input(color.red, '', inline='linha 32', group='Configuração de EMAs')              // Cor da quarta EMA
+ma1 =input.int(200, title='MMA 1', inline='linha 33', group='Configuração de EMAs')             // Primeira MMA
+colorEMA5 =input(color.orange, '', inline='linha 33', group='Configuração de EMAs')           // Cor da Primeira MMA
+bool showEmaLines =input(true, title='Exibir Linhas no gráfico', inline='linha 34', group='Configuração de EMAs')    // Exibir Linhas das EMAS
+bool showExtend =input(true, title='Mostrar extensão de Linhas das EMAs', inline='linha 35', group='Configuração de EMAs')    // Linhas Extendidas nas EMAS
+
+Pos_tabela = input.string(defval=position.bottom_right, options=[position.top_left, position.top_center, position.top_right, position.middle_left, position.middle_center, position.middle_right, position.bottom_left, position.bottom_center, position.bottom_right],  title='Posição da Tabela', inline='linha 11', group='Tabela') //Escolhe a posição da tabela no gráfico
+Border =input(color.new(color.gray,0), 'Cor da Borda', inline='linha 40', group='Tabela')       // Muda cor das Bordas do Gráfico
+Background =input(color.new(color.gray,40), 'Cor de Fundo ', inline='linha 40', group='Tabela') // Muda cor do Fundo no Gráfico
+Text_Color =input(color.white, 'Cor do Texto', inline='linha 41', group='Tabela')               // Muda cor do Texto no Gráfico
+Text_Size =input.string(defval=size.small, options=[size.auto, size.small, size.normal, size.large], title='Tamanho do Texto', inline='linha 41', group='Tabela') // Escolhe o tamanho do texto no gráfico
+SV_Cor =input(color.red, 'Caindo', inline='linha 42', group='Cores da Tendência') // Cor para tendências Baixa
+SC_Cor =input(color.green, 'Subindo', inline='linha 42', group='Cores da Tendência') // Cor para Tendências Alta
+SL_Cor =input(color.blue, 'Lateral', inline='linha 42', group='Cores da Tendência') // Cor para Tendências Lateral
+
+N_Cor =input(#131722, 'Neutro', inline='linha 43', group='Cores do Resultado')  
+S1X_Cor =input(#81c784, 'Subindo 1X', inline='linha 44', group='Cores do Resultado')  
+S2X_Cor =input(#388e3c, 'Subindo 2X', inline='linha 44', group='Cores do Resultado')  
+D1X_Cor =input(#f77c80, 'Caindo 1X', inline='linha 45', group='Cores do Resultado')  
+D2X_Cor =input(#b22833, 'Caindo 2X', inline='linha 45', group='Cores do Resultado')  
+
+// Tendência em função das EMAs 20/200 quando o ativo está acima das EMAs - alta, abaixo das EMAs - baixa, entre as EMAs - lateral. Pega os valores de RSI em todos os tempos gráficos
+TrendRef = ta.ema(close, 1)
+EMA_REF_1 = ta.ema(close, ema1)
+EMA_REF_2 = ta.ema(close, ema2)
+EMA_REF_3 = ta.ema(close, ema3)
+EMA_REF_4 = ta.ema(close, ema4)
+EMA_REF_5 = ta.sma(close, ma1)
+
+// Função para buscar EMAs em diferentes timeframes
+getEMA(ema) =>
+    request.security(syminfo.tickerid, timeframe.period, ema)
+
+// Recebe as EMAs para o timeframe atual
+EMA_PLOT_1 = getEMA(EMA_REF_1)
+EMA_PLOT_2 = getEMA(EMA_REF_2)
+EMA_PLOT_3 = getEMA(EMA_REF_3)
+EMA_PLOT_4 = getEMA(EMA_REF_4)
+EMA_PLOT_5 = getEMA(EMA_REF_5)
+
+// Plota as EMAs e MA se showEmas for verdadeiro
+plot(EMA_PLOT_1, title='EMA 1', color=colorEMA1, linewidth=2, display=showEmaLines ? display.all : display.none)
+plot(EMA_PLOT_2, title='EMA 2', color=colorEMA2, linewidth=2, display=showEmaLines ? display.all : display.none)
+plot(EMA_PLOT_3, title='EMA 3', color=colorEMA3, linewidth=2, display=showEmaLines ? display.all : display.none)
+plot(EMA_PLOT_4, title='EMA 4', color=colorEMA4, linewidth=3, display=showEmaLines ? display.all : display.none)
+plot(EMA_PLOT_5, title='MA 1', color=colorEMA5, linewidth=3, display=showEmaLines ? display.all : display.none)
+
+// Função para desenhar linhas estendidas
+linhaextendida(linhaEMA, corEMA, largEMA, nomeEMA) =>
+    lineEMA = line.new(x1=bar_index, y1=linhaEMA, x2=bar_index + 4, y2=linhaEMA, color=corEMA, width=largEMA)
+    line.delete(lineEMA[1])
+    var lineEMALabel = label.new(x=bar_index + 4, y=linhaEMA, style=label.style_label_left, color=color.rgb(100, 100, 1, 100), textcolor=corEMA, text=nomeEMA)
+    label.set_xy(lineEMALabel, x=bar_index + 4, y=linhaEMA)
+
+// Aplica linhas estendidas se ativado
+if showExtend
+    linhaextendida(EMA_REF_1[0], colorEMA1, 2, 'EMA '+str.tostring(ema1))
+    linhaextendida(EMA_REF_2[0], colorEMA2, 2, 'EMA '+str.tostring(ema2))
+    linhaextendida(EMA_REF_3[0], colorEMA3, 2, 'EMA '+str.tostring(ema3))
+    linhaextendida(EMA_REF_4[0], colorEMA4, 3, 'EMA '+str.tostring(ema4))
+    linhaextendida(EMA_REF_5[0], colorEMA5, 3, 'MA '+str.tostring(ma1))
+
+// Função para verificar tendência de alta ou baixa
+//get_trend(symbol, timeframe) =>
+//    close_current = request.security(symbol, timeframe, close)
+//    close_previous = request.security(symbol, timeframe, close[1])
+//    trend = close_current > close_previous ? "Subindo" : "Caindo"
+//    trend
+    
+// Tendência em função das EMAs 20/200 quando o ativo está acima das EMAs - alta, abaixo das EMAs - baixa, entre as EMAs - lateral. Pega os valores de RSI em todos os tempos gráficos 
+//get_trend2(symbol, timeframe, TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5) =>
+//    TrendEma1 = EMA_REF_1
+//    TrendEma2 = na(EMA_REF_5) ? na(EMA_REF_4) ? na(EMA_REF_3) ? na(EMA_REF_2) ? na(EMA_REF_1) ? 0 : EMA_REF_1 : EMA_REF_2 : EMA_REF_3 : EMA_REF_4 : EMA_REF_5
+//    //Trend = TrendEma1 < TrendRef and TrendEma2 < TrendRef ? '📈 Alta' : TrendEma1 > TrendRef and TrendEma2 > TrendRef ? '📉 Baixa' : TrendEma2 == 0 ? 'Sem Dados' : '👀 Lateral'
+//    Trend = TrendEma1 < TrendRef and TrendEma2 < TrendRef ? 'Subindo' : TrendEma1 > TrendRef and TrendEma2 > TrendRef ? 'Caindo' : TrendEma2 == 0 ? 'Sem Dados' : 'Lateral'
+//    [TREND_TF] = request.security(symbol, timeframe, [Trend], ignore_invalid_symbol = true, calc_bars_count = 300)
+//    TREND_TF
+
+// Tendência em função das EMAs 20/200 quando o ativo está acima das EMAs - alta, abaixo das EMAs - baixa, entre as EMAs - lateral.
+get_trend2x(symbol, symbol2, trend_type, timeframe, TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5) =>
+    // Solicitações para obter os valores de fechamento
+    // Utilização do lookahead: Usei lookahead=barmerge.lookahead_on para garantir que os dados estão atualizados de forma correta.
+    [btc_trend_close_current, btc_trend_close_previous] = request.security(symbol, timeframe, [close, close[1]], lookahead=barmerge.lookahead_on) 
+    [btc_dominance_trend_close_current, btc_dominance_trend_close_previous] = request.security(symbol2, timeframe, [close, close[1]], lookahead=barmerge.lookahead_on)
+    TrendEma1 = EMA_REF_1
+    // Em resumo, esta linha é uma forma de determinar o primeiro valor de EMA disponível entre as cinco referências, priorizando a EMA mais alta (EMA_REF_5) e, se todas estiverem indisponíveis, atribui 0 a TrendEma2. Isso ajuda a garantir que TrendEma2 tenha um valor que pode ser usado para cálculos posteriores sem gerar erros devido à falta de dados.
+    TrendEma2 = na(EMA_REF_5) ? (na(EMA_REF_4) ? (na(EMA_REF_3) ? (na(EMA_REF_2) ? (na(EMA_REF_1) ? 0 : EMA_REF_1) : EMA_REF_2) : EMA_REF_3) : EMA_REF_4) : EMA_REF_5
+    // Lógica condicional baseada no tipo de tendência
+    btc_trend = trend_type == "1" ? (btc_trend_close_current > btc_trend_close_previous ? "Subindo" : "Caindo") : (TrendEma1 < TrendRef and TrendEma2 < TrendRef ? 'Subindo' : TrendEma1 > TrendRef and TrendEma2 > TrendRef ? 'Caindo' : 'Lateral')
+    [btc_trend2] = request.security(symbol, timeframe, [btc_trend], ignore_invalid_symbol = true, calc_bars_count = 300)
+    btc_dominance_trend = trend_type == "1" ? (btc_dominance_trend_close_current > btc_dominance_trend_close_previous ? "Subindo" : "Caindo") : TrendEma1 < TrendRef and TrendEma2 < TrendRef ? 'Subindo' : TrendEma1 > TrendRef and TrendEma2 > TrendRef ? 'Caindo' : TrendEma2 == 0 ? '-' : 'Lateral'
+    [btc_dominance_trend2] = request.security(symbol2, timeframe, [btc_dominance_trend], ignore_invalid_symbol = true, calc_bars_count = 300)
+    trend1 = trend_type == "1" ? btc_trend : btc_trend2
+    trend2 = trend_type == "1" ? btc_dominance_trend : btc_dominance_trend2
+    // Retorna valores
+    [trend1, trend2]
+
+
+// Chamada da função
+[btc_trend_1M, btc_dominance_trend_1M] = get_trend2x(btc_usd, btc_dominance, trend_type, "1M", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_1W, btc_dominance_trend_1W] = get_trend2x(btc_usd, btc_dominance, trend_type, "1W", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_1D, btc_dominance_trend_1D] = get_trend2x(btc_usd, btc_dominance, trend_type, "1D", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_4H, btc_dominance_trend_4H] = get_trend2x(btc_usd, btc_dominance, trend_type, "240", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_1H, btc_dominance_trend_1H] = get_trend2x(btc_usd, btc_dominance, trend_type, "60", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_15M, btc_dominance_trend_15M] = get_trend2x(btc_usd, btc_dominance, trend_type, "15", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_5M, btc_dominance_trend_5M] = get_trend2x(btc_usd, btc_dominance, trend_type, "5", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+[btc_trend_1MIN, btc_dominance_trend_1MIN] = get_trend2x(btc_usd, btc_dominance, trend_type, "1", TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+
+//current period
+[btc_trend, btc_dominance_trend] = get_trend2x(btc_usd, btc_dominance, trend_type, timeframe.period, TrendRef, EMA_REF_1, EMA_REF_2, EMA_REF_3, EMA_REF_4, EMA_REF_5)
+
+// Função para calcular comportamento das altcoins e BTC
+get_behavior(btc_trend, btc_dominance_trend, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor) =>
+    altcoins_behavior = "-"
+    btc_behavior = "-"
+    altcoins_behavior_bgcolor = N_Cor
+    btc_behavior_bgcolor = N_Cor
+    if (btc_trend == "Subindo" and btc_dominance_trend == "Subindo") 
+        altcoins_behavior := "🢁 1x"
+        btc_behavior := "🢁 2x"
+        altcoins_behavior_bgcolor := S1X_Cor
+        btc_behavior_bgcolor := S2X_Cor
+    else if (btc_trend == "Caindo" and btc_dominance_trend == "Subindo") 
+        altcoins_behavior := "🢃 2x"
+        btc_behavior := "🢃 1x"
+        altcoins_behavior_bgcolor := D2X_Cor
+        btc_behavior_bgcolor := D1X_Cor
+    else if (btc_trend == "Subindo" and btc_dominance_trend == "Caindo") 
+        altcoins_behavior := "🢁 2x"
+        btc_behavior := "🢁 1x"
+        altcoins_behavior_bgcolor := S2X_Cor
+        btc_behavior_bgcolor := S1X_Cor
+    else if (btc_trend == "Caindo" and btc_dominance_trend == "Caindo") 
+        altcoins_behavior := "🢃 1x"
+        btc_behavior := "🢃 2x"
+        altcoins_behavior_bgcolor := D1X_Cor
+        btc_behavior_bgcolor := D2X_Cor
+    [btc_behavior, altcoins_behavior, altcoins_behavior_bgcolor, btc_behavior_bgcolor]
+
+// Obter comportamentos para cada timeframe e atribuí-los a variáveis
+[btc_behavior_1M, altcoins_behavior_1M, altcoins_behavior_bgcolor_1M, btc_behavior_bgcolor_1M] = get_behavior(btc_trend_1M, btc_dominance_trend_1M, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_1W, altcoins_behavior_1W, altcoins_behavior_bgcolor_1W, btc_behavior_bgcolor_1W] = get_behavior(btc_trend_1W, btc_dominance_trend_1W, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_1D, altcoins_behavior_1D, altcoins_behavior_bgcolor_1D, btc_behavior_bgcolor_1D] = get_behavior(btc_trend_1D, btc_dominance_trend_1D, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_4H, altcoins_behavior_4H, altcoins_behavior_bgcolor_4H, btc_behavior_bgcolor_4H] = get_behavior(btc_trend_4H, btc_dominance_trend_4H, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_1H, altcoins_behavior_1H, altcoins_behavior_bgcolor_1H, btc_behavior_bgcolor_1H] = get_behavior(btc_trend_1H, btc_dominance_trend_1H, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_15M, altcoins_behavior_15M, altcoins_behavior_bgcolor_15M, btc_behavior_bgcolor_15M] = get_behavior(btc_trend_15M, btc_dominance_trend_15M, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_5M, altcoins_behavior_5M, altcoins_behavior_bgcolor_5M, btc_behavior_bgcolor_5M] = get_behavior(btc_trend_5M, btc_dominance_trend_5M, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+[btc_behavior_1MIN, altcoins_behavior_1MIN, altcoins_behavior_bgcolor_1MIN, btc_behavior_bgcolor_1MIN] = get_behavior(btc_trend_1MIN, btc_dominance_trend_1MIN, N_Cor, S1X_Cor, S2X_Cor, D1X_Cor, D2X_Cor)
+
+// Criar a tabela - A posição pode ser especificada em relação ao canto do gráfico, como position.top_left, position.top_right, position.bottom_left, e position.bottom_right.
+var table trends_table = table.new(position=Pos_tabela, columns=10, rows=10, border_width=3, frame_color=Border, border_color=Border, frame_width=1)
+
+// Preencher cabeçalho da tabela
+table.cell(trends_table, 0, 0, "Período", bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+table.cell(trends_table, 0, 1, "Tendência do BTC", bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+table.cell(trends_table, 0, 2, "Tendência de Dominância", bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+table.cell(trends_table, 0, 3, "Comportamento do BTC", bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+table.cell(trends_table, 0, 4, "Comportamento de Altcoins", bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+
+// Inicializar os arrays
+var string[] periods = array.new_string(8)
+var string[] btc_trends = array.new_string(8)
+var string[] dominance_trends = array.new_string(8)
+var string[] behaviors_btc = array.new_string(8)
+var string[] behaviors_altcoins = array.new_string(8)
+var color[] altcoins_behavior_bgcolor = array.new_color(8)
+var color[] btc_behavior_bgcolor = array.new_color(8)
+
+// Preencher os arrays com os valores corretos
+array.set(periods, 0, "1M")
+array.set(periods, 1, "1W")
+array.set(periods, 2, "1D")
+array.set(periods, 3, "4H")
+array.set(periods, 4, "1H")
+array.set(periods, 5, "15MIN")
+array.set(periods, 6, "5MIN")
+array.set(periods, 7, "1MIN")
+
+array.set(btc_trends, 0, btc_trend_1M)
+array.set(btc_trends, 1, btc_trend_1W)
+array.set(btc_trends, 2, btc_trend_1D)
+array.set(btc_trends, 3, btc_trend_4H)
+array.set(btc_trends, 4, btc_trend_1H)
+array.set(btc_trends, 5, btc_trend_15M)
+array.set(btc_trends, 6, btc_trend_5M)
+array.set(btc_trends, 7, btc_trend_1MIN)
+
+array.set(dominance_trends, 0, btc_dominance_trend_1M)
+array.set(dominance_trends, 1, btc_dominance_trend_1W)
+array.set(dominance_trends, 2, btc_dominance_trend_1D)
+array.set(dominance_trends, 3, btc_dominance_trend_4H)
+array.set(dominance_trends, 4, btc_dominance_trend_1H)
+array.set(dominance_trends, 5, btc_dominance_trend_15M)
+array.set(dominance_trends, 6, btc_dominance_trend_5M)
+array.set(dominance_trends, 7, btc_dominance_trend_1MIN)
+
+array.set(behaviors_btc, 0, btc_behavior_1M)
+array.set(behaviors_altcoins, 0, altcoins_behavior_1M)
+array.set(btc_behavior_bgcolor, 0, btc_behavior_bgcolor_1M)
+array.set(altcoins_behavior_bgcolor, 0, altcoins_behavior_bgcolor_1M)
+
+array.set(behaviors_btc, 1, btc_behavior_1W)
+array.set(behaviors_altcoins, 1, altcoins_behavior_1W)
+array.set(btc_behavior_bgcolor, 1, btc_behavior_bgcolor_1W)
+array.set(altcoins_behavior_bgcolor, 1, altcoins_behavior_bgcolor_1W)
+
+array.set(behaviors_btc, 2, btc_behavior_1D)
+array.set(behaviors_altcoins, 2, altcoins_behavior_1D)
+array.set(btc_behavior_bgcolor, 2, btc_behavior_bgcolor_1D)
+array.set(altcoins_behavior_bgcolor, 2, altcoins_behavior_bgcolor_1D)
+
+array.set(behaviors_btc, 3, btc_behavior_4H)
+array.set(behaviors_altcoins, 3, altcoins_behavior_4H)
+array.set(btc_behavior_bgcolor, 3, btc_behavior_bgcolor_4H)
+array.set(altcoins_behavior_bgcolor, 3, altcoins_behavior_bgcolor_4H)
+
+array.set(behaviors_btc, 4, btc_behavior_1H)
+array.set(behaviors_altcoins, 4, altcoins_behavior_1H)
+array.set(btc_behavior_bgcolor, 4, btc_behavior_bgcolor_1H)
+array.set(altcoins_behavior_bgcolor, 4, altcoins_behavior_bgcolor_1H)
+
+array.set(behaviors_btc, 5, btc_behavior_15M)
+array.set(behaviors_altcoins, 5, altcoins_behavior_15M)
+array.set(btc_behavior_bgcolor, 5, btc_behavior_bgcolor_15M)
+array.set(altcoins_behavior_bgcolor, 5, altcoins_behavior_bgcolor_15M)
+
+array.set(behaviors_btc, 6, btc_behavior_5M)
+array.set(behaviors_altcoins, 6, altcoins_behavior_5M)
+array.set(btc_behavior_bgcolor, 6, btc_behavior_bgcolor_5M)
+array.set(altcoins_behavior_bgcolor, 6, altcoins_behavior_bgcolor_5M)
+
+array.set(behaviors_btc, 7, btc_behavior_1MIN)
+array.set(behaviors_altcoins, 7, altcoins_behavior_1MIN)
+array.set(btc_behavior_bgcolor, 7, btc_behavior_bgcolor_1MIN)
+array.set(altcoins_behavior_bgcolor, 7, altcoins_behavior_bgcolor_1MIN)
+
+// Preencher a tabela com os valores dos arrays
+for i = 0 to 7
+    ix= i+1
+    table.cell(trends_table, ix, 0, array.get(periods, i), bgcolor=Background, text_color=Text_Color, text_size=Text_Size)
+    table.cell(trends_table, ix, 1, array.get(btc_trends, i), bgcolor=array.get(btc_trends, i) == "Subindo" ? SC_Cor : array.get(btc_trends, i) == "Caindo" ? SV_Cor : SL_Cor, text_color=Text_Color, text_size=Text_Size)
+    table.cell(trends_table, ix, 2, array.get(dominance_trends, i), bgcolor=array.get(dominance_trends, i) == "Subindo" ? SC_Cor : array.get(dominance_trends, i) == "Caindo" ? SV_Cor : SL_Cor, text_color=Text_Color, text_size=Text_Size)
+    table.cell(trends_table, ix, 3, array.get(behaviors_btc, i), bgcolor=array.get(btc_behavior_bgcolor, i), text_color=Text_Color, text_size=Text_Size)
+    table.cell(trends_table, ix, 4, array.get(behaviors_altcoins, i), bgcolor=array.get(altcoins_behavior_bgcolor, i), text_color=Text_Color, text_size=Text_Size)
+
+
+// Aplica fundo ao gráfico com base na tendência
+bgcolor(btc_trend == "Subindo" ? color.new(SC_Cor, 80) : btc_trend == "Caindo" ? color.new(SV_Cor, 80) : na, title="Background Tendência")

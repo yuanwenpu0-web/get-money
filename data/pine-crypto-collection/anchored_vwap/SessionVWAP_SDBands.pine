@@ -1,0 +1,371 @@
+//@version=5
+// ════════════════════════════════════════════════════════════════
+//   Anchored Session VWAP — SD Bands + Volume-Filtered Signals
+//   by Serghey Dimitroglo
+//
+//   Session-anchored VWAP with 1/2/3 SD bands, volume-confirmation
+//   filter on signals, and dedup logic to avoid signal spam when
+//   price oscillates around a band.
+//
+//   Built around TradingView's built-in ta.vwap() with custom
+//   session anchoring, so the math is consistent with the platform's
+//   standard VWAP — no surprises.
+//
+//   Designed primarily for US futures (NQ, ES) on intraday
+//   timeframes (1m–1H). Should work on any instrument with volume
+//   data, but band parameters may need adjustment for crypto/forex
+//   due to different volatility characteristics.
+//
+//   Features:
+//   • Session-anchored VWAP (resets at session open)
+//   • 1, 2, 3 SD bands with toggle visibility
+//   • Filled zones between bands for clean visual hierarchy
+//   • Color-coded VWAP line — green when price holds above VWAP with
+//     volume support, red when below with selling pressure, default
+//     color when neutral / chop
+//   • Status dashboard in chart corner — VWAP value, state, distance
+//     in SD units, volume regime, last signal age
+//   • Optional volume confirmation filter for signals
+//   • Configurable dedup window — no signal spam near a band
+//   • First-bar-of-session signal guard
+//   • Configurable session start (RTH for futures, custom for crypto)
+//   • Buy/Sell signals on band touches with volume confirmation
+//   • Alerts for signal triggers and VWAP crosses (close-confirmed)
+//
+// ════════════════════════════════════════════════════════════════
+indicator("Anchored Session VWAP — SD Bands + Volume Signals",
+     shorttitle="ASVWAP",
+     overlay=true,
+     max_lines_count=500)
+
+// ═══════════════════════════ INPUTS ═══════════════════════════
+
+// Group: VWAP Settings
+grp_vwap = "VWAP Settings"
+src_input = input.source(hlc3, "VWAP source",
+     group=grp_vwap,
+     tooltip="Price source used for VWAP calculation. hlc3 = (high+low+close)/3 is the standard.")
+
+session_input = input.session("0930-1600", "Session (RTH)",
+     group=grp_vwap,
+     tooltip="Session window for VWAP reset. Default 0930-1600 is US RTH (NYSE/NASDAQ).\nFor 24/7 markets like crypto, set to 0000-0000.")
+
+timezone_input = input.string("America/New_York", "Session timezone",
+     options=["America/New_York", "Europe/London", "Asia/Tokyo", "UTC"],
+     group=grp_vwap,
+     tooltip="Timezone for the session window. Use America/New_York for US futures.")
+
+// Group: SD Bands
+grp_bands = "Standard Deviation Bands"
+show_sd1 = input.bool(true,  "Show 1 SD band", group=grp_bands)
+show_sd2 = input.bool(true,  "Show 2 SD band", group=grp_bands)
+show_sd3 = input.bool(false, "Show 3 SD band", group=grp_bands,
+     tooltip="3 SD band is rarely touched on liquid instruments. Off by default.")
+
+sd_mult_1 = input.float(1.0, "1 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+sd_mult_2 = input.float(2.0, "2 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+sd_mult_3 = input.float(3.0, "3 SD multiplier", minval=0.1, step=0.1, group=grp_bands)
+
+fill_zones = input.bool(true, "Fill zones between bands",
+     group=grp_bands,
+     tooltip="Fills semi-transparent regions between adjacent bands for clearer visual hierarchy.")
+
+// Group: Volume Filter
+grp_vol = "Volume Confirmation Filter"
+use_vol_filter = input.bool(true, "Require volume confirmation",
+     group=grp_vol,
+     tooltip="When ON, signals only fire when current bar volume is above the moving average. Reduces signal noise on low-volume bars.")
+
+vol_lookback = input.int(20, "Volume MA lookback",
+     minval=5, maxval=200,
+     group=grp_vol,
+     tooltip="Number of previous bars to average volume over.")
+
+vol_mult = input.float(1.2, "Volume multiplier",
+     minval=1.0, maxval=5.0, step=0.1,
+     group=grp_vol,
+     tooltip="Current bar volume must exceed (avg volume * this multiplier) to confirm signal. 1.2 = 20% above average.")
+
+// Group: Signals
+grp_sig = "Signal Settings"
+show_signals = input.bool(true, "Show signal markers", group=grp_sig)
+signal_band = input.string("2 SD", "Signal trigger band",
+     options=["1 SD", "2 SD", "3 SD"],
+     group=grp_sig,
+     tooltip="Which band must be touched to trigger a signal. 2 SD is recommended (rare touches = higher quality setups).")
+
+dedup_bars = input.int(10, "Dedup window (bars)",
+     minval=1, maxval=200,
+     group=grp_sig,
+     tooltip="Suppress repeat signals in the same direction for this many bars. Prevents spam when price oscillates near a band.")
+
+// Group: Visual
+grp_vis = "Visual Settings"
+vwap_color   = input.color(color.orange,                "VWAP color (default / neutral)", group=grp_vis)
+band_color_1 = input.color(color.new(color.blue,   40), "1 SD color",  group=grp_vis)
+band_color_2 = input.color(color.new(color.purple, 30), "2 SD color",  group=grp_vis)
+band_color_3 = input.color(color.new(color.red,    20), "3 SD color",  group=grp_vis)
+
+// Group: Trend Coloring
+grp_trend = "VWAP Trend Coloring"
+use_trend_color = input.bool(true, "Color VWAP line by state",
+     group=grp_trend,
+     tooltip="When ON, the VWAP line is colored green when price holds above VWAP with above-average volume (bullish), red when price is below with selling pressure (bearish), and the default color when neither condition holds (neutral / chop).")
+
+trend_color_up   = input.color(color.new(color.green, 0), "Bullish color",  group=grp_trend)
+trend_color_down = input.color(color.new(color.red,   0), "Bearish color",  group=grp_trend)
+
+// Group: Dashboard
+grp_dash = "Dashboard"
+show_dashboard = input.bool(true, "Show status dashboard",
+     group=grp_dash,
+     tooltip="Displays a small table in the corner of the chart showing VWAP state, distance, volume regime, and last signal.")
+
+dash_position = input.string("Top Right", "Dashboard position",
+     options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"],
+     group=grp_dash)
+
+dash_text_size = input.string("Small", "Text size",
+     options=["Tiny", "Small", "Normal"],
+     group=grp_dash)
+
+// ═════════════════════════ COMPUTATIONS ═════════════════════════
+
+// Detect new session start in chosen timezone
+in_session  = not na(time(timeframe.period, session_input, timezone_input))
+new_session = in_session and not in_session[1]
+
+// Use ta.vwap() with anchor — built-in, handles intrabar updates
+// correctly, and matches the math TradingView uses for its standard
+// VWAP indicator. The anchor resets accumulators at session open.
+[vwap_val, sd1_upper_raw, sd1_lower_raw] = ta.vwap(src_input, new_session, sd_mult_1)
+[_v2,      sd2_upper_raw, sd2_lower_raw] = ta.vwap(src_input, new_session, sd_mult_2)
+[_v3,      sd3_upper_raw, sd3_lower_raw] = ta.vwap(src_input, new_session, sd_mult_3)
+
+// Only show VWAP and bands during the active session — outside
+// the session, leave them as na so the chart doesn't show stale
+// values from a closed session.
+vwap      = in_session ? vwap_val      : na
+sd1_upper = in_session ? sd1_upper_raw : na
+sd1_lower = in_session ? sd1_lower_raw : na
+sd2_upper = in_session ? sd2_upper_raw : na
+sd2_lower = in_session ? sd2_lower_raw : na
+sd3_upper = in_session ? sd3_upper_raw : na
+sd3_lower = in_session ? sd3_lower_raw : na
+
+// Volume filter — uses prior-bar SMA to avoid look-ahead bias on
+// the current bar's own volume contribution.
+avg_vol = ta.sma(volume[1], vol_lookback)
+vol_ok  = use_vol_filter ? volume > avg_vol * vol_mult : true
+
+// ═══════════════════════════ SIGNALS ═══════════════════════════
+
+// Pick which band to use based on input
+upper_trigger = signal_band == "1 SD" ? sd1_upper : signal_band == "2 SD" ? sd2_upper : sd3_upper
+lower_trigger = signal_band == "1 SD" ? sd1_lower : signal_band == "2 SD" ? sd2_lower : sd3_lower
+
+// Raw touch detection: high crossed up into the upper band, or
+// low crossed down into the lower band. Guarded against the first
+// bar of session (upper_trigger[1] would reference stale data) and
+// against na values during off-session bars.
+sell_touch = barstate.isconfirmed and not new_session and
+             not na(upper_trigger) and not na(upper_trigger[1]) and
+             high >= upper_trigger and high[1] < upper_trigger[1]
+
+buy_touch  = barstate.isconfirmed and not new_session and
+             not na(lower_trigger) and not na(lower_trigger[1]) and
+             low <= lower_trigger and low[1] > lower_trigger[1]
+
+// Dedup: track last signal bar in each direction, suppress repeat
+// signals within the dedup window.
+var int last_sell_bar = na
+var int last_buy_bar  = na
+
+sell_ok_dedup = na(last_sell_bar) or (bar_index - last_sell_bar) >= dedup_bars
+buy_ok_dedup  = na(last_buy_bar)  or (bar_index - last_buy_bar)  >= dedup_bars
+
+sell_signal = show_signals and sell_touch and vol_ok and sell_ok_dedup
+buy_signal  = show_signals and buy_touch  and vol_ok and buy_ok_dedup
+
+if sell_signal
+    last_sell_bar := bar_index
+if buy_signal
+    last_buy_bar  := bar_index
+
+// ═══════════════════════════ VWAP STATE ═══════════════════════════
+
+// Distance of price from VWAP, expressed in SD units. Useful for
+// the dashboard and for the trend-coloring logic below.
+sd_unit       = not na(vwap) and not na(sd1_upper) ? (sd1_upper - vwap) : na
+distance_sd   = not na(vwap) and not na(sd_unit) and sd_unit > 0 ? (close - vwap) / sd_unit : na
+
+// Bullish state: price holds above VWAP AND volume is above average.
+// Bearish state: price holds below VWAP AND volume is above average.
+// Otherwise: neutral (chop, low volume, or stuck near VWAP).
+vol_above_avg = not na(avg_vol) and avg_vol > 0 and volume > avg_vol
+state_bull    = in_session and not na(vwap) and close > vwap and vol_above_avg
+state_bear    = in_session and not na(vwap) and close < vwap and vol_above_avg
+state_neutral = in_session and not na(vwap) and not state_bull and not state_bear
+
+// Active VWAP line color — switches based on state when trend
+// coloring is enabled, otherwise stays at the user's default color.
+vwap_active_color = use_trend_color ? (state_bull ? trend_color_up : state_bear ? trend_color_down : vwap_color) : vwap_color
+
+// State label for the dashboard
+state_label = state_bull ? "Bullish ▲" : state_bear ? "Bearish ▼" : "Neutral"
+
+// ═══════════════════════════ PLOTS ═══════════════════════════
+
+// VWAP line — uses plot.style_linebr so color changes between bars
+// don't draw a connecting segment between mismatched-color bars
+// (avoids the "rainbow zigzag" look when state flips bar-to-bar).
+plot(vwap, "Session VWAP", color=vwap_active_color, linewidth=2, style=plot.style_linebr)
+
+// 1 SD bands
+p_sd1_up = plot(show_sd1 ? sd1_upper : na, "1 SD Upper", color=band_color_1, linewidth=1, style=plot.style_linebr)
+p_sd1_lo = plot(show_sd1 ? sd1_lower : na, "1 SD Lower", color=band_color_1, linewidth=1, style=plot.style_linebr)
+
+// 2 SD bands
+p_sd2_up = plot(show_sd2 ? sd2_upper : na, "2 SD Upper", color=band_color_2, linewidth=1, style=plot.style_linebr)
+p_sd2_lo = plot(show_sd2 ? sd2_lower : na, "2 SD Lower", color=band_color_2, linewidth=1, style=plot.style_linebr)
+
+// 3 SD bands
+p_sd3_up = plot(show_sd3 ? sd3_upper : na, "3 SD Upper", color=band_color_3, linewidth=1, style=plot.style_linebr)
+p_sd3_lo = plot(show_sd3 ? sd3_lower : na, "3 SD Lower", color=band_color_3, linewidth=1, style=plot.style_linebr)
+
+// Filled zones between adjacent bands — gives a clean visual
+// hierarchy of "near VWAP / mid / outer" without cluttering the
+// chart. Each fill uses the outer band's color at high transparency.
+fill(p_sd1_up, p_sd2_up,
+     color = (fill_zones and show_sd1 and show_sd2) ? color.new(band_color_2, 92) : na,
+     title = "1↔2 SD upper fill")
+
+fill(p_sd1_lo, p_sd2_lo,
+     color = (fill_zones and show_sd1 and show_sd2) ? color.new(band_color_2, 92) : na,
+     title = "1↔2 SD lower fill")
+
+fill(p_sd2_up, p_sd3_up,
+     color = (fill_zones and show_sd2 and show_sd3) ? color.new(band_color_3, 94) : na,
+     title = "2↔3 SD upper fill")
+
+fill(p_sd2_lo, p_sd3_lo,
+     color = (fill_zones and show_sd2 and show_sd3) ? color.new(band_color_3, 94) : na,
+     title = "2↔3 SD lower fill")
+
+// Signal markers
+plotshape(buy_signal,
+     title="Buy Signal",
+     style=shape.triangleup,
+     location=location.belowbar,
+     color=color.new(color.green, 0),
+     size=size.small,
+     text="B")
+
+plotshape(sell_signal,
+     title="Sell Signal",
+     style=shape.triangledown,
+     location=location.abovebar,
+     color=color.new(color.red, 0),
+     size=size.small,
+     text="S")
+
+// ═══════════════════════════ DASHBOARD ═══════════════════════════
+
+// A compact status panel showing VWAP state, distance from VWAP,
+// volume regime, and last signal info. Drawn as a table that updates
+// only on the last bar to avoid repaint flicker on history.
+
+dash_pos = dash_position == "Top Right" ? position.top_right : dash_position == "Top Left" ? position.top_left : dash_position == "Bottom Right" ? position.bottom_right : position.bottom_left
+
+dash_size = dash_text_size == "Tiny" ? size.tiny : dash_text_size == "Normal" ? size.normal : size.small
+
+var table dash = table.new(dash_pos, 2, 6,
+     bgcolor       = color.new(color.black, 80),
+     border_color  = color.new(color.gray,  60),
+     border_width  = 1,
+     frame_color   = color.new(color.gray,  40),
+     frame_width   = 1)
+
+if show_dashboard and barstate.islast
+    // Header
+    table.cell(dash, 0, 0, "ASVWAP",
+         bgcolor   = color.new(color.gray, 40),
+         text_color= color.white,
+         text_size = dash_size)
+    table.cell(dash, 1, 0, "—",
+         bgcolor   = color.new(color.gray, 40),
+         text_color= color.white,
+         text_size = dash_size)
+
+    // VWAP value
+    vwap_text = na(vwap) ? "—" : str.tostring(vwap, format.mintick)
+    table.cell(dash, 0, 1, "VWAP",
+         text_color = color.new(color.white, 30),
+         text_size  = dash_size)
+    table.cell(dash, 1, 1, vwap_text,
+         text_color = color.white,
+         text_size  = dash_size)
+
+    // State
+    state_color = state_bull ? trend_color_up : state_bear ? trend_color_down : color.new(color.gray, 0)
+    table.cell(dash, 0, 2, "State",
+         text_color = color.new(color.white, 30),
+         text_size  = dash_size)
+    table.cell(dash, 1, 2, state_label,
+         text_color = state_color,
+         text_size  = dash_size)
+
+    // Distance in SD units
+    dist_text = na(distance_sd) ? "—" : (distance_sd >= 0 ? "+" : "") + str.tostring(distance_sd, "#.##") + " SD"
+    table.cell(dash, 0, 3, "Distance",
+         text_color = color.new(color.white, 30),
+         text_size  = dash_size)
+    table.cell(dash, 1, 3, dist_text,
+         text_color = color.white,
+         text_size  = dash_size)
+
+    // Volume regime
+    vol_ratio = (na(avg_vol) or avg_vol <= 0) ? na : volume / avg_vol
+    vol_text  = na(vol_ratio) ? "—" : str.tostring(vol_ratio, "#.##") + "× avg"
+    vol_col = na(vol_ratio) ? color.gray : vol_ratio >= vol_mult ? color.new(color.green, 0) : color.new(color.gray, 0)
+    table.cell(dash, 0, 4, "Volume",
+         text_color = color.new(color.white, 30),
+         text_size  = dash_size)
+    table.cell(dash, 1, 4, vol_text,
+         text_color = vol_col,
+         text_size  = dash_size)
+
+    // Last signal
+    last_sig_bar = na(last_buy_bar) and na(last_sell_bar) ? na : na(last_buy_bar) ? last_sell_bar : na(last_sell_bar) ? last_buy_bar : math.max(last_buy_bar, last_sell_bar)
+    last_sig_dir = na(last_sig_bar) ? "—" : (last_sig_bar == last_buy_bar ? "Buy" : "") + (last_sig_bar == last_sell_bar ? "Sell" : "")
+    last_sig_age = na(last_sig_bar) ? "" : " (" + str.tostring(bar_index - last_sig_bar) + "b ago)"
+    last_sig_col = na(last_sig_bar) ? color.gray : last_sig_dir == "Buy" ? color.new(color.green, 0) : color.new(color.red, 0)
+    table.cell(dash, 0, 5, "Last sig.",
+         text_color = color.new(color.white, 30),
+         text_size  = dash_size)
+    table.cell(dash, 1, 5, last_sig_dir + last_sig_age,
+         text_color = last_sig_col,
+         text_size  = dash_size)
+
+// ═══════════════════════════ ALERTS ═══════════════════════════
+
+alertcondition(buy_signal,
+     title="Buy Signal (lower band touch + volume)",
+     message="ASVWAP: Buy signal — price touched lower band with volume confirmation on {{ticker}}")
+
+alertcondition(sell_signal,
+     title="Sell Signal (upper band touch + volume)",
+     message="ASVWAP: Sell signal — price touched upper band with volume confirmation on {{ticker}}")
+
+// VWAP cross alerts — guarded by barstate.isconfirmed so they only
+// fire once per bar at close, not on every intrabar tick.
+vwap_cross_up   = barstate.isconfirmed and ta.crossover(close,  vwap)
+vwap_cross_down = barstate.isconfirmed and ta.crossunder(close, vwap)
+
+alertcondition(vwap_cross_down,
+     title="Price closed below VWAP",
+     message="ASVWAP: {{ticker}} closed below session VWAP")
+
+alertcondition(vwap_cross_up,
+     title="Price closed above VWAP",
+     message="ASVWAP: {{ticker}} closed above session VWAP")

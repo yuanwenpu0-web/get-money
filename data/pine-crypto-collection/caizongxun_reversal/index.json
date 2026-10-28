@@ -1,0 +1,16 @@
+[
+  {
+    "path": "pine_scripts/crypto_reversal_v1.0.pine",
+    "title_zh": "加密货币 15 分钟反转策略",
+    "kind": "strategy",
+    "original_description": "Advanced cryptocurrency trading strategy for 15-minute timeframes utilizing OHLCV data analysis, momentum divergence detection, and machine learning-powered feature discovery. Designed for high-probability reversal point identification with robust risk management.",
+    "description_zh": "作者将其描述为基于 OHLCV 数据、动量背离检测和机器学习特征发现的 15 分钟加密货币反转策略，目标是识别反转点并管理风险。",
+    "source_url": "https://github.com/caizongxun/crypto-reversal-strategy/blob/6d2e421c7bcc4b70d77a6aeddacef0fa80e02418/pine_scripts/crypto_reversal_v1.0.pine",
+    "description_url": "https://github.com/caizongxun/crypto-reversal-strategy/blob/6d2e421c7bcc4b70d77a6aeddacef0fa80e02418/README.md",
+    "source_commit": "6d2e421c7bcc4b70d77a6aeddacef0fa80e02418",
+    "license": "MIT",
+    "sha256": "73479490d9ba3f73cc70069fc62f0e032909c107e74cf710e81f1cd81a8a7fde",
+    "crypto_relevance": "项目面向加密交易，亦可能适用其他市场。",
+    "implementation_note_zh": "作者 README 描述的机器学习等功能不能直接等同于已收录的 Pine 源码；该仓库实际只有一个 Pine 脚本。作者的回测和效果数据未独立核验。"
+  }
+]

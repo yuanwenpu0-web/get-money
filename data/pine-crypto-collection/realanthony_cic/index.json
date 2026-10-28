@@ -1,0 +1,16 @@
+[
+  {
+    "path": "cic.pine",
+    "kind": "indicator",
+    "title_zh": "BTC / ETH 跨市场相关性指标",
+    "original_description": "**Crypto Intermarket Correlation (CIC)** is a TradingView indicator that visualizes how closely BTC and ETH are moving with a benchmark market (for example `CME_MINI:NQ1!`, `SPY`, `DXY`, or `TVC:GOLD`).",
+    "description_zh": "TradingView 指标，用于显示 BTC 和 ETH 与基准市场走势的相关程度，基准示例包括纳斯达克期货、SPY、美元指数或黄金。",
+    "crypto_relevance": "专门比较 BTC、ETH 与外部基准的相关性。",
+    "notes": "作者说明这不是方向信号；加密货币与传统市场交易时段不同，可能影响相关系数；需要所选行情源的数据访问权限。未经独立编译和回测。",
+    "source_url": "https://github.com/realanthonyc/Crypto-Intermarket-Correlation/blob/9fa3d03776026e3c3ab1ce47490b4b8f5dddc5e9/cic.pine",
+    "description_source_url": "https://github.com/realanthonyc/Crypto-Intermarket-Correlation/blob/9fa3d03776026e3c3ab1ce47490b4b8f5dddc5e9/README.md",
+    "source_commit": "9fa3d03776026e3c3ab1ce47490b4b8f5dddc5e9",
+    "license": "MPL 2.0",
+    "sha256": "54672d41a504fec43dee69846587c6d68562dec7f452711470521631e7491de4"
+  }
+]

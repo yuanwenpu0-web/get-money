@@ -1,0 +1,84 @@
+//@version=5
+strategy("Williams %R Reversal - Eterna MCP", 
+         shorttitle="Williams %R",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+wrLength = input.int(14, "Williams %R Length", minval=1)
+overboughtLevel = input.int(-20, "Overbought Level", minval=-50, maxval=0)
+oversoldLevel = input.int(-80, "Oversold Level", minval=-100, maxval=-50)
+confirmBars = input.int(2, "Confirmation Bars", minval=1, maxval=5)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// WILLIAMS %R CALCULATION
+// ============================================
+upper = ta.highest(high, wrLength)
+lower = ta.lowest(low, wrLength)
+wr = -100 * (upper - close) / (upper - lower)
+
+// ============================================
+// REVERSAL DETECTION
+// ============================================
+// Bullish reversal: WR crosses above oversold level
+bullishReversal = ta.crossover(wr, oversoldLevel)
+
+// Bearish reversal: WR crosses below overbought level
+bearishReversal = ta.crossunder(wr, overboughtLevel)
+
+// Confirmation: price action supports reversal
+var int bullishConfirm = 0
+var int bearishConfirm = 0
+
+if bullishReversal
+    bullishConfirm := confirmBars
+if bearishReversal
+    bearishConfirm := confirmBars
+
+if bullishConfirm > 0
+    bullishConfirm := bullishConfirm - 1
+if bearishConfirm > 0
+    bearishConfirm := bearishConfirm - 1
+
+// Strong signals: reversal with momentum
+strongBullish = bullishReversal and wr < oversoldLevel and close > close[1]
+strongBearish = bearishReversal and wr > overboughtLevel and close < close[1]
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if strongBullish and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if strongBearish and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite reversal
+if strongBearish and strategy.position_size > 0
+    strategy.close("Long")
+
+if strongBullish and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+plot(wr, "Williams %R", color=color.blue, linewidth=2)
+hline(overboughtLevel, "Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(oversoldLevel, "Oversold", color=color.green, linestyle=hline.style_dashed)
+hline(-50, "Midline", color=color.gray, linestyle=hline.style_dotted)
+
+// Color zones
+bgcolor(wr > overboughtLevel ? color.new(color.red, 95) : na)
+bgcolor(wr < oversoldLevel ? color.new(color.green, 95) : na)
+
+plotshape(strongBullish, "Buy", shape.triangleup, location.bottom, color.green, size=size.normal)
+plotshape(strongBearish, "Sell", shape.triangledown, location.top, color.red, size=size.normal)

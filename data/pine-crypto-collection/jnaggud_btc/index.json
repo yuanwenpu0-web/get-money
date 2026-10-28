@@ -1,0 +1,30 @@
+[
+  {
+    "path": "pine_strategies/JD_BTC_15m_MTF_Reversal_64k.pine",
+    "kind": "strategy",
+    "title_zh": "BTC 15 分钟多周期反转策略",
+    "original_description": "Tuned for BTCUSD 15m execution with completed 4H and 1D filters.",
+    "description_zh": "作者针对 BTCUSD 15 分钟周期调参，使用已完成的 4 小时和日线过滤条件。",
+    "crypto_relevance": "作者源码或文件名明确为 BTCUSD 15 分钟。",
+    "implementation_note_zh": "源码默认启用固定日期范围，且初始仓位设为权益 100%；作者调参和策略表现未独立验证。 未在 TradingView 编译或回测。",
+    "source_url": "https://github.com/jnaggud/quant-research-lab/blob/973ab00e52ed207c399677c3664c290fbe0222c9/pine_strategies/JD_BTC_15m_MTF_Reversal_64k.pine",
+    "description_source_url": "https://github.com/jnaggud/quant-research-lab/blob/973ab00e52ed207c399677c3664c290fbe0222c9/pine_strategies/JD_BTC_15m_MTF_Reversal_64k.pine",
+    "source_commit": "973ab00e52ed207c399677c3664c290fbe0222c9",
+    "sha256": "192c4176e06efaace7ec8615ac0798caad755dc4b98ef0f1d7cbe730f0bdf085",
+    "license": "MIT"
+  },
+  {
+    "path": "pine_strategies/velocity_BTCUSD_any_reversal_15min.pine",
+    "kind": "strategy",
+    "title_zh": "BTC 15 分钟速度反转策略",
+    "original_description": "this is a Pine-native conversion of the Python velocity config. Some Python-only filters that require external state are approximated with chart-native OHLCV calculations.",
+    "description_zh": "该脚本从 Python 的速度策略配置转换为 Pine；部分需要外部状态的 Python 过滤条件使用图表 OHLCV 数据近似计算。",
+    "crypto_relevance": "作者源码或文件名明确为 BTCUSD 15 分钟。",
+    "implementation_note_zh": "作者指出 Pine 对外部状态条件采用近似计算，不能假设其与 Python 原策略完全一致。 未在 TradingView 编译或回测。",
+    "source_url": "https://github.com/jnaggud/quant-research-lab/blob/973ab00e52ed207c399677c3664c290fbe0222c9/pine_strategies/velocity_BTCUSD_any_reversal_15min.pine",
+    "description_source_url": "https://github.com/jnaggud/quant-research-lab/blob/973ab00e52ed207c399677c3664c290fbe0222c9/pine_strategies/velocity_BTCUSD_any_reversal_15min.pine",
+    "source_commit": "973ab00e52ed207c399677c3664c290fbe0222c9",
+    "sha256": "d7e3c5347dd495a7c0d22638feceed6c1d4fd61aff8cd94029007c74801bbeb7",
+    "license": "MIT"
+  }
+]

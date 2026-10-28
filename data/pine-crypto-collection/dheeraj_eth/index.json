@@ -1,0 +1,15 @@
+[
+  {
+    "path": "BB_EMA_ETHUSDT.pine",
+    "kind": "strategy",
+    "title_zh": "ETH/USDT 4 小时布林带与 EMA 策略",
+    "original_description": "It combines **Bollinger Bands (BB)** and an **Exponential Moving Average (EMA)** to generate long signals and manage exits.",
+    "description_zh": "该 ETH/USDT 四小时策略使用布林带与指数移动平均线生成做多信号和管理退出，并包含训练、测试日期区间选项。",
+    "source_commit": "f6f3daa4d765455af23b0d2f0613ddf2f4e2776b",
+    "source_url": "https://github.com/DheerajJha14/Ethereum-ETH--Strategy/blob/f6f3daa4d765455af23b0d2f0613ddf2f4e2776b/BB_EMA_ETHUSDT.pine",
+    "description_source_url": "https://github.com/DheerajJha14/Ethereum-ETH--Strategy/blob/f6f3daa4d765455af23b0d2f0613ddf2f4e2776b/README.md",
+    "license": "README 声明 MIT，未提供独立 LICENSE 文件",
+    "sha256": "484966ad1ed3e40eed4dd09bb7f5e664cb8e3659f7f6c1bc61b2092856295e26",
+    "notes": "保留原仓库 README 的许可声明；作者的历史收益未独立验证。"
+  }
+]

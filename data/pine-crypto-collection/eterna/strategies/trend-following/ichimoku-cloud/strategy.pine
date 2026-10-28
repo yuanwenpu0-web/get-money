@@ -1,0 +1,76 @@
+//@version=5
+strategy("Ichimoku Cloud - Eterna", 
+         overlay=true, 
+         initial_capital=10000,
+         default_qty_type=strategy.percent_of_equity, 
+         default_qty_value=10,
+         commission_type=strategy.commission.percent,
+         commission_value=0.075)
+
+// ==================== Parameters ====================
+conversionPeriod = input.int(9, "Conversion Line Period", minval=1)
+basePeriod = input.int(26, "Base Line Period", minval=1)
+laggingSpan2Period = input.int(52, "Lagging Span 2 Period", minval=1)
+displacement = input.int(26, "Displacement", minval=1)
+leverage = input.int(5, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, step=0.001)
+
+webhookMessage = input.string('{"action":"{{strategy.order.action}}", "symbol":"{{ticker}}", "size":' + str.tostring(positionSize) + ', "leverage":' + str.tostring(leverage) + '}', 
+                               "Webhook JSON", group="Webhook")
+
+// ==================== Ichimoku Calculation ====================
+donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+
+conversionLine = donchian(conversionPeriod)
+baseLine = donchian(basePeriod)
+leadLine1 = math.avg(conversionLine, baseLine)
+leadLine2 = donchian(laggingSpan2Period)
+
+// Displaced lines for cloud
+leadLine1Displaced = leadLine1[displacement]
+leadLine2Displaced = leadLine2[displacement]
+
+// ==================== Entry Conditions ====================
+// Strong bullish: Price above cloud, conversion above base, bullish cloud
+priceAboveCloud = close > math.max(leadLine1Displaced, leadLine2Displaced)
+bullishTK = ta.crossover(conversionLine, baseLine)
+bullishCloud = leadLine1Displaced > leadLine2Displaced
+
+longCondition = priceAboveCloud and bullishTK and bullishCloud
+
+// Strong bearish: Price below cloud, conversion below base, bearish cloud
+priceBelowCloud = close < math.min(leadLine1Displaced, leadLine2Displaced)
+bearishTK = ta.crossunder(conversionLine, baseLine)
+bearishCloud = leadLine1Displaced < leadLine2Displaced
+
+shortCondition = priceBelowCloud and bearishTK and bearishCloud
+
+// Exit when TK crosses opposite direction
+exitLong = ta.crossunder(conversionLine, baseLine)
+exitShort = ta.crossover(conversionLine, baseLine)
+
+// ==================== Strategy Execution ====================
+if longCondition
+    strategy.entry("Long", strategy.long, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "buy"))
+
+if shortCondition
+    strategy.entry("Short", strategy.short, alert_message=str.replace(webhookMessage, "{{strategy.order.action}}", "sell"))
+
+if exitLong
+    strategy.close("Long", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+if exitShort
+    strategy.close("Short", alert_message='{"action":"close", "symbol":"{{ticker}}"}')
+
+// ==================== Plotting ====================
+plot(conversionLine, "Conversion Line (Tenkan)", color=color.blue, linewidth=1)
+plot(baseLine, "Base Line (Kijun)", color=color.red, linewidth=1)
+
+p1 = plot(leadLine1, "Lead 1 (Senkou A)", color=color.new(color.green, 0), offset=displacement)
+p2 = plot(leadLine2, "Lead 2 (Senkou B)", color=color.new(color.red, 0), offset=displacement)
+
+// Cloud fill
+fill(p1, p2, color=leadLine1 > leadLine2 ? color.new(color.green, 90) : color.new(color.red, 90))
+
+plotshape(longCondition, "Long", shape.triangleup, location.belowbar, color.green, size=size.normal)
+plotshape(shortCondition, "Short", shape.triangledown, location.abovebar, color.red, size=size.normal)

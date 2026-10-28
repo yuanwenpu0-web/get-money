@@ -1,0 +1,16 @@
+[
+  {
+    "path": "indicators/StockStats.pine",
+    "kind": "indicator",
+    "title_zh": "市场统计与 24 小时加密成交量预估",
+    "original_description": "a time-of-day-adjusted projection of full-session volume, with separate models for regular US equity sessions and 24/7 crypto tickers (e.g. BTCUSD).",
+    "description_zh": "按一天内的时间调整全时段成交量预估，并分别为美国股票常规交易时段和全天候加密品种（如 BTCUSD）使用不同模型。",
+    "crypto_relevance": "作者明确提供 BTCUSD 等全天候加密品种模型；其他统计项也面向股票。",
+    "implementation_note_zh": "作者说明加密品种采用平坦的日内成交量假设；成交量估计并非真实的未来数据。市值、流通股等字段可能因交易品种而不可用。",
+    "source_url": "https://github.com/peterdmv/tradingview/blob/df985deaab74ef4859dcfad9a6b8fc063322f206/indicators/StockStats.pine",
+    "description_source_url": "https://github.com/peterdmv/tradingview/blob/df985deaab74ef4859dcfad9a6b8fc063322f206/README.md",
+    "source_commit": "df985deaab74ef4859dcfad9a6b8fc063322f206",
+    "license": "MPL 2.0",
+    "sha256": "1f9df4b3ae5d0a40c7a335fe566f5a3fc9bd795b3f785e392ae810b5a03e69e2"
+  }
+]

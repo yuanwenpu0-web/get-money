@@ -1,0 +1,44 @@
+[
+  {
+    "path": "indicator/crypto_amt_session_bias_v2_companion.pine",
+    "kind": "indicator",
+    "title_zh": "加密市场交易时段偏向指标",
+    "original_description": "`indicator/crypto_amt_session_bias_v2_companion.pine` adalah companion session bias generasi baru yang tetap standalone sebagai `indicator(...)`, dibuat untuk dipasang berdampingan dengan toolkit modern v6.1, v6.2, v7.2, atau v7.3. Default dashboard-nya `Bottom Right`, detail default `Compact`, alert tetap close-confirm by default, dan perilaku overlap diperbaiki supaya level sesi selesai sebelumnya hanya update saat sesi mentah benar-benar berakhir.",
+    "description_zh": "独立的新版交易时段偏向配套指标，作者说明可与 v6.1、v6.2、v7.2 或 v7.3 主工具并用。默认仪表盘位于右下角，采用精简显示，默认等待收盘确认告警；修正了时段重叠时已结束时段高低点的更新行为。",
+    "description_source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/README.md",
+    "source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/indicator/crypto_amt_session_bias_v2_companion.pine",
+    "source_commit": "c1492611d1e411c9a348c85fe9cdf436fcb56400",
+    "license": "MIT",
+    "sha256": "ddced8f18cbd7ac5a9d12803e6b3a1dfd15ae5a8f1f047271372a578f088203e",
+    "crypto_relevance": "作者说明是面向加密货币图表的指标工具。",
+    "notes": "指标而非策略回测代码；订单流和成交量分布为代理估算，并非真实逐笔订单流。未独立编译或验证效果。"
+  },
+  {
+    "path": "indicator/crypto_amt_ict_smc_companion_v1.pine",
+    "kind": "indicator",
+    "title_zh": "加密市场 ICT 与 SMC 配套指标",
+    "original_description": "`indicator/crypto_amt_ict_smc_companion_v1.pine` adalah companion ICT/SMC standalone yang compact untuk baca premium/discount, FVG + CE, IFVG, scored order block, CISD display-only, dashboard kecil, dan dua alert setup close-confirm tanpa mengubah toolkit utama.",
+    "description_zh": "独立的精简 ICT/SMC 配套指标，显示溢价/折价区、公允价值缺口与中心线、反向缺口、评分订单块、仅显示的 CISD、小型仪表盘和两个收盘确认告警，不改变主工具。",
+    "description_source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/README.md",
+    "source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/indicator/crypto_amt_ict_smc_companion_v1.pine",
+    "source_commit": "c1492611d1e411c9a348c85fe9cdf436fcb56400",
+    "license": "MIT",
+    "sha256": "4bfd53e93ea2813c18ef668f793b4acc3cff0e24031b4ea855cc5d6cab658a80",
+    "crypto_relevance": "作者说明是面向加密货币图表的指标工具。",
+    "notes": "指标而非策略回测代码；订单流和成交量分布为代理估算，并非真实逐笔订单流。未独立编译或验证效果。"
+  },
+  {
+    "path": "indicator/crypto_amt_toolkit_v7_3_auto_performance.pine",
+    "kind": "indicator",
+    "title_zh": "加密市场综合指标 v7.3",
+    "original_description": "`indicator/crypto_amt_toolkit_v7_3_auto_performance.pine` adalah v7.3 auto-performance: turunan v7.2 dengan `Performance mode` default `Auto`, posisi dashboard pilihan, serta info display-only `Signal Grade` dan `Volatility`.",
+    "description_zh": "v7.3 自动性能模式版本，基于 v7.2，默认性能模式为自动，可选择仪表盘位置，并显示信号等级和波动率信息。",
+    "description_source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/README.md",
+    "source_url": "https://github.com/latifangren/Trading-view-setup/blob/c1492611d1e411c9a348c85fe9cdf436fcb56400/indicator/crypto_amt_toolkit_v7_3_auto_performance.pine",
+    "source_commit": "c1492611d1e411c9a348c85fe9cdf436fcb56400",
+    "license": "MIT",
+    "sha256": "c355ba0a91d6ab8526fc425eb71c053cfaa952d438713e5be4f4eb202ba90914",
+    "crypto_relevance": "作者说明是面向加密货币图表的指标工具。",
+    "notes": "指标而非策略回测代码；订单流和成交量分布为代理估算，并非真实逐笔订单流。未独立编译或验证效果。"
+  }
+]

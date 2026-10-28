@@ -1,0 +1,28 @@
+[
+  {
+    "path": "SessionVWAP_SDBands.pine",
+    "title_zh": "交易时段锚定 VWAP 与标准差带指标",
+    "original_description": "The main indicator — overlay on the chart with bands, signals, dashboard",
+    "description_zh": "在图表上叠加交易时段锚定 VWAP、标准差带、信号和仪表盘的指标。作者给出 BTC/ETH 15 分钟参数示例，默认设置原用于美国期货。",
+    "crypto_relevance": "通用指标；作者提供 BTC/ETH 参数示例，使用加密时需检查交易时段设置。",
+    "source_url": "https://github.com/sergheydimitroglo-arch/anchored-session-vwap/blob/e440dfa3ab1443d45ee20a76879a67618df1cb11/SessionVWAP_SDBands.pine",
+    "description_source_url": "https://github.com/sergheydimitroglo-arch/anchored-session-vwap/blob/e440dfa3ab1443d45ee20a76879a67618df1cb11/README.md",
+    "source_commit": "e440dfa3ab1443d45ee20a76879a67618df1cb11",
+    "sha256": "1af632c09880b8c80d28561109aa331e1d375ae19972c6434f3aa8192e1b22ad",
+    "license": "MIT",
+    "author": "sergheydimitroglo-arch"
+  },
+  {
+    "path": "SessionVWAP_Strategy.pine",
+    "title_zh": "交易时段锚定 VWAP 回测策略",
+    "original_description": "Companion strategy version for TradingView's built-in backtester",
+    "description_zh": "配套策略版本，用于 TradingView 内置回测；作者给出 BTC/ETH 15 分钟参数示例，默认设置原用于美国期货。",
+    "crypto_relevance": "通用策略；作者提供 BTC/ETH 参数示例，使用加密时需检查交易时段设置。",
+    "source_url": "https://github.com/sergheydimitroglo-arch/anchored-session-vwap/blob/e440dfa3ab1443d45ee20a76879a67618df1cb11/SessionVWAP_Strategy.pine",
+    "description_source_url": "https://github.com/sergheydimitroglo-arch/anchored-session-vwap/blob/e440dfa3ab1443d45ee20a76879a67618df1cb11/README.md",
+    "source_commit": "e440dfa3ab1443d45ee20a76879a67618df1cb11",
+    "sha256": "6454810222dd2a87eb733fa6e636e24f84e4eb9615df0d2d13f4b8353080bb72",
+    "license": "MIT",
+    "author": "sergheydimitroglo-arch"
+  }
+]

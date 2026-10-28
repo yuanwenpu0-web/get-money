@@ -1,0 +1,76 @@
+//@version=5
+indicator("Storm Gauge — Vol Regime + Position Size", shorttitle="STORM GAUGE", overlay=true)
+
+volLen      = input.int(20,  "Realized vol window (days)",   minval=5,   maxval=100)
+pctileLen   = input.int(252, "Percentile lookback (days)",   minval=60,  maxval=1000)
+periodsYear = input.int(365, "Periods per year (365 crypto / 252 stocks)", minval=1)
+targetVol   = input.float(15.0, "Target vol % (annualized)", minval=1.0, maxval=200.0, step=0.5)
+baseSize    = input.float(10000, "Baseline position ($)", minval=100, step=500)
+maxLev      = input.float(2.0,  "Max size multiplier",       minval=0.5, maxval=10.0, step=0.25)
+minSize     = input.float(0.25, "Min size multiplier",       minval=0.05, maxval=1.0, step=0.05)
+calmTh      = input.float(33.0, "Calm threshold (percentile)",  minval=1, maxval=49)
+stormTh     = input.float(67.0, "Storm threshold (percentile)", minval=51, maxval=99)
+simpleMode  = input.bool(true,  "Simple labels (plain English)")
+showBands   = input.bool(true,  "Show vol bands on price")
+showTint    = input.bool(true,  "Show storm background tint")
+tintTransp  = input.int(94, "Storm tint transparency", minval=80, maxval=99)
+showTable   = input.bool(true,  "Show gauge panel")
+
+ret       = math.log(close / close[1])
+dailyVol  = ta.stdev(ret, volLen)
+annVol    = dailyVol * math.sqrt(periodsYear) * 100.0
+
+cnt = 0
+for i = 1 to pctileLen
+    cnt := cnt + (annVol > annVol[i] ? 1 : 0)
+volPctile = 100.0 * cnt / pctileLen
+
+isCalm  = volPctile < calmTh
+isStorm = volPctile > stormTh
+regimeTxt   = isStorm ? "STORM" : isCalm ? "CALM" : "NORMAL"
+regimeColor = isStorm ? color.new(#d62728, 0) : isCalm ? color.new(#0a7d38, 0) : color.new(#8a8a8a, 0)
+
+rawSize  = annVol > 0 ? targetVol / annVol : minSize
+sizeMult = math.min(math.max(rawSize, minSize), maxLev)
+dollarSize = baseSize * sizeMult
+
+actionTxt   = sizeMult < 0.4 ? "ENTER AT QUARTER SIZE" : sizeMult < 0.75 ? "ENTER AT HALF SIZE" : sizeMult <= 1.25 ? "ENTER AT NORMAL SIZE" : "ENTER AT LARGER SIZE"
+actionColor = sizeMult < 0.75 ? color.new(#d62728, 15) : sizeMult <= 1.25 ? color.new(#3a4048, 0) : color.new(#0a7d38, 15)
+
+lblVol    = simpleMode ? "Market violence" : "Realized vol"
+lblPct    = simpleMode ? "vs past year"    : "Percentile (1y)"
+lblRegime = simpleMode ? "Weather"         : "Regime"
+lblSize   = simpleMode ? "If you enter: size" : "If you enter: size @ target"
+
+basis = ta.ema(close, volLen)
+band  = basis * dailyVol * math.sqrt(volLen)
+upper = basis + band
+lower = basis - band
+pU = plot(showBands ? upper : na, "Vol band upper", color=color.new(#5b7fa6, 45), linewidth=1)
+pL = plot(showBands ? lower : na, "Vol band lower", color=color.new(#5b7fa6, 45), linewidth=1)
+fill(pU, pL, color=isStorm ? color.new(#d62728, 93) : color.new(#5b7fa6, 97))
+
+bgcolor(showTint and isStorm ? color.new(#d62728, tintTransp) : na)
+
+var table gauge = table.new(position.top_right, 2, 8, border_width=1, bgcolor=color.new(#101418, 10), border_color=color.new(#2a2f36, 0))
+
+if barstate.islast and showTable
+    table.cell(gauge, 0, 0, "STORM GAUGE", text_color=color.white, text_size=size.small, bgcolor=color.new(#1a1f26, 0))
+    table.cell(gauge, 1, 0, "live", text_color=color.new(#8a8a8a, 0), text_size=size.tiny, bgcolor=color.new(#1a1f26, 0))
+    table.cell(gauge, 0, 1, lblVol, text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 1, str.tostring(annVol, "#.#") + "% vs " + str.tostring(targetVol, "#.#") + "% limit", text_color=color.white, text_size=size.small)
+    table.cell(gauge, 0, 2, lblPct, text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 2, str.tostring(volPctile, "#") + "%", text_color=color.white, text_size=size.small)
+    table.cell(gauge, 0, 3, lblRegime, text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 3, regimeTxt, text_color=color.white, text_size=size.small, bgcolor=regimeColor)
+    table.cell(gauge, 0, 4, lblSize, text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 4, str.tostring(sizeMult, "#.##") + "x", text_color=color.white, text_size=size.normal, bgcolor=sizeMult < 0.75 ? color.new(#d62728, 20) : sizeMult > 1.25 ? color.new(#0a7d38, 20) : color.new(#3a4048, 0))
+    table.cell(gauge, 0, 5, "If you enter: $ (on $" + str.tostring(baseSize, "#,###") + ")", text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 5, "$" + str.tostring(dollarSize, "#,###"), text_color=color.white, text_size=size.normal)
+    table.cell(gauge, 0, 6, "Action", text_color=color.new(#c9c9c9, 0), text_size=size.small)
+    table.cell(gauge, 1, 6, actionTxt, text_color=color.white, text_size=size.small, bgcolor=actionColor)
+    table.cell(gauge, 0, 7, "Says how much — never when. Entries are your strategy's job", text_color=color.new(#8a8a8a, 0), text_size=size.tiny)
+    table.cell(gauge, 1, 7, "", text_size=size.tiny)
+
+alertcondition(isStorm and not isStorm[1], "Storm regime begins", "Vol percentile crossed into STORM — size down")
+alertcondition(not isStorm and isStorm[1], "Storm regime ends", "Vol percentile left STORM — normal sizing")

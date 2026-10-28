@@ -1,0 +1,16 @@
+[
+  {
+    "path": "bullish-lines-four-state.pine",
+    "kind": "indicator",
+    "title_zh": "加密市场四状态平滑均线分类",
+    "original_description": "Four SMMA lines on the HL2 midpoint, configurable lengths.",
+    "description_zh": "基于 HL2 中间价计算四条平滑移动平均线，周期可调整。",
+    "crypto_relevance": "项目关联的平台用于主要加密资产，源码为可用于任意图表的分类工具。",
+    "implementation_note_zh": "四条均线周期默认均为 0，需手动设置至少为 2 的周期；此源码不包含平台按币种校准的参数。作者声称 README 中的完整 MIT 通知在源码头部，但头部实际只有 MIT License 字样，且仓库没有独立许可证文件；原始文件均保留。",
+    "source_url": "https://github.com/vitopod/four-state-pine/blob/31a3bf2326e22a321be4b352cf9943c43c2505ad/bullish-lines-four-state.pine",
+    "description_source_url": "https://github.com/vitopod/four-state-pine/blob/31a3bf2326e22a321be4b352cf9943c43c2505ad/README.md",
+    "source_commit": "31a3bf2326e22a321be4b352cf9943c43c2505ad",
+    "license": "README 与源码声明 MIT，未提供完整许可文本",
+    "sha256": "da8dec87a0749656f131e221889f6024f98c3ec1ceb34a949c7d8c183ce50085"
+  }
+]

@@ -1,0 +1,81 @@
+//@version=5
+strategy("CCI Strategy - Eterna MCP", 
+         shorttitle="CCI",
+         overlay=false,
+         default_qty_type=strategy.percent_of_equity,
+         default_qty_value=100,
+         initial_capital=1000)
+
+// ============================================
+// PARAMETERS
+// ============================================
+cciLength = input.int(20, "CCI Length", minval=1)
+overboughtLevel = input.int(100, "Overbought Level", minval=50)
+oversoldLevel = input.int(-100, "Oversold Level", maxval=-50)
+extremeOB = input.int(200, "Extreme Overbought", minval=150)
+extremeOS = input.int(-200, "Extreme Oversold", maxval=-150)
+leverageSize = input.float(5.0, "Leverage", minval=1, maxval=100)
+positionSize = input.float(0.01, "Position Size", minval=0.001, maxval=1)
+
+// ============================================
+// CCI CALCULATION
+// ============================================
+cci = ta.cci(close, cciLength)
+
+// ============================================
+// SIGNAL GENERATION
+// ============================================
+// Standard signals: CCI crosses threshold
+bullishStandard = ta.crossover(cci, oversoldLevel)
+bearishStandard = ta.crossunder(cci, overboughtLevel)
+
+// Extreme reversal: CCI reverses from extreme levels
+extremeBullish = cci[1] < extremeOS and cci > extremeOS and cci < oversoldLevel
+extremeBearish = cci[1] > extremeOB and cci < extremeOB and cci > overboughtLevel
+
+// Zero-line cross (trend following)
+bullishTrend = ta.crossover(cci, 0)
+bearishTrend = ta.crossunder(cci, 0)
+
+// Combined signal logic
+buySignal = bullishStandard or extremeBullish
+sellSignal = bearishStandard or extremeBearish
+
+// ============================================
+// STRATEGY LOGIC
+// ============================================
+if buySignal and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    alert('{"action":"buy","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+if sellSignal and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    alert('{"action":"sell","symbol":"' + syminfo.ticker + '","size":' + str.tostring(positionSize) + ',"leverage":' + str.tostring(leverageSize) + '}', alert.freq_once_per_bar_close)
+
+// Exit on opposite signal or zero cross
+if sellSignal and strategy.position_size > 0
+    strategy.close("Long")
+
+if buySignal and strategy.position_size < 0
+    strategy.close("Short")
+
+// ============================================
+// PLOTTING
+// ============================================
+plot(cci, "CCI", color=color.blue, linewidth=2)
+hline(overboughtLevel, "Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(oversoldLevel, "Oversold", color=color.green, linestyle=hline.style_dashed)
+hline(extremeOB, "Extreme OB", color=color.maroon, linestyle=hline.style_solid)
+hline(extremeOS, "Extreme OS", color=color.teal, linestyle=hline.style_solid)
+hline(0, "Zero Line", color=color.gray, linestyle=hline.style_dotted)
+
+// Highlight extreme zones
+bgcolor(cci > extremeOB ? color.new(color.red, 90) : na)
+bgcolor(cci < extremeOS ? color.new(color.green, 90) : na)
+
+plotshape(buySignal, "Buy", shape.triangleup, location.bottom, color.green, size=size.normal)
+plotshape(sellSignal, "Sell", shape.triangledown, location.top, color.red, size=size.normal)
+
+// Trend indicators
+plotshape(bullishTrend, "Bullish Trend", shape.circle, location.bottom, color.lime, size=size.tiny)
+plotshape(bearishTrend, "Bearish Trend", shape.circle, location.top, color.orange, size=size.tiny)
