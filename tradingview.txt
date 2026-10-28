@@ -1,0 +1,47 @@
+思考了 47s
+
+想找 TradingView 上高收益的量化交易策略，最值得看的地方是 TradingView 官方策略社区和 GitHub。
+
+考虑到你主要做 BTC/ETH、币安 U 本位永续合约、1分钟 K 线，我建议优先找开源的 Pine Script 策略，可以直接回测、修改参数，后续也方便迁移到 Python 量化系统。
+
+### 一、推荐的策略来源
+
+![Tradingview strategy using webhooks - Trading Strategies / Bot Setups - Gainium Community](https://images.openai.com/static-rsc-4/neVx_7OkO3aM5bldMgXTg-t2fr5E10u_kzbc9JQaLX8NjEC754zVTZvsAiXL-u1t1pPlLV66VqIMvZWZ-r0AbPN64HVw9chRrxICvC9OyY4waaFG0U4IbF31U0FbVQGLVZn-MuNxKuUuTVt33mL6e24tmst99ed1c-uhzYicmSdL77oum-IUQCXdOldy8nHJ?purpose=fullsize)
+
+1\. [TradingView 官方开源策略](https://www.tradingview.com/scripts/?script_type=strategies&script_access=open&utm_source=chatgpt.com)
+
+最推荐。从社区里找真实可运行的 Pine Script，添加到图表后就能查看回测结果，支持按热门、最新等方式查找。TradingView +1
+
+![6) 첫 번째 전략 만들기와 백테스팅 - 트레이딩뷰 파인 스크립트 개발: 기술적 지표, 신호, 전략, 백테스팅](https://images.openai.com/static-rsc-4/223Vigy_MgUj5EiwS4EBHz7flNXB8QgT1YKegSzPC1SSurK5Df81IULr4AND_tkP3XIZK4CLVtnc5e3ngtBkxy2J7dr9PwUMwPfvweW9V26LCMiFAE8sZG-AKnJB4t815thtBOIpdIQ4xONdQ9FLRdk4NN9eyxJmFcC_uXa8KmxEEPe1o6RkiZjaoQ_r3gvv?purpose=fullsize)
+
+2\. [GitHub TradingView 策略仓库](https://github.com/search?q=tradingview+strategy&type=repositories&utm_source=chatgpt.com)
+
+适合找开源代码、研究策略逻辑及二次开发。重点搜索 `pine script strategy`、`BTC scalping strategy`。
+
+![How to Backtest a TradingView Indicator (2026 Guide) | Quantzee](https://images.openai.com/static-rsc-4/MmTKkj61HNESyXibF79e2NsunJ5YB_CZm70kL1i2ofaWpaiImktg-ZKsCk1w7-KKquFD1LynlPeCKCIjMA_yESSa1VL5LeDxy-N702CKw5M4DtNfqoPEf3T2cfaMmEvCf-srNLJ-cEcTT7_h7gt4iTiYk-lyC47J7E0rYxWknvgvEp_RYyH1oit-WJhCSfS_?purpose=fullsize)
+
+3\. [TradingView 脚本排行榜](https://www.tradingview.com/scripts/leaderboard/?utm_source=chatgpt.com)
+
+适合发现热门脚本和策略筛选工具，但热门不代表收益最高，更不等于实盘盈利。
+
+### 二、找到的 4 个可直接回测的策略
+
+以下都是已找到的开源脚本，但尚未独立验证其实际收益率，适合作为候选策略进行回测。
+
+[my_strategy_2.0](https://www.tradingview.com/script/L0F7fijk-my-strategy-2-0/?utm_source=chatgpt.com)
+
+专为 BTC/ETH 的 1m–5m 设计，结合 SuperTrend、MACD、RSI、布林带、成交量，支持分批止盈和止损。TradingView
+
+优先测试
+
+[Vinz Win BTC – STRATEGY AUTO 1m](https://www.tradingview.com/script/bt8HJINE/?utm_source=chatgpt.com)
+
+BTC 1分钟剥头皮策略，基于连续 K 线形态，采用固定 1:2 盈亏比。作者声称历史回测优秀，但需要自行验证。TradingView
+
+[EMA Wick A+ Retest Strategy](https://www.tradingview.com/script/zeS9gFsg-EMA-Wick-A-Retest-Strategy/?utm_source=chatgpt.com)
+
+EMA21 回踩、ATR 止损、RSI 过滤，适合研究趋势回调入场。TradingView
+
+[EMA + MACD + RSI + ATR Scalping](https://www.tradingview.com/script/eESlTd8Q-Scalping-15min-EMA-MACD-RSI-ATR-based-SL-TP/?utm_source=chatgpt.com)
+
+15分钟趋势策略，可以用来与1分钟策略对比，观察减少交易频率后，扣除手续费的净收益是否更好。TradingView
