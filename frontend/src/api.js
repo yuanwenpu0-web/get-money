@@ -69,6 +69,22 @@ export default {
   listBacktests: (params) => http.get('/backtests', { params }),
   getBacktest: (id, params = {}) => http.get(`/backtests/${id}`, { params: { include_trades: false, ...params } }),
   getBacktestTrades: (id, params) => http.get(`/backtests/${id}/trades`, { params }),
+
+  // 参数寻优：一键跑全币种 → 每币最优参数 → 一键上线
+  getOptimizationOptions: () => http.get('/optimizations/options'),
+  getOptimizationUniverse: (params) => http.get('/optimizations/universe', { params }),
+  createOptimization: (payload) => http.post('/optimizations', payload),
+  listOptimizations: (params) => http.get('/optimizations', { params }),
+  getOptimization: (id) => http.get(`/optimizations/${id}`),
+  cancelOptimization: (id) => http.post(`/optimizations/${id}/cancel`),
+  deleteOptimization: (id) => http.delete(`/optimizations/${id}`),
+  getOptimizationResults: (id, params) => http.get(`/optimizations/${id}/results`, { params }),
+  applyOptimization: (id, payload) => http.post(`/optimizations/${id}/apply`, payload),
+
+  // 币种级参数覆盖：寻优结果的落地形态
+  getSymbolParams: (params) => http.get('/symbol-params', { params }),
+  saveSymbolParams: (payload) => http.put('/symbol-params', payload),
+  deleteSymbolParams: (payload) => http.delete('/symbol-params', { data: payload }),
 }
 
 

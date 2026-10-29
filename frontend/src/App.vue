@@ -21,6 +21,7 @@ const menu = [
   { path: '/orders', label: '订单', hint: '持仓与历史成交' },
   { path: '/indicators', label: '指标', hint: 'Pine 指标目录' },
   { path: '/strategies', label: '策略', hint: '信号与评分' },
+  { path: '/optimize', label: '寻优', hint: '全币种参数搜索' },
   { path: '/backtest', label: '回测', hint: '策略验证 · 收益对比' },
   { path: '/market', label: '行情', hint: '本地K线与数据源' },
   { path: '/settings', label: '设置', hint: 'API · 资金 · 风控' },

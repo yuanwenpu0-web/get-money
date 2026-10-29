@@ -15,13 +15,14 @@
 | 订单流 | `features/absorption.py`：`|delta|` 滚动最近秩百分位、无价格进展、摆动极值、拒绝影线、单边支配度五条件 + 3 根内收盘穿越实体的确认状态机；优先用 lower-tf intrabar delta，缺数据回退脚本自带的 estDelta 估计 |
 | 资金费 | fapi 历史资金费入库（8 小时 1 条，幂等增量），asof 合并为K线特征（当前费率 / 年化 / z-score / 24h 累计），可选拥挤过滤 |
 | 策略 | 注册表 + spec 插件：`strategy/specs/*` 只实现 `lookback/prepare/signals/describe`，参数默认值、范围、整数键、布尔键随 spec 声明；信号拼装（成本过滤、ATR 定杠杆、评分分层仓位、风险预算截断）由 `strategy/signals.py` 统一完成 |
-| 池与绑定 | `symbol_pools` 定义「跑哪些币」（静态列表或规则），`strategy_bindings` 定义「策略 × 池 × 周期 + 参数覆盖」；参数三层合并：全局设置 < 策略默认 < 绑定；同币多池各自评估、按评分只开一仓 |
+| 池与绑定 | `symbol_pools` 定义「跑哪些币」（静态列表或规则），`strategy_bindings` 定义「策略 × 池 × 周期 + 参数覆盖」，`symbol_params` 再给单个币种打参数补丁；参数四层合并：全局设置 < 策略默认 < 绑定 < 币种；同币多池各自评估、按评分只开一仓 |
 | 风控 | 结构止损（极值 ∓ 0.25 ATR）与 `min/max_sl_atr` 夹逼、2R 固定目标、1R 保本、30 根时间止损、含成本的单笔风险预算、平仓冷却、过期行情保护、最大杠杆 |
 | 回测 | 顺序撮合；样本内/外切分（`train_horizon` 隔离跨度）、可选验证集选参、同口径基线对比、随机方向基线、bootstrap 期望值置信区间；可指定「策略 × 池」绑定，参数层与实盘完全同源 |
+| 参数寻优 | 一键对全部有足够历史的币种做参数网格搜索：训练段选参、验证段只做判定（每笔期望 95% CI）；进程池按「币种」分片吃满 CPU（默认留 4 核给巡检），单任务独占、可取消、可看实时进度与 ETA；结果可一键写入币种级覆盖，或按参数聚类生成新池 + 绑定 |
 | 交易 | 模拟盘与合约（测试网/主网）：开仓（杠杆、步长/最小名义价值校验、市价或 `limit_maker` postOnly）、交易所侧止损止盈、撤改单、reduceOnly 平仓、状态周期同步、反手；账户级熔断；本地保证金与权益核算、追加/提取/重置资金 |
 | 巡检 | 由**生效绑定**驱动：绑定启用 + 策略总开关启用 + 池启用 → 展开成 `(symbol, binding)` 逐对评估，每对带自己的参数与周期；APScheduler 每 N 秒同步最新K线（默认最多 8 路并发、共享连接池）、单轮内复用指标帧、检查止损止盈/保本/时间止损/信号反转；周期日志记录绑定数、币种数与各阶段耗时 |
 | 指标目录 | 读取 `data/pine-collection`、`data/pine-crypto-collection` 的第三方 Pine 指标索引，支持搜索与源码查看（只读资料，不参与计算） |
-| 前端 | Vue 3 + Element Plus + ECharts：总览、订单、策略、回测、行情、指标目录、设置；按需加载、独立空态与重试；订单/回测历史/成交/本地数据列表服务端分页（默认 20） |
+| 前端 | Vue 3 + Element Plus + ECharts：总览、订单、策略、寻优、回测、行情、指标目录、设置；按需加载、独立空态与重试；订单/回测历史/成交/本地数据列表服务端分页（默认 20） |
 
 ## 2. 目录
 
@@ -29,16 +30,16 @@
 get-money/
 ├── backend/
 │   ├── app/
-│   │   ├── api/            # FastAPI 路由（backtests / bindings / indicators / market / pools / settings / strategies / trading）
-│   │   ├── backtest/       # 顺序撮合、指标、显著性检验
+│   │   ├── api/            # FastAPI 路由（backtests / bindings / optimizations / pools / symbol_params / ...）
+│   │   ├── backtest/       # 顺序撮合、指标、显著性检验、optimizer（全币种参数寻优）
 │   │   ├── features/       # 基础指标 + absorption 订单流特征
 │   │   ├── market/         # 币安客户端、K线存储、metrics 观测
 │   │   ├── ml/             # 数据集构建与 purged 切分（仅回测用，无训练/预测）
-│   │   ├── strategy/       # registry（策略注册表）、signals（公共拼装）、pools、bindings、
+│   │   ├── strategy/       # registry（策略注册表）、signals（公共拼装）、pools、bindings、symbol_params、
 │   │   │                   # rules（参数分派）、engine、specs/absorption_reversal、coin_universe、defaults
 │   │   ├── trading/        # 资金、模拟撮合、订单管理、调度、实盘同步
 │   │   └── main.py
-│   ├── scripts/            # absorption_backtest + 数据回补/迁移/校验脚本
+│   ├── scripts/            # absorption_backtest / optimize_all + 数据回补/迁移/校验脚本
 │   └── tests/              # 后端测试
 ├── frontend/               # Vue 3 前端
 ├── docs/                   # 回测与研究报告（md + json）
@@ -112,9 +113,10 @@ npm run dev        # 开发热更新，http://127.0.0.1:5173（代理到 8010）
 1. **行情**：默认 U 本位永续全量，可在设置页切自定义列表；选择币种/周期同步历史，本地数据表显示行数与起止时间；`funding=true` 同时拉资金费历史。
 2. **策略**：上半部分是「策略 × 池 × 周期」绑定矩阵（新增/删除绑定、启停、优先级、参数 JSON 覆盖、成员数预览、新建币种池）；下半部分是策略卡（启停、编辑默认参数）与信号预演（可指定用哪条绑定的参数层）。
 3. **回测**：选择币种/周期/天数/手续费/滑点/评分阈值；「参数层」下拉可直接选一条「策略 × 池」绑定，回测参数与实盘巡检完全同源（不选则用策略默认参数）；可启用验证集选参；查看收益对比、权益曲线、过滤原因、显著性区间与成交明细。
-4. **设置**：币安 API（测试网校验测试网余额，主网校验合约账户）、执行模式、代理、资金调整、风控参数、定时巡检、流动性门槛、熔断参数、主单类型。
-5. **总览 / 订单**：权益曲线、持仓、已实现/未实现盈亏、胜率、日志；订单页可改止损止盈、平仓、反手。
-6. **指标目录**：搜索并查看 Pine 指标说明与源码（只读）。
+4. **寻优**：选策略/周期/范围（全部、某个池或手填币种）→ 表单下方即时显示「本次会扫多少个币种」→ 开始。进度条给出已完成数、ETA 与判定分布；跑完后逐币表列出训练/验证收益、成交笔数、每笔 CI 与最优参数，可「仅统计通过 / 验证段为正 / 全部」+「写币种覆盖 / 生成池+绑定」一键应用；页面底部还能查/清空全部币种级覆盖。
+5. **设置**：币安 API（测试网校验测试网余额，主网校验合约账户）、执行模式、代理、资金调整、风控参数、定时巡检、流动性门槛、熔断参数、主单类型。
+6. **总览 / 订单**：权益曲线、持仓、已实现/未实现盈亏、胜率、日志；订单页可改止损止盈、平仓、反手。
+7. **指标目录**：搜索并查看 Pine 指标说明与源码（只读）。
 
 ## 6. 策略、币种池与绑定
 
@@ -162,7 +164,7 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 - 成员数是实时解析的（成交量走 TTL 缓存），前端绑定向导会先给「成员数预览」再让你调参数。
 - 种子池：`major`（主流 16 币）、`alt`（全量剔除主流）、`all`（全量）；只在表为空时写入，删掉不会被复活。
 
-### 6.3 绑定：三层参数与同币多池
+### 6.3 绑定：四层参数与同币多池
 
 一条绑定 = `(策略, 池, 周期)` + 一套参数覆盖，唯一约束 `uq_binding_scope`。同一个策略可以在多个池上跑不同周期，例如：
 
@@ -172,13 +174,15 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 | `absorption_reversal` | `alt` | 5m | 山寨币，更宽的 delta 门槛 + 更紧的止损 |
 | `absorption_reversal` | `alt` | 1m | 短线，只做多 |
 
-**参数三层合并**（`rules.resolve_params`）：全局设置 < 策略默认 < 本条绑定。`fee_rate` / `slippage` 由全局强制统一，任何一层都不能覆盖。未知字段、非有限数值、越界值在保存绑定时直接 400，不会等到巡检才炸。
+**参数四层合并**（`rules.resolve_params`）：全局设置 < 策略默认 < 本条绑定 < **币种级覆盖**（`symbol_params`）。`fee_rate` / `slippage` 由全局强制统一，任何一层都不能覆盖。未知字段、非有限数值、越界值在保存时直接 400，不会等到巡检才炸。
+
+**币种级覆盖**解决「同一个池里 BTC 和小币不该用同一套阈值」：寻优按币种算出不同最优参数后，把差异写进覆盖表即可，绑定本身不用拆。覆盖按 `(策略, 币种, 周期)` 唯一，删除即回到绑定参数。写入时会按「绑定层 + 覆盖」合并后的整体校验——只拿覆盖单独校验会漏掉跨字段约束（例如 `max_hold_bars` 小于全局 `min_hold_bars`）。
 
 **生效条件**：绑定启用 **且** 策略总开关启用 **且** 池启用。
 
 **同币多池**：BTC 既在 `major` 又在 `all` 时，两条绑定各自独立评估，产生的信号按评分排序后**只开一仓**，不做互斥校验——这样池的组合可以随意调整而不会互相卡死。
 
-**订单可追溯**：`signals.pool` / `orders.pool` 记录来源绑定，持仓管理用 `resolve_order_params(策略, 周期, 池)` 精确回取所属绑定的参数（老订单无池时回落策略配置，行为等价）。
+**订单可追溯**：`signals.pool` / `orders.pool` 记录来源绑定，持仓管理用 `resolve_order_params(策略, 周期, 池, symbol)` 精确回取「绑定 + 该币种覆盖」的参数（老订单无池时回落策略配置，行为等价）。
 
 **缓存正确性**：`engine` 的缓存键包含参数指纹，同币不同池的参数不会互相污染特征。
 
@@ -221,7 +225,78 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 
 报告：`docs/absorption-reversal-strategy.md`（Medium × 3 窗 × 30 天，88 笔，池化期望 +0.0704%，CI [−0.2456%, +0.4278%] → inconclusive）、`absorption-reversal-sens-high.*`（323 笔，期望 −0.0794%）。
 
-## 8. 主要 API
+## 8. 参数寻优：一键找每个币种自己的参数
+
+入口：前端「寻优」页，或命令行 `backend/scripts/optimize_all.py`。两者共用 `backtest/optimizer.py`，
+区别只是网页版把结果写库供后续一键应用，命令行适合在服务器上批量跑并导出 CSV。
+
+### 8.1 为什么不能「在整段历史上挑收益最高」
+
+520 个币种 × 972 种参数组合里，一定有某个币的某个组合看起来很美——那是噪声，不是 edge。
+所以选参和判定被拆成两段：
+
+| 阶段 | 数据 | 作用 |
+| --- | --- | --- |
+| 训练段（默认前 70%） | 只用于**选**参数 | 按 `净收益 + 0.5×最大回撤` 排序，成交笔数不足门槛的组合直接出局 |
+| 验证段（后 30%） | 只用于**判**定 | 最优组合在验证段重跑，给净收益与每笔期望的 bootstrap 95% CI |
+
+判定取值（`optimizer._verdict`，顺序即优先级）：
+
+| verdict | 含义 |
+| --- | --- |
+| `pass` | 验证段 CI 下界 > 0，统计上站得住 |
+| `inconclusive` | 验证段 CI 跨 0——「不知道」，不等于「亏」 |
+| `negative` | 验证段 CI 上界 < 0 |
+| `insufficient` | 验证段成交笔数不足（低于 `max(4, 门槛//2)`），不判定 |
+| `no_trades` | 训练段没有任何组合达到成交门槛 |
+
+此外整轮会给一次**验证段池化 CI**（所有币种的最优组合在验证段的成交合起来算）：单币几十笔
+太少时，池化是唯一能回答「这套参数体系整体有没有 edge」的量。
+
+### 8.2 算力怎么用
+
+- **按币种分片**：`simulate` 是纯 Python 逐 bar，线程被 GIL 锁死；一个 worker 拿到一个币就把
+  整张网格跑完，数据帧只建一次、指标只预热一次。
+- **默认并发 = CPU−4**（上限 24）：跑满会把行情同步和巡检挤到无 CPU，回测读数也会因争抢失真。
+- **单任务独占**：同时只允许一个寻优任务，第二个请求返回 409。
+- **BLAS 单线程**：进程池里每个进程默认开 `cpu_count` 个 OpenBLAS 线程，实测 20 进程直接
+  `Memory allocation failed` 并崩池；`optimizer` 在 import 时就把 `OPENBLAS_NUM_THREADS` 等
+  置 1（纯 Python 循环用不到多线程 BLAS）。
+- **崩了不整轮失败**：`BrokenProcessPool` 会把已完成的币种结果保留、剩余币降并发重试一次。
+- **prepared 帧缓存**：`spec.prepare_keys` 声明哪些参数影响 `prepare()`，网格里只改出场参数
+  （`target_r` / `max_hold_bars`）时复用同一份已富化的帧。
+
+实测（24 核 / 32GB，15m × 90 天 × 24 组参数）：**59 个币种 / 23 秒**，CPU 峰值 92%、均值 66%，
+零失败。512 组参数时按线性外推约 8 分钟。
+
+### 8.3 delta 源：这一步不能省
+
+同一份 15m 帧，est delta 下 90 天只有 **1** 个信号，lower-tf delta 下有 **5~34** 个。
+寻优若跑在 est 上，优化的根本不是实盘那个策略。所以 `delta_source` 默认 `auto`：
+有 1m 数据就用 lower（与巡检同口径），覆盖不足 90% 时整段降级 est 并在结果里标注 `delta` 列。
+
+这条也解释了「为什么只有几十个币种」：1m 历史只覆盖数十天、80 余个币，
+其余币种只能走 est（信号稀少，多半落进 `no_trades`）。**补齐 1m 历史是提升寻优覆盖率的前置条件**。
+
+### 8.4 一键应用
+
+| 模式 | 落点 | 生效时机 | 风险 |
+| --- | --- | --- | --- |
+| `symbol` | 写 `symbol_params`（币种级覆盖） | 下一轮巡检立即按新参数评估 | 绑定若已启用，等于直接换线上参数 |
+| `pool` | 按参数指纹聚类，建静态池 + 绑定（`enabled=0`） | 需到「策略」页手动启用 | 不会自动上线，人工确认后才跑 |
+
+- 筛选门槛：`pass`（最严）/ `positive`（验证段为正）/ `all`。
+- `pool` 模式会清掉这批币的币种级覆盖，否则旧覆盖会盖住新绑定的参数。
+- 应用会在 `optimization_results.applied_mode / applied_at` 留痕。
+
+### 8.5 本次全量结果
+
+`15m × 90 天 × 24 组 × 59 币`：`no_trades 31 / insufficient 15 / inconclusive 10 / negative 3 / pass 0`，
+验证段池化 **105 笔、每笔 −0.2777%、95% CI [−0.5509%, +0.0065%] → inconclusive**。
+与 `docs/absorption-reversal-strategy.md` 的结论一致：**参数寻优救不了一个没有信号层的策略**，
+这套基础设施的价值在于下次接入真正有 edge 的策略时，能立刻算出「每个币该用什么参数」。
+
+## 9. 主要 API
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -246,6 +321,15 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 | GET/POST | `/api/bindings` | 绑定列表（`?with_members=true` 带成员明细）/ 新建 |
 | PUT/DELETE | `/api/bindings/{id}` | 改周期/启停/优先级/参数覆盖（全量校验）/ 删除 |
 | GET | `/api/bindings/{id}/params` | 该绑定合并三层后的完整生效参数 |
+| GET | `/api/optimizations/options` | 策略搜索空间、池列表、默认并发、是否已有任务在跑 |
+| GET | `/api/optimizations/universe` | 预估扫描范围（`?interval=&days=` → 币种数与前 12 个） |
+| POST | `/api/optimizations` | 创建寻优任务（返回 id，后台线程 + 进程池执行；已有任务时 409） |
+| GET | `/api/optimizations`、`/api/optimizations/{id}` | 任务列表 / 详情（进度、ETA、判定分布、池化 CI） |
+| POST | `/api/optimizations/{id}/cancel` | 请求取消（等已派发的币种跑完） |
+| DELETE | `/api/optimizations/{id}` | 删除任务与结果（运行中 400） |
+| GET | `/api/optimizations/{id}/results` | 逐币结果分页（`?verdict=&q=&sort=score|symbol`） |
+| POST | `/api/optimizations/{id}/apply` | 一键应用：`mode=symbol` 写币种覆盖 / `mode=pool` 聚类建池+绑定 |
+| GET/PUT/DELETE | `/api/symbol-params` | 币种级参数覆盖的查询 / 批量写入 / 批量删除 |
 | GET | `/api/backtests` | 回测历史分页列表 |
 | POST | `/api/backtests` | 创建回测（后台线程执行） |
 | GET | `/api/backtests/{id}` | 结果与权益曲线（前端传 `include_trades=false`） |
@@ -260,7 +344,7 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 
 列表统一支持 `page`（从 1）与 `page_size`（默认 20，上限 100），响应附带 `total`、`page`、`page_size`、`pages`；筛选或条数变化回到第一页，空页自动回到有效页。设置读取用 `include_stats=false`、总览用 `include_market=false` 省去未展示的统计。
 
-## 9. 验证
+## 10. 验证
 
 ```powershell
 cd D:\UGit\get-money\backend
@@ -272,16 +356,19 @@ npm test
 npm run build
 ```
 
-## 10. 已知边界
+当前状态：后端 `349 passed`，前端 `63 passed`，构建通过；寻优全链路冒烟 26 项（创建 → 进度 → 结果 → 应用 → 并发拒绝 → 覆盖写入 → 组合生成 → 清理）全部通过。
+
+## 11. 已知边界
 
 - **实盘仅限小资金/测试网验证**：本地账本与交易所是两套账，实盘盈亏以本地口径展示，可能与交易所对账有出入。
 - **行情源**：K线一律走 fapi 公共接口；paper 固定合约主网，live+测试网走测试网。历史 paper 期现货K线与合约价格存在口径差异，切换后建议清空 `klines` 重新同步。
 - **数据深度**：1m 历史仅约 90 余天；lower-tf intrabar delta 依赖 1m，历史不足时自动降级为 estDelta 估计（信号密度与质量都会变化）。
 - **实盘简化**：未模拟资金费率、盘口深度、强平与分批建仓；市价单以返回均价入账；`limit_maker` 挂 postOnly 最多轮询约 10 秒，超时撤单后剩余转市价；交易所侧止损止盈触发后本地按标记价结算，与真实成交价有偏差；保护单挂失败会市价回滚开仓并写日志。
-- **老库升级**：启动时自动建 `symbol_pools` / `strategy_bindings` 并给 `signals` / `orders` 补 `pool` 列（幂等 `ALTER TABLE ADD COLUMN`，双方言安全），首次启动写入 3 个池与 2 条**默认关闭**的绑定。不做数据回填：老订单 `pool` 为空，持仓管理按策略配置回落，行为等价。
+- **老库升级**：启动时自动建 `symbol_pools` / `strategy_bindings` / `symbol_params` / `optimization_runs` / `optimization_results`，并给 `signals` / `orders` 补 `pool` 列（幂等 `ALTER TABLE ADD COLUMN`，双方言安全），首次启动写入 3 个池与 2 条**默认关闭**的绑定。不做数据回填：老订单 `pool` 为空，持仓管理按策略配置回落，行为等价。
+- **寻优的样本天花板**：单币 90 天通常只有几笔成交，验证段 CI 必然很宽——结论多为 `inconclusive` 而不是 `pass`。这是数据量问题，不是算法问题；把 1m 历史补到半年以上、或把区间拉长到 1h×400 天，才能得到可用的判定。
 - **策略未经足够长期验证**：当前读数不支持「有正 edge」的结论，默认关闭；开启前请自行补足样本与独立复检。
 - 不构成投资建议。
 
-## 11. 风险提示
+## 12. 风险提示
 
 加密货币合约交易风险极高，可能导致全部本金损失。请先在模拟盘与合约测试网长期验证；接入真实资金前需自行补充风控熔断、资金费率与强平模型、对账与审计流程，并妥善保管 API Key（仅授予合约交易权限、禁用提币）。
