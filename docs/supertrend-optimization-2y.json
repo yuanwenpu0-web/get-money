@@ -1,0 +1,1583 @@
+{
+  "strategy": "supertrend_current",
+  "generated_at": "2026-10-29T14:05:37+00:00",
+  "source_report": "docs/supertrend-optimization.json",
+  "days": 730,
+  "train_split": 0.7,
+  "intervals": {
+    "1h": {
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TRXUSDT",
+        "NEARUSDT",
+        "APTUSDT",
+        "BCHUSDT"
+      ],
+      "elapsed_seconds": 11.9,
+      "combos": [
+        {
+          "label": "supertrend_factor5.0_atr_period7_sl_atr_mult3.0_target_r6.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 5.0,
+            "atr_period": 7,
+            "sl_atr_mult": 3.0,
+            "target_r": 6.0,
+            "use_ema200_filter": true
+          },
+          "interval": "1h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 494,
+            "expectancy": {
+              "trades": 494,
+              "mean_return_pct": 1.1729,
+              "ci_low_pct": 0.3024,
+              "ci_high_pct": 2.0849,
+              "verdict": "positive",
+              "bootstrap_sample": 494,
+              "sampled": false
+            },
+            "long": {
+              "trades": 183,
+              "mean_return_pct": -0.9977,
+              "ci_low_pct": -2.1027,
+              "ci_high_pct": 0.2232,
+              "verdict": "insufficient",
+              "bootstrap_sample": 183,
+              "sampled": false
+            },
+            "short": {
+              "trades": 311,
+              "mean_return_pct": 2.4501,
+              "ci_low_pct": 1.2191,
+              "ci_high_pct": 3.7084,
+              "verdict": "positive",
+              "bootstrap_sample": 311,
+              "sampled": false
+            },
+            "account_median_pct": 3.4821,
+            "account_mean_pct": 3.9095,
+            "positive_symbols": 12
+          },
+          "test": {
+            "trades": 265,
+            "expectancy": {
+              "trades": 265,
+              "mean_return_pct": -1.1398,
+              "ci_low_pct": -2.0393,
+              "ci_high_pct": -0.0943,
+              "verdict": "negative",
+              "bootstrap_sample": 265,
+              "sampled": false
+            },
+            "long": {
+              "trades": 132,
+              "mean_return_pct": -0.8242,
+              "ci_low_pct": -2.2486,
+              "ci_high_pct": 0.7414,
+              "verdict": "insufficient",
+              "bootstrap_sample": 132,
+              "sampled": false
+            },
+            "short": {
+              "trades": 133,
+              "mean_return_pct": -1.453,
+              "ci_low_pct": -2.545,
+              "ci_high_pct": -0.1942,
+              "verdict": "insufficient",
+              "bootstrap_sample": 133,
+              "sampled": false
+            },
+            "account_median_pct": -1.635,
+            "account_mean_pct": -1.5552,
+            "positive_symbols": 5
+          },
+          "account_return_full_median_pct": 2.1582,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 410,
+            "signal_reverse": 254,
+            "take_profit": 72,
+            "close_at_end": 23
+          },
+          "blocked": {
+            "no_supertrend_signal": 143472,
+            "ema200_filter": 415,
+            "invalid_indicators": 90,
+            "excess_volatility": 7
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 37,
+              "trades_test": 15,
+              "ret_train_pct": -4.0329,
+              "ret_test_pct": 6.9491,
+              "ret_full_pct": 2.6359,
+              "random_mean_pct": -4.9705,
+              "random_p95_pct": 7.8683
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 40,
+              "trades_test": 17,
+              "ret_train_pct": -1.078,
+              "ret_test_pct": -4.8925,
+              "ret_full_pct": -5.9177,
+              "random_mean_pct": -5.4158,
+              "random_p95_pct": 8.026
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 25,
+              "trades_test": 20,
+              "ret_train_pct": 6.3963,
+              "ret_test_pct": -1.635,
+              "ret_full_pct": 4.6567,
+              "random_mean_pct": 0.8035,
+              "random_p95_pct": 7.7961
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 36,
+              "trades_test": 13,
+              "ret_train_pct": 2.7294,
+              "ret_test_pct": -2.4261,
+              "ret_full_pct": 0.2371,
+              "random_mean_pct": -2.9172,
+              "random_p95_pct": 5.9339
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 31,
+              "trades_test": 23,
+              "ret_train_pct": 6.8721,
+              "ret_test_pct": -8.5363,
+              "ret_full_pct": -2.2508,
+              "random_mean_pct": -2.0884,
+              "random_p95_pct": 7.1498
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 26,
+              "trades_test": 20,
+              "ret_train_pct": 13.1595,
+              "ret_test_pct": -4.0621,
+              "ret_full_pct": 8.5629,
+              "random_mean_pct": 3.1031,
+              "random_p95_pct": 11.7971
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 33,
+              "trades_test": 16,
+              "ret_train_pct": 4.5283,
+              "ret_test_pct": -1.6429,
+              "ret_full_pct": 2.8109,
+              "random_mean_pct": 0.9632,
+              "random_p95_pct": 12.8336
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 36,
+              "trades_test": 19,
+              "ret_train_pct": 1.5018,
+              "ret_test_pct": -1.2706,
+              "ret_full_pct": 0.2121,
+              "random_mean_pct": 1.2073,
+              "random_p95_pct": 12.7228
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 43,
+              "trades_test": 20,
+              "ret_train_pct": 3.4821,
+              "ret_test_pct": -1.2794,
+              "ret_full_pct": 2.1582,
+              "random_mean_pct": 3.1352,
+              "random_p95_pct": 14.8633
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 32,
+              "trades_test": 16,
+              "ret_train_pct": -1.1183,
+              "ret_test_pct": 2.6213,
+              "ret_full_pct": 1.4736,
+              "random_mean_pct": -3.5389,
+              "random_p95_pct": 3.766
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 27,
+              "trades_test": 19,
+              "ret_train_pct": 6.8246,
+              "ret_test_pct": -1.6731,
+              "ret_full_pct": 5.0373,
+              "random_mean_pct": 3.0702,
+              "random_p95_pct": 12.0946
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 36,
+              "trades_test": 14,
+              "ret_train_pct": 1.376,
+              "ret_test_pct": 0.5142,
+              "ret_full_pct": 1.8973,
+              "random_mean_pct": 3.4067,
+              "random_p95_pct": 15.7538
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 29,
+              "trades_test": 15,
+              "ret_train_pct": 1.9475,
+              "ret_test_pct": 1.1791,
+              "ret_full_pct": 3.1496,
+              "random_mean_pct": 2.7192,
+              "random_p95_pct": 10.091
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 32,
+              "trades_test": 22,
+              "ret_train_pct": 10.3751,
+              "ret_test_pct": -7.5895,
+              "ret_full_pct": 1.9982,
+              "random_mean_pct": -2.954,
+              "random_p95_pct": 7.9969
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 31,
+              "trades_test": 16,
+              "ret_train_pct": 5.6784,
+              "ret_test_pct": 0.4163,
+              "ret_full_pct": 6.1184,
+              "random_mean_pct": 4.0718,
+              "random_p95_pct": 13.8843
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": 0.0397,
+            "beats_p95": 0,
+            "beats_ratio": 0.0
+          }
+        },
+        {
+          "label": "supertrend_factor5.0_atr_period14_sl_atr_mult3.0_target_r3.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 5.0,
+            "atr_period": 14,
+            "sl_atr_mult": 3.0,
+            "target_r": 3.0,
+            "use_ema200_filter": true
+          },
+          "interval": "1h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 586,
+            "expectancy": {
+              "trades": 586,
+              "mean_return_pct": 0.8699,
+              "ci_low_pct": 0.2736,
+              "ci_high_pct": 1.5343,
+              "verdict": "positive",
+              "bootstrap_sample": 586,
+              "sampled": false
+            },
+            "long": {
+              "trades": 231,
+              "mean_return_pct": -0.3311,
+              "ci_low_pct": -1.2857,
+              "ci_high_pct": 0.6358,
+              "verdict": "inconclusive",
+              "bootstrap_sample": 231,
+              "sampled": false
+            },
+            "short": {
+              "trades": 355,
+              "mean_return_pct": 1.6513,
+              "ci_low_pct": 0.8545,
+              "ci_high_pct": 2.5322,
+              "verdict": "positive",
+              "bootstrap_sample": 355,
+              "sampled": false
+            },
+            "account_median_pct": 3.4381,
+            "account_mean_pct": 3.2591,
+            "positive_symbols": 13
+          },
+          "test": {
+            "trades": 294,
+            "expectancy": {
+              "trades": 294,
+              "mean_return_pct": -0.2229,
+              "ci_low_pct": -1.0331,
+              "ci_high_pct": 0.6006,
+              "verdict": "inconclusive",
+              "bootstrap_sample": 294,
+              "sampled": false
+            },
+            "long": {
+              "trades": 145,
+              "mean_return_pct": -0.2767,
+              "ci_low_pct": -1.5147,
+              "ci_high_pct": 0.92,
+              "verdict": "insufficient",
+              "bootstrap_sample": 145,
+              "sampled": false
+            },
+            "short": {
+              "trades": 149,
+              "mean_return_pct": -0.1706,
+              "ci_low_pct": -1.2784,
+              "ci_high_pct": 0.981,
+              "verdict": "insufficient",
+              "bootstrap_sample": 149,
+              "sampled": false
+            },
+            "account_median_pct": -0.8614,
+            "account_mean_pct": -0.2133,
+            "positive_symbols": 6
+          },
+          "account_return_full_median_pct": 1.9731,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 461,
+            "take_profit": 215,
+            "signal_reverse": 193,
+            "close_at_end": 11
+          },
+          "blocked": {
+            "no_supertrend_signal": 143386,
+            "ema200_filter": 407,
+            "invalid_indicators": 195,
+            "excess_volatility": 3
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 39,
+              "trades_test": 17,
+              "ret_train_pct": -1.3948,
+              "ret_test_pct": 8.3412,
+              "ret_full_pct": 6.83,
+              "random_mean_pct": 1.1938,
+              "random_p95_pct": 10.4305
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 46,
+              "trades_test": 18,
+              "ret_train_pct": 6.1294,
+              "ret_test_pct": -3.3168,
+              "ret_full_pct": 2.6093,
+              "random_mean_pct": 0.6176,
+              "random_p95_pct": 7.7508
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 35,
+              "trades_test": 23,
+              "ret_train_pct": 3.4381,
+              "ret_test_pct": -3.9049,
+              "ret_full_pct": -0.601,
+              "random_mean_pct": -4.1228,
+              "random_p95_pct": 3.9417
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 48,
+              "trades_test": 18,
+              "ret_train_pct": 0.1053,
+              "ret_test_pct": -0.8614,
+              "ret_full_pct": -0.757,
+              "random_mean_pct": 1.0714,
+              "random_p95_pct": 10.2689
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 39,
+              "trades_test": 28,
+              "ret_train_pct": 4.5245,
+              "ret_test_pct": -5.3883,
+              "ret_full_pct": -1.1076,
+              "random_mean_pct": 0.0807,
+              "random_p95_pct": 10.8747
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 34,
+              "trades_test": 22,
+              "ret_train_pct": 1.9303,
+              "ret_test_pct": -3.4715,
+              "ret_full_pct": -1.6082,
+              "random_mean_pct": -2.1772,
+              "random_p95_pct": 3.6306
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 40,
+              "trades_test": 18,
+              "ret_train_pct": 3.9223,
+              "ret_test_pct": -0.9313,
+              "ret_full_pct": 2.9544,
+              "random_mean_pct": -2.2516,
+              "random_p95_pct": 9.9311
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 33,
+              "trades_test": 20,
+              "ret_train_pct": 2.2012,
+              "ret_test_pct": -0.2232,
+              "ret_full_pct": 1.9731,
+              "random_mean_pct": -2.3089,
+              "random_p95_pct": 4.655
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 42,
+              "trades_test": 18,
+              "ret_train_pct": -1.5843,
+              "ret_test_pct": 3.0411,
+              "ret_full_pct": 1.4086,
+              "random_mean_pct": 3.2629,
+              "random_p95_pct": 9.9995
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 40,
+              "trades_test": 19,
+              "ret_train_pct": 7.249,
+              "ret_test_pct": 5.1211,
+              "ret_full_pct": 12.7413,
+              "random_mean_pct": 1.5092,
+              "random_p95_pct": 8.4784
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 36,
+              "trades_test": 26,
+              "ret_train_pct": 10.259,
+              "ret_test_pct": -1.0541,
+              "ret_full_pct": 9.0967,
+              "random_mean_pct": 5.0283,
+              "random_p95_pct": 16.1696
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 37,
+              "trades_test": 13,
+              "ret_train_pct": 0.2348,
+              "ret_test_pct": 0.2653,
+              "ret_full_pct": 0.5007,
+              "random_mean_pct": -2.5907,
+              "random_p95_pct": 2.3283
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 33,
+              "trades_test": 15,
+              "ret_train_pct": 3.5148,
+              "ret_test_pct": 1.1118,
+              "ret_full_pct": 4.6656,
+              "random_mean_pct": 0.4781,
+              "random_p95_pct": 10.8538
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 44,
+              "trades_test": 23,
+              "ret_train_pct": 1.6863,
+              "ret_test_pct": -5.9423,
+              "ret_full_pct": -4.3562,
+              "random_mean_pct": 0.0839,
+              "random_p95_pct": 9.9359
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 40,
+              "trades_test": 16,
+              "ret_train_pct": 6.6701,
+              "ret_test_pct": 4.0135,
+              "ret_full_pct": 10.9513,
+              "random_mean_pct": 4.0932,
+              "random_p95_pct": 21.2763
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": 0.2645,
+            "beats_p95": 1,
+            "beats_ratio": 0.0667
+          }
+        },
+        {
+          "label": "supertrend_factor5.0_atr_period14_sl_atr_mult3.0_target_r6.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 5.0,
+            "atr_period": 14,
+            "sl_atr_mult": 3.0,
+            "target_r": 6.0,
+            "use_ema200_filter": true
+          },
+          "interval": "1h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 511,
+            "expectancy": {
+              "trades": 511,
+              "mean_return_pct": 0.928,
+              "ci_low_pct": 0.1067,
+              "ci_high_pct": 1.874,
+              "verdict": "positive",
+              "bootstrap_sample": 511,
+              "sampled": false
+            },
+            "long": {
+              "trades": 207,
+              "mean_return_pct": -1.4179,
+              "ci_low_pct": -2.3649,
+              "ci_high_pct": -0.4214,
+              "verdict": "negative",
+              "bootstrap_sample": 207,
+              "sampled": false
+            },
+            "short": {
+              "trades": 304,
+              "mean_return_pct": 2.5254,
+              "ci_low_pct": 1.2218,
+              "ci_high_pct": 3.8115,
+              "verdict": "positive",
+              "bootstrap_sample": 304,
+              "sampled": false
+            },
+            "account_median_pct": 2.6702,
+            "account_mean_pct": 2.9107,
+            "positive_symbols": 13
+          },
+          "test": {
+            "trades": 271,
+            "expectancy": {
+              "trades": 271,
+              "mean_return_pct": -0.3001,
+              "ci_low_pct": -1.3121,
+              "ci_high_pct": 0.8127,
+              "verdict": "inconclusive",
+              "bootstrap_sample": 271,
+              "sampled": false
+            },
+            "long": {
+              "trades": 139,
+              "mean_return_pct": 0.2085,
+              "ci_low_pct": -1.469,
+              "ci_high_pct": 2.0854,
+              "verdict": "insufficient",
+              "bootstrap_sample": 139,
+              "sampled": false
+            },
+            "short": {
+              "trades": 132,
+              "mean_return_pct": -0.8357,
+              "ci_low_pct": -2.0326,
+              "ci_high_pct": 0.4936,
+              "verdict": "insufficient",
+              "bootstrap_sample": 132,
+              "sampled": false
+            },
+            "account_median_pct": -0.3825,
+            "account_mean_pct": -0.3631,
+            "positive_symbols": 7
+          },
+          "account_return_full_median_pct": 2.4938,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 445,
+            "signal_reverse": 237,
+            "take_profit": 80,
+            "close_at_end": 20
+          },
+          "blocked": {
+            "no_supertrend_signal": 143386,
+            "ema200_filter": 407,
+            "invalid_indicators": 195,
+            "excess_volatility": 3
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 36,
+              "trades_test": 15,
+              "ret_train_pct": 0.1837,
+              "ret_test_pct": 4.9498,
+              "ret_full_pct": 5.1426,
+              "random_mean_pct": 0.7358,
+              "random_p95_pct": 8.3186
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 42,
+              "trades_test": 18,
+              "ret_train_pct": 0.7894,
+              "ret_test_pct": -5.324,
+              "ret_full_pct": -4.5766,
+              "random_mean_pct": 0.2959,
+              "random_p95_pct": 9.0176
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 29,
+              "trades_test": 23,
+              "ret_train_pct": 3.5501,
+              "ret_test_pct": -1.157,
+              "ret_full_pct": 2.352,
+              "random_mean_pct": -3.9582,
+              "random_p95_pct": 6.7938
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 39,
+              "trades_test": 16,
+              "ret_train_pct": 0.7699,
+              "ret_test_pct": -5.7328,
+              "ret_full_pct": -5.0071,
+              "random_mean_pct": 1.0709,
+              "random_p95_pct": 16.1324
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 33,
+              "trades_test": 27,
+              "ret_train_pct": 2.6702,
+              "ret_test_pct": -6.4493,
+              "ret_full_pct": -3.9514,
+              "random_mean_pct": -4.5817,
+              "random_p95_pct": 5.6034
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 30,
+              "trades_test": 19,
+              "ret_train_pct": -1.9798,
+              "ret_test_pct": -5.6514,
+              "ret_full_pct": -7.5192,
+              "random_mean_pct": -1.6992,
+              "random_p95_pct": 5.8168
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 34,
+              "trades_test": 17,
+              "ret_train_pct": 1.8407,
+              "ret_test_pct": -1.2169,
+              "ret_full_pct": 0.6014,
+              "random_mean_pct": -2.5297,
+              "random_p95_pct": 11.5859
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 29,
+              "trades_test": 19,
+              "ret_train_pct": 5.7082,
+              "ret_test_pct": 0.2286,
+              "ret_full_pct": 5.9499,
+              "random_mean_pct": -0.1299,
+              "random_p95_pct": 6.6904
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 41,
+              "trades_test": 17,
+              "ret_train_pct": 0.2477,
+              "ret_test_pct": -0.3825,
+              "ret_full_pct": -0.1358,
+              "random_mean_pct": -0.2061,
+              "random_p95_pct": 10.6745
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 34,
+              "trades_test": 15,
+              "ret_train_pct": -1.3382,
+              "ret_test_pct": 4.642,
+              "ret_full_pct": 3.2417,
+              "random_mean_pct": -1.3308,
+              "random_p95_pct": 7.5248
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 28,
+              "trades_test": 22,
+              "ret_train_pct": 9.5664,
+              "ret_test_pct": 3.8553,
+              "ret_full_pct": 13.7905,
+              "random_mean_pct": 7.1767,
+              "random_p95_pct": 22.3924
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 36,
+              "trades_test": 15,
+              "ret_train_pct": 6.0148,
+              "ret_test_pct": 3.573,
+              "ret_full_pct": 9.8028,
+              "random_mean_pct": 1.0505,
+              "random_p95_pct": 10.289
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 30,
+              "trades_test": 12,
+              "ret_train_pct": 6.151,
+              "ret_test_pct": 3.485,
+              "ret_full_pct": 9.8504,
+              "random_mean_pct": 3.5732,
+              "random_p95_pct": 14.4007
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 39,
+              "trades_test": 23,
+              "ret_train_pct": 5.0735,
+              "ret_test_pct": -2.4552,
+              "ret_full_pct": 2.4938,
+              "random_mean_pct": -0.2998,
+              "random_p95_pct": 15.1985
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 31,
+              "trades_test": 13,
+              "ret_train_pct": 4.4128,
+              "ret_test_pct": 2.189,
+              "ret_full_pct": 6.6984,
+              "random_mean_pct": 3.4396,
+              "random_p95_pct": 16.5249
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": 0.1738,
+            "beats_p95": 0,
+            "beats_ratio": 0.0
+          }
+        }
+      ]
+    },
+    "4h": {
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TRXUSDT",
+        "NEARUSDT",
+        "APTUSDT",
+        "BCHUSDT"
+      ],
+      "elapsed_seconds": 5.8,
+      "combos": [
+        {
+          "label": "supertrend_factor1.5_atr_period14_sl_atr_mult3.0_target_r4.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 1.5,
+            "atr_period": 14,
+            "sl_atr_mult": 3.0,
+            "target_r": 4.0,
+            "use_ema200_filter": true
+          },
+          "interval": "4h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 281,
+            "expectancy": {
+              "trades": 281,
+              "mean_return_pct": 1.2236,
+              "ci_low_pct": -0.0579,
+              "ci_high_pct": 2.6185,
+              "verdict": "inconclusive",
+              "bootstrap_sample": 281,
+              "sampled": false
+            },
+            "long": {
+              "trades": 73,
+              "mean_return_pct": -0.9107,
+              "ci_low_pct": -2.8773,
+              "ci_high_pct": 1.5053,
+              "verdict": "insufficient",
+              "bootstrap_sample": 73,
+              "sampled": false
+            },
+            "short": {
+              "trades": 208,
+              "mean_return_pct": 1.9726,
+              "ci_low_pct": 0.3689,
+              "ci_high_pct": 3.7431,
+              "verdict": "positive",
+              "bootstrap_sample": 208,
+              "sampled": false
+            },
+            "account_median_pct": 1.989,
+            "account_mean_pct": 2.3844,
+            "positive_symbols": 14
+          },
+          "test": {
+            "trades": 106,
+            "expectancy": {
+              "trades": 106,
+              "mean_return_pct": -0.1369,
+              "ci_low_pct": -1.8021,
+              "ci_high_pct": 1.7183,
+              "verdict": "insufficient",
+              "bootstrap_sample": 106,
+              "sampled": false
+            },
+            "long": {
+              "trades": 57,
+              "mean_return_pct": 1.3217,
+              "ci_low_pct": -1.4662,
+              "ci_high_pct": 4.3289,
+              "verdict": "insufficient",
+              "bootstrap_sample": 57,
+              "sampled": false
+            },
+            "short": {
+              "trades": 49,
+              "mean_return_pct": -1.8335,
+              "ci_low_pct": -3.0207,
+              "ci_high_pct": -0.6629,
+              "verdict": "insufficient",
+              "bootstrap_sample": 49,
+              "sampled": false
+            },
+            "account_median_pct": -0.2826,
+            "account_mean_pct": -0.1974,
+            "positive_symbols": 6
+          },
+          "account_return_full_median_pct": 2.286,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 172,
+            "signal_reverse": 127,
+            "take_profit": 64,
+            "close_at_end": 24
+          },
+          "blocked": {
+            "no_supertrend_signal": 33813,
+            "ema200_filter": 1105,
+            "invalid_indicators": 195,
+            "excess_volatility": 165
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 20,
+              "trades_test": 6,
+              "ret_train_pct": 1.0539,
+              "ret_test_pct": 1.4337,
+              "ret_full_pct": 2.5027,
+              "random_mean_pct": 0.6224,
+              "random_p95_pct": 10.0673
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 15,
+              "trades_test": 2,
+              "ret_train_pct": 1.8963,
+              "ret_test_pct": -0.9971,
+              "ret_full_pct": 0.8803,
+              "random_mean_pct": -0.2168,
+              "random_p95_pct": 3.7534
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 22,
+              "trades_test": 10,
+              "ret_train_pct": 4.2373,
+              "ret_test_pct": 1.8594,
+              "ret_full_pct": 6.1755,
+              "random_mean_pct": 1.2707,
+              "random_p95_pct": 8.4472
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 22,
+              "trades_test": 7,
+              "ret_train_pct": -2.1384,
+              "ret_test_pct": -0.4862,
+              "ret_full_pct": -2.6142,
+              "random_mean_pct": 1.4843,
+              "random_p95_pct": 7.1602
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 17,
+              "trades_test": 11,
+              "ret_train_pct": 3.0686,
+              "ret_test_pct": -2.6919,
+              "ret_full_pct": 0.294,
+              "random_mean_pct": -0.9678,
+              "random_p95_pct": 5.152
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 23,
+              "trades_test": 5,
+              "ret_train_pct": 1.989,
+              "ret_test_pct": -1.2811,
+              "ret_full_pct": 0.6824,
+              "random_mean_pct": -1.915,
+              "random_p95_pct": 6.8807
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 13,
+              "trades_test": 4,
+              "ret_train_pct": 1.5256,
+              "ret_test_pct": 0.7489,
+              "ret_full_pct": 2.286,
+              "random_mean_pct": 0.5835,
+              "random_p95_pct": 10.6486
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 18,
+              "trades_test": 5,
+              "ret_train_pct": 0.9125,
+              "ret_test_pct": 2.1458,
+              "ret_full_pct": 3.0779,
+              "random_mean_pct": -3.201,
+              "random_p95_pct": 3.501
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 20,
+              "trades_test": 9,
+              "ret_train_pct": 1.8195,
+              "ret_test_pct": 1.9601,
+              "ret_full_pct": 3.8153,
+              "random_mean_pct": 0.1663,
+              "random_p95_pct": 6.8219
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 18,
+              "trades_test": 13,
+              "ret_train_pct": 1.6133,
+              "ret_test_pct": -0.2866,
+              "ret_full_pct": 1.322,
+              "random_mean_pct": -0.7176,
+              "random_p95_pct": 3.3543
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 17,
+              "trades_test": 4,
+              "ret_train_pct": 2.6161,
+              "ret_test_pct": 1.0425,
+              "ret_full_pct": 3.6859,
+              "random_mean_pct": 0.5585,
+              "random_p95_pct": 5.532
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 20,
+              "trades_test": 6,
+              "ret_train_pct": 2.3756,
+              "ret_test_pct": -0.2826,
+              "ret_full_pct": 2.0863,
+              "random_mean_pct": 0.048,
+              "random_p95_pct": 5.2556
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 20,
+              "trades_test": 6,
+              "ret_train_pct": 2.7422,
+              "ret_test_pct": -1.361,
+              "ret_full_pct": 1.3439,
+              "random_mean_pct": 2.5853,
+              "random_p95_pct": 8.8624
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 22,
+              "trades_test": 13,
+              "ret_train_pct": 8.5545,
+              "ret_test_pct": -4.6424,
+              "ret_full_pct": 3.5151,
+              "random_mean_pct": -0.9933,
+              "random_p95_pct": 4.9818
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 14,
+              "trades_test": 5,
+              "ret_train_pct": 3.5,
+              "ret_test_pct": -0.1231,
+              "ret_full_pct": 3.3726,
+              "random_mean_pct": 0.8909,
+              "random_p95_pct": 7.9383
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": 0.0132,
+            "beats_p95": 0,
+            "beats_ratio": 0.0
+          }
+        },
+        {
+          "label": "supertrend_factor1.5_atr_period14_sl_atr_mult2.0_target_r6.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 1.5,
+            "atr_period": 14,
+            "sl_atr_mult": 2.0,
+            "target_r": 6.0,
+            "use_ema200_filter": true
+          },
+          "interval": "4h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 351,
+            "expectancy": {
+              "trades": 351,
+              "mean_return_pct": 1.5197,
+              "ci_low_pct": 0.4037,
+              "ci_high_pct": 2.6811,
+              "verdict": "positive",
+              "bootstrap_sample": 351,
+              "sampled": false
+            },
+            "long": {
+              "trades": 107,
+              "mean_return_pct": -1.2972,
+              "ci_low_pct": -2.5632,
+              "ci_high_pct": 0.1365,
+              "verdict": "insufficient",
+              "bootstrap_sample": 107,
+              "sampled": false
+            },
+            "short": {
+              "trades": 244,
+              "mean_return_pct": 2.7551,
+              "ci_low_pct": 1.273,
+              "ci_high_pct": 4.2995,
+              "verdict": "positive",
+              "bootstrap_sample": 244,
+              "sampled": false
+            },
+            "account_median_pct": 4.9434,
+            "account_mean_pct": 4.9997,
+            "positive_symbols": 14
+          },
+          "test": {
+            "trades": 139,
+            "expectancy": {
+              "trades": 139,
+              "mean_return_pct": -0.1565,
+              "ci_low_pct": -1.4358,
+              "ci_high_pct": 1.1852,
+              "verdict": "insufficient",
+              "bootstrap_sample": 139,
+              "sampled": false
+            },
+            "long": {
+              "trades": 79,
+              "mean_return_pct": 0.8812,
+              "ci_low_pct": -1.2781,
+              "ci_high_pct": 3.2261,
+              "verdict": "insufficient",
+              "bootstrap_sample": 79,
+              "sampled": false
+            },
+            "short": {
+              "trades": 60,
+              "mean_return_pct": -1.5229,
+              "ci_low_pct": -2.4742,
+              "ci_high_pct": -0.5427,
+              "verdict": "insufficient",
+              "bootstrap_sample": 60,
+              "sampled": false
+            },
+            "account_median_pct": -0.201,
+            "account_mean_pct": -0.1856,
+            "positive_symbols": 7
+          },
+          "account_return_full_median_pct": 4.0257,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 307,
+            "signal_reverse": 88,
+            "take_profit": 74,
+            "close_at_end": 21
+          },
+          "blocked": {
+            "no_supertrend_signal": 33813,
+            "ema200_filter": 1105,
+            "invalid_indicators": 195,
+            "excess_volatility": 165
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 24,
+              "trades_test": 7,
+              "ret_train_pct": 7.541,
+              "ret_test_pct": 2.0122,
+              "ret_full_pct": 9.705,
+              "random_mean_pct": 0.6313,
+              "random_p95_pct": 16.2058
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 21,
+              "trades_test": 3,
+              "ret_train_pct": 1.9675,
+              "ret_test_pct": -1.4921,
+              "ret_full_pct": 0.446,
+              "random_mean_pct": -1.376,
+              "random_p95_pct": 3.9741
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 26,
+              "trades_test": 16,
+              "ret_train_pct": 4.5283,
+              "ret_test_pct": 0.3969,
+              "ret_full_pct": 4.9431,
+              "random_mean_pct": 0.2724,
+              "random_p95_pct": 7.7064
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 28,
+              "trades_test": 8,
+              "ret_train_pct": -3.2758,
+              "ret_test_pct": -0.2257,
+              "ret_full_pct": -3.4942,
+              "random_mean_pct": 0.1966,
+              "random_p95_pct": 8.151
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 23,
+              "trades_test": 13,
+              "ret_train_pct": 6.6414,
+              "ret_test_pct": -3.5096,
+              "ret_full_pct": 2.8986,
+              "random_mean_pct": -2.0264,
+              "random_p95_pct": 6.6532
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 29,
+              "trades_test": 6,
+              "ret_train_pct": 9.6873,
+              "ret_test_pct": -1.4382,
+              "ret_full_pct": 8.1097,
+              "random_mean_pct": -0.5781,
+              "random_p95_pct": 10.3008
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 19,
+              "trades_test": 5,
+              "ret_train_pct": 7.3673,
+              "ret_test_pct": 1.0728,
+              "ret_full_pct": 8.5191,
+              "random_mean_pct": 1.5644,
+              "random_p95_pct": 12.046
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 21,
+              "trades_test": 13,
+              "ret_train_pct": 2.3252,
+              "ret_test_pct": -0.4649,
+              "ret_full_pct": 1.8494,
+              "random_mean_pct": -3.6798,
+              "random_p95_pct": 2.7404
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 30,
+              "trades_test": 14,
+              "ret_train_pct": 4.9434,
+              "ret_test_pct": 1.2568,
+              "ret_full_pct": 6.2623,
+              "random_mean_pct": -0.2842,
+              "random_p95_pct": 10.9512
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 22,
+              "trades_test": 13,
+              "ret_train_pct": 0.7706,
+              "ret_test_pct": 1.4017,
+              "ret_full_pct": 2.1831,
+              "random_mean_pct": -0.0973,
+              "random_p95_pct": 6.1383
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 17,
+              "trades_test": 5,
+              "ret_train_pct": 2.7285,
+              "ret_test_pct": 1.2627,
+              "ret_full_pct": 4.0257,
+              "random_mean_pct": 1.3035,
+              "random_p95_pct": 8.7301
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 27,
+              "trades_test": 8,
+              "ret_train_pct": 1.8164,
+              "ret_test_pct": 1.9332,
+              "ret_full_pct": 3.7846,
+              "random_mean_pct": -0.2164,
+              "random_p95_pct": 6.9649
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 22,
+              "trades_test": 8,
+              "ret_train_pct": 5.1751,
+              "ret_test_pct": -2.1969,
+              "ret_full_pct": 2.8645,
+              "random_mean_pct": 1.8395,
+              "random_p95_pct": 9.3438
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 28,
+              "trades_test": 14,
+              "ret_train_pct": 15.7943,
+              "ret_test_pct": -2.5913,
+              "ret_full_pct": 12.7938,
+              "random_mean_pct": -0.1178,
+              "random_p95_pct": 7.1864
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 14,
+              "trades_test": 6,
+              "ret_train_pct": 6.9844,
+              "ret_test_pct": -0.201,
+              "ret_full_pct": 6.7694,
+              "random_mean_pct": 1.8624,
+              "random_p95_pct": 11.2006
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": -0.0471,
+            "beats_p95": 1,
+            "beats_ratio": 0.0667
+          }
+        },
+        {
+          "label": "supertrend_factor2.0_atr_period30_sl_atr_mult3.0_target_r3.0__ema200",
+          "stage": 4,
+          "base_label": null,
+          "overlay": null,
+          "params": {
+            "supertrend_factor": 2.0,
+            "atr_period": 30,
+            "sl_atr_mult": 3.0,
+            "target_r": 3.0,
+            "use_ema200_filter": true
+          },
+          "interval": "4h",
+          "symbols_total": 15,
+          "symbols_with_trades": 15,
+          "train": {
+            "trades": 254,
+            "expectancy": {
+              "trades": 254,
+              "mean_return_pct": 1.4774,
+              "ci_low_pct": 0.0678,
+              "ci_high_pct": 2.8358,
+              "verdict": "positive",
+              "bootstrap_sample": 254,
+              "sampled": false
+            },
+            "long": {
+              "trades": 73,
+              "mean_return_pct": -1.5133,
+              "ci_low_pct": -3.2591,
+              "ci_high_pct": 0.3297,
+              "verdict": "insufficient",
+              "bootstrap_sample": 73,
+              "sampled": false
+            },
+            "short": {
+              "trades": 181,
+              "mean_return_pct": 2.6836,
+              "ci_low_pct": 0.9957,
+              "ci_high_pct": 4.3835,
+              "verdict": "insufficient",
+              "bootstrap_sample": 181,
+              "sampled": false
+            },
+            "account_median_pct": 1.7978,
+            "account_mean_pct": 2.0543,
+            "positive_symbols": 11
+          },
+          "test": {
+            "trades": 112,
+            "expectancy": {
+              "trades": 112,
+              "mean_return_pct": 0.1512,
+              "ci_low_pct": -1.4857,
+              "ci_high_pct": 1.9793,
+              "verdict": "insufficient",
+              "bootstrap_sample": 112,
+              "sampled": false
+            },
+            "long": {
+              "trades": 69,
+              "mean_return_pct": 1.6387,
+              "ci_low_pct": -0.6825,
+              "ci_high_pct": 4.2213,
+              "verdict": "insufficient",
+              "bootstrap_sample": 69,
+              "sampled": false
+            },
+            "short": {
+              "trades": 43,
+              "mean_return_pct": -2.2359,
+              "ci_low_pct": -3.6021,
+              "ci_high_pct": -0.801,
+              "verdict": "insufficient",
+              "bootstrap_sample": 43,
+              "sampled": false
+            },
+            "account_median_pct": 0.5486,
+            "account_mean_pct": 0.0115,
+            "positive_symbols": 9
+          },
+          "account_return_full_median_pct": 0.8764,
+          "avg_bars_held": 0.0,
+          "exposure_pct": 0.0,
+          "status_counts": {
+            "stop_loss": 178,
+            "take_profit": 85,
+            "signal_reverse": 80,
+            "close_at_end": 23
+          },
+          "blocked": {
+            "no_supertrend_signal": 34307,
+            "ema200_filter": 745,
+            "invalid_indicators": 435,
+            "excess_volatility": 108
+          },
+          "per_symbol": [
+            {
+              "symbol": "ADAUSDT",
+              "trades_train": 17,
+              "trades_test": 8,
+              "ret_train_pct": 2.0395,
+              "ret_test_pct": 0.9163,
+              "ret_full_pct": 2.9745,
+              "random_mean_pct": 1.5629,
+              "random_p95_pct": 7.2878
+            },
+            {
+              "symbol": "APTUSDT",
+              "trades_train": 12,
+              "trades_test": 1,
+              "ret_train_pct": 2.158,
+              "ret_test_pct": -0.4993,
+              "ret_full_pct": 1.6479,
+              "random_mean_pct": 1.1683,
+              "random_p95_pct": 6.9282
+            },
+            {
+              "symbol": "AVAXUSDT",
+              "trades_train": 17,
+              "trades_test": 8,
+              "ret_train_pct": 5.2193,
+              "ret_test_pct": 1.4859,
+              "ret_full_pct": 6.7828,
+              "random_mean_pct": 0.9257,
+              "random_p95_pct": 7.6803
+            },
+            {
+              "symbol": "BCHUSDT",
+              "trades_train": 19,
+              "trades_test": 10,
+              "ret_train_pct": 1.3571,
+              "ret_test_pct": -2.5617,
+              "ret_full_pct": -1.2393,
+              "random_mean_pct": 0.4986,
+              "random_p95_pct": 9.8074
+            },
+            {
+              "symbol": "BTCUSDT",
+              "trades_train": 16,
+              "trades_test": 13,
+              "ret_train_pct": 1.7121,
+              "ret_test_pct": -1.4031,
+              "ret_full_pct": 0.285,
+              "random_mean_pct": 0.5202,
+              "random_p95_pct": 6.6327
+            },
+            {
+              "symbol": "DOGEUSDT",
+              "trades_train": 16,
+              "trades_test": 6,
+              "ret_train_pct": 7.9659,
+              "ret_test_pct": 0.5792,
+              "ret_full_pct": 8.5912,
+              "random_mean_pct": 0.9846,
+              "random_p95_pct": 5.8976
+            },
+            {
+              "symbol": "DOTUSDT",
+              "trades_train": 18,
+              "trades_test": 4,
+              "ret_train_pct": -1.1125,
+              "ret_test_pct": 1.9328,
+              "ret_full_pct": 0.7988,
+              "random_mean_pct": 2.5887,
+              "random_p95_pct": 10.243
+            },
+            {
+              "symbol": "ETHUSDT",
+              "trades_train": 17,
+              "trades_test": 3,
+              "ret_train_pct": -0.9597,
+              "ret_test_pct": 1.7433,
+              "ret_full_pct": 0.7669,
+              "random_mean_pct": -0.8041,
+              "random_p95_pct": 3.7808
+            },
+            {
+              "symbol": "LINKUSDT",
+              "trades_train": 17,
+              "trades_test": 11,
+              "ret_train_pct": 0.5221,
+              "ret_test_pct": -0.1788,
+              "ret_full_pct": 0.3424,
+              "random_mean_pct": -0.744,
+              "random_p95_pct": 3.3155
+            },
+            {
+              "symbol": "LTCUSDT",
+              "trades_train": 17,
+              "trades_test": 10,
+              "ret_train_pct": 1.8498,
+              "ret_test_pct": 0.0164,
+              "ret_full_pct": 1.8664,
+              "random_mean_pct": -1.7878,
+              "random_p95_pct": 2.8633
+            },
+            {
+              "symbol": "NEARUSDT",
+              "trades_train": 14,
+              "trades_test": 4,
+              "ret_train_pct": -0.6718,
+              "ret_test_pct": 0.5753,
+              "ret_full_pct": -0.1004,
+              "random_mean_pct": -0.563,
+              "random_p95_pct": 4.2905
+            },
+            {
+              "symbol": "SOLUSDT",
+              "trades_train": 23,
+              "trades_test": 9,
+              "ret_train_pct": 1.7978,
+              "ret_test_pct": -0.7352,
+              "ret_full_pct": 1.0494,
+              "random_mean_pct": 0.5852,
+              "random_p95_pct": 8.2467
+            },
+            {
+              "symbol": "SUIUSDT",
+              "trades_train": 12,
+              "trades_test": 5,
+              "ret_train_pct": -0.5577,
+              "ret_test_pct": 0.5486,
+              "ret_full_pct": -0.0121,
+              "random_mean_pct": 2.0248,
+              "random_p95_pct": 7.5557
+            },
+            {
+              "symbol": "TRXUSDT",
+              "trades_train": 20,
+              "trades_test": 14,
+              "ret_train_pct": 4.4841,
+              "ret_test_pct": -3.4529,
+              "ret_full_pct": 0.8764,
+              "random_mean_pct": -1.9801,
+              "random_p95_pct": 4.5449
+            },
+            {
+              "symbol": "XRPUSDT",
+              "trades_train": 19,
+              "trades_test": 6,
+              "ret_train_pct": 5.0108,
+              "ret_test_pct": 1.206,
+              "ret_full_pct": 6.2772,
+              "random_mean_pct": 0.3572,
+              "random_p95_pct": 6.6555
+            }
+          ],
+          "random": {
+            "symbols": 15,
+            "random_mean_pct": 0.3558,
+            "beats_p95": 1,
+            "beats_ratio": 0.0667
+          }
+        }
+      ]
+    }
+  }
+}

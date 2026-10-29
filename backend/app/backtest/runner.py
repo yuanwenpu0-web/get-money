@@ -9,14 +9,17 @@ import importlib.util
 import json
 import math
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
 from ..ml.dataset import build_dataset, purged_split
 from ..models import StrategyConfig
+from ..market.data_service import MarketDataService
 from ..strategy.bindings import binding_overrides
 from ..state import all_state
 from ..strategy.rules import evaluate_signals, resolve_params
+from ..utils import interval_ms, now_ms
 from .execution import exposure_metrics, randomize_directions, simulate
 from .metrics import downsample, metrics_from_equity
 from .significance import (
@@ -26,6 +29,139 @@ from .significance import (
 
 # Dependency information only; all runs use the same explicit execution semantics.
 HAS_VBT = importlib.util.find_spec("vectorbt") is not None
+
+# 只能由专用撮合表达的策略：它们的 `signals()` 输出方向恒为 0，
+# 通用撮合会把它们的出场规则换成另一套，所以这里统一早路由。
+OPENING_BREAKOUT = "opening_candle_breakout"
+
+
+def run_zigzag_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
+    """Replay the requested raw candle window with the Pine stop-order broker."""
+    from .zigzag_execution import simulate_zigzag
+
+    as_of = min(end_ms, now_ms()) if end_ms is not None else now_ms()
+    step = interval_ms(interval)
+    frame = MarketDataService(db).load_frame(
+        symbol, interval, start_ms=as_of - days * 86_400_000, end_ms=as_of
+    )
+    if frame.empty:
+        raise ValueError(f"{symbol} {interval} 本地无K线数据，请先拉取历史数据")
+    frame = frame.loc[(frame.index.as_unit("ms").asi8 + step) <= as_of].copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+    if len(frame) < 3:
+        raise ValueError("已收盘K线不足 3 根")
+    prices = frame[["open", "high", "low", "close"]]
+    valid = np.isfinite(prices).all(axis=1) & prices.gt(0).all(axis=1)
+    valid &= frame.high.ge(frame[["open", "close", "low"]].max(axis=1))
+    valid &= frame.low.le(frame[["open", "close", "high"]].min(axis=1))
+    if not valid.all():
+        raise ValueError("行情包含无效 K 线，无法按原策略回放")
+    diffs = frame.index.to_series().diff().dt.total_seconds().mul(1000)
+    gap_count = int(diffs.gt(step).sum())
+    signals = evaluate_signals(frame, "simple_zigzag_double", params)
+    equity, trades = simulate_zigzag(frame, signals, params, initial, fee, slippage, interval)
+    metrics = metrics_from_equity(equity, trades, initial, interval)
+    metrics.update(exposure_metrics(equity, trades, interval))
+    warnings = ["Pine 的指标状态从本地数据窗口首根开始计算；对照 TradingView 时须统一行情、历史起点和属性。"]
+    if gap_count:
+        warnings.append(f"行情存在 {gap_count} 处缺口；缺失时段的价格路径不可知。")
+    if slippage:
+        warnings.append("本地滑点按成交价百分比计算；TradingView 的 slippage 属性按最小跳动点数计算。")
+    metrics.update({
+        "engine": "pine_stop_orders", "execution": "pine_stop_orders",
+        "symbol": symbol, "interval": interval, "strategy": "simple_zigzag_double",
+        "pool": pool or "", "algo": "rule", "fee_rate": fee, "slippage": slippage,
+        "threshold": None, "buy_hold_return_pct": round((float(frame.close.iloc[-1]) / float(frame.open.iloc[0]) - 1) * 100, 4),
+        "signal_bars": int((signals.zz_long_entry | signals.zz_short_entry).sum()),
+        "parameters": params, "baseline": None, "random_baseline": None,
+        "validation": {"enabled": False}, "warnings": warnings,
+        "data_quality": {"raw_bars": len(frame), "gap_count": gap_count},
+        "split": {"test_start": str(frame.index[0]), "test_end": str(frame.index[-1]), "test_rows": len(frame), "purge_bars": 0},
+    })
+    return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
+
+
+def run_ocb_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
+    """回放开盘首根突破：会话买卖 + 按风险距离定手数，走专用撮合而不是通用信号撮合。"""
+    from .ocb_execution import simulate_ocb
+
+    as_of = min(end_ms, now_ms()) if end_ms is not None else now_ms()
+    step = interval_ms(interval)
+    frame = MarketDataService(db).load_frame(
+        symbol, interval, start_ms=as_of - days * 86_400_000, end_ms=as_of
+    )
+    if frame.empty:
+        raise ValueError(f"{symbol} {interval} 本地无K线数据，请先拉取历史数据")
+    frame = frame.loc[(frame.index.as_unit("ms").asi8 + step) <= as_of].copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+    if len(frame) < 3:
+        raise ValueError("已收盘K线不足 3 根")
+    prices = frame[["open", "high", "low", "close"]]
+    valid = np.isfinite(prices).all(axis=1) & prices.gt(0).all(axis=1)
+    valid &= frame.high.ge(frame[["open", "close", "low"]].max(axis=1))
+    valid &= frame.low.le(frame[["open", "close", "high"]].min(axis=1))
+    if not valid.all():
+        raise ValueError("行情包含无效 K 线，无法按原策略回放")
+    diffs = frame.index.to_series().diff().dt.total_seconds().mul(1000)
+    gap_count = int(diffs.gt(step).sum())
+    signals = evaluate_signals(frame, OPENING_BREAKOUT, params)
+    equity, trades = simulate_ocb(frame, signals, params, initial, fee, slippage, interval)
+    metrics = metrics_from_equity(equity, trades, initial, interval)
+    metrics.update(exposure_metrics(equity, trades, interval))
+    first_bars = int(signals["ocb_is_first"].sum())
+    setups = int(signals["ocb_dir"].ne(0).sum())
+    warnings = [
+        "会话强平/每笔风险定手数只能由专用撮合表达；本回放是完整的窗口回放，没有训练/测试切分。",
+        "Pine 的指标状态从本地数据窗口首根开始计算；对照 TradingView 时须统一行情、历史起点和属性。",
+    ]
+    if first_bars == 0:
+        warnings.append(
+            f"本周期没有任何K线的开盘时间落在开盘首窗（{params['first_session_start_min']}-"
+            f"{params['first_session_end_min']} 分钟）内，零成交是这个原因而不是没有信号逻辑。"
+        )
+    if gap_count:
+        warnings.append(f"行情存在 {gap_count} 处缺口；跨缺口的会话判定与 NaN 级 ATR 会让那些交易日直接跳过。")
+    if slippage:
+        warnings.append("本地滑点按成交价百分比计算；TradingView 的 slippage 属性按最小跳动点数计算。")
+    if trades:
+        open_end = equity.attrs.get("open_position")
+        if open_end is not None:
+            warnings.append("回放结束时有未平仓位（数据窗口在会话内截断），末根按盯市价计入净值。")
+    metrics.update({
+        "engine": "pine_session",
+        "execution": "pine_session_orders",
+        "symbol": symbol,
+        "interval": interval,
+        "strategy": OPENING_BREAKOUT,
+        "pool": pool or "",
+        "algo": "rule",
+        "fee_rate": fee,
+        "slippage": slippage,
+        "threshold": None,
+        "buy_hold_return_pct": round((float(frame.close.iloc[-1]) / float(frame.open.iloc[0]) - 1) * 100, 4),
+        "signal_bars": setups,
+        "opening_bars": first_bars,
+        "blocked_signals": {
+            str(k): int(v)
+            for k, v in signals.block_reason[signals.block_reason.ne("")]
+            .value_counts()
+            .items()
+        },
+        "parameters": params,
+        "baseline": None,
+        "random_baseline": None,
+        "validation": {"enabled": False},
+        "warnings": warnings,
+        "data_quality": {"raw_bars": len(frame), "gap_count": gap_count},
+        "open_position": equity.attrs.get("open_position"),
+        "split": {
+            "test_start": str(frame.index[0]),
+            "test_end": str(frame.index[-1]),
+            "test_rows": len(frame),
+            "purge_bars": 0,
+        },
+    })
+    return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
 
 
 def minimum_sample_trades(validation_bars: int) -> int:
@@ -118,13 +254,14 @@ def run_backtest(
 ) -> dict:
     """回测单个币种：同一撮合口径下的「当前参数 / 关闭过滤基线 / 随机方向基线」三者对照。"""
     state = all_state(db)
+    is_zigzag = strategy == "simple_zigzag_double"
     initial = float(
         initial_cash
         if initial_cash is not None
-        else state.get("initial_capital", 10000.0)
+        else 1_000_000.0 if is_zigzag else state.get("initial_capital", 10000.0)
     )
-    fee = float(fee if fee is not None else state["fee_rate"])
-    slippage = float(slippage if slippage is not None else state["slippage"])
+    fee = float(fee if fee is not None else 0.001 if is_zigzag else state["fee_rate"])
+    slippage = float(slippage if slippage is not None else 0.0 if is_zigzag else state["slippage"])
     if not math.isfinite(initial) or initial <= 0 or not 0.5 <= train_ratio <= 0.85:
         raise ValueError("初始资金或训练占比无效")
     # 指定池时用「策略 × 池」绑定的参数覆盖层，再叠该币种的覆盖，与实盘走同一套参数
@@ -144,6 +281,14 @@ def run_backtest(
         strategy, {**state, "fee_rate": fee, "slippage": slippage}, overrides,
         interval=interval,
     )
+    if is_zigzag:
+        if optimize:
+            raise ValueError("Simple ZigZag Double 不支持通用验证集选参，请关闭选参后回测")
+        return run_zigzag_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool)
+    if strategy == OPENING_BREAKOUT:
+        if optimize:
+            raise ValueError("开盘首根突破不支持通用验证集选参，请关闭选参后回测")
+        return run_ocb_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool)
     horizon = int(state.get("train_horizon", 5))
     data = build_dataset(db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms)
     if len(data) < 800:

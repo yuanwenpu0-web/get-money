@@ -28,7 +28,7 @@ function view(overrides = {}) {
     window: { scrollTo: () => {} },
   })
   vm.runInContext(`${source}\nglobalThis.subject = {
-    loadBindings, applyBinding, onIntervalChange, onStrategyChange,
+    loadBindings, loadSettings, touchField, applyBinding, onIntervalChange, onStrategyChange,
     form, bindings, strategyOptions, selectedBinding, strategyChoices, bindingOptions,
   }`, context)
   return context.subject
@@ -90,6 +90,41 @@ test('切换策略会清空原有绑定选择', async () => {
   subject.onStrategyChange()
   assert.equal(subject.form.pool, '')
   assert.equal(subject.selectedBinding.value, '')
+})
+
+test('双 ZigZag 默认使用 Pine 资金及成本，并在切换后恢复其他策略设置', async () => {
+  const subject = view({ getSettings: async () => ({ fee_rate: 0.0004, slippage: 0.0002 }) })
+  subject.form.strategy = 'simple_zigzag_double'
+  subject.onStrategyChange()
+  assert.equal(subject.form.initial_cash, 1000000)
+  assert.equal(subject.form.fee_pct, 0.1)
+  assert.equal(subject.form.slippage_pct, 0)
+  assert.equal(subject.form.optimize, false)
+  await subject.loadSettings()
+  assert.equal(subject.form.fee_pct, 0.1)
+  assert.equal(subject.form.slippage_pct, 0)
+  subject.form.strategy = 'absorption_reversal'
+  subject.onStrategyChange()
+  assert.equal(subject.form.initial_cash, 10000)
+  assert.equal(subject.form.fee_pct, 0.04)
+  assert.equal(subject.form.slippage_pct, 0.02)
+  assert.equal(subject.form.optimize, true)
+})
+
+test('切换到双 ZigZag 时保留手动输入的资金和成本', () => {
+  const subject = view()
+  subject.form.initial_cash = 12000
+  subject.touchField('initial_cash')
+  subject.form.fee_pct = 0.05
+  subject.touchField('fee_pct')
+  subject.form.slippage_pct = 0.03
+  subject.touchField('slippage_pct')
+  subject.form.strategy = 'simple_zigzag_double'
+  subject.onStrategyChange()
+  assert.equal(subject.form.initial_cash, 12000)
+  assert.equal(subject.form.fee_pct, 0.05)
+  assert.equal(subject.form.slippage_pct, 0.03)
+  assert.equal(subject.form.optimize, false)
 })
 
 test('绑定与策略接口失败时退回策略默认参数，不阻塞回测', async () => {

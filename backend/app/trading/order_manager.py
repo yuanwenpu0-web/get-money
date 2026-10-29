@@ -11,6 +11,7 @@ from ..market.data_service import MarketDataService
 from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
 from ..strategy.bindings import resolve_order_params
+from ..strategy.registry import get_spec
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from . import live as live_exec
 from .dispatch import close_position
@@ -76,6 +77,22 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
                 build_features(segment)["atr_pct"] * segment["close"]
             )
     side = 1 if order.side == "LONG" else -1
+    # 反手型策略（ZigZag 等）：止损位是 Pine 的反向挂单价，pivot 只单向松动
+    # （多头止损只下调、空头只上调），逐周期把 order.sl 跟随到最新反向通道。
+    # 保本/移动止损等通用增强会与跟随方向打架，对这类策略一律关闭。
+    follow = "stop_follow" in get_spec(order.strategy).tags
+    if follow and signal is not None:
+        levels = (getattr(signal, "reason", None) or {}).get("zz_levels") or {}
+        try:
+            desired = float(levels.get("short" if side == 1 else "long") or 0.0)
+        except (TypeError, ValueError):
+            desired = 0.0
+        loosen = (side == 1 and (order.sl or 0) > desired > 0) or (
+            side == -1 and desired > (order.sl or 0)
+        )
+        if loosen:
+            order.sl = round_price(desired)
+            result["actions"].append(f"zz_stop={order.sl}")
     # 强回调的 EMA9 失守软出场：用上一根收盘与上一根 EMA9 判定，本根开盘平仓（与回测同口径）
     ema9_prev = pd.Series(np.nan, index=frame.index)
     if params.get("ema_exit"):
@@ -116,7 +133,7 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
             result["actions"].append(hit[1])
             return result
         be_trigger_r = float(params.get("be_trigger_r", 0.0) or 0.0)
-        if be_trigger_r > 0:
+        if not follow and be_trigger_r > 0:
             new_be = round_price(
                 breakeven_stop(
                     side,
@@ -146,7 +163,7 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
                     order.sl = new_be
                 result["actions"].append(f"be_sl={new_be}")
         atr = float(atr_values.loc[row.Index])
-        if pd.notna(atr) and atr > 0:
+        if not follow and pd.notna(atr) and atr > 0:
             new_sl = round_price(
                 trailing_stop(
                     side, order.entry_price, order.sl or 0.0, row.close, atr, params

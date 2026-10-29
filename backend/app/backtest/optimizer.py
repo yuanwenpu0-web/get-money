@@ -81,6 +81,7 @@ from ..utils import interval_ms, now_ms
 from .execution import simulate
 from .metrics import metrics_from_equity
 from .significance import bootstrap_expectancy_ci
+from .trades import aggregate_positions
 
 # 默认组合数：972 种全组合里抽 64 个。实测 64 组已覆盖各参数的边缘分布，
 # 再多是线性增加的算力换越来越小的信息量。
@@ -416,7 +417,7 @@ def evaluate_symbol_task(task: dict) -> dict:
             "ci": ci,
             # 池化判定的原料：单币样本太少时，把所有币的验证段成交合起来
             # 才能回答「这套策略到底有没有 edge」。只带收益百分比，不带明细。
-            "valid_returns": [round(float(t.get("return_pct", 0.0)), 4) for t in valid_trades[:300]],
+            "valid_returns": [round(float(t.get("return_pct", 0.0)), 4) for t in aggregate_positions(valid_trades)[:300]],
             "verdict": _verdict(valid_metrics, ci, min_trades),
             "score": round(best["score"], 4),
             "elapsed": round(time.perf_counter() - started, 2),

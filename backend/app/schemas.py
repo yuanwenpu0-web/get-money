@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class CapitalAdjust(BaseModel):
@@ -127,7 +127,18 @@ class BacktestRequest(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
     symbol: str = Field(min_length=2, max_length=24, pattern=r'^[A-Za-z0-9]+$')
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '1m'
-    strategy: Literal['absorption_reversal'] = 'absorption_reversal'
+    strategy: str = Field(default='absorption_reversal', min_length=1, max_length=48)
+
+    @field_validator('strategy')
+    @classmethod
+    def validate_strategy(cls, code: str) -> str:
+        # 注册表是策略清单的唯一来源，避免新增策略后回测接口仍拒绝其代码。
+        from .strategy.rules import known_codes
+
+        if code not in known_codes():
+            raise ValueError(f'未知策略: {code}')
+        return code
+
     # 可选：用某条「策略 × 池」绑定的参数回测；留空则用策略配置
     pool: str | None = None
     days: int = Field(default=30, ge=1, le=180)

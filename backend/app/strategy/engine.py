@@ -194,8 +194,10 @@ class StrategyEngine:
             sl=round_price(price * (1 - direction * decision.sl_pct))
             if direction
             else 0.0,
+            # tp_pct<=0 表示策略本身没有止盈（如 ZigZag 反手型），落库 0 交给
+            # 反向信号/跟随止损管理，而不是把 tp 钉在入场价上
             tp=round_price(price * (1 + direction * decision.tp_pct))
-            if direction
+            if direction and float(decision.tp_pct) > 0
             else 0.0,
             leverage=int(decision.leverage) if direction else 0,
             position_pct=float(decision.position_pct) if direction else 0.0,

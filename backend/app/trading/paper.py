@@ -72,7 +72,8 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
     side = 1 if signal.direction == 'LONG' else -1
     entry = round_price(signal.price * (1 + side * slip))
     leverage = min(max(1, int(signal.leverage)), int(params['max_leverage']))
-    if (entry - signal.sl) * side <= 0 or (signal.tp - entry) * side <= 0:
+    # tp<=0 表示策略无止盈（反手型策略靠反向信号退出），只校验止损方向
+    if (entry - signal.sl) * side <= 0 or (signal.tp and (signal.tp - entry) * side <= 0):
         return None
     margin, qty = position_size(equity, cash, min(position_pct, params['max_position_pct']), leverage,
                                 entry, signal.sl, side, fee_rate, slip, params['risk_per_trade_pct'])

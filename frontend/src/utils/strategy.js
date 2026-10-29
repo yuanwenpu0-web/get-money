@@ -14,6 +14,8 @@ const reasons = {
   funding_filter_long: '资金费正极端（多头拥挤），禁止做多',
   funding_filter_short: '资金费负极端（空头拥挤），禁止做空',
   cost_filter: '波动或净盈亏比不足以覆盖成本',
+  awaiting_stop_fill: '等待挂单触价（ZigZag 通道突破）',
+  no_reverse_level: '反向通道价位无效，暂不开仓',
 }
 
 export const signalReason = (code) => reasons[code] || code || '符合开仓条件'

@@ -7,5 +7,13 @@
 from __future__ import annotations
 
 from . import absorption_reversal  # noqa: F401
+from . import opening_candle_breakout  # noqa: F401
+from . import supertrend_current  # noqa: F401
+from . import simple_zigzag_double  # noqa: F401
 
-__all__ = ["absorption_reversal"]
+__all__ = [
+    "absorption_reversal",
+    "opening_candle_breakout",
+    "supertrend_current",
+    "simple_zigzag_double",
+]

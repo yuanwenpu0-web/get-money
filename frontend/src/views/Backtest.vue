@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
 import StatCard from '../components/StatCard.vue'
-import { money, number, pct, pnlClass, price, tsLabel } from '../utils/format'
+import { closeReasonLabel, money, number, pct, pnlClass, price, tsLabel } from '../utils/format'
 import { signalReason } from '../utils/strategy'
 
 const settings = ref({})
@@ -53,11 +53,28 @@ const strategyChoices = computed(() => (
   strategyOptions.value.length ? strategyOptions.value : [{ code: 'absorption_reversal', name: '吸收反转' }]
 ))
 const bindingOptions = computed(() => bindings.value.filter((row) => row.strategy === form.strategy))
+const isZigzag = computed(() => form.strategy === 'simple_zigzag_double')
+let zigzagSelected = false
+let previousOptimize = true
 
 function onStrategyChange() {
   // 换策略后原来选中的绑定不再适用，清空回落到策略默认参数层
   selectedBinding.value = ''
   form.pool = ''
+  if (isZigzag.value && !zigzagSelected) {
+    zigzagSelected = true
+    previousOptimize = form.optimize
+    form.optimize = false
+    if (!touchedFields.has('initial_cash')) form.initial_cash = 1000000
+    if (!touchedFields.has('fee_pct')) form.fee_pct = 0.1
+    if (!touchedFields.has('slippage_pct')) form.slippage_pct = 0
+  } else if (!isZigzag.value && zigzagSelected) {
+    zigzagSelected = false
+    form.optimize = previousOptimize
+    if (!touchedFields.has('initial_cash')) form.initial_cash = 10000
+    if (!touchedFields.has('fee_pct')) form.fee_pct = Number(((settings.value.fee_rate ?? 0.0004) * 100).toFixed(4))
+    if (!touchedFields.has('slippage_pct')) form.slippage_pct = Number(((settings.value.slippage ?? 0.0002) * 100).toFixed(4))
+  }
 }
 
 function applyBinding(bindingId) {
@@ -167,8 +184,8 @@ async function loadSettings() {
     settings.value = config
     if (!touchedFields.has('symbol')) form.symbol = config.symbols?.[0] || 'BTCUSDT'
     if (!touchedFields.has('interval')) form.interval = config.interval || '1m'
-    if (!touchedFields.has('fee_pct')) form.fee_pct = Number(((config.fee_rate ?? 0.0004) * 100).toFixed(4))
-    if (!touchedFields.has('slippage_pct')) form.slippage_pct = Number(((config.slippage ?? 0.0002) * 100).toFixed(4))
+    if (!touchedFields.has('fee_pct')) form.fee_pct = isZigzag.value ? 0.1 : Number(((config.fee_rate ?? 0.0004) * 100).toFixed(4))
+    if (!touchedFields.has('slippage_pct')) form.slippage_pct = isZigzag.value ? 0 : Number(((config.slippage ?? 0.0002) * 100).toFixed(4))
     settingsReady.value = true
   } catch (error) {
     if (!disposed) settingsError.value = error.message
@@ -333,8 +350,8 @@ async function submit() {
       initial_cash: Number(form.initial_cash),
       fee: Number(form.fee_pct) / 100,
       slippage: Number(form.slippage_pct) / 100,
-      threshold: form.threshold == null ? null : Number(form.threshold),
-      optimize: form.optimize,
+      threshold: isZigzag.value || form.threshold == null ? null : Number(form.threshold),
+      optimize: isZigzag.value ? false : form.optimize,
     }
     const created = await api.createBacktest(payload)
     if (disposed || request !== runRequest) return
@@ -385,9 +402,9 @@ onBeforeUnmount(() => {
       <div class="panel-head">
         <div>
           <div class="panel-title">策略验证与收益对比</div>
-          <div class="panel-sub">收盘信号于下一根开盘撮合，计入双边成本、杠杆与风险限额；独立测试集评估</div>
+          <div class="panel-sub">{{ isZigzag ? '收盘更新止损挂单，按后续 K 线价格路径模拟触发；使用所选完整数据窗口。' : '收盘信号于下一根开盘撮合，计入双边成本、杠杆与风险限额；独立测试集评估' }}</div>
         </div>
-        <el-tag size="small" effect="plain" type="info">统一顺序撮合</el-tag>
+        <el-tag size="small" effect="plain" type="info">{{ isZigzag ? 'Pine 止损挂单撮合' : '统一顺序撮合' }}</el-tag>
       </div>
 
       <div v-if="settingsLoading" class="muted" role="status">正在加载回测设置，回测历史可独立查看…</div>
@@ -437,7 +454,7 @@ onBeforeUnmount(() => {
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">初始资金</div>
-          <el-input-number v-model="form.initial_cash" :min="1000" :step="1000" style="width: 100%" />
+          <el-input-number v-model="form.initial_cash" :min="1000" :step="1000" style="width: 100%" @change="touchField('initial_cash')" />
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">手续费（单边 %）</div>
@@ -449,15 +466,15 @@ onBeforeUnmount(() => {
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">开仓评分阈值（留空使用策略配置）</div>
-          <el-input-number v-model="form.threshold" :min="0.5" :max="1" :step="0.01" :precision="2" placeholder="使用策略配置" style="width: 100%" />
+          <el-input-number v-model="form.threshold" :disabled="isZigzag" :min="0.5" :max="1" :step="0.01" :precision="2" placeholder="使用策略配置" style="width: 100%" />
         </div>
       </div>
 
       <div class="row" style="margin-top: 14px">
-        <el-switch v-model="form.optimize" active-text="验证集选参" />
+        <el-switch v-model="form.optimize" :disabled="isZigzag" active-text="验证集选参" />
         <el-button type="primary" :loading="running" :disabled="!settingsReady" @click="submit">开始回测</el-button>
         <span class="muted" v-if="running">回测在后台运行，通常需要数秒到一分钟</span>
-        <span class="muted" v-else>{{ form.optimize ? '前 60% 训练、15% 验证选参、后 25% 测试；边界隔离预测跨度' : '前 75% 训练、后 25% 测试；边界隔离预测跨度' }}</span>
+        <span class="muted" v-else>{{ isZigzag ? '使用所选完整数据窗口；不进行参数优化。该策略目前仅支持回测。' : form.optimize ? '前 60% 训练、15% 验证选参、后 25% 测试；边界隔离预测跨度' : '前 75% 训练、后 25% 测试；边界隔离预测跨度' }}</span>
       </div>
     </div>
 
@@ -472,7 +489,11 @@ onBeforeUnmount(() => {
         <StatCard label="盈利因子" :value="profitFactor(metrics)" sub="总盈利 / 总亏损" />
         <StatCard label="手续费" :value="money(metrics.total_fees)" :tone="pnlClass(-Number(metrics.total_fees || 0))" :sub="`滑点 ${(metrics.slippage * 100).toFixed(3)}% · 费率 ${(metrics.fee_rate * 100).toFixed(3)}%`" />
         <StatCard label="买入持有" :value="pct(metrics.buy_hold_return_pct)" :tone="pnlClass(metrics.buy_hold_return_pct)" sub="测试区间基准" />
-        <StatCard label="回测引擎" :value="metrics.engine === 'sequential' ? '顺序撮合' : metrics.engine" :sub="`${metrics.signal_bars} 个信号K线`" />
+        <StatCard label="回测引擎" :value="metrics.engine === 'sequential' ? '顺序撮合' : metrics.engine === 'pine_stop_orders' ? 'Pine 止损挂单' : metrics.engine" :sub="metrics.engine === 'pine_stop_orders' ? `${metrics.signal_bars} 根挂单请求 K 线` : `${metrics.signal_bars} 个信号K线`" />
+      </div>
+
+      <div v-if="metrics.warnings?.length" class="panel section-gap">
+        <div v-for="warning in metrics.warnings" :key="warning" class="form-hint">{{ warning }}</div>
       </div>
 
       <div v-if="comparison.length" class="panel section-gap">
@@ -490,7 +511,6 @@ onBeforeUnmount(() => {
           <el-table-column label="手续费"><template #default="{ row }">{{ money(row.total_fees) }}</template></el-table-column>
           <el-table-column label="盈利因子"><template #default="{ row }">{{ profitFactor(row) }}</template></el-table-column>
         </el-table>
-        <div v-for="warning in metrics.warnings || []" :key="warning" class="form-hint">{{ warning }}</div>
         <div class="form-hint">测试区间：{{ metrics.split?.test_start }} → {{ metrics.split?.test_end }}；边界清除 {{ metrics.split?.purge_bars }} 根标签。</div>
         <el-collapse style="margin-top: 12px">
           <el-collapse-item title="参数选择与信号过滤" name="diagnostics">
@@ -530,7 +550,7 @@ onBeforeUnmount(() => {
         <div class="panel-head">
           <div>
             <div class="panel-title">成交明细</div>
-            <div class="panel-sub">最多保留最近 500 笔，按页加载，含手续费与退出原因</div>
+            <div class="panel-sub">最多保留最近 500 条平仓记录；分批止盈会显示多条，交易统计按完整持仓计算。</div>
           </div>
           <el-button size="small" :loading="loadingTrades" @click="loadTrades">刷新</el-button>
         </div>
@@ -547,7 +567,7 @@ onBeforeUnmount(() => {
           <el-table-column label="盈亏" width="110"><template #default="{ row }"><span class="mono" :class="pnlClass(row.pnl)">{{ money(row.pnl) }}</span></template></el-table-column>
           <el-table-column label="收益率" width="90"><template #default="{ row }"><span class="mono" :class="pnlClass(row.return_pct)">{{ pct(row.return_pct) }}</span></template></el-table-column>
           <el-table-column label="手续费" width="90"><template #default="{ row }"><span class="mono">{{ money(row.fees) }}</span></template></el-table-column>
-          <el-table-column prop="status" label="退出" min-width="100" />
+          <el-table-column label="退出" min-width="100"><template #default="{ row }">{{ closeReasonLabel(row.status) }}</template></el-table-column>
         </el-table>
         <el-pagination
           class="table-pagination"

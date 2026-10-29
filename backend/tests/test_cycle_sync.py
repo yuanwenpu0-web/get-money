@@ -228,3 +228,61 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
         assert order.close_reason == "stop_loss"
         assert order.realized_pnl < 0
         assert summary["managed"] == [{"order_id": order.id, "actions": ["stop_loss"]}]
+
+
+def test_zigzag_reversal_reopens_opposite_side_in_same_cycle(db, monkeypatch):
+    """反手型策略：反向触价在同一根K线上平旧仓开新仓，同周期放行反向开仓。
+
+    若按「本周期刚平仓」拦截，反手后的新仓会因后续周期触价条件消失而永久漏开。
+    """
+    from types import SimpleNamespace
+
+    from app.market.data_service import MarketDataService
+    from app.utils import now_ms
+
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", ["AAAUSDT"])
+    set_state(db, "interval", "1m")
+    seed_binding(db, ["AAAUSDT"], strategy="simple_zigzag_double", interval="1m")
+
+    step = 60_000
+    last_closed = now_ms() // step * step - step
+    created = last_closed - step
+    old = Order(symbol="AAAUSDT", interval="1m", side="LONG", qty=1.0,
+                entry_price=100.0, mark_price=110.0, margin=100.0, leverage=1,
+                sl=95.0, tp=0.0, strategy="simple_zigzag_double", status="OPEN",
+                created_at=datetime.fromtimestamp(created / 1000, timezone.utc))
+    db.add(old)
+    db.commit()
+    MarketDataService(db).store("AAAUSDT", "1m", [
+        {"open_time": created, "close_time": created + step - 1,
+         "open": 100, "high": 101, "low": 99, "close": 100,
+         "volume": 1, "quote_volume": 100, "trades": 1},
+        {"open_time": last_closed, "close_time": last_closed + step - 1,
+         "open": 110, "high": 111, "low": 109, "close": 110,
+         "volume": 1, "quote_volume": 100, "trades": 1},
+    ])
+
+    def evaluate(self, symbol, interval, strategy, **kwargs):
+        assert strategy == "simple_zigzag_double"
+        signal = SimpleNamespace(
+            symbol=symbol, interval=interval, strategy=strategy, pool="test",
+            ts=last_closed, price=110.0, direction="SHORT", score=0.6, prob_up=0.5,
+            sl=115.0, tp=0.0, leverage=1, position_pct=0.5, atr_pct=0.01,
+            reason={"zz_levels": {"long": 115.0, "short": 95.0}},
+        )
+        signal.to_dict = lambda: {"direction": "SHORT"}
+        return signal
+
+    monkeypatch.setattr(trading_service, "_sync_recent_many", lambda *a, **k: [])
+    monkeypatch.setattr(
+        trading_service, "StrategyEngine",
+        lambda db, **kwargs: type("Stub", (), {"evaluate": evaluate})(),
+    )
+    summary = TradingService(db).run_cycle()
+    assert summary["ok"] is True
+    orders = db.query(Order).order_by(Order.id.asc()).all()
+    assert orders[0].status == "CLOSED" and orders[0].close_reason == "signal_reverse"
+    assert len(orders) == 2
+    assert orders[1].status == "OPEN" and orders[1].side == "SHORT"
+    assert orders[1].tp == 0 and orders[1].sl == 115.0

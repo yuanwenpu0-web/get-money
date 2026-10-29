@@ -32,8 +32,16 @@ def metrics_from_equity(
         if len(daily) > 2 and daily.std() > 0
         else 0.0
     )
-    wins = [t["pnl"] for t in trades if t["pnl"] > 0]
-    losses = [t["pnl"] for t in trades if t["pnl"] < 0]
+    # A position may have several partial exits. Count its combined result once;
+    # legacy trade records without a position ID remain independent trades.
+    positions = {}
+    for index, trade in enumerate(trades):
+        position_id = trade.get("position_id")
+        key = ("position", position_id) if position_id is not None else ("trade", index)
+        positions[key] = positions.get(key, 0.0) + trade["pnl"]
+    pnls = list(positions.values())
+    wins = [pnl for pnl in pnls if pnl > 0]
+    losses = [pnl for pnl in pnls if pnl < 0]
     gross_profit, gross_loss = sum(wins), -sum(losses)
     return {
         "initial_cash": round(initial, 2),
@@ -41,12 +49,12 @@ def metrics_from_equity(
         "total_return_pct": round((float(equity.iloc[-1]) / initial - 1) * 100, 4),
         "max_drawdown_pct": round(float(drawdown.min()), 4),
         "sharpe": round(sharpe, 2) if math.isfinite(sharpe) else 0.0,
-        "total_trades": len(trades),
-        "win_rate": round(len(wins) / len(trades) * 100, 2) if trades else 0.0,
+        "total_trades": len(pnls),
+        "win_rate": round(len(wins) / len(pnls) * 100, 2) if pnls else 0.0,
         "profit_factor": round(gross_profit / gross_loss, 3) if gross_loss else None,
         "profit_factor_infinite": bool(gross_profit > 0 and not gross_loss),
-        "expectancy": round(sum(t["pnl"] for t in trades) / len(trades), 4)
-        if trades
+        "expectancy": round(sum(pnls) / len(pnls), 4)
+        if pnls
         else 0.0,
         "total_fees": round(sum(t["fees"] for t in trades), 2),
         "bars": len(equity),

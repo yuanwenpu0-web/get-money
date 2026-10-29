@@ -59,6 +59,7 @@ def assemble_signal_frame(
     sl_pct: pd.Series,
     tp_pct: pd.Series,
     reason: pd.Series,
+    apply_min_distances: bool = True,
 ) -> pd.DataFrame:
     """输入策略判断，输出 `SIGNAL_COLUMNS` 定义的可执行信号帧。"""
     index = data.index
@@ -68,16 +69,18 @@ def assemble_signal_frame(
     reason = reason.reindex(index).fillna("").astype(object)
 
     cost = 2 * (float(params["fee_rate"]) + float(params["slippage"]))
-    sl_pct = (
-        pd.to_numeric(sl_pct, errors="coerce")
-        .clip(lower=float(params["min_sl_pct"]))
-        .fillna(float(params["min_sl_pct"]))
-    )
-    tp_pct = (
-        pd.to_numeric(tp_pct, errors="coerce")
-        .clip(lower=float(params["min_tp_pct"]))
-        .fillna(float(params["min_tp_pct"]))
-    )
+    sl_pct = pd.to_numeric(sl_pct, errors="coerce")
+    tp_pct = pd.to_numeric(tp_pct, errors="coerce")
+    if apply_min_distances:
+        sl_pct = sl_pct.clip(lower=float(params["min_sl_pct"])).fillna(float(params["min_sl_pct"]))
+        tp_pct = tp_pct.clip(lower=float(params["min_tp_pct"])).fillna(float(params["min_tp_pct"]))
+    else:
+        # Strategies whose price levels are explicitly defined must not have
+        # their ATR distances silently widened by generic minimums.
+        valid = np.isfinite(sl_pct) & np.isfinite(tp_pct) & sl_pct.gt(0) & tp_pct.gt(0)
+        reason = block(reason, ~valid, "invalid_distance")
+        sl_pct = sl_pct.where(valid, 0.0)
+        tp_pct = tp_pct.where(valid, 0.0)
     net_rr = (tp_pct - cost) / (sl_pct + cost)
 
     atr = column(data, "atr_pct")

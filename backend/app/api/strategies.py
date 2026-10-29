@@ -15,6 +15,10 @@ from ..strategy.registry import all_specs, get_spec
 from ..strategy.rules import resolve_params
 from ..trading.service import TradingService
 
+# 只能由专用撮合表达的策略：连锁信号帧方向恒为 0，开启巡检只会得到一个永不交易的空策略
+# （simple_zigzag_double 已完成模拟盘集成：挂单触价信号 + 跟随止损 + 同周期反手）
+BROKER_ONLY_CODES = ("opening_candle_breakout",)
+
 router = APIRouter(prefix="/strategies", tags=["strategies"])
 
 
@@ -74,6 +78,8 @@ def list_strategies(db: Session = Depends(get_db)):
 def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(get_db)):
     if code not in ALLOWED_CODES:
         raise HTTPException(404, "策略不存在")
+    if code in BROKER_ONLY_CODES and payload.enabled:
+        raise HTTPException(400, "此策略目前仅支持回测，模拟盘和实盘尚不支持挂单/会话强平")
     row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
     if row is None:
         raise HTTPException(404, "策略不存在")

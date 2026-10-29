@@ -56,6 +56,59 @@ def test_stale_signal_cannot_open(db, monkeypatch):
     assert paper.open_position(db, signal(ts=1)) is None
 
 
+def test_paper_allows_stop_only_signal_without_take_profit(db):
+    # ZigZag 反手型：反向通道为止损，无止盈（tp=0）必须能开仓
+    order = paper.open_position(db, signal(
+        strategy="simple_zigzag_double", tp=0.0, sl=105.0,
+        direction="SHORT", leverage=1, position_pct=0.5,
+    ))
+    assert order is not None
+    assert order.tp == 0 and order.sl == 105.0 and order.side == "SHORT"
+
+
+def test_zigzag_order_follows_reverse_level_and_skips_generic_stops(db, monkeypatch):
+    start = pd.Timestamp("2026-01-01T00:00:00Z")
+
+    def make_order(sl):
+        return Order(
+            symbol="BTCUSDT", interval="1m", side="LONG", qty=1.0,
+            entry_price=110.0, mark_price=110.0, margin=110.0, leverage=1,
+            sl=sl, tp=0.0, strategy="simple_zigzag_double",
+            status="OPEN", created_at=start.to_pydatetime(),
+        )
+
+    frame = pd.DataFrame(
+        dict(open=[110.0], high=[110.5], low=[109.5], close=[110.0], volume=[1.0]),
+        index=pd.date_range(start, periods=1, freq="1min"),
+    )
+    monkeypatch.setattr(order_manager.MarketDataService, "load_frame", lambda *a, **k: frame)
+    monkeypatch.setattr(
+        order_manager, "now_ms",
+        lambda: int((start + pd.Timedelta(minutes=1)).timestamp() * 1000),
+    )
+
+    def zigzag_signal(short_level):
+        return SimpleNamespace(
+            ts=int(start.timestamp() * 1000), direction="FLAT",
+            reason={"zz_levels": {"long": 118.0, "short": short_level}},
+        )
+
+    # 多头止损跟随最新空头通道：pivot 下移 → 止损只下调
+    order = make_order(105.0)
+    db.add(order)
+    db.commit()
+    result = order_manager.manage_order(db, order, zigzag_signal(102.0))
+    assert order.sl == 102.0 and "zz_stop=102.0" in result["actions"]
+    assert order.status == "OPEN"  # 未触及，正常持仓
+
+    # 止损只单向松动：新的通道价位更高时不回收紧
+    db.add(make_order(102.0))
+    db.commit()
+    tighter = db.query(Order).filter(Order.id != order.id).first()
+    order_manager.manage_order(db, tighter, zigzag_signal(106.0))
+    assert tighter.sl == 102.0
+
+
 def test_order_does_not_replay_pre_entry_candle_or_same_candle(db, monkeypatch):
     start = pd.Timestamp("2026-01-01T00:00:00Z")
     order = Order(

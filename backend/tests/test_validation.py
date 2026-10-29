@@ -30,6 +30,11 @@ def test_backtest_rejects_invalid_parameters(changes):
         BacktestRequest(symbol="BTCUSDT", **changes)
 
 
+def test_backtest_accepts_registered_supertrend_strategy():
+    request = BacktestRequest(symbol="BTCUSDT", strategy="supertrend_current")
+    assert request.strategy == "supertrend_current"
+
+
 def test_strategy_rejects_invalid_json_values_before_mutation(db):
     row = StrategyConfig(code="absorption_reversal", name="test", params="{}", enabled=1)
     db.add(row)

@@ -53,7 +53,7 @@ DEFAULTS = {
     "min_sl_atr": 0.30,
     "max_sl_atr": 3.00,
     "max_hold_bars": 30,     # 脚本的 Time stop(bars)，按 bar 计（与脚本一致，不换算小时）
-    # 脚本在持仓期间允许反手；本地撮合需要 min_hold_bars=0 才允许反向信号先平后开
+    # 本地通用撮合在持仓时可按反向信号平仓；原脚本仅在空仓时入场，不按反向信号平仓。
     "min_hold_bars": 0,
     "max_leverage": 1,
     "base_position_pct": 0.30,

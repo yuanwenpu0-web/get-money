@@ -50,9 +50,10 @@ def _out(**changes):
 
 # ---------- 参数层 ----------
 
-def test_only_one_strategy_is_registered():
-    assert [item["code"] for item in DEFAULT_STRATEGIES] == [CODE]
-    assert list(known_codes()) == [CODE]
+def test_builtin_strategies_are_registered():
+    codes = {CODE, "supertrend_current", "simple_zigzag_double", "opening_candle_breakout"}
+    assert {item["code"] for item in DEFAULT_STRATEGIES} == codes
+    assert set(known_codes()) == codes
 
 
 def test_unknown_strategy_is_rejected():

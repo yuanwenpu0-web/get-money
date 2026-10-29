@@ -20,6 +20,12 @@ from .risk_halt import halt_status
 # 全量宇宙下逐币种记日志会刷爆 JobLog，按 60s 最多记一条。
 _HALT_LOG_INTERVAL_SECONDS = 60.0
 _last_halt_log_at = 0.0
+_last_live_block_log_at = 0.0
+
+# 反手型策略依赖本地「挂单触价 + 跟随止损」语义；实盘需要交易所侧止损挂单，
+# 在落地交易所止损单之前禁止上实盘，静默拒单会造成持仓裸奔。
+# opening_candle_breakout 的出场由会话时间触发（强平窗），实盘持仓管理没有这一层。
+LIVE_BLOCKED_CODES = ("simple_zigzag_double", "opening_candle_breakout")
 
 
 def execution_mode(db: Session) -> str:
@@ -44,10 +50,27 @@ def _log_halt(db: Session, reason: str) -> None:
         pass
 
 
+def _log_live_block(db: Session, strategy: str) -> None:
+    global _last_live_block_log_at
+    now = time.monotonic()
+    if now - _last_live_block_log_at < _HALT_LOG_INTERVAL_SECONDS:
+        return
+    _last_live_block_log_at = now
+    try:
+        db.add(JobLog(job="dispatch", level="warning",
+                      message=f"策略 {strategy} 暂不支持实盘（需交易所侧止损挂单），已拒绝开仓"[:4000]))
+        db.commit()
+    except Exception:  # noqa: BLE001 - 日志失败不影响拒绝本身
+        pass
+
+
 def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
     halted, reason = halt_status(db)
     if halted:
         _log_halt(db, reason)
+        return None
+    if is_live(db) and getattr(signal, "strategy", "") in LIVE_BLOCKED_CODES:
+        _log_live_block(db, signal.strategy)
         return None
     if is_live(db):
         return live.open_live(db, signal)

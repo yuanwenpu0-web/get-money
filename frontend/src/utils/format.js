@@ -47,13 +47,23 @@ export const closeReasonLabel = (reason) =>
     reverse: '手动反手',
     stop_loss: '止损',
     take_profit: '止盈',
+    take_profit_1: 'TP1 止盈',
+    take_profit_2: 'TP2 止盈',
+    take_profit_3: 'TP3 止盈',
     time_stop: '超时平仓',
     signal_reverse: '信号反转',
+    reverse_stop: '反向挂单触发',
+    time_end: '到达结束时间',
     close_at_end: '回测结束',
   })[reason] || reason || '—'
 
 export const strategyLabel = (code) =>
-  ({ absorption_reversal: '吸收反转' })[code] || code
+  ({
+    absorption_reversal: '吸收反转',
+    supertrend_current: 'Supertrend 趋势反转',
+    simple_zigzag_double: '双 ZigZag',
+    opening_candle_breakout: '开盘首根突破',
+  })[code] || code
 
 export function symbolsLabel(settings, count = 0) {
   if (settings?.symbol_scope === 'all') {

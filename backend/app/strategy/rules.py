@@ -136,6 +136,8 @@ def resolve_params(
         raise ValueError("基础仓位不能超过单仓上限")
     if 0 < params["max_hold_bars"] < params["min_hold_bars"]:
         raise ValueError("最大持仓K线数不能小于最小持仓K线数")
+    if spec.validate is not None:
+        spec.validate(params)
     return params
 
 

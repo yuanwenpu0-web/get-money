@@ -30,10 +30,19 @@ def randomize_directions(signals: pd.DataFrame, seed: int = RANDOM_BASELINE_SEED
 def exposure_metrics(equity: pd.Series, trades: list[dict], interval: str) -> dict:
     """曝光时间：持仓 bar 数 / 总 bar 数；平均每笔持仓 bar 数。无成交时为 0。"""
     step = interval_ms(interval)
-    held = [
-        int((pd.Timestamp(trade["exit_time"]) - pd.Timestamp(trade["entry_time"])).total_seconds() * 1000) // step + 1
-        for trade in trades
-    ]
+    positions = {}
+    for index, trade in enumerate(trades):
+        key = trade.get("position_id")
+        key = ("position", key) if key is not None else ("trade", index)
+        entry = pd.Timestamp(trade["entry_time"])
+        exit_time = pd.Timestamp(trade["exit_time"])
+        if key in positions:
+            old_entry, old_exit = positions[key]
+            positions[key] = (min(entry, old_entry), max(exit_time, old_exit))
+        else:
+            positions[key] = (entry, exit_time)
+    held = [int((end - start).total_seconds() * 1000) // step + 1
+            for start, end in positions.values()]
     total_bars = len(equity)
     return {
         "exposure_pct": round(sum(held) / total_bars * 100, 4) if total_bars else 0.0,
@@ -67,6 +76,7 @@ def simulate(
         trades.append(
             {
                 "entry_time": str(p["time"]),
+                "position_id": str(p["time"]),
                 "exit_time": str(timestamp),
                 "side": "long" if p["side"] == 1 else "short",
                 "entry_price": p["entry"],
@@ -82,7 +92,7 @@ def simulate(
         )
         position = None
 
-    def partial_close(price, timestamp, frac):
+    def partial_close(price, timestamp, frac, reason="partial_tp"):
         """浮盈达标先平一部分落袋：现金/数量/保证金/入场费按比例结转，剩余仓位继续持有。"""
         nonlocal cash
         p = position
@@ -97,6 +107,7 @@ def simulate(
         trades.append(
             {
                 "entry_time": str(p["time"]),
+                "position_id": str(p["time"]),
                 "exit_time": str(timestamp),
                 "side": "long" if p["side"] == 1 else "short",
                 "entry_price": p["entry"],
@@ -105,7 +116,7 @@ def simulate(
                 "pnl": net,
                 "return_pct": net / margin * 100,
                 "fees": entry_fee + exit_fee,
-                "status": "partial_tp",
+                "status": reason,
                 "leverage": p["leverage"],
                 "margin": margin,
             }
@@ -113,6 +124,26 @@ def simulate(
         p["qty"] -= qty
         p["margin"] -= margin
         p["entry_fee"] -= entry_fee
+
+    def close_reached_targets(high, low, timestamp):
+        """Fill reached targets in order; fractions refer to the original position."""
+        nonlocal position
+        p = position
+        for index, target in enumerate(p["targets"]):
+            if target["done"]:
+                continue
+            reached = high >= target["price"] if p["side"] == 1 else low <= target["price"]
+            if not reached:
+                continue
+            target["done"] = True
+            quantity = min(p["initial_qty"] * target["fraction"], p["qty"])
+            if quantity <= 0:
+                continue
+            last_active = not any(t["fraction"] > 0 for t in p["targets"][index + 1:])
+            if last_active or quantity >= p["qty"] * (1 - 1e-12):
+                close_position(target["price"], timestamp, target["status"])
+                return
+            partial_close(target["price"], timestamp, quantity / p["qty"], target["status"])
 
     for i, row in enumerate(bars):
         signal = decisions[i - 1] if i else None
@@ -127,9 +158,12 @@ def simulate(
                 close_position(hit[0], row.Index, hit[1])
             elif gap:
                 close_position(row.open, row.Index, "data_gap")
-            elif params["max_hold_bars"] > 0 and held >= params["max_hold_bars"]:
+            elif p.get("targets"):
+                # A resting target crossed at the open fills before an open-time exit.
+                close_reached_targets(row.open, row.open, row.Index)
+            if position is not None and not hit and not gap and params["max_hold_bars"] > 0 and held >= params["max_hold_bars"]:
                 close_position(row.open, row.Index, "time_stop")
-            elif (
+            elif position is not None and not hit and not gap and (
                 params.get("ema_exit")
                 and p["side"] == 1
                 and signal is not None
@@ -137,7 +171,7 @@ def simulate(
             ):
                 # 软出场：上一根收盘已失守 EMA9 → 本根开盘平多（与入场同为「收盘信号、次开成交」）
                 close_position(row.open, row.Index, "ema_exit")
-            elif held >= params["min_hold_bars"] and signal.direction == -p["side"]:
+            elif position is not None and not hit and not gap and held >= params["min_hold_bars"] and signal.direction == -p["side"]:
                 close_position(row.open, row.Index, "signal_reverse")
             exited = position is None
 
@@ -160,6 +194,15 @@ def simulate(
             entry = row.open * (1 + side * slippage)
             stop = previous.close * (1 - side * signal.sl_pct)
             target = previous.close * (1 + side * signal.tp_pct)
+            scaled = all(k in params for k in ("tp1_r", "tp2_r", "target_r", "tp1_fraction", "tp2_fraction", "tp3_fraction"))
+            target_levels = []
+            if scaled:
+                risk_from_signal = abs(previous.close - stop)
+                for n, r_key in enumerate(("tp1_r", "tp2_r", "target_r"), 1):
+                    target_levels.append({"price": previous.close + side * risk_from_signal * float(params[r_key]),
+                                          "fraction": float(params[f"tp{n}_fraction"]),
+                                          "status": f"take_profit_{n}", "done": False})
+                target = next(level["price"] for level in target_levels if level["fraction"] > 0)
             # Ignore signals whose exit levels were already crossed at the next open.
             if (entry - stop) * side > 0 and (target - entry) * side > 0:
                 margin, qty = position_size(
@@ -190,7 +233,12 @@ def simulate(
                         leverage=int(signal.leverage),
                         risk=abs(entry - stop),
                         partial_done=False,
+                        initial_qty=qty,
+                        targets=target_levels,
                     )
+                    if scaled:
+                        # Individual targets are managed below, not by the single-target exit.
+                        position["tp"] = 0.0
 
         if position is not None:
             p = position
@@ -199,8 +247,17 @@ def simulate(
                 close_position(hit[0], row.Index, hit[1])
                 exited = True
             else:
+                if p.get("targets"):
+                    close_reached_targets(row.high, row.low, row.Index)
+                    if position is None:
+                        exited = True
+                if position is None:
+                    if exited:
+                        next_entry = i + int(params["cooldown_bars"]) + 1
+                    values.append(cash)
+                    continue
                 partial_r = float(params.get("partial_tp_r", 0.0))
-                if not p["partial_done"] and partial_r > 0:
+                if not p.get("targets") and not p["partial_done"] and partial_r > 0:
                     partial_price = p["entry"] + p["side"] * partial_r * p["risk"]
                     if (row.high - partial_price) * p["side"] >= 0:
                         # 同根 SL/TP 已由上方 stop_exit 先判；到这里才允许落袋。

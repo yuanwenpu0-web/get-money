@@ -14,6 +14,7 @@ from ..models import JobLog, Order
 from ..state import all_state
 from ..strategy.bindings import active_bindings, expand
 from ..strategy.engine import StrategyEngine
+from ..strategy.registry import get_spec
 from ..utils import interval_ms, iso_utc
 from .order_manager import manage_order
 from .dispatch import close_position, open_position
@@ -141,7 +142,15 @@ class TradingService:
                 if result["actions"]:
                     managed.append(result)
                 if order.status != 'OPEN':
-                    closed_symbols.add(order.symbol)
+                    # 反手型策略（Pine 止损单系统）：反向成交在同一根K线上同时
+                    # 平旧仓开新仓。若按「刚平仓」拦掉本周期开仓，反手后的新仓
+                    # 会在后续周期因触价条件消失而永久漏开，这里放行同周期反手。
+                    if 'reverse_on_stop' in get_spec(order.strategy).tags and (
+                        'signal_reverse' in result['actions'] or 'stop_loss' in result['actions']
+                    ):
+                        pass
+                    else:
+                        closed_symbols.add(order.symbol)
 
             # 无持仓的币种按信号开仓；刚止损/止盈的币种本周期不再追单
             # 账户熔断中只拒新仓，已持仓单子的管理在上面照常执行

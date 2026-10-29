@@ -1,10 +1,26 @@
 import numpy as np
 import pandas as pd
 import pytest
-from app.backtest.execution import simulate
+from app.backtest.execution import exposure_metrics, simulate
 from app.backtest.metrics import downsample, metrics_from_equity
 from app.ml.dataset import purged_split
 from app.strategy.rules import resolve_params
+
+
+def test_metrics_count_partial_exits_as_one_position():
+    index = pd.date_range("2026-01-01", periods=2, freq="15min", tz="UTC")
+    equity = pd.Series([10000.0, 10030.0], index=index)
+    trades = [
+        {"position_id": "a", "pnl": 40.0, "fees": 2.0},
+        {"position_id": "a", "pnl": -10.0, "fees": 1.0},
+        {"position_id": "b", "pnl": -5.0, "fees": 1.0},
+    ]
+    metrics = metrics_from_equity(equity, trades, 10000.0, "15m")
+    assert metrics["total_trades"] == 2
+    assert metrics["win_rate"] == 50.0
+    assert metrics["expectancy"] == 12.5
+    assert metrics["profit_factor"] == 6.0
+    assert metrics["total_fees"] == 4.0
 
 
 def fixture_bars(n=5):
@@ -71,6 +87,80 @@ def test_no_entry_across_missing_candles():
     signals["direction"] = [0, 1, 0, 0, 0]
     _, trades = simulate(data, signals, params(), 10000.0, 0.0, 0.0, "1m")
     assert trades == []
+
+
+def scaled_params():
+    return {**params(), "be_trigger_r": 0.0, "tp1_r": 1.0, "tp2_r": 2.0, "target_r": 3.0,
+            "tp1_fraction": 0.2, "tp2_fraction": 0.3, "tp3_fraction": 0.5}
+
+
+@pytest.mark.parametrize("side", [1, -1])
+def test_scaled_targets_close_original_position_fractions_and_account_for_fees(side):
+    data, signals = fixture_bars()
+    signals["direction"] = [side, 0, 0, 0, 0]
+    signals["tp_pct"] = 0.03
+    # Each target is hit on a different bar, with no stop hit.
+    if side == 1:
+        data.loc[data.index[1:4], "high"] = [101.1, 102.1, 103.1]
+    else:
+        data.loc[data.index[1:4], "low"] = [98.9, 97.9, 96.9]
+    equity, trades = simulate(data, signals, scaled_params(), 10000.0, 0.001, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["take_profit_1", "take_profit_2", "take_profit_3"]
+    assert [t["exit_price"] for t in trades] == pytest.approx([100 + side, 100 + 2 * side, 100 + 3 * side])
+    total_size = sum(t["size"] for t in trades)
+    assert [t["size"] / total_size for t in trades] == pytest.approx([0.2, 0.3, 0.5])
+    assert sum(t["pnl"] for t in trades) == pytest.approx(equity.iloc[-1] - 10000.0)
+    assert sum(t["fees"] for t in trades) > 0
+
+
+def test_scaled_targets_can_fill_together_and_stop_wins_on_ambiguous_bar():
+    data, signals = fixture_bars()
+    signals["direction"] = [1, 0, 0, 0, 0]
+    signals["tp_pct"] = 0.03
+    data.loc[data.index[1], ["high", "low"]] = [103.5, 99.5]
+    _, trades = simulate(data, signals, scaled_params(), 10000.0, 0.0, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["take_profit_1", "take_profit_2", "take_profit_3"]
+    data.loc[data.index[1], "low"] = 98.5
+    _, trades = simulate(data, signals, scaled_params(), 10000.0, 0.0, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["stop_loss"]
+
+
+def test_scaled_target_then_original_stop_for_remaining_position():
+    data, signals = fixture_bars()
+    signals["direction"] = [1, 0, 0, 0, 0]
+    signals["tp_pct"] = 0.03
+    data.loc[data.index[1], "high"] = 101.1
+    data.loc[data.index[2], "low"] = 98.5
+    _, trades = simulate(data, signals, scaled_params(), 10000.0, 0.0, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["take_profit_1", "stop_loss"]
+    assert trades[0]["size"] / (trades[0]["size"] + trades[1]["size"]) == pytest.approx(0.2)
+    assert trades[1]["exit_price"] == 99.0
+
+
+def test_scaled_targets_open_gap_precedes_intrabar_stop():
+    data, signals = fixture_bars()
+    signals["direction"] = [1, 0, 0, 0, 0]
+    signals["tp_pct"] = 0.03
+    data.loc[data.index[2], ["open", "high", "low", "close"]] = [102.2, 102.3, 98.5, 99.0]
+    _, trades = simulate(data, signals, scaled_params(), 10000.0, 0.0, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["take_profit_1", "take_profit_2", "stop_loss"]
+    assert [t["exit_price"] for t in trades] == pytest.approx([101, 102, 99])
+    assert len({t["position_id"] for t in trades}) == 1
+    exposure = exposure_metrics(pd.Series(10000.0, index=data.index), trades, "1m")
+    assert exposure["avg_bars_held"] == 2.0
+    assert exposure["exposure_pct"] == 40.0
+
+
+def test_scaled_targets_zero_fraction_skipped_and_final_target_closes_all():
+    data, signals = fixture_bars()
+    signals["direction"] = [1, 0, 0, 0, 0]
+    signals["tp_pct"] = 0.03
+    data.loc[data.index[1], "high"] = 103.1
+    config = {**scaled_params(), "tp1_fraction": 0.0, "tp2_fraction": 0.25, "tp3_fraction": 0.75}
+    equity, trades = simulate(data, signals, config, 10000.0, 0.001, 0.0, "1m")
+    assert [t["status"] for t in trades] == ["take_profit_2", "take_profit_3"]
+    assert trades[0]["size"] / sum(t["size"] for t in trades) == pytest.approx(0.25)
+    assert sum(t["pnl"] for t in trades) == pytest.approx(equity.iloc[-1] - 10000.0)
 
 
 def test_purge_removes_labels_reaching_test_period():

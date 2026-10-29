@@ -401,6 +401,28 @@ def test_pooled_ci_with_enough_trades_still_judges():
     assert out["verdict"] == "positive"
 
 
+def test_bootstrap_counts_partial_exits_as_one_margin_weighted_position():
+    from app.backtest.significance import bootstrap_expectancy_ci
+    from app.backtest.trades import aggregate_positions
+
+    trades = [
+        {"position_id": "a", "pnl": 10, "margin": 100, "return_pct": 10,
+         "fees": 1, "size": 1, "status": "tp1", "exit_time": "1"},
+        {"position_id": "a", "pnl": -10, "margin": 200, "return_pct": -5,
+         "fees": 2, "size": 2, "status": "stop_loss", "exit_time": "2"},
+        {"return_pct": 3},  # Existing independent record, with no ID.
+    ]
+    positions = aggregate_positions(trades)
+    assert len(positions) == 2
+    assert positions[0]["return_pct"] == 0
+    assert positions[0]["status"] == "stop_loss"
+    assert positions[0]["fees"] == 3
+    result = bootstrap_expectancy_ci(trades, min_trades=3)
+    assert result["trades"] == 2
+    assert result["mean_return_pct"] == 1.5
+    assert result["verdict"] == "insufficient"
+
+
 def test_reap_stale_runs_marks_orphans_failed(db):
     """进程重启后遗留的 pending/running 任务必须被标失败。
 

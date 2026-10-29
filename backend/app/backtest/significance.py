@@ -22,6 +22,8 @@ import random
 
 import numpy as np
 
+from .trades import aggregate_positions
+
 
 def bootstrap_expectancy_ci(
     trades: list[dict],
@@ -44,7 +46,7 @@ def bootstrap_expectancy_ci(
     """
     if not trades:
         return {"trades": 0, "verdict": "no_trades"}
-    returns = np.array([float(t.get("return_pct", 0.0)) for t in trades], dtype=float)
+    returns = np.array([float(t.get("return_pct", 0.0)) for t in aggregate_positions(trades)], dtype=float)
     returns = returns[np.isfinite(returns)]
     n = len(returns)
     if n == 0:

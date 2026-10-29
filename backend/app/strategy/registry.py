@@ -40,6 +40,7 @@ LookbackFn = Callable[[dict], int]
 PrepareFn = Callable[[pd.DataFrame, dict, PrepareContext], pd.DataFrame]
 SignalsFn = Callable[[pd.DataFrame, dict], pd.DataFrame]
 DescribeFn = Callable[[pd.Series], dict]
+ValidateFn = Callable[[dict], None]
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,7 @@ class StrategySpec:
     signals: SignalsFn
     # 可选：把末根的特征快照写进信号的 reason，纯观测用途，不影响任何决策
     describe: DescribeFn | None = None
+    validate: ValidateFn | None = None
     bool_keys: tuple[str, ...] = ()
     # 只用于整数校验：`*_bars` 这类已在 resolve_params 里按后缀兜底，这里补显式声明的
     int_keys: tuple[str, ...] = ()
