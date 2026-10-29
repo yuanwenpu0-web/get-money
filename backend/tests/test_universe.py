@@ -158,12 +158,21 @@ def test_market_symbols_endpoint_structure(db, monkeypatch):
         lambda session: {"symbols": ["BTCUSDT", "ETHUSDT"], "cached": False, "source": "futures-testnet"},
     )
     result = market_api.market_symbols(db)
-    assert result == {"symbols": ["BTCUSDT", "ETHUSDT"], "source": "futures-testnet", "cached": False}
+    assert result["symbols"] == ["BTCUSDT", "ETHUSDT"]
+    assert result["source"] == "futures-testnet"
+    assert result["cached"] is False
+    # 前端要能看出「全部」实际被流动性门槛/黑名单砍成了多少
+    assert result["count"] == 2
+    assert "min_quote_volume_usd" in result
+    assert "blacklist" in result
 
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", ["BTCUSDT"])
     custom = market_api.market_symbols(db)
-    assert custom == {"symbols": ["BTCUSDT"], "source": "custom", "cached": True}
+    assert custom["symbols"] == ["BTCUSDT"]
+    assert custom["source"] == "custom"
+    assert custom["cached"] is True
+    assert custom["count"] == 1
 
 
 def test_liquidity_filter_drops_symbols_below_min_quote_volume(db, monkeypatch):

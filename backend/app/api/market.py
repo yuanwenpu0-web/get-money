@@ -23,13 +23,33 @@ router = APIRouter(prefix="/market", tags=["market"])
 
 @router.get("/symbols")
 def market_symbols(db: Session = Depends(get_db)):
-    """U 本位永续合约全量列表（前端下拉选择用）；symbol_scope=custom 时返回用户 symbols。"""
+    """U 本位永续合约全量列表（前端下拉选择用）；symbol_scope=custom 时返回用户 symbols。
+
+    同时回传 `min_quote_volume_usd`：设置页写的是「全部 U 本位永续」，但实际生效范围
+    还要减去流动性门槛与黑名单。不回传这个值，用户会以为配的是 500+ 币，实际只有几十个
+    ——「配置里明明是全部、回测却只扫 64 个币」就是这么来的。
+    """
     state = all_state(db)
+    min_volume = state.get("min_quote_volume_usd")
     if state.get("symbol_scope", "all") == "all":
         info = resolve_universe(db)
-        return {"symbols": info["symbols"], "source": info["source"], "cached": info["cached"]}
+        return {
+            "symbols": info["symbols"],
+            "count": len(info["symbols"]),
+            "min_quote_volume_usd": min_volume,
+            "blacklist": state.get("symbol_blacklist") or [],
+            "source": info["source"],
+            "cached": info["cached"],
+        }
     symbols = [str(item).strip().upper() for item in (state.get("symbols") or []) if str(item).strip()]
-    return {"symbols": symbols, "source": "custom", "cached": True}
+    return {
+        "symbols": symbols,
+        "count": len(symbols),
+        "min_quote_volume_usd": min_volume,
+        "blacklist": state.get("symbol_blacklist") or [],
+        "source": "custom",
+        "cached": True,
+    }
 
 
 def _clean(value):
