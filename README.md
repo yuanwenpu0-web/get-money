@@ -39,7 +39,7 @@ get-money/
 │   │   │                   # rules（参数分派）、engine、specs/absorption_reversal、coin_universe、defaults
 │   │   ├── trading/        # 资金、模拟撮合、订单管理、调度、实盘同步
 │   │   └── main.py
-│   ├── scripts/            # absorption_backtest / optimize_all / derive_candles + 数据回补/迁移/校验脚本
+│   ├── scripts/            # absorption_backtest / optimize_all / derive_candles / set_strategy_scope + 数据回补/迁移/校验脚本
 │   └── tests/              # 后端测试
 ├── frontend/               # Vue 3 前端
 ├── docs/                   # 回测与研究报告（md + json）
@@ -164,15 +164,39 @@ StrategySpec（注册表）        SymbolPool（池）            StrategyBindin
 - 成员数是实时解析的（成交量走 TTL 缓存），前端绑定向导会先给「成员数预览」再让你调参数。
 - 种子池：`major`（主流 16 币）、`alt`（全量剔除主流）、`all`（全量）；只在表为空时写入，删掉不会被复活。
 
+**「全部」是四层过滤后的结果，不是交易所挂了多少个合约**：
+
+```
+交易所 U 本位永续（500+）
+  → symbol_scope=all / custom        设置页「币种范围」
+  → min_quote_volume_usd（24h 成交额）设置页「流动性门槛」，0 = 不过滤
+  → symbol_blacklist（全局黑名单）
+  → 池规则（base / exclude_major / max_symbols / exclude）
+  = 实际参与回测与巡检的币种
+```
+
+这条链路踩过坑：设置页显示「全部 U 本位永续」，默认门槛却是 3000 万美元，实际只生效 **64 个币**，而寻优又用的是另一条口径（按 K 线覆盖度直接从 `klines` 取币），三方对不上账。现在 `/api/market/symbols` 会回传 `count` 与 `min_quote_volume_usd`，设置页直接显示「当前实际生效 N 个合约」，门槛也做成了可编辑输入。
+
+**改策略运行范围**用脚本（幂等、可 dry-run、撞唯一键会跳过而不是抛错）：
+
+```bash
+python backend/scripts/set_strategy_scope.py --strategy absorption_reversal --pool all --dry-run
+python backend/scripts/set_strategy_scope.py --strategy absorption_reversal --pool all
+```
+
+脚本默认**不改 `enabled`**：换范围不等于上线，是否参与巡检仍由绑定开关决定。
+
+
 ### 6.3 绑定：四层参数与同币多池
 
 一条绑定 = `(策略, 池, 周期)` + 一套参数覆盖，唯一约束 `uq_binding_scope`。同一个策略可以在多个池上跑不同周期，例如：
 
 | 策略 | 池 | 周期 | 意图 |
 | --- | --- | --- | --- |
-| `absorption_reversal` | `major` | 15m | 主流币，脚本默认灵敏度 |
-| `absorption_reversal` | `alt` | 5m | 山寨币，更宽的 delta 门槛 + 更紧的止损 |
-| `absorption_reversal` | `alt` | 1m | 短线，只做多 |
+| `absorption_reversal` | `all` | 15m | 全市场，主周期（365 天覆盖 57 币） |
+| `absorption_reversal` | `all` | 5m | 全市场，短周期（1m 只覆盖 90 天，5m 上限即此） |
+
+两条绑定目前 `enabled=0`：参数与范围已就绪，是否参与巡检由开关决定。
 
 **参数四层合并**（`rules.resolve_params`）：全局设置 < 策略默认 < 本条绑定 < **币种级覆盖**（`symbol_params`）。`fee_rate` / `slippage` 由全局强制统一，任何一层都不能覆盖。未知字段、非有限数值、越界值在保存时直接 400，不会等到巡检才炸。
 
@@ -356,31 +380,38 @@ python backend/scripts/derive_candles.py --dry-run
 
 ### 8.6 本次全量结果
 
-`15m + 1h + 4h × 365 天 × 32 组 × 1055 任务`，322 秒：
+范围改成全市场（`min_quote_volume_usd=0`、绑定池 `all`）后跑了两批：365 天 × `15m/1h/4h` × 64 组
+（1053 个任务 / 578 秒），以及 `5m × 90 天` × 64 组（71 个任务 / 148 秒）。完整报告见
+`docs/optimization-all-symbols.md`。
 
-| 周期 | 任务 | 有候选 | 验证段池化 | 每笔期望 | 95% CI | 判定 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 15m | 57 | 54 | 594 笔 | −0.1927% | [−0.3176%, −0.0538%] | **negative** |
-| 1h | 498 | 107 | 126 笔 | −0.0551% | [−0.4163%, +0.3373%] | inconclusive |
-| 4h | 498 | 11 | **4 笔** | +4.98% | [+0.86%, +10.48%] | **insufficient** |
-| 合计 | 1053 | 172 | 724 笔 | **−0.1402%** | **[−0.2738%, −0.0060%]** | **negative** |
+| 周期 | 窗口 | 任务 | 有候选 | 验证段池化 | 每笔期望 | 95% CI | 判定 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 5m | 90 天 | 71 | 71 | 631 笔 | −0.3265% | [−0.6372%, −0.1127%] | **negative** |
+| 15m | 365 天 | 57 | 54 | 558 笔 | −0.1987% | [−0.3448%, −0.0550%] | **negative** |
+| 1h | 365 天 | 498 | 107 | 122 笔 | +0.0674% | [−0.3146%, +0.5106%] | inconclusive |
+| 4h | 365 天 | 498 | 11 | **4 笔** | +5.65% | [+0.86%, +11.26%] | **insufficient** |
 
-判定分布：`no_trades 935 / insufficient 77 / inconclusive 30 / negative 11 / pass 0`。
-币级最佳周期：`15m 51 / 1h 417 / 4h 30`。
+判定分布：`no_trades 938 / insufficient 98 / inconclusive 68 / negative 20 / pass 0`。
+币级最佳周期：`1h 417 / 15m 51 / 4h 30`（498 个币有结果）。
 
-三个必须点破的点：
+四个必须点破的点：
 
-1. **池化从 inconclusive 变成 negative。** 上一轮 15m×90 天的池化是
-   −0.2777%/笔、CI 上界 +0.0065%（跨 0），本轮把窗口拉到一年、币种扩到全市场后
-   CI 上界变成 −0.0060%——**之前的「不确定」是小样本在掩盖负 edge**。
-2. **4h 那 4 笔不能看。** n=4 的 bootstrap 会给出「CI 下界 +0.86%」这种假精确读数。
-   池化因此加了 `MIN_POOLED_TRADES = 30` 门槛，不足就判 `insufficient`（数值照给、不下结论）。
-3. **1h/4h 绝大多数是 `no_trades`（925/996）。** 不是参数不好，是这两个周期上吸收形态
-   太稀疏（BTC 一年 1h 只有 5 次命中、4h 是 0 次）。判定门槛 `min_trades` 过不去，
-   就不该硬选一套参数出来。
+1. **`pass` 仍然是 0。** 范围放到 509 币、周期铺到 4 个、组合数从 32 翻到 64，没有一个币通过样本外判定。
+2. **5m 最差、周期越短越负。** −0.33%/笔的期望远低于 0.06% 的双边成本打平线；周期越短，
+   成本项吃掉的比例越大。1h 是唯一不算负的口径（+0.067%/笔、122 笔），但 CI 宽度 0.8 个百分点。
+3. **4h 那 4 笔不能看。** n=4 的 bootstrap 会给出「CI 下界 +0.86%」这种假精确读数，
+   `MIN_POOLED_TRADES=30` 已把它判成 `insufficient`（数值照给、不下结论）。
+4. **`no_trades` 占 84%（938/1124）。** 不是参数不好，是信号太稀疏：BTC 一年在 1h 上只命中 5 次、
+   4h 上 0 次。门槛过不去就不该硬选一套参数出来。
 
-结论与 `docs/absorption-reversal-strategy.md` 一致且更硬：**参数寻优救不了一个没有
-信号层的策略**；周期维度也救不了——换周期只是把「信号太少」和「信号为负」对调。
+**比「哪个币最优」更有用的一组数**：172 个有候选组合的任务里，最优组合相对线上基准的系统性改动是
+`conf_mode` 关掉（93%）、`delta_pct` 降到 90（88%）、`min_score` 提到 0.7–0.8（66%）、
+`be_trigger_r` 关掉（51%）、`max_hold_bars` 放到 45–60（50%）。方向一致：**放宽入场、收紧评分、
+拉长持有**。而 `sl_buffer_atr` 的偏好是 0.15（67 次）对 0.4（62 次)对半分——这个键的最优值随币种
+随机漂移，属于纯过拟合，不该留在搜索空间里。
+
+结论与 `docs/absorption-reversal-strategy.md` 一致且更硬：**参数寻优救不了一个没有信号层的策略**；
+周期维度也救不了——换周期只是把「信号太少」和「信号为负」对调。
 这套基础设施的价值在于下次接入真正有 edge 的策略时，能立刻算出「每个币该用什么参数、在哪个周期」。
 
 ### 8.7 一键应用
@@ -459,7 +490,7 @@ npm test
 npm run build
 ```
 
-当前状态：后端 `367 passed`，前端 `67 passed`，构建通过；多周期寻优全链路冒烟 14 项（逐周期扫描范围 → 创建 → 进度 → 每币最佳/周期明细 → 应用写覆盖 → 清理）全部通过。
+当前状态：后端 `373 passed`，前端 `67 passed`，构建通过；多周期寻优全链路冒烟 14 项（逐周期扫描范围 → 创建 → 进度 → 每币最佳/周期明细 → 应用写覆盖 → 清理）全部通过。
 
 ## 11. 已知边界
 

@@ -12,6 +12,9 @@ let loadPromise = null
 let disposed = false
 const saving = ref(false)
 const credentialInfo = ref({})
+// 「全部 U 本位永续」还会被流动性门槛与黑名单筛一遍，这里存真实生效的合约数，
+// 否则页面上写着「全部」，回测却只扫几十个币，没人能对上账
+const universeInfo = ref({ count: 0, min_quote_volume_usd: 0 })
 const credentialSaving = ref(false)
 const testing = ref(false)
 const testResult = ref(null)
@@ -25,6 +28,7 @@ const form = reactive({
   symbols: ['BTCUSDT', 'ETHUSDT'],
   interval: '1m',
   testnet: true,
+  min_quote_volume_usd: 0,
   fee_pct: 0.04,
   slippage_pct: 0.02,
   base_pct: 8,
@@ -82,7 +86,22 @@ function applySettings(data) {
   form.train_horizon = data.train_horizon ?? 5
   form.schedule_enabled = Boolean(data.schedule_enabled)
   form.schedule_seconds = Number(data.schedule_seconds || 60)
+  form.min_quote_volume_usd = Number(data.min_quote_volume_usd ?? 0)
   credentialForm.testnet = Boolean(data.testnet)
+}
+
+async function loadUniverseInfo() {
+  try {
+    const data = await api.getMarketSymbols()
+    if (disposed) return
+    universeInfo.value = {
+      count: Number(data?.count ?? (data?.symbols || []).length),
+      min_quote_volume_usd: Number(data?.min_quote_volume_usd ?? 0),
+    }
+  } catch {
+    // 拿不到交易所宇宙时只是少一行统计，不影响设置本身
+    if (!disposed) universeInfo.value = { count: 0, min_quote_volume_usd: 0 }
+  }
 }
 
 function load() {
@@ -122,6 +141,7 @@ async function saveSettings() {
       symbols: form.symbols.map((item) => String(item).trim().toUpperCase()),
       interval: form.interval,
       testnet: form.testnet,
+      min_quote_volume_usd: Math.max(0, Math.round(Number(form.min_quote_volume_usd) || 0)),
       fee_rate: Number(form.fee_pct) / 100,
       slippage: Number(form.slippage_pct) / 100,
       base_position_pct: Number(form.base_pct) / 100,
@@ -145,6 +165,7 @@ async function saveSettings() {
       schedule_seconds: Number(form.schedule_seconds),
     }
     applySettings(await api.saveSettings(payload))
+    loadUniverseInfo()
     ElMessage.success('设置已保存')
   } catch (error) {
     ElMessage.error(error.message)
@@ -238,7 +259,10 @@ watch(
   },
 )
 
-onMounted(load)
+onMounted(() => {
+  load()
+  loadUniverseInfo()
+})
 onBeforeUnmount(() => { disposed = true })
 </script>
 
@@ -406,6 +430,17 @@ onBeforeUnmount(() => { disposed = true })
               <el-radio-button value="all">全部 U 本位永续</el-radio-button>
               <el-radio-button value="custom">自定义列表</el-radio-button>
             </el-radio-group>
+            <div v-if="universeInfo.count" class="form-hint" style="margin-top: 6px">
+              当前实际生效 <strong>{{ universeInfo.count }}</strong> 个合约<template v-if="form.symbol_scope === 'custom'">（自定义列表）</template><template v-else>（已扣除流动性门槛与黑名单）</template>。
+            </div>
+            <div style="margin-top: 10px">
+              <div class="muted" style="margin-bottom: 4px">流动性门槛（24h 成交额，美元）</div>
+              <el-input-number v-model="form.min_quote_volume_usd" :min="0" :step="1000000" :controls-position="'right'" style="width: 100%" />
+              <div class="form-hint">
+                低于该成交额的合约不进入宇宙；<strong>0 = 不过滤</strong>（回测/巡检覆盖全部合约，但低流动性币的滑点假设不可信）。
+                改完保存后「实际生效」数量会刷新。
+              </div>
+            </div>
             <div style="margin-top: 8px">
               <div class="muted" style="margin-bottom: 4px">交易对（自定义列表）</div>
               <el-select
