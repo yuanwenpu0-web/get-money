@@ -27,12 +27,20 @@ function view(overrides = {}) {
       getOptimizationOptions: async () => OPTIONS,
       listOptimizations: async () => ({ optimizations: [], total: 0 }),
       getSymbolParams: async () => ({ total: 0, sources: {}, items: [] }),
-      getOptimizationUniverse: async ({ interval, days }) => ({
-        interval,
-        days,
-        count: 59,
-        sample: ['BTCUSDT', 'ETHUSDT'],
-      }),
+      getOptimizationUniverse: async ({ interval, intervals, days }) => {
+        const list = (intervals || interval || '15m').split(',').filter(Boolean)
+        return {
+          interval: list[0],
+          intervals: list,
+          days,
+          count: 59,
+          sample: ['BTCUSDT', 'ETHUSDT'],
+          per_interval: Object.fromEntries(
+            list.map((item) => [item, { count: 59, sample: ['BTCUSDT'] }]),
+          ),
+          total_tasks: list.length * 59,
+        }
+      },
       getOptimization: async () => ({ id: 1, status: 'done', progress: {}, summary: {} }),
       getOptimizationResults: async () => ({ results: [], total: 0 }),
       createOptimization: async () => ({ id: 1, symbol_count: 2, combos: 4, workers: 2 }),
@@ -58,7 +66,7 @@ globalThis.subject = {
   form, options, runs, run, results, resultsTotal, filters, applyMode, applyOnly,
   spec, gridRows, progressPct, busy, running, canApply, verdictCounts, pooled, coverage,
   loadOptions, loadRuns, loadResults, loadCoverage, startOptimization, refresh,
-  previewUniverse, universe,
+  previewUniverse, universe, universeRows, onIntervalsChange, page, activeId,
   applyResults, buildStartPayload, buildApplyPayload, verdictMeta, paramsText,
 }`,
     context,
@@ -195,6 +203,7 @@ test('无任务时不允许应用', () => {
 
 test('扫描范围预览反映当前周期与天数', async () => {
   const subject = view()
+  subject.form.intervals = ['1h']
   subject.form.interval = '1h'
   subject.form.days = 180
   await subject.previewUniverse()
@@ -202,6 +211,57 @@ test('扫描范围预览反映当前周期与天数', async () => {
   assert.equal(subject.universe.value.interval, '1h')
   assert.equal(subject.universe.value.days, 180)
   assert.deepEqual([...subject.universe.value.sample], ['BTCUSDT', 'ETHUSDT'])
+})
+
+test('多周期预览按周期分别给出可用币数', async () => {
+  const subject = view()
+  subject.form.intervals = ['15m', '1h', '4h']
+  subject.form.days = 365
+  await subject.previewUniverse()
+  const rows = subject.universeRows.value
+  assert.deepEqual(
+    [...rows.map((row) => row.interval)],
+    ['15m', '1h', '4h'],
+  )
+  assert.equal(subject.universe.value.total_tasks, 177)
+})
+
+test('多周期启动参数带 intervals，主周期取所选之一', () => {
+  const subject = view()
+  subject.form.intervals = ['4h', '1h']
+  subject.form.interval = '4h'
+  const payload = subject.buildStartPayload()
+  assert.deepEqual([...payload.intervals], ['4h', '1h'])
+  assert.equal(payload.interval, '4h')
+
+  // 主周期不在所选周期里时回落到第一个，避免后端拿到矛盾的主周期
+  subject.form.interval = '15m'
+  const fallback = subject.buildStartPayload()
+  assert.equal(fallback.interval, '4h')
+})
+
+test('周期全部取消时至少保留一个', () => {
+  const subject = view()
+  subject.form.intervals = []
+  subject.onIntervalsChange([])
+  assert.deepEqual([...subject.form.intervals], ['15m'])
+})
+
+test('结果默认只取每币最佳周期，可切到周期明细', async () => {
+  const seen = []
+  const subject = view({
+    getOptimizationResults: async (id, params) => {
+      seen.push(params)
+      return { results: [], total: 0 }
+    },
+  })
+  subject.activeId.value = 7
+  await subject.loadResults()
+  assert.equal(seen[0].best_only, 'true')
+
+  subject.filters.bestOnly = false
+  await subject.loadResults()
+  assert.equal(seen[1].best_only, 'false')
 })
 
 test('预览失败时不影响开始寻优', async () => {

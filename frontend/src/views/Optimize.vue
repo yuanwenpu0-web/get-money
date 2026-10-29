@@ -32,14 +32,16 @@ const universe = ref(null)
 const universeLoading = ref(false)
 
 const page = reactive({ page: 1, pageSize: 30 })
-const filters = reactive({ verdict: '', q: '' })
+const filters = reactive({ verdict: '', q: '', bestOnly: true })
 const applyMode = ref('symbol')
 const applyOnly = ref('positive')
 const poolPrefix = ref('')
 
 const form = reactive({
   strategy: 'absorption_reversal',
-  interval: '15m',
+  // 周期是搜索维度：选了多个就每个周期各跑一遍，最后每币在它们之间选最优
+  intervals: ['15m'],
+  interval: '15m',    // 主周期（列表页展示、单周期兼容）
   scope: 'all',       // all = 该周期全部有历史的币种；pool = 某个池；symbols = 手填
   pool: '',
   symbols: '',
@@ -51,6 +53,8 @@ const form = reactive({
   objective: 'return_dd',
   deltaSource: 'auto',
 })
+
+const INTERVAL_CHOICES = ['1m', '5m', '15m', '1h', '4h', '1d']
 
 let pollTimer = null
 let disposed = false
@@ -91,9 +95,13 @@ function verdictMeta(verdict) {
 }
 
 function buildStartPayload() {
+  const intervals = form.intervals.length ? [...form.intervals] : [form.interval]
+  let interval = form.interval
+  if (!intervals.includes(interval)) interval = intervals[0]
   const payload = {
     strategy: form.strategy,
-    interval: form.interval,
+    interval,
+    intervals,
     days: Number(form.days),
     combos: Number(form.combos),
     workers: Number(form.workers),
@@ -184,7 +192,11 @@ async function previewUniverse() {
   if (disposed) return
   universeLoading.value = true
   try {
-    const data = await api.getOptimizationUniverse({ interval: form.interval, days: Number(form.days) })
+    const intervals = form.intervals.length ? form.intervals : [form.interval]
+    const data = await api.getOptimizationUniverse({
+      intervals: intervals.join(','),
+      days: Number(form.days),
+    })
     if (!disposed) universe.value = data
   } catch {
     // 预览失败不阻塞寻优，只是少一个「会扫多少币」的提示
@@ -193,6 +205,26 @@ async function previewUniverse() {
     if (!disposed) universeLoading.value = false
   }
 }
+
+// 至少留一个周期：全取消时后端会退回到主周期，界面却显示「没选」，容易误解
+function onIntervalsChange(value) {
+  if (!value.length) {
+    form.intervals = [form.interval]
+    return
+  }
+  if (!value.includes(form.interval)) form.interval = value[0]
+  previewUniverse()
+}
+
+// 某周期上到底有多少币够历史——这是「为什么 4h 有 499 个币而 15m 只有 57 个」的答案
+const universeRows = computed(() => {
+  const per = universe.value?.per_interval || {}
+  return Object.entries(per).map(([interval, item]) => ({
+    interval,
+    count: item.count,
+    sample: item.sample || [],
+  }))
+})
 
 async function startOptimization() {
   if (starting.value) return
@@ -277,7 +309,12 @@ async function loadResults() {
   if (disposed || activeId.value == null) return
   resultsLoading.value = true
   resultsError.value = ''
-  const params = { page: page.page, page_size: page.pageSize, sort: 'score' }
+  const params = {
+    page: page.page,
+    page_size: page.pageSize,
+    sort: 'score',
+    best_only: filters.bestOnly ? 'true' : 'false',
+  }
   if (filters.verdict) params.verdict = filters.verdict
   if (filters.q.trim()) params.q = filters.q.trim()
   try {
@@ -425,11 +462,13 @@ onBeforeUnmount(() => {
           <el-option v-for="item in options.specs" :key="item.code" :label="item.name" :value="item.code" />
         </el-select>
       </div>
-      <div class="opt-field">
-        <div class="muted">周期</div>
-        <el-select v-model="form.interval" style="width: 100%" @change="previewUniverse">
-          <el-option v-for="item in ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
-        </el-select>
+      <div class="opt-field opt-field-wide">
+        <div class="muted">周期（多选时周期本身也是搜索维度，币级再选最优）</div>
+        <el-checkbox-group v-model="form.intervals" @change="onIntervalsChange">
+          <el-checkbox-button v-for="item in INTERVAL_CHOICES" :key="item" :value="item">
+            {{ item }}
+          </el-checkbox-button>
+        </el-checkbox-group>
       </div>
       <div class="opt-field">
         <div class="muted">范围</div>
@@ -487,9 +526,29 @@ onBeforeUnmount(() => {
     </div>
 
     <div v-if="universe" class="opt-universe muted">
-      本次将扫描 <strong>{{ universe.count }}</strong> 个币种（{{ universe.interval }} · {{ universe.days }} 天以上历史）
-      <span v-if="universe.sample?.length">：{{ universe.sample.join(' / ') }}{{ universe.count > universe.sample.length ? ' …' : '' }}</span>
-      <span v-if="universe.count === 0" class="down">　没有币种满足历史要求，请缩短天数或换周期。</span>
+      <template v-if="universeRows.length > 1">
+        本次每周期可扫描的币种数：
+        <el-tag
+          v-for="row in universeRows"
+          :key="row.interval"
+          size="small"
+          effect="plain"
+          style="margin: 2px 4px 2px 0"
+        >
+          {{ row.interval }} · {{ row.count }} 币
+        </el-tag>
+        <span>合计 <strong>{{ universe.total_tasks }}</strong> 个 (币, 周期) 任务</span>
+        <span v-if="universe.total_tasks === 0" class="down">　没有币种满足历史要求，请缩短天数或换周期。</span>
+        <div class="opt-universe-hint">
+          周期之间币种数差这么多是数据覆盖导致的：1m 只有约 94 天，15m 长历史只有部分币，
+          1h/4h 覆盖最全。同一个币在 15m 上没信号、在 4h 上有 edge 是常见的。
+        </div>
+      </template>
+      <template v-else>
+        本次将扫描 <strong>{{ universe.count }}</strong> 个币种（{{ universe.interval }} · {{ universe.days }} 天以上历史）
+        <span v-if="universe.sample?.length">：{{ universe.sample.join(' / ') }}{{ universe.count > universe.sample.length ? ' …' : '' }}</span>
+        <span v-if="universe.count === 0" class="down">　没有币种满足历史要求，请缩短天数或换周期。</span>
+      </template>
     </div>
     <div v-if="gridRows.length" class="opt-grid-preview">
       <span class="muted">搜索空间（{{ spec?.grid_size }} 种组合）：</span>
@@ -512,7 +571,7 @@ onBeforeUnmount(() => {
   <div v-if="run" class="panel" style="margin-bottom: 14px">
     <div class="panel-head">
       <div>
-        <div class="panel-title">任务 #{{ run.id }} · {{ run.strategy }} × {{ run.interval }}</div>
+        <div class="panel-title">任务 #{{ run.id }} · {{ run.strategy }} × {{ (run.intervals || [run.interval]).join('/') }}</div>
         <div class="panel-sub">
           {{ run.days }} 天 · {{ run.workers }} 进程 ·
           {{ run.status === 'done' ? '已完成' : run.status === 'running' ? '运行中' : run.status === 'cancelled' ? '已取消' : run.status === 'failed' ? '失败' : '排队中' }}
@@ -588,9 +647,18 @@ onBeforeUnmount(() => {
     <div class="panel-head">
       <div>
         <div class="panel-title">逐币结果</div>
-        <div class="panel-sub">按评分排序：训练段选出最优，验证段给判定；参数列只显示与当前不同的键</div>
+        <div class="panel-sub">
+          {{ filters.bestOnly
+            ? '每币一行：在它跑过的所有周期里选出最佳周期（判定优先，其次评分）'
+            : '每个 (币, 周期) 一行：同一个币在不同周期的表现对比' }}
+          · 参数列只显示与当前不同的键
+        </div>
       </div>
       <div class="opt-filters">
+        <el-radio-group v-model="filters.bestOnly" size="small" @change="changeFilter">
+          <el-radio-button :value="true">每币最佳周期</el-radio-button>
+          <el-radio-button :value="false">周期明细</el-radio-button>
+        </el-radio-group>
         <el-select v-model="filters.verdict" size="small" style="width: 130px" placeholder="全部判定" clearable @change="changeFilter">
           <el-option v-for="(meta, key) in VERDICTS" :key="key" :label="meta.label" :value="key" />
         </el-select>
@@ -602,6 +670,11 @@ onBeforeUnmount(() => {
     <div v-if="resultsError" class="muted" role="alert">结果加载失败：{{ resultsError }}</div>
     <el-table :data="results" class="table-compact" v-loading="resultsLoading" empty-text="还没有结果（任务未完成或该筛选下为空）">
       <el-table-column prop="symbol" label="币种" width="110" />
+      <el-table-column label="周期" width="80">
+        <template #default="{ row }">
+          <el-tag size="small" effect="plain" :type="filters.bestOnly ? 'success' : 'info'">{{ row.interval || '—' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="判定" width="100">
         <template #default="{ row }">
           <el-tooltip :content="verdictMeta(row.verdict).hint" placement="top">
@@ -638,8 +711,17 @@ onBeforeUnmount(() => {
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="delta" width="80">
-        <template #default="{ row }"><el-tag size="small" effect="plain" type="info">{{ row.delta_source || '—' }}</el-tag></template>
+      <el-table-column label="delta" width="90">
+        <template #default="{ row }">
+          <el-tooltip
+            v-if="row.delta_source === 'mixed'"
+            :content="`lower-tf 只覆盖 ${Math.round(Number(row.delta_coverage || 0) * 100)}% 的 bar，其余逐根用 bar shape 估计兜底（脚本 na(ltfDelta) ? estDelta 语义）`"
+            placement="top"
+          >
+            <el-tag size="small" effect="plain" type="warning">mixed</el-tag>
+          </el-tooltip>
+          <el-tag v-else size="small" effect="plain" type="info">{{ row.delta_source || '—' }}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
@@ -689,7 +771,9 @@ onBeforeUnmount(() => {
     <el-table :data="runs" class="table-compact" empty-text="还没有寻优任务">
       <el-table-column prop="id" label="#" width="70" />
       <el-table-column prop="strategy" label="策略" min-width="150" />
-      <el-table-column prop="interval" label="周期" width="80" />
+      <el-table-column label="周期" width="120">
+        <template #default="{ row }">{{ (row.intervals || [row.interval]).join(' / ') }}</template>
+      </el-table-column>
       <el-table-column prop="days" label="天数" width="80" />
       <el-table-column label="状态" width="110">
         <template #default="{ row }">
@@ -738,6 +822,7 @@ onBeforeUnmount(() => {
 }
 .opt-field-wide { grid-column: span 2; }
 .opt-universe { margin-top: 10px; font-size: 12px; }
+.opt-universe-hint { margin-top: 6px; line-height: 1.6; opacity: 0.85; }
 .opt-grid-preview {
   margin-top: 10px;
   font-size: 12px;
