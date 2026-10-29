@@ -112,6 +112,7 @@ def init_db():
 
     Base.metadata.create_all(bind=engine)
     _add_missing_columns()
+    _ensure_optimization_result_interval()
 
 
 # 轻量补列表：create_all 只建缺失的表，不会给既有表加列。
@@ -134,3 +135,47 @@ def _add_missing_columns() -> None:
             for name, ddl in columns.items():
                 if name not in existing:
                     conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))
+
+
+def _ensure_optimization_result_interval() -> None:
+    """把 `optimization_results` 的唯一键从 (run_id, symbol) 扩到含 interval。
+
+    周期变成搜索维度后，同一币种一次任务会有多行结果。SQLite 不支持改约束，
+    只能重建表——该库是本地回退库，寻优结果可随时重跑，因此直接重建空表；
+    PostgreSQL 走标准 ADD COLUMN + 更换约束，不动已有数据。
+    """
+    inspector = inspect(engine)
+    if "optimization_results" not in set(inspector.get_table_names()):
+        return
+    columns = {column["name"] for column in inspector.get_columns("optimization_results")}
+    if "interval" in columns:
+        return
+
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE optimization_results "
+                    "ADD COLUMN IF NOT EXISTS interval VARCHAR(8) NOT NULL DEFAULT ''"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE optimization_results "
+                    "DROP CONSTRAINT IF EXISTS uq_optimization_result"
+                )
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE optimization_results ADD CONSTRAINT "
+                    "uq_optimization_result UNIQUE (run_id, symbol, interval)"
+                )
+            )
+        return
+
+    # SQLite：丢表让 create_all 按新定义重建
+    with engine.begin() as conn:
+        conn.execute(text("DROP TABLE optimization_results"))
+    from . import models  # noqa: F401  确保映射已注册
+
+    Base.metadata.create_all(bind=engine, tables=[models.OptimizationResult.__table__])

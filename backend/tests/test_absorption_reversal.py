@@ -604,3 +604,45 @@ def test_manage_order_replays_breakeven(db, monkeypatch):
     # 初始风险 = |100 − 98| = 2 → 1R 触发价 102；前 52 根 high=102.5 已触及
     order_manager.manage_order(db, order)
     assert float(order.sl or 0.0) == pytest.approx(100.0, abs=0.01)
+
+
+def test_bucket_delta_marks_uncovered_buckets_as_nan():
+    """没有 lower-tf 数据落入的桶必须是 NaN，不能是 0。
+
+    填 0 会被 `na(ltfDelta) ? estDelta` 当成「买卖完全均衡」的合法读数：
+    1m 只覆盖 94 天，长窗口前半段就全变成零 delta，信号永不触发。
+    """
+    parent_idx = pd.date_range("2026-01-01T00:00", periods=4, freq="1h", tz="UTC")
+    lower_idx = parent_idx[:2]  # 只有前两个桶有数据
+    lower = pd.Series([5.0, -5.0], index=lower_idx)
+    buckets = bucket_delta(lower, parent_idx)
+    assert buckets.iloc[0] == pytest.approx(5.0)
+    assert buckets.iloc[1] == pytest.approx(-5.0)
+    assert buckets.iloc[2:].isna().all()
+
+
+def test_bucket_delta_empty_lower_is_all_nan():
+    parent_idx = pd.date_range("2026-01-01T00:00", periods=3, freq="1h", tz="UTC")
+    buckets = bucket_delta(pd.Series(dtype=float), parent_idx)
+    assert buckets.isna().all()
+
+
+def test_missing_lower_delta_falls_back_to_bar_shape_estimate():
+    """lower-tf 没覆盖到的 bar 要逐根退化为 estDelta，而不是留 0。"""
+    raw = _frame(300)
+    frame = build_features(raw, with_label=False)
+    lower = pd.Series(np.nan, index=frame.index)
+    lower.iloc[150:] = 400.0
+
+    out = add_absorption_context(frame, _params(), lower_tf_delta=lower)
+    delta = out["abs_delta"].to_numpy()
+
+    # 有覆盖：直接用 lower-tf 的值
+    assert delta[200] == pytest.approx(400.0)
+    # 无覆盖：回落到脚本的 bar shape 估计，且不能是 0
+    rng = (frame["high"] - frame["low"]).to_numpy()
+    est = frame["volume"].to_numpy() * (
+        2 * frame["close"].to_numpy() - frame["high"].to_numpy() - frame["low"].to_numpy()
+    ) / np.where(rng > 0, rng, 1.0)
+    assert delta[50] == pytest.approx(est[50])
+    assert delta[50] != 0

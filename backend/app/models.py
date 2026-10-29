@@ -307,16 +307,21 @@ class OptimizationRun(Base):
 
 
 class OptimizationResult(Base):
-    """寻优结果：单币种的最优参数、逐窗口指标与判定。"""
+    """寻优结果：单币种单周期的最优参数、指标与判定。
+
+    一个币种会在多个周期上各跑一遍网格（周期本身也是搜索维度），所以唯一键
+    必须带上 `interval`，否则同币的后一个周期会覆盖前一个。
+    """
 
     __tablename__ = "optimization_results"
     __table_args__ = (
-        UniqueConstraint("run_id", "symbol", name="uq_optimization_result"),
+        UniqueConstraint("run_id", "symbol", "interval", name="uq_optimization_result"),
     )
 
     id = Column(Integer, primary_key=True)
     run_id = Column(Integer, nullable=False, index=True)
     symbol = Column(String(24), nullable=False, index=True)
+    interval = Column(String(8), nullable=False, default="", index=True)
     params = Column(Text, default="{}")          # 最优组合（只存与基准不同的键）
     params_before = Column(Text, default="{}")   # 寻优前该币种实际生效的参数
     metrics = Column(Text, default="{}")         # 训练/验证逐窗指标与合计

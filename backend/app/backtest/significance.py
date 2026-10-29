@@ -28,6 +28,7 @@ def bootstrap_expectancy_ci(
     n_boot: int = 2000,
     seed: int = 20261027,
     confidence: float = 0.95,
+    min_trades: int = 0,
 ) -> dict:
     """每笔收益率均值的 bootstrap 置信区间。
 
@@ -36,6 +37,10 @@ def bootstrap_expectancy_ci(
 
     同时给出账户层面的换算：均值 × 成交笔数 ≈ 该窗口的累计收益贡献，
     便于和 total_return_pct 对照。
+
+    `min_trades` > 0 时样本不足就判 `insufficient`（CI 数值照给，但不作结论）。
+    池化必须开这个：实测 4h × 365 天全市场只有 4 笔成交，bootstrap 在 n=4 上
+    会给出 [0.86%, 10.48%] 这种「显著为正」的假精确读数，只看 CI 会当成金矿。
     """
     if not trades:
         return {"trades": 0, "verdict": "no_trades"}
@@ -53,6 +58,10 @@ def bootstrap_expectancy_ci(
     lo, hi = np.percentile(means, [alpha * 100, (1 - alpha) * 100])
     point = float(returns.mean())
     positive_share = float((means > 0).mean())
+    if min_trades and n < min_trades:
+        verdict = "insufficient"
+    else:
+        verdict = "positive" if lo > 0 else "negative" if hi < 0 else "inconclusive"
     return {
         "trades": n,
         "mean_return_pct": round(point, 4),
@@ -62,9 +71,7 @@ def bootstrap_expectancy_ci(
         "n_boot": n_boot,
         # 正的比例：0.5 表示完全没把握，>0.95 才算统计上站得住
         "positive_share": round(positive_share, 4),
-        "verdict": (
-            "positive" if lo > 0 else "negative" if hi < 0 else "inconclusive"
-        ),
+        "verdict": verdict,
     }
 
 

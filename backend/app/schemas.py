@@ -147,11 +147,13 @@ class OptimizationPayload(BaseModel):
     """一键全币种参数寻优的请求。
 
     `symbols` 留空时按 `pool` 展开；`pool` 也留空则取该周期上历史足够的所有币种。
+    `intervals` 非空时，给定的每个周期都会跑一遍，最后在币级别选出最佳周期。
     """
 
     model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
     strategy: str = Field(min_length=2, max_length=48)
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '15m'
+    intervals: list[Literal['1m', '5m', '15m', '1h', '4h', '1d']] | None = None
     pool: str | None = None
     symbols: list[str] | None = None
     days: int = Field(default=90, ge=30, le=720)

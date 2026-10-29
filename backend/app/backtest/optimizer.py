@@ -22,11 +22,22 @@
 - prepare 的输出按 `spec.prepare_keys` 缓存：滚动百分位是每币最贵的一步，
   网格里出场参数（target_r / max_hold_bars）变化不影响它，可以复用。
 
+周期也是搜索维度
+----------------
+同一个策略在 15m 和 4h 上的最优参数不是同一套，甚至同一个币在 15m 上不可交易、
+在 4h 上有 edge。所以任务单位是 **(币种, 周期)** 而不是币种：每个组合都在它自己
+的周期上模拟，`simulate` 的持仓时长、年化换算、成本摊销都随周期变。任务粒度变细
+还有个副作用是负载更均衡——1h 的 365 天和 4h 的 365 天 bar 数差 4 倍，混在一个
+worker 里会让尾部只剩一个大任务在跑。
+
+选完每个 (币, 周期) 的最优组合后，还要在币级别再选一次「最佳周期」，见
+`pick_best_per_symbol`。
+
 delta 源
 --------
-寻优固定用 est delta（脚本的 `na(ltfDelta) ? estDelta` 分支）：1m 历史只覆盖约
-93 天，而寻优窗口通常 180 天，混用两种 delta 源会让同一列跨区间不可比。
-需要 lower-tf delta 口径时用 `scripts/absorption_backtest.py --delta-source lower`。
+`delta_source="auto"` 时有 1m 数据就用 lower-tf delta（与实盘口径一致），覆盖不足
+90% 或全零则降级 est。两条路径的读数不可直接比较，所以结果的 `delta_source`
+字段必须一起看：同一轮里混用两种源，池化 CI 会被口径差异污染。
 """
 
 from __future__ import annotations
@@ -78,6 +89,10 @@ MAX_COMBOS = 512
 MAX_WORKERS = 24
 # 保留 4 核给 FastAPI / 调度器 / 数据库：寻优跑满 24 核会把巡检挤到没 CPU
 RESERVED_CORES = 4
+# 池化判定的最小成交笔数：单币判定有 min_trades 门槛，池化层也要有。
+# 实测 4h × 365 天全市场只有 4 笔成交，n=4 的 bootstrap 会给出「CI 下界 +0.86%」
+# 的假精确读数，必须降级成 insufficient 而不是当成找到了 edge。
+MIN_POOLED_TRADES = 30
 # worker 内 prepared 帧缓存上限：一份 15m×180天 帧约 4MB，8 份 ≈ 32MB/进程
 PREPARE_CACHE_LIMIT = 8
 
@@ -224,8 +239,15 @@ def _attach_lower_delta(db: Session, symbol: str, frame: pd.DataFrame, mode: str
     这不是可选优化：同一份 15m 帧，est delta 下 90 天只有 1 个信号，lower delta
     下有 5~34 个——寻优如果跑在 est 上，优化的压根不是实盘那个策略。
 
-    覆盖不足时（1m 历史短于寻优窗口）降级 est 并在结果里标注：半截 NaN 的
-    lower 序列会让滚动百分位在覆盖边界上算出假阈值，比整段降级更危险。
+    返回值有三档：
+    - `lower`：lower-tf 覆盖 >=90%，整段都是真实买卖差
+    - `mixed`：只覆盖一部分（1m 历史比窗口短）。缺的那段由 `add_absorption_context`
+      逐根用 est 兜底，这是脚本 `na(ltfDelta) ? estDelta` 的原语义
+    - `est`：完全没有 lower-tf 数据
+
+    早先这里对部分覆盖直接整段降级 est，理由是「半截 NaN 会让滚动百分位算出假阈值」。
+    但整段降级反而更糟：长窗口下等于放弃了那 94 天的真实口径；而 bucket_delta 曾经
+    把空桶填 0，覆盖率永远显示 100%，保护完全失效。
     """
     if mode == "est":
         return "est"
@@ -239,17 +261,25 @@ def _attach_lower_delta(db: Session, symbol: str, frame: pd.DataFrame, mode: str
     if lower is None or not len(lower):
         return "est"
     coverage = float(lower.notna().mean())
-    if coverage < 0.9 or float(lower.abs().sum()) <= 0:
+    if coverage <= 0:
         return "est"
     frame["intrabar_delta"] = lower
-    return "lower"
+    frame.attrs["delta_coverage"] = round(coverage, 4)
+    return "lower" if coverage >= 0.9 else "mixed"
+
+
+def _finish(payload: dict, task: dict) -> dict:
+    """给 worker 结果补上周期标识：上层要靠它区分同一个币的不同周期结果。"""
+    payload["interval"] = task.get("interval", "")
+    payload["key"] = task.get("key") or payload.get("symbol", "")
+    return payload
 
 
 def evaluate_symbol_task(task: dict) -> dict:
-    """进程池 worker：单个币种跑完整张网格，返回摘要（不含成交明细）。
+    """进程池 worker：单个 (币种, 周期) 跑完整张网格，返回摘要（不含成交明细）。
 
-    不返回 equity / trades：520 个币种 × 几百笔成交会把结果表撑爆，而选参只需要
-    指标。要看具体成交时用单币回测复现。
+    不返回 equity / trades：500 个币 × 几个周期 × 几百笔成交会把结果表撑爆，
+    而选参只需要指标。要看具体成交时用单币回测复现。
     """
     symbol = task["symbol"]
     strategy = task["strategy"]
@@ -276,29 +306,32 @@ def evaluate_symbol_task(task: dict) -> dict:
             cutoff = pd.Timestamp(now_ms() - days * 86_400_000, unit="ms", tz="UTC")
             frame = frame[frame.index >= cutoff]
             delta_source = _attach_lower_delta(db, symbol, frame, task.get("delta_source", "auto"))
+            delta_coverage = float(frame.attrs.get("delta_coverage") or 0.0)
         finally:
             db.close()
         if len(frame) < int(task["min_bars"]):
-            return {
+            return _finish({
                 "symbol": symbol,
                 "status": "skipped",
                 "error": f"可用K线仅 {len(frame)} 根（门槛 {task['min_bars']}）",
                 "rows": len(frame),
                 "delta_source": delta_source,
+                "delta_coverage": delta_coverage,
                 "elapsed": round(time.perf_counter() - started, 2),
-            }
+            }, task)
 
         split = int(len(frame) * float(task["train_ratio"]))
         train, valid = frame.iloc[:split], frame.iloc[split:]
         if len(train) < 300 or len(valid) < 100:
-            return {
+            return _finish({
                 "symbol": symbol,
                 "status": "skipped",
                 "error": f"切分后样本不足（训练 {len(train)} / 验证 {len(valid)}）",
                 "rows": len(frame),
                 "delta_source": delta_source,
+                "delta_coverage": delta_coverage,
                 "elapsed": round(time.perf_counter() - started, 2),
-            }
+            }, task)
 
         initial, fee, slippage = task["initial"], task["fee"], task["slippage"]
         min_trades = int(task["min_trades"])
@@ -338,11 +371,12 @@ def evaluate_symbol_task(task: dict) -> dict:
                 }
 
         if best is None:
-            return {
+            return _finish({
                 "symbol": symbol,
                 "status": "ok",
                 "rows": len(frame),
                 "delta_source": delta_source,
+                "delta_coverage": delta_coverage,
                 "train_bars": len(train),
                 "valid_bars": len(valid),
                 "grid_size": len(task["grid"]),
@@ -355,7 +389,7 @@ def evaluate_symbol_task(task: dict) -> dict:
                 "verdict": "no_trades",
                 "score": 0.0,
                 "elapsed": round(time.perf_counter() - started, 2),
-            }
+            }, task)
 
         valid_signals = evaluate_signals(valid, strategy, best["params"])
         valid_equity, valid_trades = simulate(
@@ -365,11 +399,12 @@ def evaluate_symbol_task(task: dict) -> dict:
         ci = bootstrap_expectancy_ci(valid_trades)
         train_metrics = dict(best["metrics"])
         train_metrics["positive_months"] = _monthly_positive_ratio(best["equity"])
-        return {
+        return _finish({
             "symbol": symbol,
             "status": "ok",
             "rows": len(frame),
             "delta_source": delta_source,
+            "delta_coverage": delta_coverage,
             "train_bars": len(train),
             "valid_bars": len(valid),
             "grid_size": len(task["grid"]),
@@ -385,14 +420,14 @@ def evaluate_symbol_task(task: dict) -> dict:
             "verdict": _verdict(valid_metrics, ci, min_trades),
             "score": round(best["score"], 4),
             "elapsed": round(time.perf_counter() - started, 2),
-        }
+        }, task)
     except Exception as exc:  # 单币失败不中断整轮
-        return {
+        return _finish({
             "symbol": symbol,
             "status": "error",
             "error": f"{type(exc).__name__}: {exc}"[:500],
             "elapsed": round(time.perf_counter() - started, 2),
-        }
+        }, task)
 
 
 # ------------------------------------------------------------------ 主进程侧
@@ -401,7 +436,10 @@ def evaluate_symbol_task(task: dict) -> dict:
 @dataclass
 class OptimizationRequest:
     strategy: str
-    interval: str
+    interval: str = "15m"
+    # 周期作为搜索维度：给了 intervals 就跑遍这些周期，每个 (币, 周期) 各出一行结果。
+    # `interval` 保留为主周期（表单默认值、单周期调用的入口）。
+    intervals: list[str] | None = None
     days: int = 180
     train_ratio: float = 0.7
     combos: int = DEFAULT_COMBOS
@@ -416,9 +454,24 @@ class OptimizationRequest:
     fee: float = -1.0
     slippage: float = -1.0
 
+    @property
+    def interval_list(self) -> list[str]:
+        """要扫的周期列表（去重并保持顺序）。"""
+        raw = self.intervals or [self.interval]
+        seen: list[str] = []
+        for item in raw:
+            text_ = str(item or "").strip()
+            if text_ and text_ not in seen:
+                seen.append(text_)
+        return seen or [self.interval]
+
     def validate(self) -> None:
-        if self.interval not in SUPPORTED_INTERVALS:
-            raise ValueError(f"不支持的周期: {self.interval}")
+        intervals = self.interval_list
+        if not intervals:
+            raise ValueError("至少需要一个周期")
+        for item in intervals:
+            if item not in SUPPORTED_INTERVALS:
+                raise ValueError(f"不支持的周期: {item}")
         if not 30 <= int(self.days) <= 720:
             raise ValueError("回测天数允许 30-720")
         if not 0.5 <= float(self.train_ratio) <= 0.85:
@@ -468,11 +521,18 @@ def _base_params(db: Session, strategy: str, interval: str, state: dict) -> dict
 
 
 def prepare_request(
-    db: Session, strategy: str, interval: str, **kwargs
-) -> tuple[OptimizationRequest, dict, list[dict]]:
-    """把请求补齐成可直接派发的形态：基准参数、成本、候选网格。"""
+    db: Session, strategy: str, interval: str | None = None, **kwargs
+) -> tuple[OptimizationRequest, dict, dict[str, list[dict]]]:
+    """把请求补齐成可直接派发的形态：逐周期的基准参数、成本、候选网格。
+
+    返回的第三个元素是 `{周期: 组合列表}`。每个周期的基准参数不同（绑定按
+    `(策略, 周期)` 唯一），所以网格也必须逐周期独立抽样——否则 4h 的基准会被
+    15m 的绑定参数污染，「改善幅度」这一列就失去参照。
+    """
     spec = get_spec(strategy)
-    request = OptimizationRequest(strategy=strategy, interval=interval, **kwargs)
+    if interval and not kwargs.get("intervals"):
+        kwargs["intervals"] = [interval]
+    request = OptimizationRequest(strategy=strategy, interval=interval or "15m", **kwargs)
     request.validate()
     state = all_state(db)
     if request.initial <= 0:
@@ -481,27 +541,42 @@ def prepare_request(
         request.fee = float(state["fee_rate"])
     if request.slippage < 0:
         request.slippage = float(state["slippage"])
-    base = _base_params(db, strategy, interval, state)
-    grid = build_grid(
-        spec, base, n=request.combos, seed=request.seed, custom=request.custom_grid
-    )
-    space = request.custom_grid or spec.grid
+
+    intervals = request.interval_list
+    per_interval: dict[str, dict] = {}
+    grids: dict[str, list[dict]] = {}
+    for item in intervals:
+        base = _base_params(db, strategy, item, state)
+        grids[item] = build_grid(
+            spec, base, n=request.combos, seed=request.seed, custom=request.custom_grid
+        )
+        space = request.custom_grid or spec.grid
+        per_interval[item] = {
+            "base_params": base,
+            "grid_size": grid_size(spec, request.custom_grid),
+            "combos": len(grids[item]),
+            "grid_keys": list(space),
+        }
+
+    primary = intervals[0]
     meta = {
-        "base_params": base,
+        "intervals": intervals,
+        "base_params": per_interval[primary]["base_params"],
         # 结果表里「寻优前」的对照只列被搜索过的键，存整套 40 多个参数没有信息量
-        "grid_keys": list(space),
+        "grid_keys": per_interval[primary]["grid_keys"],
         "fee": request.fee,
         "slippage": request.slippage,
         "initial": request.initial,
-        "grid_size": grid_size(spec, request.custom_grid),
-        "combos": len(grid),
+        "grid_size": per_interval[primary]["grid_size"],
+        "combos": len(grids[primary]),
+        "per_interval": per_interval,
         "objective": request.objective,
         "min_trades": request.min_trades,
         "train_ratio": request.train_ratio,
         "days": request.days,
         "delta_source": request.delta_source,
     }
-    return request, meta, grid
+    return request, meta, grids
 
 
 def symbol_universe(db: Session, interval: str, days: int) -> list[str]:
@@ -509,17 +584,55 @@ def symbol_universe(db: Session, interval: str, days: int) -> list[str]:
 
     按原始K线计数判断而不是逐个 build_dataset —— 对 500+ 币种来说，
     前者是一条 SQL，后者是 500 次指标预热。
+
+    计数口径要覆盖回测的两条取数路径：`interval` 自身的 native 行 + 1m 聚合行
+    （1m 只覆盖 94 天，但它是短周期唯一来源）。只数 native 行会把「1m 聚合够用」
+    的币误判成不可用——实测 15m 90 天：只数 native 是 31 币，合并口径是 70+。
+    两条路径在重叠时段会被重复计入，所以门槛本身是宽松的粗筛；真正的硬门槛在
+    `evaluate_symbol_task` 里（`min_bars` + 训练/验证段最小长度）。
     """
     step = interval_ms(interval)
     needed = max(200, int(days * 86_400_000 / step * 0.5))
+    since = now_ms() - int(days) * 86_400_000
+    if interval == "1m":
+        rows = db.execute(
+            text(
+                "select symbol from klines where interval = '1m' and open_time >= :since "
+                "group by symbol having count(*) >= :needed order by symbol"
+            ),
+            {"since": since, "needed": needed},
+        ).all()
+        return [row[0] for row in rows]
     rows = db.execute(
         text(
-            "select symbol from klines where interval = :iv "
-            "group by symbol having count(*) >= :needed order by symbol"
+            """
+            select symbol from (
+              select symbol, sum(w) as bars from (
+                select symbol, 1.0 as w from klines
+                 where interval = :iv and open_time >= :since
+                union all
+                select symbol, :m1_weight as w from klines
+                 where interval = '1m' and open_time >= :since
+              ) u group by symbol
+            ) t where bars >= :needed order by symbol
+            """
         ),
-        {"iv": interval, "needed": needed},
+        {
+            "iv": interval,
+            "since": since,
+            "needed": needed,
+            # 一根 1m 只能折算成 1/step_minutes 根目标周期
+            "m1_weight": round(60_000 / step, 6),
+        },
     ).all()
     return [row[0] for row in rows]
+
+
+def symbol_universes(
+    db: Session, intervals: list[str], days: int
+) -> dict[str, list[str]]:
+    """逐周期算可用币种（同一币在不同周期的覆盖完全不同）。"""
+    return {item: symbol_universe(db, item, days) for item in intervals}
 
 
 def _run_round(
@@ -539,7 +652,7 @@ def _run_round(
     cancelled = False
     pool = ProcessPoolExecutor(max_workers=workers)
     try:
-        futures = {pool.submit(evaluate_symbol_task, task): task["symbol"] for task in tasks}
+        futures = {pool.submit(evaluate_symbol_task, task): task["key"] for task in tasks}
         for future in as_completed(futures):
             if cancel is not None and cancel.is_set():
                 cancelled = True
@@ -549,16 +662,16 @@ def _run_round(
             try:
                 payload = future.result()
             except Exception as exc:
-                # 池崩溃必须冒泡到上层重建，其它异常降级成单币失败
+                # 池崩溃必须冒泡到上层重建，其它异常降级成单任务失败
                 if isinstance(exc, BrokenProcessPool):
                     raise
                 payload = {
-                    "symbol": futures[future],
+                    "key": futures[future],
                     "status": "error",
                     "error": f"{type(exc).__name__}: {exc}"[:500],
                 }
-            symbol = payload.get("symbol") or futures[future]
-            completed.add(symbol)
+            key = payload.get("key") or futures[future]
+            completed.add(key)
             status = payload.get("status")
             if status == "error":
                 counts["failed"] += 1
@@ -566,9 +679,9 @@ def _run_round(
                 counts["skipped"] += 1
             else:
                 counts["done"] += 1
-                key = payload.get("verdict") or ""
-                if key:
-                    verdicts[key] = verdicts.get(key, 0) + 1
+                verdict_key = payload.get("verdict") or ""
+                if verdict_key:
+                    verdicts[verdict_key] = verdicts.get(verdict_key, 0) + 1
             if on_result is not None:
                 on_result(payload)
             if on_progress is not None:
@@ -583,7 +696,7 @@ def _run_round(
                         "skipped": counts["skipped"],
                         "elapsed": round(elapsed, 1),
                         "eta": round((total - done) / rate, 1) if rate > 0 else None,
-                        "current": payload.get("symbol", ""),
+                        "current": payload.get("key", ""),
                         "verdicts": dict(verdicts),
                     }
                 )
@@ -595,12 +708,98 @@ def _run_round(
     return cancelled
 
 
+VERDICT_RANK = {
+    "pass": 4,
+    "inconclusive": 3,
+    "negative": 2,
+    "insufficient": 1,
+    "no_trades": 0,
+}
+
+
+def pick_best_per_symbol(items: list[dict]) -> dict[str, dict]:
+    """在每个币的多个周期结果里选一个「最佳配置」。
+
+    排序不看单一指标，而是先看结论强度再看分数：
+    1. 判定等级（pass 优于 inconclusive 优于 negative 优于样本不足/无成交）——
+       验证段没成交的周期即使训练段分数再高也不能用；
+    2. 同等级比 score（验证段净收益 + 0.5×最大回撤）；
+    3. 再比验证段成交笔数，样本多的更可信。
+
+    没有成交的周期分数都是 0，如果只按 score 排，会出现「4h 无成交」和「1h 微亏
+    且 -0.3 分」之间的胡乱排序，所以等级必须先于分数。
+    """
+    best: dict[str, dict] = {}
+    for item in items:
+        symbol = item.get("symbol")
+        if not symbol:
+            continue
+        current = best.get(symbol)
+        if current is None or _rank(item) > _rank(current):
+            best[symbol] = item
+    return best
+
+
+def _rank(item: dict) -> tuple:
+    valid = item.get("valid") or {}
+    return (
+        VERDICT_RANK.get(item.get("verdict") or "", 0),
+        float(item.get("score") or 0.0),
+        int(valid.get("total_trades") or 0),
+    )
+
+
+def build_tasks(
+    request: OptimizationRequest,
+    meta: dict,
+    grids: dict[str, list[dict]],
+    symbols: dict[str, list[str]],
+) -> list[dict]:
+    """展开成 (币种, 周期) 任务列表。
+
+    每个任务带自己的 `base_params` 与 `grid`：同一策略在不同周期上生效的线上参数
+    本来就不同，混用会让「相对基准改善了多少」失去意义。
+    """
+    tasks: list[dict] = []
+    for interval in request.interval_list:
+        iv_symbols = symbols.get(interval) or []
+        if not iv_symbols:
+            continue
+        step = interval_ms(interval)
+        min_bars = max(400, int(request.days * 86_400_000 / step * 0.4))
+        grid = grids.get(interval) or []
+        base = (meta.get("per_interval") or {}).get(interval, {}).get(
+            "base_params", meta.get("base_params") or {}
+        )
+        for symbol in iv_symbols:
+            tasks.append(
+                {
+                    "key": f"{symbol}@{interval}",
+                    "symbol": symbol,
+                    "interval": interval,
+                    "strategy": request.strategy,
+                    "days": request.days,
+                    "train_ratio": request.train_ratio,
+                    "min_trades": request.min_trades,
+                    "objective": request.objective,
+                    "base_params": base,
+                    "initial": request.initial,
+                    "fee": request.fee,
+                    "slippage": request.slippage,
+                    "delta_source": request.delta_source,
+                    "min_bars": min_bars,
+                    "grid": grid,
+                }
+            )
+    return tasks
+
+
 def run_optimization(
     *,
     request: OptimizationRequest,
     meta: dict,
-    grid: list[dict],
-    symbols: list[str],
+    grids: dict[str, list[dict]],
+    symbols: dict[str, list[str]],
     on_progress: Callable[[dict], None] | None = None,
     on_result: Callable[[dict], None] | None = None,
     cancel: threading.Event | None = None,
@@ -608,15 +807,17 @@ def run_optimization(
 ) -> dict:
     """跑完整轮寻优，返回汇总。
 
-    `on_result` 每完成一个币种回调一次（写库/推进度）。
+    `symbols` 是 `{周期: 币种列表}`；同一币种在不同周期的覆盖不同，必须逐周期给。
+    `on_result` 每完成一个 (币种, 周期) 回调一次（写库/推进度）。
     `cancel` 被置位后不再收集新结果，进程池等已派发的任务跑完再退出——
     进程池没有安全的强杀手段，硬杀会留下僵尸进程和半写的连接。
 
     进程池崩溃（BLAS 申请不到内存、worker 被系统杀掉）时**不整轮失败**：
-    已完成的币种结果保留，剩下的降并发重试一次（并发减半，压力通常来自
-    同时 import numpy 的瞬时内存峰值）。第二次仍崩才把剩余币标记失败。
+    已完成的任务结果保留，剩下的降并发重试一次（并发减半，压力通常来自
+    同时 import numpy 的瞬时内存峰值）。第二次仍崩才把剩余任务标记失败。
     """
-    total = len(symbols)
+    tasks = build_tasks(request, meta, grids, symbols)
+    total = len(tasks)
     if total == 0:
         return {
             "done": 0,
@@ -630,27 +831,6 @@ def run_optimization(
             "error": "",
         }
     base_workers = min(int(workers or request.workers or default_workers()), MAX_WORKERS, total)
-    step = interval_ms(request.interval)
-    min_bars = max(400, int(request.days * 86_400_000 / step * 0.4))
-    tasks = [
-        {
-            "symbol": symbol,
-            "strategy": request.strategy,
-            "interval": request.interval,
-            "days": request.days,
-            "train_ratio": request.train_ratio,
-            "min_trades": request.min_trades,
-            "objective": request.objective,
-            "base_params": meta["base_params"],
-            "initial": request.initial,
-            "fee": request.fee,
-            "slippage": request.slippage,
-            "delta_source": request.delta_source,
-            "min_bars": min_bars,
-            "grid": grid,
-        }
-        for symbol in symbols
-    ]
 
     started = time.perf_counter()
     counts = {"done": 0, "failed": 0, "skipped": 0}
@@ -679,7 +859,7 @@ def run_optimization(
             pending = []
         except BrokenProcessPool as exc:
             last_error = f"进程池崩溃：{exc}"
-            pending = [task for task in pending if task["symbol"] not in completed]
+            pending = [task for task in pending if task["key"] not in completed]
         if cancelled:
             break
 
@@ -688,11 +868,14 @@ def run_optimization(
         for task in pending:
             if on_result is not None:
                 on_result(
-                    {
-                        "symbol": task["symbol"],
-                        "status": "error",
-                        "error": last_error or "进程池不可用",
-                    }
+                    _finish(
+                        {
+                            "symbol": task["symbol"],
+                            "status": "error",
+                            "error": last_error or "进程池不可用",
+                        },
+                        task,
+                    )
                 )
     return {
         "done": counts["done"],

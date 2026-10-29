@@ -35,6 +35,8 @@ async def lifespan(_app: FastAPI):
         sync_scheduler_with_state(db)
     finally:
         db.close()
+    # 寻优跑在后台线程里，进程重启后线程没了、库里的任务还挂着「运行中」
+    optimizations.reap_stale_runs()
     yield
     scheduler.stop()
 

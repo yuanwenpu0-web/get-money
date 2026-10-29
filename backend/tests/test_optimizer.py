@@ -11,11 +11,14 @@ import pytest
 
 from app.backtest.optimizer import (
     OptimizationRequest,
+    VERDICT_RANK,
     _verdict,
     build_grid,
+    build_tasks,
     default_workers,
     diff_params,
     grid_size,
+    pick_best_per_symbol,
 )
 from app.models import StrategyBinding, SymbolParam, SymbolPool, StrategyConfig
 from app.state import all_state
@@ -290,3 +293,136 @@ def test_broken_override_row_does_not_break_binding(db):
     bindings, _ = active_bindings(db, state=all_state(db))
     # 非法覆盖被丢弃 → 回落到绑定/策略默认，币种不能因此从巡检里消失
     assert bindings[0].params_for("BTCUSDT")["target_r"] == 2.0
+
+
+# ---------------------------------------------------------------- 多周期寻优
+
+
+def test_interval_list_dedupes_and_defaults():
+    req = OptimizationRequest(strategy=CODE, interval="15m")
+    assert req.interval_list == ["15m"]
+    req = OptimizationRequest(strategy=CODE, interval="15m", intervals=["4h", "1h", "4h", ""])
+    assert req.interval_list == ["4h", "1h"]
+
+
+def test_validate_rejects_unknown_interval_in_list():
+    OptimizationRequest(strategy=CODE, intervals=["1h", "4h"]).validate()
+    with pytest.raises(ValueError):
+        OptimizationRequest(strategy=CODE, intervals=["1h", "7m"]).validate()
+
+
+def test_pick_best_per_symbol_prefers_stronger_verdict():
+    items = [
+        {"symbol": "BTCUSDT", "interval": "15m", "verdict": "no_trades", "score": 9.0, "valid": {}},
+        {"symbol": "BTCUSDT", "interval": "4h", "verdict": "negative", "score": -0.4, "valid": {"total_trades": 20}},
+        {"symbol": "BTCUSDT", "interval": "1h", "verdict": "inconclusive", "score": 0.1, "valid": {"total_trades": 31}},
+    ]
+    best = pick_best_per_symbol(items)
+    # no_trades 的分数是 0 分制里的最高值也不能赢：那是「没交易」不是「赚最多」
+    assert best["BTCUSDT"]["interval"] == "1h"
+
+
+def test_pick_best_per_symbol_breaks_ties_by_score_then_trades():
+    items = [
+        {"symbol": "ETHUSDT", "interval": "1h", "verdict": "pass", "score": 0.5, "valid": {"total_trades": 40}},
+        {"symbol": "ETHUSDT", "interval": "4h", "verdict": "pass", "score": 0.9, "valid": {"total_trades": 12}},
+    ]
+    assert pick_best_per_symbol(items)["ETHUSDT"]["interval"] == "4h"
+    items[1]["score"] = 0.5
+    # 同分看样本量
+    assert pick_best_per_symbol(items)["ETHUSDT"]["interval"] == "1h"
+
+
+def test_verdict_rank_covers_every_verdict():
+    for key in ("pass", "inconclusive", "negative", "insufficient", "no_trades"):
+        assert key in VERDICT_RANK
+
+
+def test_build_tasks_expands_symbol_interval_pairs():
+    request = OptimizationRequest(
+        strategy=CODE, intervals=["1h", "4h"], days=365,
+        initial=10000.0, fee=0.0005, slippage=0.0002,
+    )
+    meta = {
+        "base_params": {"target_r": 2.0},
+        "per_interval": {
+            "1h": {"base_params": {"target_r": 2.0}},
+            "4h": {"base_params": {"target_r": 3.0}},
+        },
+    }
+    grids = {"1h": [{"a": 1}, {"a": 2}], "4h": [{"a": 3}]}
+    symbols = {"1h": ["BTCUSDT", "ETHUSDT"], "4h": ["BTCUSDT"]}
+    tasks = build_tasks(request, meta, grids, symbols)
+    assert len(tasks) == 3
+    keys = {task["key"] for task in tasks}
+    assert keys == {"BTCUSDT@1h", "ETHUSDT@1h", "BTCUSDT@4h"}
+    by_key = {task["key"]: task for task in tasks}
+    # 每个周期用自己的基准参数与网格，不能串
+    assert by_key["BTCUSDT@4h"]["base_params"]["target_r"] == 3.0
+    assert by_key["BTCUSDT@1h"]["grid"] == [{"a": 1}, {"a": 2}]
+    # min_bars 随周期缩放：4h 的 365 天只有 1h 的四分之一根数
+    assert by_key["BTCUSDT@4h"]["min_bars"] < by_key["BTCUSDT@1h"]["min_bars"]
+
+
+def test_build_tasks_skips_empty_interval():
+    request = OptimizationRequest(strategy=CODE, intervals=["1h", "4h"], initial=1.0, fee=0.0, slippage=0.0)
+    meta = {"base_params": {}, "per_interval": {}}
+    tasks = build_tasks(
+        request, meta, {"1h": [{}], "4h": [{}]}, {"1h": ["BTCUSDT"], "4h": []}
+    )
+    assert [task["key"] for task in tasks] == ["BTCUSDT@1h"]
+
+
+def test_pooled_ci_requires_minimum_trades():
+    """池化 CI 在样本过少时必须判 insufficient，不能给出「显著为正」。
+
+    实测 4h × 365 天全市场只有 4 笔成交，bootstrap 在 n=4 上会给出
+    CI [0.86%, 10.48%] 这种假精确读数。
+    """
+    from app.backtest.optimizer import MIN_POOLED_TRADES
+    from app.backtest.significance import bootstrap_expectancy_ci
+
+    few = [{"return_pct": 5.0} for _ in range(4)]
+    loose = bootstrap_expectancy_ci(few)
+    assert loose["verdict"] == "positive"  # 不设门槛时确实会误报
+
+    guarded = bootstrap_expectancy_ci(few, min_trades=MIN_POOLED_TRADES)
+    assert guarded["verdict"] == "insufficient"
+    # 数值照给：判不住不等于不能看
+    assert guarded["trades"] == 4
+    assert guarded["ci_low_pct"] > 0
+
+
+def test_pooled_ci_with_enough_trades_still_judges():
+    from app.backtest.significance import bootstrap_expectancy_ci
+
+    many = [{"return_pct": 0.5} for _ in range(40)]
+    out = bootstrap_expectancy_ci(many, min_trades=30)
+    assert out["verdict"] == "positive"
+
+
+def test_reap_stale_runs_marks_orphans_failed(db):
+    """进程重启后遗留的 pending/running 任务必须被标失败。
+
+    否则前端永远显示「运行中」，用户以为还在跑，而线程其实早没了。
+    """
+    from app.api.optimizations import reap_stale_runs
+    from app.models import OptimizationRun
+
+    db.add_all(
+        [
+            OptimizationRun(strategy=CODE, interval="15m", status="running", config="{}"),
+            OptimizationRun(strategy=CODE, interval="15m", status="pending", config="{}"),
+            OptimizationRun(strategy=CODE, interval="15m", status="done", config="{}"),
+        ]
+    )
+    db.commit()
+
+    assert reap_stale_runs(db) == 2
+    statuses = sorted(row.status for row in db.query(OptimizationRun).all())
+    assert statuses == ["done", "failed", "failed"]
+    interrupted = db.query(OptimizationRun).filter(OptimizationRun.status == "failed").first()
+    assert "进程重启" in interrupted.error
+    assert interrupted.finished_at is not None
+    # 幂等：再跑一次没有可清理的
+    assert reap_stale_runs(db) == 0

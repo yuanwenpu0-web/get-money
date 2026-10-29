@@ -131,17 +131,27 @@ def bucket_delta(
 
     parent 桶边界由 parent_index 自身给出：每个 lower bar 归入 open_time <= t < 下一 open_time 的桶；
     早于首个 parent bar 的数据丢弃（不在回测帧内），晚于最后一个的归入最后一个桶。
+
+    **没有任何 lower-tf 数据落入的桶返回 NaN，而不是 0**。这一点是刻意区分的：
+    Pine 里 `array.sum()` 对空数组给 `na`，`0` 会被 `na(ltfDelta) ? estDelta : ltfDelta`
+    当成「买卖完全均衡」的合法读数。填 0 会让长窗口（1m 只覆盖后 90 天）的前半段
+    全部变成零 delta，信号永不触发——实测 1h×365 天 8711 根里只有 2244 根非零，
+    整段寻优得到 8/8 `no_trades` 就是这个原因。
     """
     if len(lower_delta) == 0 or len(parent_index) == 0:
-        return pd.Series(0.0, index=parent_index, dtype=float)
+        return pd.Series(np.nan, index=parent_index, dtype=float)
     stamps = parent_index.as_unit("ms").asi8
     lower_stamps = lower_delta.index.as_unit("ms").asi8
     pos = np.searchsorted(stamps, lower_stamps, side="right") - 1
     keep = pos >= 0
     pos = np.clip(pos, 0, len(stamps) - 1)
     totals = np.zeros(len(stamps), dtype=float)
+    counts = np.zeros(len(stamps), dtype=float)
     np.add.at(totals, pos[keep], lower_delta.to_numpy()[keep])
-    return pd.Series(totals, index=parent_index)
+    np.add.at(counts, pos[keep], 1.0)
+    series = pd.Series(totals, index=parent_index)
+    series[counts == 0] = np.nan
+    return series
 
 
 # 脚本的 lower-tf 映射（tfSec → ltf）：低于 1h 的图一律用 1m，4h 用 5m，日线用 15m。
@@ -239,18 +249,19 @@ def add_absorption_context(
 
     n = len(data)
     rng = high - low
-    # delta 优先走脚本的 lower-tf intrabar 分支；没有 lower-tf 数据时退化为脚本自带的
-    # bar shape 估计（宁可注明数据限制，也不悄悄换成别的算法）
-    if lower_tf_delta is not None:
-        delta = (
-            pd.to_numeric(lower_tf_delta, errors="coerce")
-            .reindex(data.index)
-            .fillna(0.0)
-            .to_numpy()
+    # delta 优先走脚本的 lower-tf intrabar 分支；lower-tf 没覆盖到的 bar 按脚本语义
+    # 逐根退化为 bar shape 估计（`na(ltfDelta) ? estDelta : ltfDelta`）。
+    # 不能整段二选一：1m 只有 94 天，长窗口若整段用 lower 会让前半段 delta 恒为 0，
+    # 若整段改用 est 又会让「与实盘同源」的那 94 天失真。
+    with np.errstate(divide="ignore", invalid="ignore"):
+        est_delta = np.where(
+            rng > 0, volume * (2.0 * close - high - low) / np.where(rng > 0, rng, 1.0), 0.0
         )
+    if lower_tf_delta is not None:
+        aligned = pd.to_numeric(lower_tf_delta, errors="coerce").reindex(data.index)
+        delta = aligned.fillna(pd.Series(est_delta, index=data.index)).to_numpy()
     else:
-        with np.errstate(divide="ignore", invalid="ignore"):
-            delta = np.where(rng > 0, volume * (2.0 * close - high - low) / np.where(rng > 0, rng, 1.0), 0.0)
+        delta = est_delta
     abs_delta = np.abs(delta)
     with np.errstate(divide="ignore", invalid="ignore"):
         dominance = np.where(volume > 0, abs_delta / np.where(volume > 0, volume, 1.0) * 100.0, 0.0)
