@@ -76,7 +76,11 @@ def open_live(db: Session, signal) -> Order | None:
         log(db, "error", f"live 开仓被拒绝: 未配置币安 API 凭证 {getattr(signal, 'symbol', '')}")
         return None
     params = getattr(signal, "params", None) or resolve_order_params(
-        db, signal.strategy, signal.interval, getattr(signal, "pool", "")
+        db,
+        signal.strategy,
+        signal.interval,
+        getattr(signal, "pool", ""),
+        symbol=getattr(signal, "symbol", ""),
     )
     if not entry_gates(db, signal, params, ignore_cooldown=False):
         return None

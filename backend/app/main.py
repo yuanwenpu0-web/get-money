@@ -6,7 +6,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .api import backtests, bindings, indicators, market, pools, settings, strategies, trading
+from .api import (
+    backtests,
+    bindings,
+    indicators,
+    market,
+    optimizations,
+    pools,
+    settings,
+    strategies,
+    symbol_params,
+    trading,
+)
 from .config import BASE_DIR
 from .db import SessionLocal, init_db
 from .state import all_state, ensure_default_state
@@ -44,7 +55,9 @@ app.include_router(indicators.router, prefix="/api")
 app.include_router(strategies.router, prefix="/api")
 app.include_router(pools.router, prefix="/api")
 app.include_router(bindings.router, prefix="/api")
+app.include_router(symbol_params.router, prefix="/api")
 app.include_router(backtests.router, prefix="/api")
+app.include_router(optimizations.router, prefix="/api")
 app.include_router(trading.router, prefix="/api")
 
 

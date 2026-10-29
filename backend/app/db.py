@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from .config import (
     DATABASE_URL,
@@ -12,7 +13,15 @@ from .config import (
 IS_SQLITE = DATABASE_URL.startswith("sqlite")
 
 
-def make_engine(url: str | None = None, read_only: bool = False, echo: bool = False) -> Engine:
+def make_engine(
+    url: str | None = None,
+    read_only: bool = False,
+    echo: bool = False,
+    *,
+    pool_size: int | None = None,
+    max_overflow: int | None = None,
+    null_pool: bool = False,
+) -> Engine:
     """按方言构建 Engine。
 
     SQLite 需要 check_same_thread=False（FastAPI 多线程共享连接）；
@@ -21,6 +30,10 @@ def make_engine(url: str | None = None, read_only: bool = False, echo: bool = Fa
     read_only=True 时：
     - SQLite 用 mode=ro 的 URI（需要传入普通 sqlite:/// path 形式）
     - PostgreSQL 在连接池层设置 default_transaction_read_only
+
+    `null_pool=True` 给**寻优进程池的 worker** 用：每个 worker 进程一条连接、
+    用完即关。默认连接池（5+10）在 20 个进程下会瞬间打满 PostgreSQL 的
+    max_connections，而 worker 的生命周期里只做顺序查询，池化收益为零。
     """
     target = url or DATABASE_URL
     is_local_sqlite = target.startswith("sqlite")
@@ -39,11 +52,16 @@ def make_engine(url: str | None = None, read_only: bool = False, echo: bool = Fa
         # PostgreSQL：只在这里挂排查型参数，SQLite 不接受这些
         kwargs.update(
             pool_pre_ping=True,
-            pool_size=DB_POOL_SIZE,
-            max_overflow=DB_MAX_OVERFLOW,
             pool_recycle=1800,
             connect_args={"connect_timeout": DB_CONNECT_TIMEOUT},
         )
+        if null_pool:
+            kwargs["poolclass"] = NullPool
+        else:
+            kwargs["pool_size"] = pool_size if pool_size is not None else DB_POOL_SIZE
+            kwargs["max_overflow"] = (
+                max_overflow if max_overflow is not None else DB_MAX_OVERFLOW
+            )
 
     engine = create_engine(target, **kwargs)
 

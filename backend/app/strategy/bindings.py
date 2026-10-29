@@ -8,6 +8,8 @@
 - `absorption_reversal × alt   × 1m`（短线，只做多）
 
 参数三层合并：全局设置 < 策略默认 < 本条绑定的 params（见 `rules.resolve_params`）。
+再往上还有一层**币种级覆盖**（`symbol_params` 表）：同一绑定内，某些币种可以带
+自己寻优得到的参数，见 `params_for()`。
 
 同一币种可能同时落进多个池（如 BTC 既在 major 又在 all）：各绑定独立评估，
 巡检按评分择优只开一仓，不做互斥校验，避免池组合被卡死。
@@ -16,7 +18,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from sqlalchemy.orm import Session
 
@@ -26,6 +28,7 @@ from ..state import all_state
 from .pools import load_pool_spec, pool_symbols
 from .registry import get_spec, has_spec
 from .rules import resolve_params
+from .symbol_params import get_override, load_map
 
 
 @dataclass(frozen=True)
@@ -39,14 +42,41 @@ class ResolvedBinding:
     priority: int
     params: dict
     symbols: tuple[str, ...]
+    # 该「策略 × 周期」下的币种覆盖（symbol → 覆盖层）。巡检一次展开几百个
+    # (币种, 绑定) 对，逐条查库会把 SQL 往返变成瓶颈，所以在解析绑定时一次性载入。
+    symbol_overrides: dict = field(default_factory=dict)
 
     @property
     def key(self) -> tuple[str, str, str]:
         return (self.strategy, self.pool, self.interval)
 
+    def params_for(self, symbol: str) -> dict:
+        """单个币种的最终参数：绑定参数 + 该币种的覆盖。"""
+        override = self.symbol_overrides.get(symbol)
+        if not override:
+            return self.params
+        try:
+            # self.params 是完整解析结果（含 fee_rate / slippage），而
+            # resolve_params 拒绝把成本当覆盖传进来，必须先把这两键剔掉
+            layer = {
+                key: value
+                for key, value in {**self.params, **override}.items()
+                if key not in ("fee_rate", "slippage")
+            }
+            resolved = resolve_params(self.strategy, {}, layer, interval=self.interval)
+            resolved["fee_rate"] = self.params["fee_rate"]
+            resolved["slippage"] = self.params["slippage"]
+            return resolved
+        except Exception:
+            # 覆盖行被手改坏时宁可退回绑定参数，也不让整个币种停止评估
+            return self.params
+
 
 def binding_params(db: Session, binding: StrategyBinding, state: dict | None = None) -> dict:
-    """单条绑定的有效参数（三层合并 + 校验）。"""
+    """单条绑定的有效参数（三层合并 + 校验），不含任何币种级覆盖。
+
+    币种级覆盖在本层之上，见 `ResolvedBinding.params_for()` / `resolve_order_params()`。
+    """
     overrides = json.loads(binding.params or "{}")
     if not isinstance(overrides, dict):
         raise ValueError("绑定参数必须是 JSON 对象")
@@ -104,6 +134,8 @@ def active_bindings(
 
     bindings: list[ResolvedBinding] = []
     errors: list[str] = []
+    # 覆盖表整体很小（正常只有几十行），一次取回再切片，避免逐币查库
+    overrides_all = load_map(db) if rows else {}
     for row in rows:
         if row.strategy_code not in enabled_strategies:
             continue
@@ -119,6 +151,11 @@ def active_bindings(
             continue
         if not members:
             continue
+        symbol_overrides = {
+            symbol: overrides_all[(row.strategy_code, symbol, row.interval)]
+            for symbol in members
+            if (row.strategy_code, symbol, row.interval) in overrides_all
+        }
         bindings.append(
             ResolvedBinding(
                 id=row.id,
@@ -128,6 +165,7 @@ def active_bindings(
                 priority=int(row.priority or 0),
                 params=params,
                 symbols=tuple(members),
+                symbol_overrides=symbol_overrides,
             )
         )
     return bindings, errors
@@ -139,41 +177,14 @@ def expand(bindings: list[ResolvedBinding]) -> list[tuple[str, ResolvedBinding]]
 
 
 def binding_overrides(
-    db: Session, strategy: str, pool: str, interval: str
+    db: Session, strategy: str, pool: str, interval: str, symbol: str = ""
 ) -> dict | None:
-    """绑定的原始参数覆盖层（未与全局合并）。
+    """绑定的原始参数覆盖层（未与全局合并），传 symbol 时叠上该币种的覆盖。
 
     回测走这条：和实盘完全同一层参数，避免「回测用策略配置、实盘用绑定」的口径分裂。
-    没有对应绑定时返回 None，调用方回落到策略配置。
+    没有对应绑定也没有币种覆盖时返回 None，调用方回落到策略配置。
     """
-    if not pool:
-        return None
-    row = (
-        db.query(StrategyBinding)
-        .filter(
-            StrategyBinding.strategy_code == strategy,
-            StrategyBinding.pool_code == pool,
-            StrategyBinding.interval == interval,
-        )
-        .first()
-    )
-    if row is None:
-        return None
-    try:
-        overrides = json.loads(row.params or "{}")
-    except ValueError:
-        return None
-    return overrides if isinstance(overrides, dict) else None
-
-
-def resolve_order_params(
-    db: Session, strategy: str, interval: str, pool: str = "", state: dict | None = None
-) -> dict:
-    """订单/信号所属绑定的有效参数。
-
-    优先级：绑定（strategy × pool × interval）> 策略配置行 > 策略默认。
-    老订单没有 pool，或手工构造的信号没有对应绑定，都会回落到策略配置，行为与改造前一致。
-    """
+    layer: dict | None = None
     if pool:
         row = (
             db.query(StrategyBinding)
@@ -185,13 +196,67 @@ def resolve_order_params(
             .first()
         )
         if row is not None:
-            return binding_params(db, row, state)
-    config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
-    overrides = json.loads(config.params or "{}") if config else None
+            try:
+                parsed = json.loads(row.params or "{}")
+            except ValueError:
+                parsed = None
+            if isinstance(parsed, dict) and parsed:
+                layer = parsed
+    if symbol:
+        override = get_override(db, strategy, symbol, interval)
+        if override:
+            layer = {**(layer or {}), **override}
+    return layer
+
+
+def resolve_order_params(
+    db: Session,
+    strategy: str,
+    interval: str,
+    pool: str = "",
+    state: dict | None = None,
+    symbol: str = "",
+) -> dict:
+    """订单/信号所属绑定的有效参数（含该币种的覆盖层）。
+
+    优先级：币种覆盖 > 绑定（strategy × pool × interval）> 策略配置行 > 策略默认。
+    老订单没有 pool，或手工构造的信号没有对应绑定，都会回落到策略配置，行为与改造前一致。
+    """
+    layer: dict = {}
+    matched = False
+    if pool:
+        row = (
+            db.query(StrategyBinding)
+            .filter(
+                StrategyBinding.strategy_code == strategy,
+                StrategyBinding.pool_code == pool,
+                StrategyBinding.interval == interval,
+            )
+            .first()
+        )
+        if row is not None:
+            try:
+                parsed = json.loads(row.params or "{}")
+            except ValueError:
+                parsed = None
+            if isinstance(parsed, dict):
+                layer.update(parsed)
+                matched = True
+    if not matched:
+        config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
+        if config is not None:
+            try:
+                parsed = json.loads(config.params or "{}")
+            except ValueError:
+                parsed = None
+            if isinstance(parsed, dict):
+                layer.update(parsed)
+    if symbol:
+        layer.update(get_override(db, strategy, symbol, interval))
     return resolve_params(
         strategy,
         state if state is not None else all_state(db),
-        overrides or None,
+        layer or None,
         interval=interval,
     )
 

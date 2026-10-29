@@ -141,3 +141,56 @@ class BacktestRequest(BaseModel):
 class OrderPatch(BaseModel):
     sl: float | None = None
     tp: float | None = None
+
+
+class OptimizationPayload(BaseModel):
+    """一键全币种参数寻优的请求。
+
+    `symbols` 留空时按 `pool` 展开；`pool` 也留空则取该周期上历史足够的所有币种。
+    """
+
+    model_config = ConfigDict(allow_inf_nan=False, extra='forbid')
+    strategy: str = Field(min_length=2, max_length=48)
+    interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] = '15m'
+    pool: str | None = None
+    symbols: list[str] | None = None
+    days: int = Field(default=90, ge=30, le=720)
+    train_ratio: float = Field(default=0.7, ge=.5, le=.85)
+    combos: int = Field(default=64, ge=4, le=512)
+    workers: int = Field(default=0, ge=0, le=24)
+    min_trades: int = Field(default=5, ge=1, le=500)
+    objective: Literal['return_dd', 'sharpe'] = 'return_dd'
+    delta_source: Literal['auto', 'lower', 'est'] = 'auto'
+    grid: dict[str, list] | None = None
+    seed: int = 7
+
+
+class OptimizationApply(BaseModel):
+    """把寻优结果落到线上。
+
+    mode=symbol → 写币种级参数覆盖（立即对巡检生效，绑定不变）
+    mode=pool   → 按参数聚类新建池 + 绑定（默认停用，需手工启用）
+    """
+
+    model_config = ConfigDict(extra='forbid')
+    mode: Literal['symbol', 'pool'] = 'symbol'
+    symbols: list[str] | None = None      # 留空 = 该次任务的全部结果
+    only: Literal['all', 'positive', 'pass'] = 'positive'
+    pool_prefix: str = Field(default='', max_length=24)
+
+
+class SymbolParamPayload(BaseModel):
+    """手工写入币种级参数覆盖。"""
+
+    model_config = ConfigDict(extra='forbid')
+    strategy: str = Field(min_length=2, max_length=48)
+    interval: Literal['1m', '5m', '15m', '1h', '4h', '1d']
+    params: dict[str, dict]               # {symbol: {参数覆盖}}
+    note: str = Field(default='', max_length=200)
+
+
+class SymbolParamDelete(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    strategy: str = Field(min_length=2, max_length=48)
+    interval: Literal['1m', '5m', '15m', '1h', '4h', '1d']
+    symbols: list[str]

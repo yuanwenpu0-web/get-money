@@ -15,6 +15,7 @@ from ..state import all_state
 from ..utils import interval_ms, now_ms, round_price
 from .registry import StrategySpec, get_spec
 from .rules import evaluate_signals, prepare_frame, resolve_params
+from .symbol_params import get_override
 
 
 def _fingerprint(params: dict) -> str:
@@ -146,6 +147,9 @@ class StrategyEngine:
             return None
         if params is None:
             merged = json.loads(config.params or "{}") if config else {}
+            # 未显式传入时也叠上该币种的参数覆盖，保证「不传 params」的调用
+            # 与巡检/回测取出同一套参数
+            merged.update(get_override(self.db, strategy_code, symbol, interval))
             params = resolve_params(
                 strategy_code, self._get_state(), merged or None, interval=interval
             )

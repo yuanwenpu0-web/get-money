@@ -38,9 +38,14 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
     result = {"order_id": order.id, "actions": []}
     if order.status != "OPEN" or not order.created_at:
         return result
-    # 订单必须用「它所属那条绑定」的参数管理，否则池级覆盖（止损宽度/时间止损）会失效
+    # 订单必须用「它所属那条绑定 + 该币种覆盖」的参数管理，否则池级或币种级覆盖
+    # （止损宽度 / 目标 R / 时间止损）会失效
     params = resolve_order_params(
-        db, order.strategy, order.interval, getattr(order, "pool", "")
+        db,
+        order.strategy,
+        order.interval,
+        getattr(order, "pool", ""),
+        symbol=order.symbol,
     )
     step, created = interval_ms(order.interval), dt_ms(order.created_at)
     key = f"order_cursor:{order.id}"

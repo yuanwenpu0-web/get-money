@@ -109,6 +109,31 @@ class SymbolPool(Base):
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
+class SymbolParam(Base):
+    """币种级参数覆盖：同一策略、同一周期，某个币种可以有自己的参数。
+
+    参数优先级：全局设置 < 策略默认 < 绑定 params < 本表。
+    只有「真的按币种寻出不同最优参数」时才写这一行——绝大多数币种应当沿用
+    绑定参数，覆盖表保持小而可审计。`source=optimization` 的记录带 `run_id`，
+    可以追溯到是哪一次参数寻优写进来的。
+    """
+
+    __tablename__ = "symbol_params"
+    __table_args__ = (
+        UniqueConstraint("strategy_code", "symbol", "interval", name="uq_symbol_param"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    strategy_code = Column(String(48), nullable=False, index=True)
+    symbol = Column(String(24), nullable=False, index=True)
+    interval = Column(String(8), nullable=False)
+    params = Column(Text, default="{}")           # JSON 对象，覆盖绑定/策略默认
+    source = Column(String(32), default="manual")  # manual / optimization
+    run_id = Column(Integer, default=0)            # 产生该覆盖的寻优任务
+    note = Column(String(200), default="")
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
 class StrategyBinding(Base):
     """策略 × 币种池 的运行绑定：一条绑定 = 一套完整参数 + 一个K线周期。
 
@@ -254,6 +279,51 @@ class BacktestRun(Base):
     status = Column(String(16), default="running")
     error = Column(Text, default="")
     created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
+class OptimizationRun(Base):
+    """一次全币种参数寻优任务。
+
+    结果落在 `optimization_results`（每币种一行），本表只存任务级配置与进度，
+    避免前端轮询时把 500 多行结果一起拉回来。
+    """
+
+    __tablename__ = "optimization_runs"
+
+    id = Column(Integer, primary_key=True)
+    strategy = Column(String(48), nullable=False)
+    interval = Column(String(8), nullable=False)
+    pool = Column(String(48), default="")        # 空 = 全部有足够历史的币种
+    days = Column(Integer, default=90)
+    windows = Column(Integer, default=3)
+    workers = Column(Integer, default=0)         # 0 = 自动（CPU-4）
+    status = Column(String(16), default="pending")  # pending/running/done/failed/cancelled
+    config = Column(Text, default="{}")          # 网格、基准参数、成本、门槛
+    progress = Column(Text, default="{}")        # total/done/failed/elapsed/eta/current
+    summary = Column(Text, default="{}")         # 计数与最优分布统计
+    error = Column(Text, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+    finished_at = Column(DateTime(timezone=True), default=None)
+
+
+class OptimizationResult(Base):
+    """寻优结果：单币种的最优参数、逐窗口指标与判定。"""
+
+    __tablename__ = "optimization_results"
+    __table_args__ = (
+        UniqueConstraint("run_id", "symbol", name="uq_optimization_result"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    run_id = Column(Integer, nullable=False, index=True)
+    symbol = Column(String(24), nullable=False, index=True)
+    params = Column(Text, default="{}")          # 最优组合（只存与基准不同的键）
+    params_before = Column(Text, default="{}")   # 寻优前该币种实际生效的参数
+    metrics = Column(Text, default="{}")         # 训练/验证逐窗指标与合计
+    score = Column(Float, default=0.0)
+    verdict = Column(String(24), default="")     # pass/inconclusive/negative/no_trades/insufficient
+    applied_mode = Column(String(24), default="")  # 应用方式（留痕）
+    applied_at = Column(DateTime(timezone=True), default=None)
 
 
 class JobLog(Base):

@@ -88,6 +88,41 @@ RANGES = {
 # 显式声明整数键：除了 `*_bars` 后缀的自动判断，其余整数字段必须写在这里
 INT_KEYS = ("conf_mode", "direction_mode", "trend_mode", "extreme_lookback", "conf_window_bars")
 
+# 参数寻优搜索空间。只放「业务上有意义且真的会改变读数」的档位：
+# - conf_mode：0 = 吸收 bar 收盘直接入场（信号多一个数量级），1 = 等穿越确认（脚本默认）
+# - delta_pct：滚动百分位门槛，决定「多大算放量」
+# - min_score：评分门槛，等价于换手率旋钮
+# - target_r / be_trigger_r / max_hold_bars：出场结构，历史检验里最敏感的一层
+# - sl_buffer_atr：结构止损外扩，直接决定止损宽度与 R 的分母
+# 全组合 2×3×3×3×2×3×3 = 972；默认只随机采样其中一部分（见 backtest/optimizer.py）。
+GRID = {
+    "conf_mode": (0, 1),
+    "delta_pct": (90.0, 95.0, 98.0),
+    "min_score": (0.55, 0.70, 0.80),
+    "target_r": (1.5, 2.0, 3.0),
+    "be_trigger_r": (0.0, 1.0),
+    # 不能低于全局 min_hold_bars（默认 30）：parser 会拒绝
+    # 「max_hold_bars < min_hold_bars」，那样的组合既跑不出实盘行为也写不进覆盖表
+    "max_hold_bars": (30, 45, 60),
+    "sl_buffer_atr": (0.15, 0.25, 0.40),
+}
+
+# add_absorption_context 消费的参数：这些一变，prepared 帧就得重算
+PREPARE_KEYS = (
+    "delta_window",
+    "delta_pct",
+    "body_mult",
+    "extreme_lookback",
+    "wick_mult",
+    "dominance_pct",
+    "abs_gap_bars",
+    "legacy_gap_logic",
+    "conf_mode",
+    "conf_window_bars",
+    "sl_buffer_atr",
+    "trend_len",
+)
+
 
 def lookback(params: dict) -> int:
     """|delta| 百分位要 delta_window 根窗口，EMA(trend_len) 要 3 倍跨度预热；
@@ -254,6 +289,8 @@ SPEC = register(
         describe=describe,
         bool_keys=("legacy_gap_logic", "funding_filter", "cost_filter", "regime_filter", "trailing_enabled"),
         int_keys=INT_KEYS,
+        grid=GRID,
+        prepare_keys=PREPARE_KEYS,
         # 默认**不启用**：docs/absorption-reversal-strategy.md 三窗 × 主流币 15m 检验
         # 池化 88/106 笔的每笔期望 95% CI 跨 0（不可判定），放宽灵敏度后转负。
         # 移植已完整落地、可在「策略 × 池」绑定上手动开启，但在补齐 1m 历史、

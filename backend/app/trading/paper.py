@@ -49,7 +49,11 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
     state = all_state(db)
     # 信号自带参数（来自「策略 × 池」绑定）；否则按订单归属反查，最后才回落策略配置
     params = getattr(signal, "params", None) or resolve_order_params(
-        db, signal.strategy, signal.interval, getattr(signal, "pool", "")
+        db,
+        signal.strategy,
+        signal.interval,
+        getattr(signal, "pool", ""),
+        symbol=getattr(signal, "symbol", ""),
     )
     if not entry_gates(db, signal, params, ignore_cooldown):
         return None

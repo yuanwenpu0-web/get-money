@@ -127,8 +127,8 @@ def run_backtest(
     slippage = float(slippage if slippage is not None else state["slippage"])
     if not math.isfinite(initial) or initial <= 0 or not 0.5 <= train_ratio <= 0.85:
         raise ValueError("初始资金或训练占比无效")
-    # 指定池时用「策略 × 池」绑定的参数覆盖层，与实盘走同一套参数
-    bound = binding_overrides(db, strategy, pool or "", interval)
+    # 指定池时用「策略 × 池」绑定的参数覆盖层，再叠该币种的覆盖，与实盘走同一套参数
+    bound = binding_overrides(db, strategy, pool or "", interval, symbol=symbol)
     if bound is not None:
         overrides = dict(bound)
     else:

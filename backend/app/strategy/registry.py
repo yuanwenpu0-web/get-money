@@ -8,6 +8,7 @@
 | `lookback(params)` | 指标预热需要多少根K线（决定取数窗口） |
 | `prepare(frame, params, ctx)` | 策略自有特征或上下文富化（只加列、纯因果） |
 | `signals(frame, params)` | 产出统一信号帧（`signals.SIGNAL_COLUMNS`） |
+| `grid` | 参数寻优的候选值（每键一组离散取值，笛卡尔积过大时随机采样） |
 
 新增一个 TradingView 迁移过来的策略 = 在 `specs/` 下加一个模块并调用 `register()`：
 引擎、巡检、回测、撮合、参数校验、API 全部自动复用，不需要改任何公用代码。
@@ -59,6 +60,13 @@ class StrategySpec:
     # 首次入库时是否默认启用；未通过统计检验的策略应显式设为 False
     default_enabled: bool = True
     tags: tuple[str, ...] = field(default_factory=tuple)
+    # 参数寻优的搜索空间：`{参数名: [候选值, ...]}`。
+    # 声明业务上真的会取的离散档位，而不是把 ranges 整个区间铺开——吸收阈值的
+    # 90/95/97 分位有实际含义，88.3 分位没有。空 dict 表示该策略不支持寻优。
+    grid: dict[str, tuple] = field(default_factory=dict)
+    # 会影响 `prepare()` 输出的参数键。寻优时同一币种的组合按这组键分组，
+    # 组内复用同一份已富化的帧（prepare 要算滚动百分位，是每币最贵的一步）。
+    prepare_keys: tuple[str, ...] = ()
 
 
 _SPECS: dict[str, StrategySpec] = {}

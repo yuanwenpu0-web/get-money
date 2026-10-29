@@ -96,7 +96,7 @@ class TradingService:
                         binding.interval,
                         binding.strategy,
                         save=True,
-                        params=binding.params,
+                        params=binding.params_for(symbol),
                         pool=binding.pool,
                     )
                     strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
