@@ -1,0 +1,3578 @@
+{
+  "config": {
+    "as_of": "2026-10-30 16:32:31.759000+00:00",
+    "days": 400,
+    "interval": "1h",
+    "cap_bars": 336,
+    "confirm_pct": 0.01,
+    "min_drawdown_pct": 0.05,
+    "pivot_min_gap": 6,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "round_trip_cost_pct": 0.12,
+    "atr_len": 14,
+    "random_draws": 40,
+    "n_boot": 2000,
+    "symbols_requested": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "BNBUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "ADAUSDT",
+      "LINKUSDT",
+      "AVAXUSDT",
+      "LTCUSDT",
+      "DOTUSDT",
+      "SUIUSDT",
+      "TRXUSDT",
+      "NEARUSDT",
+      "APTUSDT",
+      "BCHUSDT",
+      "ATOMUSDT",
+      "ETCUSDT",
+      "FILUSDT",
+      "HBARUSDT",
+      "ICPUSDT",
+      "IMXUSDT",
+      "TONUSDT",
+      "VETUSDT",
+      "RNDRUSDT",
+      "AAVEUSDT"
+    ],
+    "symbols_used": [
+      "AAVEUSDT",
+      "ADAUSDT",
+      "APTUSDT",
+      "ATOMUSDT",
+      "AVAXUSDT",
+      "BCHUSDT",
+      "BNBUSDT",
+      "BTCUSDT",
+      "DOGEUSDT",
+      "DOTUSDT",
+      "ETCUSDT",
+      "ETHUSDT",
+      "FILUSDT",
+      "HBARUSDT",
+      "ICPUSDT",
+      "IMXUSDT",
+      "LINKUSDT",
+      "LTCUSDT",
+      "NEARUSDT",
+      "SOLUSDT",
+      "SUIUSDT",
+      "TRXUSDT",
+      "VETUSDT",
+      "XRPUSDT"
+    ],
+    "skipped": {
+      "TONUSDT": "K线不足: 0",
+      "RNDRUSDT": "K线不足: 0"
+    },
+    "errors": {},
+    "total_entries": 806
+  },
+  "summary": {
+    "entries": 806,
+    "train_entries": 571,
+    "test_entries": 235,
+    "random_control_mean_pct": 5.2034,
+    "benchmark_mean_pct": 4.3886,
+    "available_move_mean_pct": 18.3644,
+    "train_pick": "hold_72",
+    "train_pick_mean_pct": 8.5232,
+    "test_best": "trail_10pct_t336",
+    "test_best_mean_pct": 3.4954,
+    "rank_corr_train_test": -0.2584,
+    "rank_corr_ideal_vs_open": 0.9936
+  },
+  "rules": {
+    "hold_24": {
+      "name": "hold_24",
+      "desc": "持有 24 根后收盘平仓",
+      "mean_net_pct": 5.4147,
+      "median_net_pct": 2.6906,
+      "win_rate": 0.727,
+      "mean_hold_bars": 23.0,
+      "capture_pct": 20.45,
+      "ci": {
+        "n": 806,
+        "mean": 5.4147,
+        "ci_low": 4.4936,
+        "ci_high": 6.3974,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": 0.2113,
+        "ci_low": -0.5559,
+        "ci_high": 0.8999,
+        "positive_share": 0.7035,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 1.0261,
+        "ci_low": 0.0145,
+        "ci_high": 1.9878,
+        "positive_share": 0.9765,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "time": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 535,
+        "median_account_return_pct": 152.63,
+        "mean_account_return_pct": 200.69,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 6.8305,
+      "test_mean_net_pct": 1.9747,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 1.9747,
+        "ci_low": 1.3391,
+        "ci_high": 2.4697,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.8108,
+        "ci_low": -2.9491,
+        "ci_high": 1.2296,
+        "positive_share": 0.216,
+        "verdict": "inconclusive"
+      }
+    },
+    "hold_72": {
+      "name": "hold_72",
+      "desc": "持有 72 根后收盘平仓",
+      "mean_net_pct": 6.5727,
+      "median_net_pct": 2.7761,
+      "win_rate": 0.6526,
+      "mean_hold_bars": 71.0,
+      "capture_pct": 21.09,
+      "ci": {
+        "n": 806,
+        "mean": 6.5727,
+        "ci_low": 5.3089,
+        "ci_high": 7.915,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": 1.3693,
+        "ci_low": 0.912,
+        "ci_high": 1.8348,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 2.1841,
+        "ci_low": 1.5071,
+        "ci_high": 2.8634,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "time": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 370,
+        "median_account_return_pct": 171.78,
+        "mean_account_return_pct": 209.59,
+        "positive_symbols": 23
+      },
+      "train_mean_net_pct": 8.5232,
+      "test_mean_net_pct": 1.8334,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 1.8334,
+        "ci_low": 0.2204,
+        "ci_high": 3.5017,
+        "positive_share": 0.9875,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.9521,
+        "ci_low": -2.155,
+        "ci_high": 0.2307,
+        "positive_share": 0.056,
+        "verdict": "inconclusive"
+      }
+    },
+    "hold_168": {
+      "name": "hold_168",
+      "desc": "持有 168 根(7天)后收盘平仓",
+      "mean_net_pct": 4.3886,
+      "median_net_pct": 2.8699,
+      "win_rate": 0.603,
+      "mean_hold_bars": 167.0,
+      "capture_pct": 20.97,
+      "ci": {
+        "n": 806,
+        "mean": 4.3886,
+        "ci_low": 2.969,
+        "ci_high": 5.8435,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.8148,
+        "ci_low": -1.2534,
+        "ci_high": -0.4064,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "positive_share": 0.0,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 252,
+        "median_account_return_pct": 65.32,
+        "mean_account_return_pct": 106.97,
+        "positive_symbols": 21
+      },
+      "train_mean_net_pct": 5.1905,
+      "test_mean_net_pct": 2.4402,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.4402,
+        "ci_low": -0.3017,
+        "ci_high": 5.3664,
+        "positive_share": 0.959,
+        "verdict": "inconclusive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3453,
+        "ci_low": -1.1594,
+        "ci_high": 0.462,
+        "positive_share": 0.1885,
+        "verdict": "inconclusive"
+      }
+    },
+    "hold_336": {
+      "name": "hold_336",
+      "desc": "持有 336 根(14天)后收盘平仓",
+      "mean_net_pct": 3.4607,
+      "median_net_pct": 1.7136,
+      "win_rate": 0.5459,
+      "mean_hold_bars": 335.0,
+      "capture_pct": 13.37,
+      "ci": {
+        "n": 806,
+        "mean": 3.4607,
+        "ci_low": 1.8418,
+        "ci_high": 5.1428,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -1.7427,
+        "ci_low": -2.3544,
+        "ci_high": -1.064,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.9279,
+        "ci_low": -1.8252,
+        "ci_high": -0.0337,
+        "positive_share": 0.0235,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "time": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 196,
+        "median_account_return_pct": 84.1,
+        "mean_account_return_pct": 87.56,
+        "positive_symbols": 21
+      },
+      "train_mean_net_pct": 3.9373,
+      "test_mean_net_pct": 2.3025,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp2_sl1": {
+      "name": "tp2_sl1",
+      "desc": "止盈 +2ATR / 止损 -1ATR",
+      "mean_net_pct": 5.0926,
+      "median_net_pct": 2.9326,
+      "win_rate": 0.8102,
+      "mean_hold_bars": 3.7,
+      "capture_pct": 23.01,
+      "ci": {
+        "n": 806,
+        "mean": 5.0926,
+        "ci_low": 4.266,
+        "ci_high": 6.0384,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.1108,
+        "ci_low": -1.1885,
+        "ci_high": 0.806,
+        "positive_share": 0.4055,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.704,
+        "ci_low": -0.5953,
+        "ci_high": 1.8569,
+        "positive_share": 0.85,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 653,
+        "stop": 153
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 765,
+        "median_account_return_pct": 252.5,
+        "mean_account_return_pct": 362.73,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 6.211,
+      "test_mean_net_pct": 2.3751,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.3751,
+        "ci_low": 2.1136,
+        "ci_high": 2.6643,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.4103,
+        "ci_low": -2.6231,
+        "ci_high": 1.6709,
+        "positive_share": 0.357,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp3_sl1": {
+      "name": "tp3_sl1",
+      "desc": "止盈 +3ATR / 止损 -1ATR",
+      "mean_net_pct": 4.9642,
+      "median_net_pct": 3.2715,
+      "win_rate": 0.5993,
+      "mean_hold_bars": 11.3,
+      "capture_pct": 20.23,
+      "ci": {
+        "n": 806,
+        "mean": 4.9642,
+        "ci_low": 4.1799,
+        "ci_high": 5.8839,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.2391,
+        "ci_low": -1.1769,
+        "ci_high": 0.5828,
+        "positive_share": 0.2935,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.5757,
+        "ci_low": -0.5858,
+        "ci_high": 1.6594,
+        "positive_share": 0.827,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 483,
+        "stop": 323
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 680,
+        "median_account_return_pct": 232.59,
+        "mean_account_return_pct": 290.49,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 6.0899,
+      "test_mean_net_pct": 2.2291,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.2291,
+        "ci_low": 1.833,
+        "ci_high": 2.6753,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.5564,
+        "ci_low": -2.8424,
+        "ci_high": 1.5213,
+        "positive_share": 0.3065,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp5_sl1": {
+      "name": "tp5_sl1",
+      "desc": "止盈 +5ATR / 止损 -1ATR",
+      "mean_net_pct": 4.5696,
+      "median_net_pct": -1.4499,
+      "win_rate": 0.3722,
+      "mean_hold_bars": 33.4,
+      "capture_pct": -12.22,
+      "ci": {
+        "n": 806,
+        "mean": 4.5696,
+        "ci_low": 3.7006,
+        "ci_high": 5.583,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.6337,
+        "ci_low": -1.4472,
+        "ci_high": 0.086,
+        "positive_share": 0.0405,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.1811,
+        "ci_low": -0.889,
+        "ci_high": 1.1828,
+        "positive_share": 0.6245,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 296,
+        "stop": 506,
+        "cap": 4
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 556,
+        "median_account_return_pct": 180.24,
+        "mean_account_return_pct": 210.12,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 5.6957,
+      "test_mean_net_pct": 1.8336,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 1.8336,
+        "ci_low": 1.1196,
+        "ci_high": 2.6718,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.9518,
+        "ci_low": -3.1146,
+        "ci_high": 0.985,
+        "positive_share": 0.1805,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp3_nostop": {
+      "name": "tp3_nostop",
+      "desc": "只挂 +3ATR 止盈，无止损",
+      "mean_net_pct": 4.8796,
+      "median_net_pct": 4.5953,
+      "win_rate": 0.835,
+      "mean_hold_bars": 84.0,
+      "capture_pct": 33.4,
+      "ci": {
+        "n": 806,
+        "mean": 4.8796,
+        "ci_low": 3.6522,
+        "ci_high": 5.9408,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.3238,
+        "ci_low": -1.1531,
+        "ci_high": 0.4031,
+        "positive_share": 0.1995,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.491,
+        "ci_low": -0.6259,
+        "ci_high": 1.4744,
+        "positive_share": 0.821,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 669,
+        "cap": 137
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 400,
+        "median_account_return_pct": 152.72,
+        "mean_account_return_pct": 157.5,
+        "positive_symbols": 23
+      },
+      "train_mean_net_pct": 5.8734,
+      "test_mean_net_pct": 2.4648,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.4648,
+        "ci_low": 0.6708,
+        "ci_high": 4.1048,
+        "positive_share": 0.995,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3207,
+        "ci_low": -1.5406,
+        "ci_high": 0.9483,
+        "positive_share": 0.31,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp5pct_sl2pct": {
+      "name": "tp5pct_sl2pct",
+      "desc": "止盈 +5% / 止损 -2%",
+      "mean_net_pct": 4.9391,
+      "median_net_pct": 4.8741,
+      "win_rate": 0.6241,
+      "mean_hold_bars": 13.9,
+      "capture_pct": 21.72,
+      "ci": {
+        "n": 806,
+        "mean": 4.9391,
+        "ci_low": 4.1585,
+        "ci_high": 5.8682,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.2643,
+        "ci_low": -1.2693,
+        "ci_high": 0.6065,
+        "positive_share": 0.2845,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.5505,
+        "ci_low": -0.6727,
+        "ci_high": 1.6649,
+        "positive_share": 0.805,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 503,
+        "stop": 303
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 689,
+        "median_account_return_pct": 227.51,
+        "mean_account_return_pct": 296.51,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 5.9466,
+      "test_mean_net_pct": 2.491,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.491,
+        "ci_low": 2.0279,
+        "ci_high": 2.8945,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.2945,
+        "ci_low": -2.5677,
+        "ci_high": 1.811,
+        "positive_share": 0.3965,
+        "verdict": "inconclusive"
+      }
+    },
+    "tp15pct_sl5pct": {
+      "name": "tp15pct_sl5pct",
+      "desc": "止盈 +15% / 止损 -5%",
+      "mean_net_pct": 4.429,
+      "median_net_pct": -5.1139,
+      "win_rate": 0.4069,
+      "mean_hold_bars": 105.7,
+      "capture_pct": -32.5,
+      "ci": {
+        "n": 806,
+        "mean": 4.429,
+        "ci_low": 3.4021,
+        "ci_high": 5.6163,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.7743,
+        "ci_low": -1.5771,
+        "ci_high": 0.0226,
+        "positive_share": 0.0275,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.0405,
+        "ci_low": -0.9558,
+        "ci_high": 1.0599,
+        "positive_share": 0.511,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 89,
+        "stop": 467,
+        "target": 250
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 386,
+        "median_account_return_pct": 133.52,
+        "mean_account_return_pct": 176.11,
+        "positive_symbols": 23
+      },
+      "train_mean_net_pct": 4.9211,
+      "test_mean_net_pct": 3.2334,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 3.2334,
+        "ci_low": 1.8716,
+        "ci_high": 4.7766,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": 0.4479,
+        "ci_low": -1.0878,
+        "ci_high": 1.9473,
+        "positive_share": 0.719,
+        "verdict": "inconclusive"
+      }
+    },
+    "trail_5pct": {
+      "name": "trail_5pct",
+      "desc": "最高价回撤 5% 出",
+      "mean_net_pct": 4.9775,
+      "median_net_pct": 0.6376,
+      "win_rate": 0.5744,
+      "mean_hold_bars": 37.8,
+      "capture_pct": 4.85,
+      "ci": {
+        "n": 806,
+        "mean": 4.9775,
+        "ci_low": 4.0471,
+        "ci_high": 6.0729,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.2259,
+        "ci_low": -1.1385,
+        "ci_high": 0.5242,
+        "positive_share": 0.2755,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.5889,
+        "ci_low": -0.5109,
+        "ci_high": 1.5748,
+        "positive_share": 0.8435,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 800,
+        "cap": 6
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 648,
+        "median_account_return_pct": 218.6,
+        "mean_account_return_pct": 312.96,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 6.0071,
+      "test_mean_net_pct": 2.4757,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.4757,
+        "ci_low": 1.6645,
+        "ci_high": 3.2967,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3097,
+        "ci_low": -2.2057,
+        "ci_high": 1.3474,
+        "positive_share": 0.365,
+        "verdict": "inconclusive"
+      }
+    },
+    "trail_10pct": {
+      "name": "trail_10pct",
+      "desc": "最高价回撤 10% 出",
+      "mean_net_pct": 4.0453,
+      "median_net_pct": -1.8948,
+      "win_rate": 0.4429,
+      "mean_hold_bars": 129.1,
+      "capture_pct": -14.42,
+      "ci": {
+        "n": 806,
+        "mean": 4.0453,
+        "ci_low": 3.0216,
+        "ci_high": 5.1697,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -1.1581,
+        "ci_low": -2.0042,
+        "ci_high": -0.3877,
+        "positive_share": 0.001,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.3433,
+        "ci_low": -1.3575,
+        "ci_high": 0.6067,
+        "positive_share": 0.2305,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 691,
+        "cap": 115
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 385,
+        "median_account_return_pct": 88.67,
+        "mean_account_return_pct": 156.56,
+        "positive_symbols": 22
+      },
+      "train_mean_net_pct": 4.2729,
+      "test_mean_net_pct": 3.4921,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 3.4921,
+        "ci_low": 2.018,
+        "ci_high": 5.217,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": 0.7067,
+        "ci_low": -0.5572,
+        "ci_high": 2.0291,
+        "positive_share": 0.857,
+        "verdict": "inconclusive"
+      }
+    },
+    "trail_20pct": {
+      "name": "trail_20pct",
+      "desc": "最高价回撤 20% 出",
+      "mean_net_pct": 2.6603,
+      "median_net_pct": 0.7994,
+      "win_rate": 0.5161,
+      "mean_hold_bars": 266.0,
+      "capture_pct": 6.28,
+      "ci": {
+        "n": 806,
+        "mean": 2.6603,
+        "ci_low": 1.2974,
+        "ci_high": 4.1738,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -2.5431,
+        "ci_low": -3.1709,
+        "ci_high": -1.8194,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -1.7283,
+        "ci_low": -2.4367,
+        "ci_high": -0.9637,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "cap": 496,
+        "trail": 310
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 235,
+        "median_account_return_pct": 53.93,
+        "mean_account_return_pct": 84.39,
+        "positive_symbols": 21
+      },
+      "train_mean_net_pct": 2.8451,
+      "test_mean_net_pct": 2.2114,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.2114,
+        "ci_low": -0.4561,
+        "ci_high": 5.2944,
+        "positive_share": 0.943,
+        "verdict": "inconclusive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.5741,
+        "ci_low": -1.4087,
+        "ci_high": 0.3696,
+        "positive_share": 0.123,
+        "verdict": "inconclusive"
+      }
+    },
+    "trail_10pct_t336": {
+      "name": "trail_10pct_t336",
+      "desc": "回撤10%出，且最多 336 根",
+      "mean_net_pct": 4.0463,
+      "median_net_pct": -1.8948,
+      "win_rate": 0.4429,
+      "mean_hold_bars": 129.1,
+      "capture_pct": -13.99,
+      "ci": {
+        "n": 806,
+        "mean": 4.0463,
+        "ci_low": 3.0235,
+        "ci_high": 5.1697,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -1.1571,
+        "ci_low": -2.0041,
+        "ci_high": -0.3861,
+        "positive_share": 0.001,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.3423,
+        "ci_low": -1.3554,
+        "ci_high": 0.6067,
+        "positive_share": 0.2305,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 690,
+        "cap": 115,
+        "time": 1
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 385,
+        "median_account_return_pct": 88.67,
+        "mean_account_return_pct": 156.56,
+        "positive_symbols": 22
+      },
+      "train_mean_net_pct": 4.2729,
+      "test_mean_net_pct": 3.4954,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 3.4954,
+        "ci_low": 2.0249,
+        "ci_high": 5.2205,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": 0.7099,
+        "ci_low": -0.551,
+        "ci_high": 2.0291,
+        "positive_share": 0.8575,
+        "verdict": "inconclusive"
+      }
+    },
+    "chand_3atr": {
+      "name": "chand_3atr",
+      "desc": "最高价 - 3ATR 出",
+      "mean_net_pct": 4.4853,
+      "median_net_pct": 0.5703,
+      "win_rate": 0.5732,
+      "mean_hold_bars": 38.5,
+      "capture_pct": 5.2,
+      "ci": {
+        "n": 806,
+        "mean": 4.4853,
+        "ci_low": 3.6174,
+        "ci_high": 5.391,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.7181,
+        "ci_low": -1.4602,
+        "ci_high": -0.1152,
+        "positive_share": 0.012,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.0967,
+        "ci_low": -0.8371,
+        "ci_high": 0.957,
+        "positive_share": 0.576,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 800,
+        "cap": 6
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 616,
+        "median_account_return_pct": 162.71,
+        "mean_account_return_pct": 221.78,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 5.8852,
+      "test_mean_net_pct": 1.0839,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 1.0839,
+        "ci_low": 0.7352,
+        "ci_high": 1.4675,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -1.7016,
+        "ci_low": -3.7483,
+        "ci_high": 0.2124,
+        "positive_share": 0.0435,
+        "verdict": "inconclusive"
+      }
+    },
+    "chand_5atr": {
+      "name": "chand_5atr",
+      "desc": "最高价 - 5ATR 出",
+      "mean_net_pct": 4.2271,
+      "median_net_pct": -0.8709,
+      "win_rate": 0.4442,
+      "mean_hold_bars": 99.0,
+      "capture_pct": -6.92,
+      "ci": {
+        "n": 806,
+        "mean": 4.2271,
+        "ci_low": 3.2171,
+        "ci_high": 5.2605,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.9763,
+        "ci_low": -1.5227,
+        "ci_high": -0.4587,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.1615,
+        "ci_low": -0.9702,
+        "ci_high": 0.6621,
+        "positive_share": 0.3375,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 736,
+        "cap": 70
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 439,
+        "median_account_return_pct": 115.18,
+        "mean_account_return_pct": 134.22,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 5.0081,
+      "test_mean_net_pct": 2.3296,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.3296,
+        "ci_low": 1.2015,
+        "ci_high": 3.6923,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.4559,
+        "ci_low": -1.8238,
+        "ci_high": 0.8633,
+        "positive_share": 0.2525,
+        "verdict": "inconclusive"
+      }
+    },
+    "ema20_close": {
+      "name": "ema20_close",
+      "desc": "收盘跌破 EMA20，下根开盘出",
+      "mean_net_pct": 5.1112,
+      "median_net_pct": 1.9197,
+      "win_rate": 1.0,
+      "mean_hold_bars": 1.1,
+      "capture_pct": 19.59,
+      "ci": {
+        "n": 806,
+        "mean": 5.1112,
+        "ci_low": 4.3158,
+        "ci_high": 6.0201,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -0.0922,
+        "ci_low": -1.1427,
+        "ci_high": 0.8114,
+        "positive_share": 0.419,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 0.7226,
+        "ci_low": -0.5429,
+        "ci_high": 1.9036,
+        "positive_share": 0.861,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "signal": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 806,
+        "median_account_return_pct": 272.96,
+        "mean_account_return_pct": 376.71,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 6.0955,
+      "test_mean_net_pct": 2.7196,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.7196,
+        "ci_low": 2.5301,
+        "ci_high": 2.9161,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.0659,
+        "ci_low": -2.4091,
+        "ci_high": 2.1034,
+        "positive_share": 0.4945,
+        "verdict": "inconclusive"
+      }
+    },
+    "rsi50_cross": {
+      "name": "rsi50_cross",
+      "desc": "RSI14 下穿 50，下根开盘出",
+      "mean_net_pct": 5.6828,
+      "median_net_pct": 2.8254,
+      "win_rate": 0.7804,
+      "mean_hold_bars": 33.8,
+      "capture_pct": 22.15,
+      "ci": {
+        "n": 806,
+        "mean": 5.6828,
+        "ci_low": 4.7333,
+        "ci_high": 6.6753,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": 0.4794,
+        "ci_low": -0.335,
+        "ci_high": 1.1955,
+        "positive_share": 0.873,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 1.2942,
+        "ci_low": 0.2637,
+        "ci_high": 2.2446,
+        "positive_share": 0.9925,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "signal": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 500,
+        "median_account_return_pct": 155.5,
+        "mean_account_return_pct": 207.97,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 7.2546,
+      "test_mean_net_pct": 1.8635,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 1.8635,
+        "ci_low": 0.7735,
+        "ci_high": 3.0146,
+        "positive_share": 0.9995,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.922,
+        "ci_low": -2.645,
+        "ci_high": 0.9128,
+        "positive_share": 0.156,
+        "verdict": "inconclusive"
+      }
+    },
+    "pivot_high_open": {
+      "name": "pivot_high_open",
+      "desc": "下一个确认高点后开盘出",
+      "mean_net_pct": 3.5391,
+      "median_net_pct": 1.8747,
+      "win_rate": 0.5509,
+      "mean_hold_bars": 332.0,
+      "capture_pct": 14.47,
+      "ci": {
+        "n": 806,
+        "mean": 3.5391,
+        "ci_low": 1.9159,
+        "ci_high": 5.1837,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -1.6643,
+        "ci_low": -2.2533,
+        "ci_high": -1.0228,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.8495,
+        "ci_low": -1.6922,
+        "ci_high": -0.0017,
+        "positive_share": 0.024,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "cap": 797,
+        "structure": 9
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 197,
+        "median_account_return_pct": 59.0,
+        "mean_account_return_pct": 80.52,
+        "positive_symbols": 20
+      },
+      "train_mean_net_pct": 4.048,
+      "test_mean_net_pct": 2.3025,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      }
+    },
+    "pivot_high_ideal": {
+      "name": "pivot_high_ideal",
+      "desc": "下一个确认高点的最高价出(上界)",
+      "mean_net_pct": 3.5864,
+      "median_net_pct": 1.8747,
+      "win_rate": 0.5509,
+      "mean_hold_bars": 332.0,
+      "capture_pct": 14.47,
+      "ci": {
+        "n": 806,
+        "mean": 3.5864,
+        "ci_low": 1.9549,
+        "ci_high": 5.2489,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": -1.617,
+        "ci_low": -2.2209,
+        "ci_high": -0.9488,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": -0.8022,
+        "ci_low": -1.6465,
+        "ci_high": 0.0491,
+        "positive_share": 0.0345,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 797,
+        "structure": 9
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 197,
+        "median_account_return_pct": 59.91,
+        "mean_account_return_pct": 82.76,
+        "positive_symbols": 20
+      },
+      "train_mean_net_pct": 4.1148,
+      "test_mean_net_pct": 2.3025,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      }
+    },
+    "oracle_cap_high": {
+      "name": "oracle_cap_high",
+      "desc": "窗口内最高价卖出（未来函数，仅理论上界）",
+      "mean_net_pct": 18.2225,
+      "median_net_pct": 11.796,
+      "win_rate": 1.0,
+      "mean_hold_bars": 140.0,
+      "capture_pct": 99.88,
+      "ci": {
+        "n": 806,
+        "mean": 18.2225,
+        "ci_low": 16.3748,
+        "ci_high": 20.1504,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 806,
+        "mean": 13.0191,
+        "ci_low": 11.9292,
+        "ci_high": 14.0222,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "delta_vs_hold168": {
+        "n": 806,
+        "mean": 13.8339,
+        "ci_low": 12.702,
+        "ci_high": 14.9228,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "oracle": 806
+      },
+      "sequential": {
+        "symbols": 24,
+        "trades": 445,
+        "median_account_return_pct": 1221.88,
+        "mean_account_return_pct": 1487.02,
+        "positive_symbols": 24
+      },
+      "train_mean_net_pct": 19.6357,
+      "test_mean_net_pct": 14.7886,
+      "test_mean_net_ci": {
+        "n": 235,
+        "mean": 14.7886,
+        "ci_low": 13.0197,
+        "ci_high": 17.1661,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "test_alpha_vs_random": {
+        "n": 235,
+        "mean": 12.0031,
+        "ci_low": 10.3348,
+        "ci_high": 13.5993,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      }
+    }
+  },
+  "open_entry_model": {
+    "context": {
+      "entries": 806,
+      "random_control_mean_pct": -0.2916,
+      "benchmark_mean_pct": -0.9619,
+      "available_move_mean_pct": 12.1906
+    },
+    "rules": {
+      "hold_24": {
+        "mean_net_pct": -0.0894,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 0.2022,
+          "ci_low": -0.5352,
+          "ci_high": 0.8696,
+          "positive_share": 0.703,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.0894,
+          "ci_low": -0.4786,
+          "ci_high": 0.3085,
+          "positive_share": 0.356,
+          "verdict": "inconclusive"
+        }
+      },
+      "hold_72": {
+        "mean_net_pct": 0.7218,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 1.0134,
+          "ci_low": 0.549,
+          "ci_high": 1.4873,
+          "positive_share": 1.0,
+          "verdict": "positive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": 0.7218,
+          "ci_low": -0.0601,
+          "ci_high": 1.7518,
+          "positive_share": 0.96,
+          "verdict": "inconclusive"
+        }
+      },
+      "hold_168": {
+        "mean_net_pct": -0.9619,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.6702,
+          "ci_low": -1.0424,
+          "ci_high": -0.324,
+          "positive_share": 0.0005,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.9619,
+          "ci_low": -2.0225,
+          "ci_high": 0.2094,
+          "positive_share": 0.063,
+          "verdict": "inconclusive"
+        }
+      },
+      "hold_336": {
+        "mean_net_pct": -1.9085,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -1.6168,
+          "ci_low": -2.2075,
+          "ci_high": -0.9842,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.9085,
+          "ci_low": -3.1502,
+          "ci_high": -0.4544,
+          "positive_share": 0.0045,
+          "verdict": "negative"
+        }
+      },
+      "tp2_sl1": {
+        "mean_net_pct": -0.175,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 0.1166,
+          "ci_low": -0.7908,
+          "ci_high": 0.8829,
+          "positive_share": 0.599,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.175,
+          "ci_low": -0.3341,
+          "ci_high": 0.0017,
+          "positive_share": 0.026,
+          "verdict": "inconclusive"
+        }
+      },
+      "tp3_sl1": {
+        "mean_net_pct": -0.2773,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 0.0143,
+          "ci_low": -0.8856,
+          "ci_high": 0.7528,
+          "positive_share": 0.513,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.2773,
+          "ci_low": -0.5088,
+          "ci_high": -0.0073,
+          "positive_share": 0.019,
+          "verdict": "negative"
+        }
+      },
+      "tp5_sl1": {
+        "mean_net_pct": -0.4892,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.1976,
+          "ci_low": -1.117,
+          "ci_high": 0.5548,
+          "positive_share": 0.3115,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.4892,
+          "ci_low": -0.7058,
+          "ci_high": -0.2597,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "tp3_nostop": {
+        "mean_net_pct": -0.536,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.2444,
+          "ci_low": -1.0852,
+          "ci_high": 0.5086,
+          "positive_share": 0.266,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.536,
+          "ci_low": -1.6648,
+          "ci_high": 0.5846,
+          "positive_share": 0.186,
+          "verdict": "inconclusive"
+        }
+      },
+      "tp5pct_sl2pct": {
+        "mean_net_pct": -0.426,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.1344,
+          "ci_low": -1.0727,
+          "ci_high": 0.6842,
+          "positive_share": 0.3765,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.426,
+          "ci_low": -0.627,
+          "ci_high": -0.2238,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "tp15pct_sl5pct": {
+        "mean_net_pct": -0.5682,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.2766,
+          "ci_low": -1.1455,
+          "ci_high": 0.6262,
+          "positive_share": 0.236,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.5682,
+          "ci_low": -1.1939,
+          "ci_high": 0.1177,
+          "positive_share": 0.0505,
+          "verdict": "inconclusive"
+        }
+      },
+      "trail_5pct": {
+        "mean_net_pct": -0.3689,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.0773,
+          "ci_low": -0.9463,
+          "ci_high": 0.6421,
+          "positive_share": 0.421,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.3689,
+          "ci_low": -0.6957,
+          "ci_high": -0.0212,
+          "positive_share": 0.02,
+          "verdict": "negative"
+        }
+      },
+      "trail_10pct": {
+        "mean_net_pct": -1.3284,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -1.0368,
+          "ci_low": -1.8406,
+          "ci_high": -0.2947,
+          "positive_share": 0.002,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.3284,
+          "ci_low": -2.0104,
+          "ci_high": -0.5976,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "trail_20pct": {
+        "mean_net_pct": -2.5889,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -2.2973,
+          "ci_low": -2.8979,
+          "ci_high": -1.6084,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -2.5889,
+          "ci_low": -3.7617,
+          "ci_high": -1.1181,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "trail_10pct_t336": {
+        "mean_net_pct": -1.3284,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -1.0368,
+          "ci_low": -1.8406,
+          "ci_high": -0.2947,
+          "positive_share": 0.002,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.3284,
+          "ci_low": -2.0104,
+          "ci_high": -0.5976,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "chand_3atr": {
+        "mean_net_pct": -0.727,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.4354,
+          "ci_low": -1.1996,
+          "ci_high": 0.1895,
+          "positive_share": 0.1015,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.727,
+          "ci_low": -1.0135,
+          "ci_high": -0.3777,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "chand_5atr": {
+        "mean_net_pct": -1.1866,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -0.8949,
+          "ci_low": -1.443,
+          "ci_high": -0.3955,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.1866,
+          "ci_low": -1.7257,
+          "ci_high": -0.5051,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "ema20_close": {
+        "mean_net_pct": -0.2139,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 0.0777,
+          "ci_low": -0.9284,
+          "ci_high": 0.9182,
+          "positive_share": 0.562,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -0.2139,
+          "ci_low": -0.2838,
+          "ci_high": -0.1395,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "rsi50_cross": {
+        "mean_net_pct": 0.027,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 0.3186,
+          "ci_low": -0.4907,
+          "ci_high": 1.0304,
+          "positive_share": 0.773,
+          "verdict": "inconclusive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": 0.027,
+          "ci_low": -0.3662,
+          "ci_high": 0.451,
+          "positive_share": 0.5685,
+          "verdict": "inconclusive"
+        }
+      },
+      "pivot_high_open": {
+        "mean_net_pct": -1.8231,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -1.5315,
+          "ci_low": -2.0921,
+          "ci_high": -0.9433,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.8231,
+          "ci_low": -3.0635,
+          "ci_high": -0.4097,
+          "positive_share": 0.0045,
+          "verdict": "negative"
+        }
+      },
+      "pivot_high_ideal": {
+        "mean_net_pct": -1.7766,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": -1.485,
+          "ci_low": -2.0558,
+          "ci_high": -0.8678,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        },
+        "ci": {
+          "n": 806,
+          "mean": -1.7766,
+          "ci_low": -3.0297,
+          "ci_high": -0.3135,
+          "positive_share": 0.0055,
+          "verdict": "negative"
+        }
+      },
+      "oracle_cap_high": {
+        "mean_net_pct": 12.0561,
+        "alpha_vs_random": {
+          "n": 806,
+          "mean": 12.3477,
+          "ci_low": 11.3159,
+          "ci_high": 13.2819,
+          "positive_share": 1.0,
+          "verdict": "positive"
+        },
+        "ci": {
+          "n": 806,
+          "mean": 12.0561,
+          "ci_low": 10.6837,
+          "ci_high": 13.5813,
+          "positive_share": 1.0,
+          "verdict": "positive"
+        }
+      }
+    }
+  },
+  "train_table": [
+    {
+      "name": "hold_24",
+      "desc": "持有 24 根后收盘平仓",
+      "mean_net_pct": 6.8305,
+      "median_net_pct": 2.9395,
+      "win_rate": 0.7303,
+      "mean_hold_bars": 23.0,
+      "capture_pct": 22.71,
+      "ci": {
+        "n": 571,
+        "mean": 6.8305,
+        "ci_low": 5.5463,
+        "ci_high": 8.155,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": 0.632,
+        "ci_low": -0.4848,
+        "ci_high": 1.6336,
+        "positive_share": 0.867,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 1.64,
+        "ci_low": 0.2538,
+        "ci_high": 2.9079,
+        "positive_share": 0.987,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "time": 571
+      }
+    },
+    {
+      "name": "hold_72",
+      "desc": "持有 72 根后收盘平仓",
+      "mean_net_pct": 8.5232,
+      "median_net_pct": 3.0447,
+      "win_rate": 0.6392,
+      "mean_hold_bars": 71.0,
+      "capture_pct": 22.85,
+      "ci": {
+        "n": 571,
+        "mean": 8.5232,
+        "ci_low": 6.9133,
+        "ci_high": 10.2816,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": 2.3247,
+        "ci_low": 1.6476,
+        "ci_high": 2.9763,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 3.3327,
+        "ci_low": 2.3485,
+        "ci_high": 4.2834,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "time": 571
+      }
+    },
+    {
+      "name": "hold_168",
+      "desc": "持有 168 根(7天)后收盘平仓",
+      "mean_net_pct": 5.1905,
+      "median_net_pct": 2.5699,
+      "win_rate": 0.5919,
+      "mean_hold_bars": 167.0,
+      "capture_pct": 19.61,
+      "ci": {
+        "n": 571,
+        "mean": 5.1905,
+        "ci_low": 3.4091,
+        "ci_high": 7.1607,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -1.008,
+        "ci_low": -1.4971,
+        "ci_high": -0.5129,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "positive_share": 0.0,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 571
+      }
+    },
+    {
+      "name": "hold_336",
+      "desc": "持有 336 根(14天)后收盘平仓",
+      "mean_net_pct": 3.9373,
+      "median_net_pct": 0.5429,
+      "win_rate": 0.5114,
+      "mean_hold_bars": 335.0,
+      "capture_pct": 5.49,
+      "ci": {
+        "n": 571,
+        "mean": 3.9373,
+        "ci_low": 1.8628,
+        "ci_high": 6.1503,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -2.2612,
+        "ci_low": -2.9408,
+        "ci_high": -1.498,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -1.2532,
+        "ci_low": -2.2078,
+        "ci_high": -0.259,
+        "positive_share": 0.007,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "time": 571
+      }
+    },
+    {
+      "name": "tp2_sl1",
+      "desc": "止盈 +2ATR / 止损 -1ATR",
+      "mean_net_pct": 6.211,
+      "median_net_pct": 3.0217,
+      "win_rate": 0.8039,
+      "mean_hold_bars": 4.0,
+      "capture_pct": 24.04,
+      "ci": {
+        "n": 571,
+        "mean": 6.211,
+        "ci_low": 5.0714,
+        "ci_high": 7.4522,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": 0.0125,
+        "ci_low": -1.4327,
+        "ci_high": 1.2014,
+        "positive_share": 0.498,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 1.0205,
+        "ci_low": -0.6387,
+        "ci_high": 2.4739,
+        "positive_share": 0.8935,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 459,
+        "stop": 112
+      }
+    },
+    {
+      "name": "tp3_sl1",
+      "desc": "止盈 +3ATR / 止损 -1ATR",
+      "mean_net_pct": 6.0899,
+      "median_net_pct": 3.486,
+      "win_rate": 0.5989,
+      "mean_hold_bars": 11.1,
+      "capture_pct": 19.81,
+      "ci": {
+        "n": 571,
+        "mean": 6.0899,
+        "ci_low": 5.0198,
+        "ci_high": 7.2518,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.1086,
+        "ci_low": -1.3867,
+        "ci_high": 0.9676,
+        "positive_share": 0.429,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.8995,
+        "ci_low": -0.6088,
+        "ci_high": 2.2465,
+        "positive_share": 0.8835,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 342,
+        "stop": 229
+      }
+    },
+    {
+      "name": "tp5_sl1",
+      "desc": "止盈 +5ATR / 止损 -1ATR",
+      "mean_net_pct": 5.6957,
+      "median_net_pct": -1.4777,
+      "win_rate": 0.3748,
+      "mean_hold_bars": 29.7,
+      "capture_pct": -12.61,
+      "ci": {
+        "n": 571,
+        "mean": 5.6957,
+        "ci_low": 4.531,
+        "ci_high": 6.9626,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.5028,
+        "ci_low": -1.6819,
+        "ci_high": 0.5138,
+        "positive_share": 0.1895,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.5052,
+        "ci_low": -0.9151,
+        "ci_high": 1.7794,
+        "positive_share": 0.7705,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 211,
+        "stop": 357,
+        "cap": 3
+      }
+    },
+    {
+      "name": "tp3_nostop",
+      "desc": "只挂 +3ATR 止盈，无止损",
+      "mean_net_pct": 5.8734,
+      "median_net_pct": 4.7573,
+      "win_rate": 0.8249,
+      "mean_hold_bars": 84.5,
+      "capture_pct": 33.68,
+      "ci": {
+        "n": 571,
+        "mean": 5.8734,
+        "ci_low": 4.4993,
+        "ci_high": 7.233,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.3251,
+        "ci_low": -1.5766,
+        "ci_high": 0.8607,
+        "positive_share": 0.29,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.6829,
+        "ci_low": -0.8432,
+        "ci_high": 2.0138,
+        "positive_share": 0.8275,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 468,
+        "cap": 103
+      }
+    },
+    {
+      "name": "tp5pct_sl2pct",
+      "desc": "止盈 +5% / 止损 -2%",
+      "mean_net_pct": 5.9466,
+      "median_net_pct": 4.8741,
+      "win_rate": 0.6112,
+      "mean_hold_bars": 12.5,
+      "capture_pct": 20.38,
+      "ci": {
+        "n": 571,
+        "mean": 5.9466,
+        "ci_low": 4.7969,
+        "ci_high": 7.2057,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.2519,
+        "ci_low": -1.6,
+        "ci_high": 0.8998,
+        "positive_share": 0.3405,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.7561,
+        "ci_low": -0.8213,
+        "ci_high": 2.1865,
+        "positive_share": 0.834,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 349,
+        "stop": 222
+      }
+    },
+    {
+      "name": "tp15pct_sl5pct",
+      "desc": "止盈 +15% / 止损 -5%",
+      "mean_net_pct": 4.9211,
+      "median_net_pct": -5.1139,
+      "win_rate": 0.3678,
+      "mean_hold_bars": 87.8,
+      "capture_pct": -37.84,
+      "ci": {
+        "n": 571,
+        "mean": 4.9211,
+        "ci_low": 3.517,
+        "ci_high": 6.5097,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -1.2774,
+        "ci_low": -2.2841,
+        "ci_high": -0.4498,
+        "positive_share": 0.001,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -0.2693,
+        "ci_low": -1.4969,
+        "ci_high": 0.8579,
+        "positive_share": 0.319,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 40,
+        "stop": 357,
+        "target": 174
+      }
+    },
+    {
+      "name": "trail_5pct",
+      "desc": "最高价回撤 5% 出",
+      "mean_net_pct": 6.0071,
+      "median_net_pct": 0.5764,
+      "win_rate": 0.5552,
+      "mean_hold_bars": 34.2,
+      "capture_pct": 4.42,
+      "ci": {
+        "n": 571,
+        "mean": 6.0071,
+        "ci_low": 4.8047,
+        "ci_high": 7.3883,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.1914,
+        "ci_low": -1.5385,
+        "ci_high": 1.0012,
+        "positive_share": 0.3795,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.8167,
+        "ci_low": -0.7821,
+        "ci_high": 2.272,
+        "positive_share": 0.8415,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 567,
+        "cap": 4
+      }
+    },
+    {
+      "name": "trail_10pct",
+      "desc": "最高价回撤 10% 出",
+      "mean_net_pct": 4.2729,
+      "median_net_pct": -2.5327,
+      "win_rate": 0.4028,
+      "mean_hold_bars": 108.1,
+      "capture_pct": -18.72,
+      "ci": {
+        "n": 571,
+        "mean": 4.2729,
+        "ci_low": 2.8641,
+        "ci_high": 5.7695,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -1.9255,
+        "ci_low": -2.9779,
+        "ci_high": -0.9851,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -0.9175,
+        "ci_low": -2.1658,
+        "ci_high": 0.2272,
+        "positive_share": 0.062,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 518,
+        "cap": 53
+      }
+    },
+    {
+      "name": "trail_20pct",
+      "desc": "最高价回撤 20% 出",
+      "mean_net_pct": 2.8451,
+      "median_net_pct": -0.8862,
+      "win_rate": 0.4764,
+      "mean_hold_bars": 255.3,
+      "capture_pct": -10.29,
+      "ci": {
+        "n": 571,
+        "mean": 2.8451,
+        "ci_low": 0.9544,
+        "ci_high": 4.8609,
+        "positive_share": 0.998,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -3.3534,
+        "ci_low": -4.1108,
+        "ci_high": -2.5085,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -2.3454,
+        "ci_low": -3.193,
+        "ci_high": -1.4341,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "cap": 312,
+        "trail": 259
+      }
+    },
+    {
+      "name": "trail_10pct_t336",
+      "desc": "回撤10%出，且最多 336 根",
+      "mean_net_pct": 4.2729,
+      "median_net_pct": -2.5327,
+      "win_rate": 0.4028,
+      "mean_hold_bars": 108.1,
+      "capture_pct": -18.72,
+      "ci": {
+        "n": 571,
+        "mean": 4.2729,
+        "ci_low": 2.8641,
+        "ci_high": 5.7695,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -1.9255,
+        "ci_low": -2.9779,
+        "ci_high": -0.9851,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -0.9175,
+        "ci_low": -2.1658,
+        "ci_high": 0.2272,
+        "positive_share": 0.062,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 518,
+        "cap": 53
+      }
+    },
+    {
+      "name": "chand_3atr",
+      "desc": "最高价 - 3ATR 出",
+      "mean_net_pct": 5.8852,
+      "median_net_pct": 0.6979,
+      "win_rate": 0.5762,
+      "mean_hold_bars": 40.6,
+      "capture_pct": 5.98,
+      "ci": {
+        "n": 571,
+        "mean": 5.8852,
+        "ci_low": 4.6855,
+        "ci_high": 7.1865,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.3133,
+        "ci_low": -1.3547,
+        "ci_high": 0.6138,
+        "positive_share": 0.258,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.6947,
+        "ci_low": -0.5736,
+        "ci_high": 1.8363,
+        "positive_share": 0.8605,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 566,
+        "cap": 5
+      }
+    },
+    {
+      "name": "chand_5atr",
+      "desc": "最高价 - 5ATR 出",
+      "mean_net_pct": 5.0081,
+      "median_net_pct": -1.2029,
+      "win_rate": 0.4308,
+      "mean_hold_bars": 88.6,
+      "capture_pct": -10.44,
+      "ci": {
+        "n": 571,
+        "mean": 5.0081,
+        "ci_low": 3.6464,
+        "ci_high": 6.4333,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -1.1904,
+        "ci_low": -2.0295,
+        "ci_high": -0.4685,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -0.1824,
+        "ci_low": -1.3498,
+        "ci_high": 0.8523,
+        "positive_share": 0.373,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 531,
+        "cap": 40
+      }
+    },
+    {
+      "name": "ema20_close",
+      "desc": "收盘跌破 EMA20，下根开盘出",
+      "mean_net_pct": 6.0955,
+      "median_net_pct": 1.7621,
+      "win_rate": 1.0,
+      "mean_hold_bars": 1.2,
+      "capture_pct": 19.32,
+      "ci": {
+        "n": 571,
+        "mean": 6.0955,
+        "ci_low": 4.986,
+        "ci_high": 7.3708,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -0.103,
+        "ci_low": -1.5364,
+        "ci_high": 1.1255,
+        "positive_share": 0.4285,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 0.905,
+        "ci_low": -0.7415,
+        "ci_high": 2.3981,
+        "positive_share": 0.8585,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "signal": 571
+      }
+    },
+    {
+      "name": "rsi50_cross",
+      "desc": "RSI14 下穿 50，下根开盘出",
+      "mean_net_pct": 7.2546,
+      "median_net_pct": 2.9529,
+      "win_rate": 0.7846,
+      "mean_hold_bars": 33.6,
+      "capture_pct": 24.62,
+      "ci": {
+        "n": 571,
+        "mean": 7.2546,
+        "ci_low": 5.92,
+        "ci_high": 8.6241,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": 1.0561,
+        "ci_low": -0.1116,
+        "ci_high": 2.1377,
+        "positive_share": 0.956,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 2.0642,
+        "ci_low": 0.6015,
+        "ci_high": 3.408,
+        "positive_share": 0.996,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "signal": 571
+      }
+    },
+    {
+      "name": "pivot_high_open",
+      "desc": "下一个确认高点后开盘出",
+      "mean_net_pct": 4.048,
+      "median_net_pct": 0.7014,
+      "win_rate": 0.5184,
+      "mean_hold_bars": 330.8,
+      "capture_pct": 6.39,
+      "ci": {
+        "n": 571,
+        "mean": 4.048,
+        "ci_low": 2.0593,
+        "ci_high": 6.1542,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -2.1505,
+        "ci_low": -2.7664,
+        "ci_high": -1.4598,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -1.1425,
+        "ci_low": -2.0382,
+        "ci_high": -0.2165,
+        "positive_share": 0.007,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "cap": 562,
+        "structure": 9
+      }
+    },
+    {
+      "name": "pivot_high_ideal",
+      "desc": "下一个确认高点的最高价出(上界)",
+      "mean_net_pct": 4.1148,
+      "median_net_pct": 0.7014,
+      "win_rate": 0.5184,
+      "mean_hold_bars": 330.8,
+      "capture_pct": 6.39,
+      "ci": {
+        "n": 571,
+        "mean": 4.1148,
+        "ci_low": 2.1051,
+        "ci_high": 6.2558,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": -2.0837,
+        "ci_low": -2.7126,
+        "ci_high": -1.3455,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": -1.0756,
+        "ci_low": -1.9692,
+        "ci_high": -0.1388,
+        "positive_share": 0.013,
+        "verdict": "negative"
+      },
+      "exit_counts": {
+        "cap": 562,
+        "structure": 9
+      }
+    },
+    {
+      "name": "oracle_cap_high",
+      "desc": "窗口内最高价卖出（未来函数，仅理论上界）",
+      "mean_net_pct": 19.6357,
+      "median_net_pct": 11.7231,
+      "win_rate": 1.0,
+      "mean_hold_bars": 128.5,
+      "capture_pct": 99.88,
+      "ci": {
+        "n": 571,
+        "mean": 19.6357,
+        "ci_low": 17.17,
+        "ci_high": 22.2132,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 571,
+        "mean": 13.4372,
+        "ci_low": 12.1089,
+        "ci_high": 14.6847,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "delta_vs_hold168": {
+        "n": 571,
+        "mean": 14.4452,
+        "ci_low": 13.0912,
+        "ci_high": 15.7395,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "oracle": 571
+      }
+    }
+  ],
+  "test_table": [
+    {
+      "name": "hold_24",
+      "desc": "持有 24 根后收盘平仓",
+      "mean_net_pct": 1.9747,
+      "median_net_pct": 2.0566,
+      "win_rate": 0.7191,
+      "mean_hold_bars": 23.0,
+      "capture_pct": 15.15,
+      "ci": {
+        "n": 235,
+        "mean": 1.9747,
+        "ci_low": 1.3391,
+        "ci_high": 2.4697,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.8108,
+        "ci_low": -2.9491,
+        "ci_high": 1.2296,
+        "positive_share": 0.216,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.4655,
+        "ci_low": -3.2068,
+        "ci_high": 2.0802,
+        "positive_share": 0.369,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 235
+      }
+    },
+    {
+      "name": "hold_72",
+      "desc": "持有 72 根后收盘平仓",
+      "mean_net_pct": 1.8334,
+      "median_net_pct": 2.6881,
+      "win_rate": 0.6851,
+      "mean_hold_bars": 71.0,
+      "capture_pct": 19.39,
+      "ci": {
+        "n": 235,
+        "mean": 1.8334,
+        "ci_low": 0.2204,
+        "ci_high": 3.5017,
+        "positive_share": 0.9875,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.9521,
+        "ci_low": -2.155,
+        "ci_high": 0.2307,
+        "positive_share": 0.056,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.6068,
+        "ci_low": -2.1583,
+        "ci_high": 0.9665,
+        "positive_share": 0.2165,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 235
+      }
+    },
+    {
+      "name": "hold_168",
+      "desc": "持有 168 根(7天)后收盘平仓",
+      "mean_net_pct": 2.4402,
+      "median_net_pct": 3.4497,
+      "win_rate": 0.6298,
+      "mean_hold_bars": 167.0,
+      "capture_pct": 24.44,
+      "ci": {
+        "n": 235,
+        "mean": 2.4402,
+        "ci_low": -0.3017,
+        "ci_high": 5.3664,
+        "positive_share": 0.959,
+        "verdict": "inconclusive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3453,
+        "ci_low": -1.1594,
+        "ci_high": 0.462,
+        "positive_share": 0.1885,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "positive_share": 0.0,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 235
+      }
+    },
+    {
+      "name": "hold_336",
+      "desc": "持有 336 根(14天)后收盘平仓",
+      "mean_net_pct": 2.3025,
+      "median_net_pct": 3.3141,
+      "win_rate": 0.6298,
+      "mean_hold_bars": 335.0,
+      "capture_pct": 27.65,
+      "ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.1377,
+        "ci_low": -1.6472,
+        "ci_high": 1.5969,
+        "positive_share": 0.4485,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "time": 235
+      }
+    },
+    {
+      "name": "tp2_sl1",
+      "desc": "止盈 +2ATR / 止损 -1ATR",
+      "mean_net_pct": 2.3751,
+      "median_net_pct": 2.7119,
+      "win_rate": 0.8255,
+      "mean_hold_bars": 3.1,
+      "capture_pct": 21.34,
+      "ci": {
+        "n": 235,
+        "mean": 2.3751,
+        "ci_low": 2.1136,
+        "ci_high": 2.6643,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.4103,
+        "ci_low": -2.6231,
+        "ci_high": 1.6709,
+        "positive_share": 0.357,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.065,
+        "ci_low": -2.9223,
+        "ci_high": 2.5906,
+        "positive_share": 0.5005,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 194,
+        "stop": 41
+      }
+    },
+    {
+      "name": "tp3_sl1",
+      "desc": "止盈 +3ATR / 止损 -1ATR",
+      "mean_net_pct": 2.2291,
+      "median_net_pct": 2.8991,
+      "win_rate": 0.6,
+      "mean_hold_bars": 11.6,
+      "capture_pct": 20.59,
+      "ci": {
+        "n": 235,
+        "mean": 2.2291,
+        "ci_low": 1.833,
+        "ci_high": 2.6753,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.5564,
+        "ci_low": -2.8424,
+        "ci_high": 1.5213,
+        "positive_share": 0.3065,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.2111,
+        "ci_low": -3.1357,
+        "ci_high": 2.4336,
+        "positive_share": 0.4575,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 141,
+        "stop": 94
+      }
+    },
+    {
+      "name": "tp5_sl1",
+      "desc": "止盈 +5ATR / 止损 -1ATR",
+      "mean_net_pct": 1.8336,
+      "median_net_pct": -1.3748,
+      "win_rate": 0.366,
+      "mean_hold_bars": 42.4,
+      "capture_pct": -11.74,
+      "ci": {
+        "n": 235,
+        "mean": 1.8336,
+        "ci_low": 1.1196,
+        "ci_high": 2.6718,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.9518,
+        "ci_low": -3.1146,
+        "ci_high": 0.985,
+        "positive_share": 0.1805,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.6065,
+        "ci_low": -3.4505,
+        "ci_high": 1.9364,
+        "positive_share": 0.3405,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "stop": 149,
+        "target": 85,
+        "cap": 1
+      }
+    },
+    {
+      "name": "tp3_nostop",
+      "desc": "只挂 +3ATR 止盈，无止损",
+      "mean_net_pct": 2.4648,
+      "median_net_pct": 4.1692,
+      "win_rate": 0.8596,
+      "mean_hold_bars": 82.7,
+      "capture_pct": 32.38,
+      "ci": {
+        "n": 235,
+        "mean": 2.4648,
+        "ci_low": 0.6708,
+        "ci_high": 4.1048,
+        "positive_share": 0.995,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3207,
+        "ci_low": -1.5406,
+        "ci_high": 0.9483,
+        "positive_share": 0.31,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.0246,
+        "ci_low": -1.8862,
+        "ci_high": 1.9538,
+        "positive_share": 0.536,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 201,
+        "cap": 34
+      }
+    },
+    {
+      "name": "tp5pct_sl2pct",
+      "desc": "止盈 +5% / 止损 -2%",
+      "mean_net_pct": 2.491,
+      "median_net_pct": 4.8741,
+      "win_rate": 0.6553,
+      "mean_hold_bars": 17.4,
+      "capture_pct": 24.08,
+      "ci": {
+        "n": 235,
+        "mean": 2.491,
+        "ci_low": 2.0279,
+        "ci_high": 2.8945,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.2945,
+        "ci_low": -2.5677,
+        "ci_high": 1.811,
+        "positive_share": 0.3965,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.0508,
+        "ci_low": -2.8071,
+        "ci_high": 2.6657,
+        "positive_share": 0.5275,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "target": 154,
+        "stop": 81
+      }
+    },
+    {
+      "name": "tp15pct_sl5pct",
+      "desc": "止盈 +15% / 止损 -5%",
+      "mean_net_pct": 3.2334,
+      "median_net_pct": 0.3105,
+      "win_rate": 0.5021,
+      "mean_hold_bars": 149.2,
+      "capture_pct": 4.23,
+      "ci": {
+        "n": 235,
+        "mean": 3.2334,
+        "ci_low": 1.8716,
+        "ci_high": 4.7766,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": 0.4479,
+        "ci_low": -1.0878,
+        "ci_high": 1.9473,
+        "positive_share": 0.719,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.7932,
+        "ci_low": -1.3288,
+        "ci_high": 2.7522,
+        "positive_share": 0.772,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 49,
+        "stop": 110,
+        "target": 76
+      }
+    },
+    {
+      "name": "trail_5pct",
+      "desc": "最高价回撤 5% 出",
+      "mean_net_pct": 2.4757,
+      "median_net_pct": 0.8706,
+      "win_rate": 0.6213,
+      "mean_hold_bars": 46.7,
+      "capture_pct": 5.96,
+      "ci": {
+        "n": 235,
+        "mean": 2.4757,
+        "ci_low": 1.6645,
+        "ci_high": 3.2967,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.3097,
+        "ci_low": -2.2057,
+        "ci_high": 1.3474,
+        "positive_share": 0.365,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.0356,
+        "ci_low": -2.477,
+        "ci_high": 2.2437,
+        "positive_share": 0.528,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 233,
+        "cap": 2
+      }
+    },
+    {
+      "name": "trail_10pct",
+      "desc": "最高价回撤 10% 出",
+      "mean_net_pct": 3.4921,
+      "median_net_pct": 1.268,
+      "win_rate": 0.5404,
+      "mean_hold_bars": 180.3,
+      "capture_pct": 10.04,
+      "ci": {
+        "n": 235,
+        "mean": 3.4921,
+        "ci_low": 2.018,
+        "ci_high": 5.217,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": 0.7067,
+        "ci_low": -0.5572,
+        "ci_high": 2.0291,
+        "positive_share": 0.857,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 1.052,
+        "ci_low": -0.7165,
+        "ci_high": 2.9229,
+        "positive_share": 0.866,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 62,
+        "trail": 173
+      }
+    },
+    {
+      "name": "trail_20pct",
+      "desc": "最高价回撤 20% 出",
+      "mean_net_pct": 2.2114,
+      "median_net_pct": 3.0567,
+      "win_rate": 0.6128,
+      "mean_hold_bars": 292.1,
+      "capture_pct": 26.76,
+      "ci": {
+        "n": 235,
+        "mean": 2.2114,
+        "ci_low": -0.4561,
+        "ci_high": 5.2944,
+        "positive_share": 0.943,
+        "verdict": "inconclusive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.5741,
+        "ci_low": -1.4087,
+        "ci_high": 0.3696,
+        "positive_share": 0.123,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.2288,
+        "ci_low": -1.1985,
+        "ci_high": 1.0015,
+        "positive_share": 0.3505,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 184,
+        "trail": 51
+      }
+    },
+    {
+      "name": "trail_10pct_t336",
+      "desc": "回撤10%出，且最多 336 根",
+      "mean_net_pct": 3.4954,
+      "median_net_pct": 1.268,
+      "win_rate": 0.5404,
+      "mean_hold_bars": 180.3,
+      "capture_pct": 10.04,
+      "ci": {
+        "n": 235,
+        "mean": 3.4954,
+        "ci_low": 2.0249,
+        "ci_high": 5.2205,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": 0.7099,
+        "ci_low": -0.551,
+        "ci_high": 2.0291,
+        "positive_share": 0.8575,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 1.0552,
+        "ci_low": -0.7132,
+        "ci_high": 2.9256,
+        "positive_share": 0.8675,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 62,
+        "trail": 172,
+        "time": 1
+      }
+    },
+    {
+      "name": "chand_3atr",
+      "desc": "最高价 - 3ATR 出",
+      "mean_net_pct": 1.0839,
+      "median_net_pct": 0.4459,
+      "win_rate": 0.566,
+      "mean_hold_bars": 33.2,
+      "capture_pct": 2.99,
+      "ci": {
+        "n": 235,
+        "mean": 1.0839,
+        "ci_low": 0.7352,
+        "ci_high": 1.4675,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -1.7016,
+        "ci_low": -3.7483,
+        "ci_high": 0.2124,
+        "positive_share": 0.0435,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -1.3563,
+        "ci_low": -4.0693,
+        "ci_high": 1.1079,
+        "positive_share": 0.1495,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 234,
+        "cap": 1
+      }
+    },
+    {
+      "name": "chand_5atr",
+      "desc": "最高价 - 5ATR 出",
+      "mean_net_pct": 2.3296,
+      "median_net_pct": -0.3583,
+      "win_rate": 0.4766,
+      "mean_hold_bars": 124.2,
+      "capture_pct": -2.76,
+      "ci": {
+        "n": 235,
+        "mean": 2.3296,
+        "ci_low": 1.2015,
+        "ci_high": 3.6923,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.4559,
+        "ci_low": -1.8238,
+        "ci_high": 0.8633,
+        "positive_share": 0.2525,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.1106,
+        "ci_low": -2.165,
+        "ci_high": 1.8438,
+        "positive_share": 0.482,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "trail": 205,
+        "cap": 30
+      }
+    },
+    {
+      "name": "ema20_close",
+      "desc": "收盘跌破 EMA20，下根开盘出",
+      "mean_net_pct": 2.7196,
+      "median_net_pct": 2.2799,
+      "win_rate": 1.0,
+      "mean_hold_bars": 1.1,
+      "capture_pct": 20.0,
+      "ci": {
+        "n": 235,
+        "mean": 2.7196,
+        "ci_low": 2.5301,
+        "ci_high": 2.9161,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.0659,
+        "ci_low": -2.4091,
+        "ci_high": 2.1034,
+        "positive_share": 0.4945,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 0.2794,
+        "ci_low": -2.7077,
+        "ci_high": 3.0905,
+        "positive_share": 0.5905,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "signal": 235
+      }
+    },
+    {
+      "name": "rsi50_cross",
+      "desc": "RSI14 下穿 50，下根开盘出",
+      "mean_net_pct": 1.8635,
+      "median_net_pct": 2.5988,
+      "win_rate": 0.7702,
+      "mean_hold_bars": 34.4,
+      "capture_pct": 17.99,
+      "ci": {
+        "n": 235,
+        "mean": 1.8635,
+        "ci_low": 0.7735,
+        "ci_high": 3.0146,
+        "positive_share": 0.9995,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.922,
+        "ci_low": -2.645,
+        "ci_high": 0.9128,
+        "positive_share": 0.156,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.5767,
+        "ci_low": -2.8273,
+        "ci_high": 1.6823,
+        "positive_share": 0.3115,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "signal": 235
+      }
+    },
+    {
+      "name": "pivot_high_open",
+      "desc": "下一个确认高点后开盘出",
+      "mean_net_pct": 2.3025,
+      "median_net_pct": 3.3141,
+      "win_rate": 0.6298,
+      "mean_hold_bars": 335.0,
+      "capture_pct": 27.65,
+      "ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.1377,
+        "ci_low": -1.6472,
+        "ci_high": 1.5969,
+        "positive_share": 0.4485,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 235
+      }
+    },
+    {
+      "name": "pivot_high_ideal",
+      "desc": "下一个确认高点的最高价出(上界)",
+      "mean_net_pct": 2.3025,
+      "median_net_pct": 3.3141,
+      "win_rate": 0.6298,
+      "mean_hold_bars": 335.0,
+      "capture_pct": 27.65,
+      "ci": {
+        "n": 235,
+        "mean": 2.3025,
+        "ci_low": -1.1337,
+        "ci_high": 5.6718,
+        "positive_share": 0.906,
+        "verdict": "inconclusive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": -0.483,
+        "ci_low": -1.9266,
+        "ci_high": 0.9825,
+        "positive_share": 0.301,
+        "verdict": "inconclusive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": -0.1377,
+        "ci_low": -1.6472,
+        "ci_high": 1.5969,
+        "positive_share": 0.4485,
+        "verdict": "inconclusive"
+      },
+      "exit_counts": {
+        "cap": 235
+      }
+    },
+    {
+      "name": "oracle_cap_high",
+      "desc": "窗口内最高价卖出（未来函数，仅理论上界）",
+      "mean_net_pct": 14.7886,
+      "median_net_pct": 11.9542,
+      "win_rate": 1.0,
+      "mean_hold_bars": 168.0,
+      "capture_pct": 99.88,
+      "ci": {
+        "n": 235,
+        "mean": 14.7886,
+        "ci_low": 13.0197,
+        "ci_high": 17.1661,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "alpha_vs_random": {
+        "n": 235,
+        "mean": 12.0031,
+        "ci_low": 10.3348,
+        "ci_high": 13.5993,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "delta_vs_hold168": {
+        "n": 235,
+        "mean": 12.3484,
+        "ci_low": 10.2747,
+        "ci_high": 14.4371,
+        "positive_share": 1.0,
+        "verdict": "positive"
+      },
+      "exit_counts": {
+        "oracle": 235
+      }
+    }
+  ],
+  "diagnostics": {
+    "mean_confirm_lag_bars": 1.17,
+    "mean_available_move_pct": 12.191
+  },
+  "sensitivity": [
+    {
+      "confirm_pct": 0.005,
+      "min_drawdown_pct": 0.0,
+      "entries": 1348,
+      "available_move_mean_pct": 16.6544,
+      "random_control_mean_pct": 4.0486,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 4.5983,
+          "alpha_vs_random": 0.5497
+        },
+        {
+          "name": "trail_5pct",
+          "mean_net_pct": 4.0014,
+          "alpha_vs_random": -0.0471
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 3.8133,
+          "alpha_vs_random": -0.2353
+        }
+      ],
+      "rank_corr_vs_main": 0.6406
+    },
+    {
+      "confirm_pct": 0.005,
+      "min_drawdown_pct": 0.02,
+      "entries": 1258,
+      "available_move_mean_pct": 16.5781,
+      "random_control_mean_pct": 3.9576,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 4.7323,
+          "alpha_vs_random": 0.7748
+        },
+        {
+          "name": "trail_5pct",
+          "mean_net_pct": 4.0718,
+          "alpha_vs_random": 0.1143
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 4.0451,
+          "alpha_vs_random": 0.0875
+        }
+      ],
+      "rank_corr_vs_main": 0.8902
+    },
+    {
+      "confirm_pct": 0.005,
+      "min_drawdown_pct": 0.05,
+      "entries": 809,
+      "available_move_mean_pct": 18.1816,
+      "random_control_mean_pct": 5.0968,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 6.4439,
+          "alpha_vs_random": 1.3471
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 5.4847,
+          "alpha_vs_random": 0.3879
+        },
+        {
+          "name": "hold_24",
+          "mean_net_pct": 5.1618,
+          "alpha_vs_random": 0.065
+        }
+      ],
+      "rank_corr_vs_main": 0.9955
+    },
+    {
+      "confirm_pct": 0.01,
+      "min_drawdown_pct": 0.0,
+      "entries": 1508,
+      "available_move_mean_pct": 16.2564,
+      "random_control_mean_pct": 3.8542,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 4.5168,
+          "alpha_vs_random": 0.6626
+        },
+        {
+          "name": "trail_5pct",
+          "mean_net_pct": 4.1563,
+          "alpha_vs_random": 0.3021
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 3.7892,
+          "alpha_vs_random": -0.065
+        }
+      ],
+      "rank_corr_vs_main": 0.6165
+    },
+    {
+      "confirm_pct": 0.01,
+      "min_drawdown_pct": 0.02,
+      "entries": 1299,
+      "available_move_mean_pct": 16.7844,
+      "random_control_mean_pct": 3.9799,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 4.7789,
+          "alpha_vs_random": 0.799
+        },
+        {
+          "name": "trail_5pct",
+          "mean_net_pct": 4.1699,
+          "alpha_vs_random": 0.19
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 4.132,
+          "alpha_vs_random": 0.1521
+        }
+      ],
+      "rank_corr_vs_main": 0.8346
+    },
+    {
+      "confirm_pct": 0.01,
+      "min_drawdown_pct": 0.05,
+      "entries": 806,
+      "available_move_mean_pct": 18.3644,
+      "random_control_mean_pct": 5.2034,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 6.5727,
+          "alpha_vs_random": 1.3693
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 5.6828,
+          "alpha_vs_random": 0.4794
+        },
+        {
+          "name": "hold_24",
+          "mean_net_pct": 5.4147,
+          "alpha_vs_random": 0.2113
+        }
+      ],
+      "rank_corr_vs_main": 1.0
+    },
+    {
+      "confirm_pct": 0.02,
+      "min_drawdown_pct": 0.0,
+      "entries": 2424,
+      "available_move_mean_pct": 15.1179,
+      "random_control_mean_pct": 3.0782,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 3.9902,
+          "alpha_vs_random": 0.912
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 3.8546,
+          "alpha_vs_random": 0.7763
+        },
+        {
+          "name": "trail_5pct",
+          "mean_net_pct": 3.7845,
+          "alpha_vs_random": 0.7063
+        }
+      ],
+      "rank_corr_vs_main": 0.6947
+    },
+    {
+      "confirm_pct": 0.02,
+      "min_drawdown_pct": 0.02,
+      "entries": 1512,
+      "available_move_mean_pct": 16.9413,
+      "random_control_mean_pct": 4.1811,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 4.8393,
+          "alpha_vs_random": 0.6583
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 4.5775,
+          "alpha_vs_random": 0.3964
+        },
+        {
+          "name": "hold_24",
+          "mean_net_pct": 4.5241,
+          "alpha_vs_random": 0.3431
+        }
+      ],
+      "rank_corr_vs_main": 0.8075
+    },
+    {
+      "confirm_pct": 0.02,
+      "min_drawdown_pct": 0.05,
+      "entries": 873,
+      "available_move_mean_pct": 18.82,
+      "random_control_mean_pct": 5.6778,
+      "top3": [
+        {
+          "name": "hold_72",
+          "mean_net_pct": 6.7654,
+          "alpha_vs_random": 1.0876
+        },
+        {
+          "name": "rsi50_cross",
+          "mean_net_pct": 6.1597,
+          "alpha_vs_random": 0.4819
+        },
+        {
+          "name": "hold_24",
+          "mean_net_pct": 6.0111,
+          "alpha_vs_random": 0.3333
+        }
+      ],
+      "rank_corr_vs_main": 0.9549
+    }
+  ]
+}
