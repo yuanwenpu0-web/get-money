@@ -1,0 +1,4605 @@
+{
+  "strategy": "rgd_donchian_v2",
+  "generated_at": "2026-10-30T17:02:02+00:00",
+  "interval": "15m",
+  "htf_interval": "4h",
+  "days": 180,
+  "window": {
+    "start": "2026-05-03T17:00:10.842000+00:00",
+    "end": "2026-10-30T17:00:10.842000+00:00"
+  },
+  "universe": {
+    "kind": "all",
+    "requested": 99,
+    "evaluated": 99,
+    "skipped": [],
+    "insufficient_history": []
+  },
+  "parameters": {
+    "min_score": 0.75,
+    "heavy_score": 0.9,
+    "base_position_pct": 0.08,
+    "max_position_pct": 0.25,
+    "max_leverage": 10,
+    "sl_atr_mult": 1.5,
+    "tp_atr_mult": 2.5,
+    "trailing_atr_mult": 1.2,
+    "min_sl_pct": 0.0025,
+    "min_tp_pct": 0.005,
+    "min_hold_bars": 0,
+    "max_hold_bars": 0,
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "regime_filter": false,
+    "cost_filter": false,
+    "funding_filter": false,
+    "risk_per_trade_pct": 0.005,
+    "cooldown_bars": 0,
+    "min_atr_cost_ratio": 0.5,
+    "min_net_reward_risk": 1.0,
+    "max_atr_pct": 0.03,
+    "trailing_enabled": false,
+    "trail_activation_atr": 1.5,
+    "max_signal_age_bars": 2,
+    "dir_mode": 0,
+    "use_pull": true,
+    "cooldown": 5,
+    "brk_fast": 14,
+    "brk_slow": 34,
+    "atr_len": 14,
+    "rank_len": 100,
+    "rank_cut": 50.0,
+    "er_len": 10,
+    "er_min": 0.3,
+    "brk_buf": 0.1,
+    "use_ten": true,
+    "htf_in": 1,
+    "auto_htf": true,
+    "build_len": 6,
+    "rel_len": 20,
+    "max_ten": 8.25,
+    "ten_th": 0.2,
+    "use_corr": true,
+    "corr_len": 30,
+    "corr_min": 0.25,
+    "use_vol": true,
+    "vol_min": 1.0,
+    "def_fast": 8,
+    "def_slow": 21,
+    "acc_len": 6,
+    "max_depth": 0.7,
+    "risk_pct": 1.0,
+    "max_stop_atr": 2.5,
+    "min_stop_atr": 0.5,
+    "tp1_r": 2.0,
+    "tp1_pct": 50.0
+  },
+  "costs": {
+    "cash_per_symbol": 10000.0,
+    "groups": [
+      {
+        "id": "G1",
+        "dir_mode": 0,
+        "fee_rate": 0.0004,
+        "slippage": 0.0002,
+        "slippage_note": "比例滑点（项目全局）"
+      },
+      {
+        "id": "G2",
+        "dir_mode": 1,
+        "fee_rate": 0.0004,
+        "slippage": 0.0002,
+        "slippage_note": "比例滑点（项目全局）"
+      },
+      {
+        "id": "G3",
+        "dir_mode": 0,
+        "fee_rate": 0.0005,
+        "slippage": "2ticks",
+        "slippage_note": "2 ticks 每币标量近似（R15）"
+      },
+      {
+        "id": "G4",
+        "dir_mode": 1,
+        "fee_rate": 0.0005,
+        "slippage": "2ticks",
+        "slippage_note": "2 ticks 每币标量近似（R15）"
+      }
+    ]
+  },
+  "random_baseline_seeds": 10,
+  "min_pooled_trades": 30,
+  "min_bars": 800,
+  "processes": 22,
+  "elapsed_seconds": 109.9,
+  "groups": [
+    {
+      "id": "G1",
+      "label": "Long & Short · 项目全局成本",
+      "dir_mode": 0,
+      "fee_rate": 0.0004,
+      "slippage_mode": 0.0002,
+      "slippage_note": "比例滑点（项目全局）",
+      "slippage_used": 0.0002,
+      "symbols_total": 99,
+      "symbols_with_trades": 99,
+      "trades": 18497,
+      "signal_bars": 17673,
+      "account_return_median_pct": -16.7208,
+      "account_return_mean_pct": -15.1599,
+      "positive_symbols": 14,
+      "max_drawdown_mean_pct": -26.5673,
+      "exposure_mean_pct": 29.3073,
+      "beats_random_ratio": 0.1313,
+      "random_mean_pct": -15.4588,
+      "expectancy_ci": {
+        "trades": 18497,
+        "mean_return_pct": -0.1665,
+        "ci_low_pct": -0.215,
+        "ci_high_pct": -0.1161,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "side_split": {
+        "long": {
+          "trades": 9118,
+          "mean_return_pct": -0.0267,
+          "ci_low_pct": -0.1086,
+          "ci_high_pct": 0.0593,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.2755,
+          "verdict": "inconclusive"
+        },
+        "short": {
+          "trades": 9379,
+          "mean_return_pct": -0.3024,
+          "ci_low_pct": -0.3589,
+          "ci_high_pct": -0.2442,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "status_counts": {
+        "stop_loss": 18496,
+        "take_profit_1": 1
+      },
+      "fill_status_counts": {
+        "stop_loss": 18496,
+        "take_profit_1": 3860
+      },
+      "tp1_positions": 3860,
+      "tp1_position_ratio": 0.2087,
+      "blocked": {
+        "stop_order_requires_dedicated_broker": 1368672
+      },
+      "htf_degraded_symbols": [],
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "trades": 125,
+          "return_pct": -4.678,
+          "win_rate": 32.8,
+          "max_drawdown_pct": -14.4332,
+          "random_mean_pct": -6.7362
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "trades": 120,
+          "return_pct": -4.4771,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -12.04,
+          "random_mean_pct": -10.6317
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "trades": 240,
+          "return_pct": -18.1943,
+          "win_rate": 31.67,
+          "max_drawdown_pct": -21.7934,
+          "random_mean_pct": -19.5048
+        },
+        {
+          "symbol": "ADAUSDT",
+          "trades": 228,
+          "return_pct": -12.1493,
+          "win_rate": 29.82,
+          "max_drawdown_pct": -22.9443,
+          "random_mean_pct": -18.446
+        },
+        {
+          "symbol": "AGTUSDT",
+          "trades": 218,
+          "return_pct": -5.7472,
+          "win_rate": 33.49,
+          "max_drawdown_pct": -21.8032,
+          "random_mean_pct": -21.504
+        },
+        {
+          "symbol": "AINUSDT",
+          "trades": 221,
+          "return_pct": -8.498,
+          "win_rate": 27.15,
+          "max_drawdown_pct": -33.2216,
+          "random_mean_pct": -9.4544
+        },
+        {
+          "symbol": "AKEUSDT",
+          "trades": 113,
+          "return_pct": -13.2922,
+          "win_rate": 32.74,
+          "max_drawdown_pct": -18.8522,
+          "random_mean_pct": -10.3219
+        },
+        {
+          "symbol": "APRUSDT",
+          "trades": 210,
+          "return_pct": -9.3419,
+          "win_rate": 31.9,
+          "max_drawdown_pct": -25.477,
+          "random_mean_pct": -17.8917
+        },
+        {
+          "symbol": "APTUSDT",
+          "trades": 237,
+          "return_pct": -41.7113,
+          "win_rate": 26.58,
+          "max_drawdown_pct": -45.0528,
+          "random_mean_pct": -20.3692
+        },
+        {
+          "symbol": "ARBUSDT",
+          "trades": 238,
+          "return_pct": -27.4095,
+          "win_rate": 28.99,
+          "max_drawdown_pct": -30.1168,
+          "random_mean_pct": -18.077
+        },
+        {
+          "symbol": "ARCUSDT",
+          "trades": 104,
+          "return_pct": 2.0025,
+          "win_rate": 30.77,
+          "max_drawdown_pct": -19.1985,
+          "random_mean_pct": -6.9508
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "trades": 232,
+          "return_pct": 4.9057,
+          "win_rate": 34.48,
+          "max_drawdown_pct": -15.3632,
+          "random_mean_pct": -15.0268
+        },
+        {
+          "symbol": "ARUSDT",
+          "trades": 128,
+          "return_pct": -3.8179,
+          "win_rate": 26.56,
+          "max_drawdown_pct": -20.1034,
+          "random_mean_pct": -12.3842
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "trades": 236,
+          "return_pct": -55.4283,
+          "win_rate": 22.46,
+          "max_drawdown_pct": -56.0817,
+          "random_mean_pct": -25.4014
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "trades": 247,
+          "return_pct": -28.1289,
+          "win_rate": 29.55,
+          "max_drawdown_pct": -30.5941,
+          "random_mean_pct": -24.0022
+        },
+        {
+          "symbol": "AXSUSDT",
+          "trades": 128,
+          "return_pct": -16.8984,
+          "win_rate": 32.81,
+          "max_drawdown_pct": -23.7627,
+          "random_mean_pct": -10.5606
+        },
+        {
+          "symbol": "BANKUSDT",
+          "trades": 207,
+          "return_pct": -26.6209,
+          "win_rate": 28.99,
+          "max_drawdown_pct": -36.9497,
+          "random_mean_pct": -20.3522
+        },
+        {
+          "symbol": "BATUSDT",
+          "trades": 121,
+          "return_pct": -14.2672,
+          "win_rate": 33.06,
+          "max_drawdown_pct": -14.497,
+          "random_mean_pct": -6.4754
+        },
+        {
+          "symbol": "BCHUSDT",
+          "trades": 240,
+          "return_pct": -3.8418,
+          "win_rate": 30.42,
+          "max_drawdown_pct": -15.3813,
+          "random_mean_pct": -21.2087
+        },
+        {
+          "symbol": "BEAMXUSDT",
+          "trades": 123,
+          "return_pct": -0.7184,
+          "win_rate": 31.71,
+          "max_drawdown_pct": -17.7214,
+          "random_mean_pct": -9.1494
+        },
+        {
+          "symbol": "BEATUSDT",
+          "trades": 230,
+          "return_pct": -2.5287,
+          "win_rate": 34.35,
+          "max_drawdown_pct": -17.8422,
+          "random_mean_pct": -17.6887
+        },
+        {
+          "symbol": "BIRBUSDT",
+          "trades": 121,
+          "return_pct": -10.6469,
+          "win_rate": 33.88,
+          "max_drawdown_pct": -21.831,
+          "random_mean_pct": -10.7084
+        },
+        {
+          "symbol": "BNBUSDT",
+          "trades": 115,
+          "return_pct": 2.9332,
+          "win_rate": 40.0,
+          "max_drawdown_pct": -7.5794,
+          "random_mean_pct": -14.7717
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "trades": 129,
+          "return_pct": -0.7702,
+          "win_rate": 31.78,
+          "max_drawdown_pct": -23.3289,
+          "random_mean_pct": -10.6911
+        },
+        {
+          "symbol": "BRUSDT",
+          "trades": 226,
+          "return_pct": -23.5729,
+          "win_rate": 30.09,
+          "max_drawdown_pct": -28.3006,
+          "random_mean_pct": -19.5019
+        },
+        {
+          "symbol": "BTCUSDT",
+          "trades": 238,
+          "return_pct": -40.2193,
+          "win_rate": 23.53,
+          "max_drawdown_pct": -41.3043,
+          "random_mean_pct": -25.9469
+        },
+        {
+          "symbol": "BTWUSDT",
+          "trades": 166,
+          "return_pct": -0.3215,
+          "win_rate": 32.53,
+          "max_drawdown_pct": -15.9378,
+          "random_mean_pct": -18.2689
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "trades": 212,
+          "return_pct": -1.9538,
+          "win_rate": 31.6,
+          "max_drawdown_pct": -25.5308,
+          "random_mean_pct": -20.5726
+        },
+        {
+          "symbol": "CAKEUSDT",
+          "trades": 137,
+          "return_pct": 2.3325,
+          "win_rate": 32.12,
+          "max_drawdown_pct": -10.292,
+          "random_mean_pct": -13.7591
+        },
+        {
+          "symbol": "CAPUSDT",
+          "trades": 158,
+          "return_pct": -16.7208,
+          "win_rate": 35.44,
+          "max_drawdown_pct": -32.3976,
+          "random_mean_pct": -6.7852
+        },
+        {
+          "symbol": "CHIPUSDT",
+          "trades": 244,
+          "return_pct": 1.0241,
+          "win_rate": 38.11,
+          "max_drawdown_pct": -18.5791,
+          "random_mean_pct": -22.4803
+        },
+        {
+          "symbol": "COTIUSDT",
+          "trades": 120,
+          "return_pct": -1.316,
+          "win_rate": 36.67,
+          "max_drawdown_pct": -15.1017,
+          "random_mean_pct": -10.603
+        },
+        {
+          "symbol": "DASHUSDT",
+          "trades": 236,
+          "return_pct": -29.0583,
+          "win_rate": 28.39,
+          "max_drawdown_pct": -30.6588,
+          "random_mean_pct": -17.7563
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "trades": 228,
+          "return_pct": -19.895,
+          "win_rate": 27.63,
+          "max_drawdown_pct": -30.3916,
+          "random_mean_pct": -25.703
+        },
+        {
+          "symbol": "DOODUSDT",
+          "trades": 235,
+          "return_pct": -20.0015,
+          "win_rate": 31.06,
+          "max_drawdown_pct": -33.7186,
+          "random_mean_pct": -11.5923
+        },
+        {
+          "symbol": "DOSUSDT",
+          "trades": 105,
+          "return_pct": -23.0022,
+          "win_rate": 31.43,
+          "max_drawdown_pct": -26.3014,
+          "random_mean_pct": -12.1468
+        },
+        {
+          "symbol": "DOTUSDT",
+          "trades": 232,
+          "return_pct": -19.8205,
+          "win_rate": 34.05,
+          "max_drawdown_pct": -27.5356,
+          "random_mean_pct": -22.1033
+        },
+        {
+          "symbol": "EIGENUSDT",
+          "trades": 123,
+          "return_pct": -9.528,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -17.6293,
+          "random_mean_pct": -12.2193
+        },
+        {
+          "symbol": "ENAUSDT",
+          "trades": 230,
+          "return_pct": -9.1796,
+          "win_rate": 34.35,
+          "max_drawdown_pct": -23.9816,
+          "random_mean_pct": -16.258
+        },
+        {
+          "symbol": "ERAUSDT",
+          "trades": 235,
+          "return_pct": -11.4013,
+          "win_rate": 33.19,
+          "max_drawdown_pct": -37.8255,
+          "random_mean_pct": -17.6353
+        },
+        {
+          "symbol": "ETHUSDT",
+          "trades": 216,
+          "return_pct": -22.4952,
+          "win_rate": 29.63,
+          "max_drawdown_pct": -27.0603,
+          "random_mean_pct": -22.6293
+        },
+        {
+          "symbol": "FETUSDT",
+          "trades": 125,
+          "return_pct": -6.5971,
+          "win_rate": 32.0,
+          "max_drawdown_pct": -13.6388,
+          "random_mean_pct": -10.1975
+        },
+        {
+          "symbol": "FILUSDT",
+          "trades": 240,
+          "return_pct": -25.6039,
+          "win_rate": 30.0,
+          "max_drawdown_pct": -34.4931,
+          "random_mean_pct": -20.0198
+        },
+        {
+          "symbol": "GALAUSDT",
+          "trades": 111,
+          "return_pct": -5.9771,
+          "win_rate": 29.73,
+          "max_drawdown_pct": -16.471,
+          "random_mean_pct": -8.0532
+        },
+        {
+          "symbol": "GTCUSDT",
+          "trades": 112,
+          "return_pct": 5.9756,
+          "win_rate": 37.5,
+          "max_drawdown_pct": -9.1682,
+          "random_mean_pct": -14.0205
+        },
+        {
+          "symbol": "HBARUSDT",
+          "trades": 129,
+          "return_pct": -12.2596,
+          "win_rate": 27.91,
+          "max_drawdown_pct": -16.2416,
+          "random_mean_pct": -13.43
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "trades": 213,
+          "return_pct": -16.151,
+          "win_rate": 31.92,
+          "max_drawdown_pct": -27.2927,
+          "random_mean_pct": -18.1524
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "trades": 133,
+          "return_pct": -28.9536,
+          "win_rate": 24.06,
+          "max_drawdown_pct": -29.23,
+          "random_mean_pct": -15.4819
+        },
+        {
+          "symbol": "INJUSDT",
+          "trades": 233,
+          "return_pct": -24.6455,
+          "win_rate": 27.9,
+          "max_drawdown_pct": -33.7862,
+          "random_mean_pct": -15.2367
+        },
+        {
+          "symbol": "IOSTUSDT",
+          "trades": 120,
+          "return_pct": 7.3019,
+          "win_rate": 35.83,
+          "max_drawdown_pct": -13.7076,
+          "random_mean_pct": -5.0707
+        },
+        {
+          "symbol": "IRYSUSDT",
+          "trades": 229,
+          "return_pct": -25.7768,
+          "win_rate": 27.95,
+          "max_drawdown_pct": -47.601,
+          "random_mean_pct": -16.9314
+        },
+        {
+          "symbol": "JCTUSDT",
+          "trades": 229,
+          "return_pct": -22.16,
+          "win_rate": 31.0,
+          "max_drawdown_pct": -32.3438,
+          "random_mean_pct": -6.4615
+        },
+        {
+          "symbol": "KATUSDT",
+          "trades": 235,
+          "return_pct": -23.6015,
+          "win_rate": 31.91,
+          "max_drawdown_pct": -31.4319,
+          "random_mean_pct": -24.3863
+        },
+        {
+          "symbol": "LINKUSDT",
+          "trades": 236,
+          "return_pct": -8.2889,
+          "win_rate": 36.44,
+          "max_drawdown_pct": -23.2061,
+          "random_mean_pct": -23.5817
+        },
+        {
+          "symbol": "LITUSDT",
+          "trades": 268,
+          "return_pct": -38.5966,
+          "win_rate": 29.48,
+          "max_drawdown_pct": -45.0042,
+          "random_mean_pct": -21.2635
+        },
+        {
+          "symbol": "LTCUSDT",
+          "trades": 227,
+          "return_pct": -32.1509,
+          "win_rate": 30.84,
+          "max_drawdown_pct": -33.2536,
+          "random_mean_pct": -24.0199
+        },
+        {
+          "symbol": "LYNUSDT",
+          "trades": 121,
+          "return_pct": -30.825,
+          "win_rate": 27.27,
+          "max_drawdown_pct": -33.9011,
+          "random_mean_pct": -15.5597
+        },
+        {
+          "symbol": "MAGICUSDT",
+          "trades": 108,
+          "return_pct": 3.1039,
+          "win_rate": 37.04,
+          "max_drawdown_pct": -10.6215,
+          "random_mean_pct": -7.9561
+        },
+        {
+          "symbol": "MAGMAUSDT",
+          "trades": 109,
+          "return_pct": 21.5384,
+          "win_rate": 36.7,
+          "max_drawdown_pct": -14.1229,
+          "random_mean_pct": -3.79
+        },
+        {
+          "symbol": "MANAUSDT",
+          "trades": 125,
+          "return_pct": -26.2992,
+          "win_rate": 28.8,
+          "max_drawdown_pct": -31.592,
+          "random_mean_pct": -13.723
+        },
+        {
+          "symbol": "METUSDT",
+          "trades": 136,
+          "return_pct": -5.3755,
+          "win_rate": 33.09,
+          "max_drawdown_pct": -18.183,
+          "random_mean_pct": -8.3634
+        },
+        {
+          "symbol": "MORPHOUSDT",
+          "trades": 131,
+          "return_pct": -18.7986,
+          "win_rate": 30.53,
+          "max_drawdown_pct": -22.9922,
+          "random_mean_pct": -12.5755
+        },
+        {
+          "symbol": "MOVRUSDT",
+          "trades": 126,
+          "return_pct": 16.8561,
+          "win_rate": 35.71,
+          "max_drawdown_pct": -14.3246,
+          "random_mean_pct": -10.0235
+        },
+        {
+          "symbol": "NEARUSDT",
+          "trades": 240,
+          "return_pct": -17.3272,
+          "win_rate": 32.5,
+          "max_drawdown_pct": -23.6626,
+          "random_mean_pct": -14.7579
+        },
+        {
+          "symbol": "NILUSDT",
+          "trades": 236,
+          "return_pct": -0.5925,
+          "win_rate": 33.05,
+          "max_drawdown_pct": -35.8151,
+          "random_mean_pct": -10.185
+        },
+        {
+          "symbol": "OGNUSDT",
+          "trades": 124,
+          "return_pct": -25.5934,
+          "win_rate": 26.61,
+          "max_drawdown_pct": -31.3228,
+          "random_mean_pct": -6.6549
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "trades": 243,
+          "return_pct": -37.3922,
+          "win_rate": 27.57,
+          "max_drawdown_pct": -44.393,
+          "random_mean_pct": -18.216
+        },
+        {
+          "symbol": "OPUSDT",
+          "trades": 122,
+          "return_pct": -8.2521,
+          "win_rate": 31.97,
+          "max_drawdown_pct": -15.8201,
+          "random_mean_pct": -8.9407
+        },
+        {
+          "symbol": "ORDERUSDT",
+          "trades": 229,
+          "return_pct": -36.4182,
+          "win_rate": 27.95,
+          "max_drawdown_pct": -40.3733,
+          "random_mean_pct": -17.9684
+        },
+        {
+          "symbol": "PAXGUSDT",
+          "trades": 260,
+          "return_pct": -26.2162,
+          "win_rate": 25.0,
+          "max_drawdown_pct": -27.4804,
+          "random_mean_pct": -27.8661
+        },
+        {
+          "symbol": "PENDLEUSDT",
+          "trades": 136,
+          "return_pct": -20.6425,
+          "win_rate": 30.15,
+          "max_drawdown_pct": -23.4464,
+          "random_mean_pct": -13.2537
+        },
+        {
+          "symbol": "PENGUUSDT",
+          "trades": 237,
+          "return_pct": -34.3573,
+          "win_rate": 29.11,
+          "max_drawdown_pct": -40.2206,
+          "random_mean_pct": -22.3448
+        },
+        {
+          "symbol": "POLUSDT",
+          "trades": 120,
+          "return_pct": -26.5979,
+          "win_rate": 27.5,
+          "max_drawdown_pct": -28.1404,
+          "random_mean_pct": -13.0964
+        },
+        {
+          "symbol": "PROMUSDT",
+          "trades": 119,
+          "return_pct": -10.8751,
+          "win_rate": 31.09,
+          "max_drawdown_pct": -23.2521,
+          "random_mean_pct": -12.3711
+        },
+        {
+          "symbol": "PUMPUSDT",
+          "trades": 241,
+          "return_pct": -22.9705,
+          "win_rate": 32.78,
+          "max_drawdown_pct": -30.1323,
+          "random_mean_pct": -14.1877
+        },
+        {
+          "symbol": "QNTUSDT",
+          "trades": 240,
+          "return_pct": -28.7562,
+          "win_rate": 26.67,
+          "max_drawdown_pct": -40.4721,
+          "random_mean_pct": -15.2174
+        },
+        {
+          "symbol": "QUSDT",
+          "trades": 209,
+          "return_pct": -49.5908,
+          "win_rate": 26.32,
+          "max_drawdown_pct": -51.832,
+          "random_mean_pct": -13.6737
+        },
+        {
+          "symbol": "RAREUSDT",
+          "trades": 131,
+          "return_pct": -15.9122,
+          "win_rate": 29.77,
+          "max_drawdown_pct": -22.8882,
+          "random_mean_pct": -11.6648
+        },
+        {
+          "symbol": "RIVERUSDT",
+          "trades": 122,
+          "return_pct": -3.2172,
+          "win_rate": 32.79,
+          "max_drawdown_pct": -21.3914,
+          "random_mean_pct": -9.4553
+        },
+        {
+          "symbol": "RLCUSDT",
+          "trades": 116,
+          "return_pct": 52.6288,
+          "win_rate": 39.66,
+          "max_drawdown_pct": -15.9096,
+          "random_mean_pct": -1.6163
+        },
+        {
+          "symbol": "RUNEUSDT",
+          "trades": 129,
+          "return_pct": -12.8162,
+          "win_rate": 32.56,
+          "max_drawdown_pct": -13.232,
+          "random_mean_pct": -13.9005
+        },
+        {
+          "symbol": "SAGAUSDT",
+          "trades": 124,
+          "return_pct": -18.2743,
+          "win_rate": 26.61,
+          "max_drawdown_pct": -27.9134,
+          "random_mean_pct": -9.2681
+        },
+        {
+          "symbol": "SANDUSDT",
+          "trades": 115,
+          "return_pct": -1.466,
+          "win_rate": 30.43,
+          "max_drawdown_pct": -14.9968,
+          "random_mean_pct": -9.9519
+        },
+        {
+          "symbol": "SKYUSDT",
+          "trades": 116,
+          "return_pct": 7.1109,
+          "win_rate": 32.76,
+          "max_drawdown_pct": -11.8343,
+          "random_mean_pct": -11.2935
+        },
+        {
+          "symbol": "SOLUSDT",
+          "trades": 234,
+          "return_pct": -25.2698,
+          "win_rate": 29.06,
+          "max_drawdown_pct": -33.0016,
+          "random_mean_pct": -22.8021
+        },
+        {
+          "symbol": "SOONUSDT",
+          "trades": 242,
+          "return_pct": -50.4791,
+          "win_rate": 25.21,
+          "max_drawdown_pct": -51.1293,
+          "random_mean_pct": -12.9605
+        },
+        {
+          "symbol": "STRKUSDT",
+          "trades": 242,
+          "return_pct": -6.0197,
+          "win_rate": 31.82,
+          "max_drawdown_pct": -29.408,
+          "random_mean_pct": -17.5462
+        },
+        {
+          "symbol": "SUIUSDT",
+          "trades": 211,
+          "return_pct": -20.5584,
+          "win_rate": 28.44,
+          "max_drawdown_pct": -39.7149,
+          "random_mean_pct": -18.2359
+        },
+        {
+          "symbol": "TAGUSDT",
+          "trades": 226,
+          "return_pct": 9.8033,
+          "win_rate": 32.74,
+          "max_drawdown_pct": -19.2328,
+          "random_mean_pct": -15.9174
+        },
+        {
+          "symbol": "TAOUSDT",
+          "trades": 252,
+          "return_pct": -34.9012,
+          "win_rate": 27.38,
+          "max_drawdown_pct": -47.1916,
+          "random_mean_pct": -20.7953
+        },
+        {
+          "symbol": "TIAUSDT",
+          "trades": 234,
+          "return_pct": -24.1738,
+          "win_rate": 29.49,
+          "max_drawdown_pct": -26.728,
+          "random_mean_pct": -16.4043
+        },
+        {
+          "symbol": "TRUMPUSDT",
+          "trades": 228,
+          "return_pct": -27.6966,
+          "win_rate": 28.51,
+          "max_drawdown_pct": -34.159,
+          "random_mean_pct": -23.0301
+        },
+        {
+          "symbol": "UNIUSDT",
+          "trades": 238,
+          "return_pct": -1.6759,
+          "win_rate": 33.19,
+          "max_drawdown_pct": -18.045,
+          "random_mean_pct": -19.374
+        },
+        {
+          "symbol": "WLDUSDT",
+          "trades": 223,
+          "return_pct": 1.0252,
+          "win_rate": 36.32,
+          "max_drawdown_pct": -21.8939,
+          "random_mean_pct": -17.7243
+        },
+        {
+          "symbol": "XAUTUSDT",
+          "trades": 251,
+          "return_pct": -26.8725,
+          "win_rate": 23.9,
+          "max_drawdown_pct": -27.7511,
+          "random_mean_pct": -27.0022
+        },
+        {
+          "symbol": "XLMUSDT",
+          "trades": 247,
+          "return_pct": -29.6531,
+          "win_rate": 29.96,
+          "max_drawdown_pct": -33.2619,
+          "random_mean_pct": -18.7117
+        },
+        {
+          "symbol": "XMRUSDT",
+          "trades": 249,
+          "return_pct": -40.823,
+          "win_rate": 31.73,
+          "max_drawdown_pct": -42.8437,
+          "random_mean_pct": -22.5205
+        },
+        {
+          "symbol": "XRPUSDT",
+          "trades": 229,
+          "return_pct": -20.2448,
+          "win_rate": 30.57,
+          "max_drawdown_pct": -27.0215,
+          "random_mean_pct": -20.5757
+        },
+        {
+          "symbol": "ZROUSDT",
+          "trades": 234,
+          "return_pct": -24.0222,
+          "win_rate": 30.77,
+          "max_drawdown_pct": -33.1245,
+          "random_mean_pct": -18.3671
+        }
+      ]
+    },
+    {
+      "id": "G2",
+      "label": "Long Only · 项目全局成本",
+      "dir_mode": 1,
+      "fee_rate": 0.0004,
+      "slippage_mode": 0.0002,
+      "slippage_note": "比例滑点（项目全局）",
+      "slippage_used": 0.0002,
+      "symbols_total": 99,
+      "symbols_with_trades": 99,
+      "trades": 9118,
+      "signal_bars": 17673,
+      "account_return_median_pct": -5.097,
+      "account_return_mean_pct": -3.0204,
+      "positive_symbols": 41,
+      "max_drawdown_mean_pct": -16.0801,
+      "exposure_mean_pct": 14.3209,
+      "beats_random_ratio": 0.2121,
+      "random_mean_pct": -7.5952,
+      "expectancy_ci": {
+        "trades": 9118,
+        "mean_return_pct": -0.0267,
+        "ci_low_pct": -0.1086,
+        "ci_high_pct": 0.0593,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.2755,
+        "verdict": "inconclusive"
+      },
+      "side_split": {
+        "long": {
+          "trades": 9118,
+          "mean_return_pct": -0.0267,
+          "ci_low_pct": -0.1086,
+          "ci_high_pct": 0.0593,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.2755,
+          "verdict": "inconclusive"
+        },
+        "short": {
+          "trades": 0,
+          "verdict": "no_trades"
+        }
+      },
+      "status_counts": {
+        "stop_loss": 9117,
+        "take_profit_1": 1
+      },
+      "fill_status_counts": {
+        "stop_loss": 9117,
+        "take_profit_1": 2219
+      },
+      "tp1_positions": 2219,
+      "tp1_position_ratio": 0.2434,
+      "blocked": {
+        "stop_order_requires_dedicated_broker": 1368672
+      },
+      "htf_degraded_symbols": [],
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "trades": 62,
+          "return_pct": -5.3143,
+          "win_rate": 27.42,
+          "max_drawdown_pct": -12.8624,
+          "random_mean_pct": -2.1405
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "trades": 65,
+          "return_pct": -1.12,
+          "win_rate": 33.85,
+          "max_drawdown_pct": -11.739,
+          "random_mean_pct": -5.4424
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "trades": 121,
+          "return_pct": -7.2975,
+          "win_rate": 31.4,
+          "max_drawdown_pct": -10.1604,
+          "random_mean_pct": -9.1135
+        },
+        {
+          "symbol": "ADAUSDT",
+          "trades": 112,
+          "return_pct": 2.5322,
+          "win_rate": 30.36,
+          "max_drawdown_pct": -12.3608,
+          "random_mean_pct": -8.3894
+        },
+        {
+          "symbol": "AGTUSDT",
+          "trades": 115,
+          "return_pct": 15.0684,
+          "win_rate": 37.39,
+          "max_drawdown_pct": -14.2911,
+          "random_mean_pct": -12.8437
+        },
+        {
+          "symbol": "AINUSDT",
+          "trades": 107,
+          "return_pct": 3.3457,
+          "win_rate": 26.17,
+          "max_drawdown_pct": -25.5998,
+          "random_mean_pct": -2.3699
+        },
+        {
+          "symbol": "AKEUSDT",
+          "trades": 53,
+          "return_pct": 7.6854,
+          "win_rate": 39.62,
+          "max_drawdown_pct": -9.9509,
+          "random_mean_pct": -2.9921
+        },
+        {
+          "symbol": "APRUSDT",
+          "trades": 92,
+          "return_pct": 6.6002,
+          "win_rate": 31.52,
+          "max_drawdown_pct": -18.4743,
+          "random_mean_pct": -6.043
+        },
+        {
+          "symbol": "APTUSDT",
+          "trades": 114,
+          "return_pct": -22.6824,
+          "win_rate": 25.44,
+          "max_drawdown_pct": -24.4772,
+          "random_mean_pct": -11.5869
+        },
+        {
+          "symbol": "ARBUSDT",
+          "trades": 106,
+          "return_pct": 9.2294,
+          "win_rate": 33.96,
+          "max_drawdown_pct": -11.2413,
+          "random_mean_pct": -8.083
+        },
+        {
+          "symbol": "ARCUSDT",
+          "trades": 49,
+          "return_pct": -4.0212,
+          "win_rate": 30.61,
+          "max_drawdown_pct": -15.6238,
+          "random_mean_pct": -4.5895
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "trades": 116,
+          "return_pct": 8.7509,
+          "win_rate": 35.34,
+          "max_drawdown_pct": -13.942,
+          "random_mean_pct": -5.4957
+        },
+        {
+          "symbol": "ARUSDT",
+          "trades": 67,
+          "return_pct": 1.5712,
+          "win_rate": 20.9,
+          "max_drawdown_pct": -18.2706,
+          "random_mean_pct": -4.5323
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "trades": 122,
+          "return_pct": -29.083,
+          "win_rate": 22.95,
+          "max_drawdown_pct": -30.8188,
+          "random_mean_pct": -13.6519
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "trades": 121,
+          "return_pct": -10.8434,
+          "win_rate": 29.75,
+          "max_drawdown_pct": -20.5092,
+          "random_mean_pct": -13.0629
+        },
+        {
+          "symbol": "AXSUSDT",
+          "trades": 61,
+          "return_pct": -13.8539,
+          "win_rate": 27.87,
+          "max_drawdown_pct": -15.6428,
+          "random_mean_pct": -3.1852
+        },
+        {
+          "symbol": "BANKUSDT",
+          "trades": 98,
+          "return_pct": -16.3484,
+          "win_rate": 27.55,
+          "max_drawdown_pct": -23.2272,
+          "random_mean_pct": -8.1478
+        },
+        {
+          "symbol": "BATUSDT",
+          "trades": 64,
+          "return_pct": -7.0694,
+          "win_rate": 29.69,
+          "max_drawdown_pct": -12.8693,
+          "random_mean_pct": 0.1186
+        },
+        {
+          "symbol": "BCHUSDT",
+          "trades": 108,
+          "return_pct": 6.752,
+          "win_rate": 35.19,
+          "max_drawdown_pct": -12.9247,
+          "random_mean_pct": -8.6633
+        },
+        {
+          "symbol": "BEAMXUSDT",
+          "trades": 62,
+          "return_pct": 22.0412,
+          "win_rate": 35.48,
+          "max_drawdown_pct": -13.8213,
+          "random_mean_pct": -0.3831
+        },
+        {
+          "symbol": "BEATUSDT",
+          "trades": 110,
+          "return_pct": 3.0408,
+          "win_rate": 36.36,
+          "max_drawdown_pct": -9.4073,
+          "random_mean_pct": -8.9754
+        },
+        {
+          "symbol": "BIRBUSDT",
+          "trades": 57,
+          "return_pct": 1.3105,
+          "win_rate": 35.09,
+          "max_drawdown_pct": -9.9227,
+          "random_mean_pct": -4.2358
+        },
+        {
+          "symbol": "BNBUSDT",
+          "trades": 59,
+          "return_pct": 5.7978,
+          "win_rate": 44.07,
+          "max_drawdown_pct": -6.3911,
+          "random_mean_pct": -7.4627
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "trades": 61,
+          "return_pct": 13.2151,
+          "win_rate": 39.34,
+          "max_drawdown_pct": -16.2383,
+          "random_mean_pct": -4.4003
+        },
+        {
+          "symbol": "BRUSDT",
+          "trades": 109,
+          "return_pct": -9.8345,
+          "win_rate": 29.36,
+          "max_drawdown_pct": -23.4999,
+          "random_mean_pct": -11.5441
+        },
+        {
+          "symbol": "BTCUSDT",
+          "trades": 120,
+          "return_pct": -22.9153,
+          "win_rate": 20.83,
+          "max_drawdown_pct": -23.127,
+          "random_mean_pct": -13.1987
+        },
+        {
+          "symbol": "BTWUSDT",
+          "trades": 100,
+          "return_pct": 27.1957,
+          "win_rate": 38.0,
+          "max_drawdown_pct": -9.4079,
+          "random_mean_pct": -10.1279
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "trades": 115,
+          "return_pct": 8.2003,
+          "win_rate": 35.65,
+          "max_drawdown_pct": -12.7188,
+          "random_mean_pct": -13.7975
+        },
+        {
+          "symbol": "CAKEUSDT",
+          "trades": 75,
+          "return_pct": 4.7238,
+          "win_rate": 34.67,
+          "max_drawdown_pct": -9.0478,
+          "random_mean_pct": -6.7325
+        },
+        {
+          "symbol": "CAPUSDT",
+          "trades": 88,
+          "return_pct": -6.2024,
+          "win_rate": 36.36,
+          "max_drawdown_pct": -20.3807,
+          "random_mean_pct": -3.9521
+        },
+        {
+          "symbol": "CHIPUSDT",
+          "trades": 112,
+          "return_pct": 11.7903,
+          "win_rate": 46.43,
+          "max_drawdown_pct": -7.6218,
+          "random_mean_pct": -8.2003
+        },
+        {
+          "symbol": "COTIUSDT",
+          "trades": 62,
+          "return_pct": -9.3779,
+          "win_rate": 29.03,
+          "max_drawdown_pct": -14.4665,
+          "random_mean_pct": -7.5017
+        },
+        {
+          "symbol": "DASHUSDT",
+          "trades": 110,
+          "return_pct": -11.3364,
+          "win_rate": 27.27,
+          "max_drawdown_pct": -16.1641,
+          "random_mean_pct": -10.1885
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "trades": 108,
+          "return_pct": -7.0108,
+          "win_rate": 25.93,
+          "max_drawdown_pct": -20.6234,
+          "random_mean_pct": -14.3952
+        },
+        {
+          "symbol": "DOODUSDT",
+          "trades": 112,
+          "return_pct": -17.5563,
+          "win_rate": 27.68,
+          "max_drawdown_pct": -24.0675,
+          "random_mean_pct": -3.6397
+        },
+        {
+          "symbol": "DOSUSDT",
+          "trades": 61,
+          "return_pct": -14.5981,
+          "win_rate": 29.51,
+          "max_drawdown_pct": -17.6753,
+          "random_mean_pct": -11.4148
+        },
+        {
+          "symbol": "DOTUSDT",
+          "trades": 113,
+          "return_pct": -9.4194,
+          "win_rate": 30.97,
+          "max_drawdown_pct": -17.7194,
+          "random_mean_pct": -11.3592
+        },
+        {
+          "symbol": "EIGENUSDT",
+          "trades": 62,
+          "return_pct": 0.2952,
+          "win_rate": 33.87,
+          "max_drawdown_pct": -9.6913,
+          "random_mean_pct": -6.1922
+        },
+        {
+          "symbol": "ENAUSDT",
+          "trades": 108,
+          "return_pct": 9.7003,
+          "win_rate": 37.04,
+          "max_drawdown_pct": -14.0608,
+          "random_mean_pct": -5.8938
+        },
+        {
+          "symbol": "ERAUSDT",
+          "trades": 113,
+          "return_pct": -9.8705,
+          "win_rate": 30.97,
+          "max_drawdown_pct": -25.2775,
+          "random_mean_pct": -11.1973
+        },
+        {
+          "symbol": "ETHUSDT",
+          "trades": 114,
+          "return_pct": -15.2816,
+          "win_rate": 28.07,
+          "max_drawdown_pct": -15.2816,
+          "random_mean_pct": -12.6791
+        },
+        {
+          "symbol": "FETUSDT",
+          "trades": 65,
+          "return_pct": -2.2416,
+          "win_rate": 26.15,
+          "max_drawdown_pct": -9.6638,
+          "random_mean_pct": -6.5632
+        },
+        {
+          "symbol": "FILUSDT",
+          "trades": 123,
+          "return_pct": -12.1586,
+          "win_rate": 30.89,
+          "max_drawdown_pct": -18.4816,
+          "random_mean_pct": -11.0108
+        },
+        {
+          "symbol": "GALAUSDT",
+          "trades": 53,
+          "return_pct": 1.1375,
+          "win_rate": 32.08,
+          "max_drawdown_pct": -10.712,
+          "random_mean_pct": -4.7059
+        },
+        {
+          "symbol": "GTCUSDT",
+          "trades": 53,
+          "return_pct": 9.4187,
+          "win_rate": 35.85,
+          "max_drawdown_pct": -6.7301,
+          "random_mean_pct": -3.8242
+        },
+        {
+          "symbol": "HBARUSDT",
+          "trades": 67,
+          "return_pct": 0.4933,
+          "win_rate": 31.34,
+          "max_drawdown_pct": -10.003,
+          "random_mean_pct": -7.6666
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "trades": 101,
+          "return_pct": 1.5278,
+          "win_rate": 32.67,
+          "max_drawdown_pct": -12.1546,
+          "random_mean_pct": -9.4737
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "trades": 69,
+          "return_pct": -14.3143,
+          "win_rate": 24.64,
+          "max_drawdown_pct": -14.8314,
+          "random_mean_pct": -7.4213
+        },
+        {
+          "symbol": "INJUSDT",
+          "trades": 113,
+          "return_pct": -5.097,
+          "win_rate": 31.86,
+          "max_drawdown_pct": -16.1819,
+          "random_mean_pct": -5.9048
+        },
+        {
+          "symbol": "IOSTUSDT",
+          "trades": 59,
+          "return_pct": 8.0514,
+          "win_rate": 32.2,
+          "max_drawdown_pct": -9.6845,
+          "random_mean_pct": -2.5127
+        },
+        {
+          "symbol": "IRYSUSDT",
+          "trades": 117,
+          "return_pct": -12.7046,
+          "win_rate": 25.64,
+          "max_drawdown_pct": -36.8115,
+          "random_mean_pct": -12.4627
+        },
+        {
+          "symbol": "JCTUSDT",
+          "trades": 117,
+          "return_pct": 2.4841,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -14.9539,
+          "random_mean_pct": -1.884
+        },
+        {
+          "symbol": "KATUSDT",
+          "trades": 113,
+          "return_pct": -23.5057,
+          "win_rate": 25.66,
+          "max_drawdown_pct": -25.0897,
+          "random_mean_pct": -12.1298
+        },
+        {
+          "symbol": "LINKUSDT",
+          "trades": 108,
+          "return_pct": 11.9075,
+          "win_rate": 38.89,
+          "max_drawdown_pct": -9.4768,
+          "random_mean_pct": -10.6559
+        },
+        {
+          "symbol": "LITUSDT",
+          "trades": 140,
+          "return_pct": -13.7919,
+          "win_rate": 31.43,
+          "max_drawdown_pct": -18.2035,
+          "random_mean_pct": -11.9197
+        },
+        {
+          "symbol": "LTCUSDT",
+          "trades": 116,
+          "return_pct": -11.5646,
+          "win_rate": 31.9,
+          "max_drawdown_pct": -14.8315,
+          "random_mean_pct": -14.9595
+        },
+        {
+          "symbol": "LYNUSDT",
+          "trades": 58,
+          "return_pct": -9.9699,
+          "win_rate": 36.21,
+          "max_drawdown_pct": -15.2088,
+          "random_mean_pct": -8.4674
+        },
+        {
+          "symbol": "MAGICUSDT",
+          "trades": 62,
+          "return_pct": 4.6577,
+          "win_rate": 35.48,
+          "max_drawdown_pct": -10.3615,
+          "random_mean_pct": -6.1723
+        },
+        {
+          "symbol": "MAGMAUSDT",
+          "trades": 58,
+          "return_pct": 30.4688,
+          "win_rate": 43.1,
+          "max_drawdown_pct": -10.7158,
+          "random_mean_pct": -1.0084
+        },
+        {
+          "symbol": "MANAUSDT",
+          "trades": 69,
+          "return_pct": -22.1237,
+          "win_rate": 23.19,
+          "max_drawdown_pct": -24.5299,
+          "random_mean_pct": -8.0528
+        },
+        {
+          "symbol": "METUSDT",
+          "trades": 63,
+          "return_pct": 3.9907,
+          "win_rate": 30.16,
+          "max_drawdown_pct": -8.113,
+          "random_mean_pct": -2.4304
+        },
+        {
+          "symbol": "MORPHOUSDT",
+          "trades": 64,
+          "return_pct": -6.9261,
+          "win_rate": 29.69,
+          "max_drawdown_pct": -8.6087,
+          "random_mean_pct": -5.4816
+        },
+        {
+          "symbol": "MOVRUSDT",
+          "trades": 56,
+          "return_pct": 8.6188,
+          "win_rate": 30.36,
+          "max_drawdown_pct": -14.1103,
+          "random_mean_pct": -4.3382
+        },
+        {
+          "symbol": "NEARUSDT",
+          "trades": 125,
+          "return_pct": 1.4944,
+          "win_rate": 33.6,
+          "max_drawdown_pct": -12.8123,
+          "random_mean_pct": -4.0635
+        },
+        {
+          "symbol": "NILUSDT",
+          "trades": 113,
+          "return_pct": 11.9436,
+          "win_rate": 32.74,
+          "max_drawdown_pct": -24.6191,
+          "random_mean_pct": -5.0444
+        },
+        {
+          "symbol": "OGNUSDT",
+          "trades": 69,
+          "return_pct": -12.7579,
+          "win_rate": 27.54,
+          "max_drawdown_pct": -16.9152,
+          "random_mean_pct": -0.504
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "trades": 113,
+          "return_pct": -13.602,
+          "win_rate": 29.2,
+          "max_drawdown_pct": -15.9446,
+          "random_mean_pct": -8.5212
+        },
+        {
+          "symbol": "OPUSDT",
+          "trades": 57,
+          "return_pct": 4.0514,
+          "win_rate": 35.09,
+          "max_drawdown_pct": -9.6263,
+          "random_mean_pct": -3.6088
+        },
+        {
+          "symbol": "ORDERUSDT",
+          "trades": 104,
+          "return_pct": -25.5791,
+          "win_rate": 25.0,
+          "max_drawdown_pct": -27.1035,
+          "random_mean_pct": -7.4939
+        },
+        {
+          "symbol": "PAXGUSDT",
+          "trades": 122,
+          "return_pct": -14.3966,
+          "win_rate": 22.95,
+          "max_drawdown_pct": -15.8235,
+          "random_mean_pct": -14.7913
+        },
+        {
+          "symbol": "PENDLEUSDT",
+          "trades": 68,
+          "return_pct": -10.5529,
+          "win_rate": 26.47,
+          "max_drawdown_pct": -13.2923,
+          "random_mean_pct": -6.7245
+        },
+        {
+          "symbol": "PENGUUSDT",
+          "trades": 118,
+          "return_pct": -10.2038,
+          "win_rate": 32.2,
+          "max_drawdown_pct": -15.9318,
+          "random_mean_pct": -10.683
+        },
+        {
+          "symbol": "POLUSDT",
+          "trades": 65,
+          "return_pct": -15.7564,
+          "win_rate": 29.23,
+          "max_drawdown_pct": -19.5891,
+          "random_mean_pct": -6.7926
+        },
+        {
+          "symbol": "PROMUSDT",
+          "trades": 63,
+          "return_pct": -3.4563,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -16.4189,
+          "random_mean_pct": -5.4781
+        },
+        {
+          "symbol": "PUMPUSDT",
+          "trades": 109,
+          "return_pct": 9.0881,
+          "win_rate": 38.53,
+          "max_drawdown_pct": -11.5788,
+          "random_mean_pct": -6.5972
+        },
+        {
+          "symbol": "QNTUSDT",
+          "trades": 119,
+          "return_pct": -10.0323,
+          "win_rate": 25.21,
+          "max_drawdown_pct": -28.9135,
+          "random_mean_pct": -5.5894
+        },
+        {
+          "symbol": "QUSDT",
+          "trades": 97,
+          "return_pct": -13.3548,
+          "win_rate": 30.93,
+          "max_drawdown_pct": -18.969,
+          "random_mean_pct": -4.115
+        },
+        {
+          "symbol": "RAREUSDT",
+          "trades": 68,
+          "return_pct": -8.44,
+          "win_rate": 29.41,
+          "max_drawdown_pct": -17.3409,
+          "random_mean_pct": -6.2363
+        },
+        {
+          "symbol": "RIVERUSDT",
+          "trades": 56,
+          "return_pct": -0.1899,
+          "win_rate": 32.14,
+          "max_drawdown_pct": -16.6283,
+          "random_mean_pct": -6.2147
+        },
+        {
+          "symbol": "RLCUSDT",
+          "trades": 57,
+          "return_pct": 56.5368,
+          "win_rate": 40.35,
+          "max_drawdown_pct": -15.7141,
+          "random_mean_pct": 1.6931
+        },
+        {
+          "symbol": "RUNEUSDT",
+          "trades": 67,
+          "return_pct": -3.813,
+          "win_rate": 31.34,
+          "max_drawdown_pct": -10.1821,
+          "random_mean_pct": -5.9011
+        },
+        {
+          "symbol": "SAGAUSDT",
+          "trades": 68,
+          "return_pct": -8.3592,
+          "win_rate": 26.47,
+          "max_drawdown_pct": -19.6113,
+          "random_mean_pct": -3.8075
+        },
+        {
+          "symbol": "SANDUSDT",
+          "trades": 60,
+          "return_pct": -0.8667,
+          "win_rate": 30.0,
+          "max_drawdown_pct": -11.6407,
+          "random_mean_pct": -6.0647
+        },
+        {
+          "symbol": "SKYUSDT",
+          "trades": 57,
+          "return_pct": 7.8127,
+          "win_rate": 38.6,
+          "max_drawdown_pct": -7.4406,
+          "random_mean_pct": -7.0447
+        },
+        {
+          "symbol": "SOLUSDT",
+          "trades": 115,
+          "return_pct": -9.7643,
+          "win_rate": 27.83,
+          "max_drawdown_pct": -14.929,
+          "random_mean_pct": -12.873
+        },
+        {
+          "symbol": "SOONUSDT",
+          "trades": 122,
+          "return_pct": -28.8204,
+          "win_rate": 24.59,
+          "max_drawdown_pct": -31.2335,
+          "random_mean_pct": -3.2714
+        },
+        {
+          "symbol": "STRKUSDT",
+          "trades": 110,
+          "return_pct": 9.5828,
+          "win_rate": 30.91,
+          "max_drawdown_pct": -19.6866,
+          "random_mean_pct": -6.9774
+        },
+        {
+          "symbol": "SUIUSDT",
+          "trades": 100,
+          "return_pct": -13.1881,
+          "win_rate": 26.0,
+          "max_drawdown_pct": -24.4768,
+          "random_mean_pct": -9.7784
+        },
+        {
+          "symbol": "TAGUSDT",
+          "trades": 96,
+          "return_pct": 12.6874,
+          "win_rate": 37.5,
+          "max_drawdown_pct": -8.8061,
+          "random_mean_pct": -9.817
+        },
+        {
+          "symbol": "TAOUSDT",
+          "trades": 121,
+          "return_pct": -18.0406,
+          "win_rate": 28.1,
+          "max_drawdown_pct": -27.0181,
+          "random_mean_pct": -12.0501
+        },
+        {
+          "symbol": "TIAUSDT",
+          "trades": 119,
+          "return_pct": -0.3988,
+          "win_rate": 33.61,
+          "max_drawdown_pct": -12.0339,
+          "random_mean_pct": -9.5268
+        },
+        {
+          "symbol": "TRUMPUSDT",
+          "trades": 108,
+          "return_pct": -5.3104,
+          "win_rate": 29.63,
+          "max_drawdown_pct": -14.8851,
+          "random_mean_pct": -12.3641
+        },
+        {
+          "symbol": "UNIUSDT",
+          "trades": 121,
+          "return_pct": 12.2313,
+          "win_rate": 37.19,
+          "max_drawdown_pct": -11.7893,
+          "random_mean_pct": -10.6575
+        },
+        {
+          "symbol": "WLDUSDT",
+          "trades": 108,
+          "return_pct": 19.9554,
+          "win_rate": 41.67,
+          "max_drawdown_pct": -6.8129,
+          "random_mean_pct": -9.5892
+        },
+        {
+          "symbol": "XAUTUSDT",
+          "trades": 110,
+          "return_pct": -12.9432,
+          "win_rate": 22.73,
+          "max_drawdown_pct": -13.8869,
+          "random_mean_pct": -13.7579
+        },
+        {
+          "symbol": "XLMUSDT",
+          "trades": 114,
+          "return_pct": -20.4902,
+          "win_rate": 27.19,
+          "max_drawdown_pct": -24.9567,
+          "random_mean_pct": -10.2237
+        },
+        {
+          "symbol": "XMRUSDT",
+          "trades": 139,
+          "return_pct": -22.3757,
+          "win_rate": 33.09,
+          "max_drawdown_pct": -24.9778,
+          "random_mean_pct": -10.5544
+        },
+        {
+          "symbol": "XRPUSDT",
+          "trades": 112,
+          "return_pct": -9.6168,
+          "win_rate": 27.68,
+          "max_drawdown_pct": -13.5808,
+          "random_mean_pct": -9.3088
+        },
+        {
+          "symbol": "ZROUSDT",
+          "trades": 120,
+          "return_pct": -18.2647,
+          "win_rate": 25.83,
+          "max_drawdown_pct": -25.7026,
+          "random_mean_pct": -10.8629
+        }
+      ]
+    },
+    {
+      "id": "G3",
+      "label": "Long & Short · 脚本原样成本",
+      "dir_mode": 0,
+      "fee_rate": 0.0005,
+      "slippage_mode": "2ticks",
+      "slippage_note": "2 ticks 每币标量近似（R15）",
+      "slippage_used": [
+        2.616e-07,
+        2.761e-07,
+        5.032e-07,
+        8.091e-07,
+        8.498e-07,
+        2.0519e-06,
+        2.0907e-06,
+        2.0993e-06,
+        2.3563e-06,
+        2.4733e-06,
+        2.5013e-06,
+        2.5988e-06,
+        2.9691e-06,
+        2.9696e-06,
+        3.0912e-06,
+        3.241e-06,
+        3.937e-06,
+        3.9471e-06,
+        4.6743e-06,
+        4.6745e-06,
+        4.9677e-06,
+        5.005e-06,
+        5.2124e-06,
+        5.3996e-06,
+        5.5979e-06,
+        6.3512e-06,
+        8.2232e-06,
+        8.8496e-06,
+        8.9047e-06,
+        9.4366e-06,
+        9.5831e-06,
+        9.7752e-06,
+        1.01574e-05,
+        1.05319e-05,
+        1.08578e-05,
+        1.0917e-05,
+        1.17509e-05,
+        1.27967e-05,
+        1.85469e-05,
+        1.94761e-05,
+        1.9978e-05,
+        2.0949e-05,
+        2.0971e-05,
+        2.33291e-05,
+        2.38834e-05,
+        2.57136e-05,
+        2.64306e-05,
+        2.68456e-05,
+        2.68781e-05,
+        2.71739e-05,
+        2.73785e-05,
+        2.87315e-05,
+        2.92997e-05,
+        3.43407e-05,
+        3.86623e-05,
+        3.87973e-05,
+        3.8937e-05,
+        4.33276e-05,
+        4.48732e-05,
+        4.76985e-05,
+        5.14403e-05,
+        5.26593e-05,
+        5.55864e-05,
+        5.66572e-05,
+        5.73806e-05,
+        5.98623e-05,
+        6.03682e-05,
+        7.08717e-05,
+        8.45201e-05,
+        8.59328e-05,
+        8.7146e-05,
+        9.23446e-05,
+        9.35651e-05,
+        9.93049e-05,
+        9.99675e-05,
+        0.0001067236,
+        0.0001072961,
+        0.0001117506,
+        0.0001161778,
+        0.0001263424,
+        0.0001292825,
+        0.0001365561,
+        0.0001535744,
+        0.0001536216,
+        0.0001587302,
+        0.0001592357,
+        0.0001878111,
+        0.0001992627,
+        0.0002687089,
+        0.0004151962,
+        0.0005334187,
+        0.0005832604,
+        0.0009259259,
+        0.0010958904,
+        0.0012232416,
+        0.0012978585,
+        0.0021141649,
+        0.0023148148,
+        0.0026262228
+      ],
+      "symbols_total": 99,
+      "symbols_with_trades": 99,
+      "trades": 18497,
+      "signal_bars": 17673,
+      "account_return_median_pct": -17.3119,
+      "account_return_mean_pct": -15.9665,
+      "positive_symbols": 15,
+      "max_drawdown_mean_pct": -26.9291,
+      "exposure_mean_pct": 29.3073,
+      "beats_random_ratio": 0.1212,
+      "random_mean_pct": -16.2017,
+      "expectancy_ci": {
+        "trades": 18497,
+        "mean_return_pct": -0.1781,
+        "ci_low_pct": -0.2272,
+        "ci_high_pct": -0.1279,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      },
+      "side_split": {
+        "long": {
+          "trades": 9118,
+          "mean_return_pct": -0.0374,
+          "ci_low_pct": -0.1194,
+          "ci_high_pct": 0.0484,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.2045,
+          "verdict": "inconclusive"
+        },
+        "short": {
+          "trades": 9379,
+          "mean_return_pct": -0.315,
+          "ci_low_pct": -0.3713,
+          "ci_high_pct": -0.2563,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.0,
+          "verdict": "negative"
+        }
+      },
+      "status_counts": {
+        "stop_loss": 18496,
+        "take_profit_1": 1
+      },
+      "fill_status_counts": {
+        "stop_loss": 18496,
+        "take_profit_1": 3860
+      },
+      "tp1_positions": 3860,
+      "tp1_position_ratio": 0.2087,
+      "blocked": {
+        "stop_order_requires_dedicated_broker": 1368672
+      },
+      "htf_degraded_symbols": [],
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "trades": 125,
+          "return_pct": -3.4233,
+          "win_rate": 32.8,
+          "max_drawdown_pct": -14.1858,
+          "random_mean_pct": -5.328
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "trades": 120,
+          "return_pct": -11.2386,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -16.641,
+          "random_mean_pct": -17.5505
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "trades": 240,
+          "return_pct": -15.3611,
+          "win_rate": 31.67,
+          "max_drawdown_pct": -19.7325,
+          "random_mean_pct": -16.4481
+        },
+        {
+          "symbol": "ADAUSDT",
+          "trades": 228,
+          "return_pct": -9.459,
+          "win_rate": 31.14,
+          "max_drawdown_pct": -21.8786,
+          "random_mean_pct": -15.7031
+        },
+        {
+          "symbol": "AGTUSDT",
+          "trades": 218,
+          "return_pct": -6.153,
+          "win_rate": 33.49,
+          "max_drawdown_pct": -21.9413,
+          "random_mean_pct": -21.8981
+        },
+        {
+          "symbol": "AINUSDT",
+          "trades": 221,
+          "return_pct": -7.1475,
+          "win_rate": 27.15,
+          "max_drawdown_pct": -32.6784,
+          "random_mean_pct": -7.8717
+        },
+        {
+          "symbol": "AKEUSDT",
+          "trades": 113,
+          "return_pct": -13.3535,
+          "win_rate": 32.74,
+          "max_drawdown_pct": -18.867,
+          "random_mean_pct": -10.4163
+        },
+        {
+          "symbol": "APRUSDT",
+          "trades": 210,
+          "return_pct": -7.9286,
+          "win_rate": 31.9,
+          "max_drawdown_pct": -24.8541,
+          "random_mean_pct": -16.3993
+        },
+        {
+          "symbol": "APTUSDT",
+          "trades": 237,
+          "return_pct": -39.9089,
+          "win_rate": 26.58,
+          "max_drawdown_pct": -43.637,
+          "random_mean_pct": -17.7659
+        },
+        {
+          "symbol": "ARBUSDT",
+          "trades": 238,
+          "return_pct": -25.6785,
+          "win_rate": 28.99,
+          "max_drawdown_pct": -28.485,
+          "random_mean_pct": -15.9604
+        },
+        {
+          "symbol": "ARCUSDT",
+          "trades": 104,
+          "return_pct": 2.7782,
+          "win_rate": 30.77,
+          "max_drawdown_pct": -18.9066,
+          "random_mean_pct": -6.1744
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "trades": 232,
+          "return_pct": 5.8501,
+          "win_rate": 34.48,
+          "max_drawdown_pct": -15.0837,
+          "random_mean_pct": -14.15
+        },
+        {
+          "symbol": "ARUSDT",
+          "trades": 128,
+          "return_pct": -3.3535,
+          "win_rate": 26.56,
+          "max_drawdown_pct": -19.8794,
+          "random_mean_pct": -11.9315
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "trades": 236,
+          "return_pct": -53.6112,
+          "win_rate": 22.46,
+          "max_drawdown_pct": -54.3557,
+          "random_mean_pct": -22.2278
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "trades": 247,
+          "return_pct": -26.0103,
+          "win_rate": 29.96,
+          "max_drawdown_pct": -29.3646,
+          "random_mean_pct": -21.6073
+        },
+        {
+          "symbol": "AXSUSDT",
+          "trades": 128,
+          "return_pct": -15.3121,
+          "win_rate": 32.81,
+          "max_drawdown_pct": -22.8084,
+          "random_mean_pct": -8.7592
+        },
+        {
+          "symbol": "BANKUSDT",
+          "trades": 207,
+          "return_pct": -25.8878,
+          "win_rate": 28.99,
+          "max_drawdown_pct": -36.4353,
+          "random_mean_pct": -19.4596
+        },
+        {
+          "symbol": "BATUSDT",
+          "trades": 121,
+          "return_pct": -13.2913,
+          "win_rate": 33.06,
+          "max_drawdown_pct": -13.5254,
+          "random_mean_pct": -5.3763
+        },
+        {
+          "symbol": "BCHUSDT",
+          "trades": 240,
+          "return_pct": 0.0186,
+          "win_rate": 31.25,
+          "max_drawdown_pct": -14.3974,
+          "random_mean_pct": -17.8558
+        },
+        {
+          "symbol": "BEAMXUSDT",
+          "trades": 123,
+          "return_pct": -17.1766,
+          "win_rate": 30.89,
+          "max_drawdown_pct": -23.3555,
+          "random_mean_pct": -24.6059
+        },
+        {
+          "symbol": "BEATUSDT",
+          "trades": 230,
+          "return_pct": -1.1113,
+          "win_rate": 34.35,
+          "max_drawdown_pct": -17.4588,
+          "random_mean_pct": -16.06
+        },
+        {
+          "symbol": "BIRBUSDT",
+          "trades": 121,
+          "return_pct": -9.8425,
+          "win_rate": 33.88,
+          "max_drawdown_pct": -21.2347,
+          "random_mean_pct": -9.7944
+        },
+        {
+          "symbol": "BNBUSDT",
+          "trades": 115,
+          "return_pct": 5.2856,
+          "win_rate": 40.87,
+          "max_drawdown_pct": -7.0317,
+          "random_mean_pct": -12.6004
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "trades": 129,
+          "return_pct": -26.4556,
+          "win_rate": 29.46,
+          "max_drawdown_pct": -37.2195,
+          "random_mean_pct": -36.7921
+        },
+        {
+          "symbol": "BRUSDT",
+          "trades": 226,
+          "return_pct": -22.3786,
+          "win_rate": 30.09,
+          "max_drawdown_pct": -27.4458,
+          "random_mean_pct": -17.8815
+        },
+        {
+          "symbol": "BTCUSDT",
+          "trades": 238,
+          "return_pct": -37.3579,
+          "win_rate": 23.95,
+          "max_drawdown_pct": -38.9167,
+          "random_mean_pct": -22.2592
+        },
+        {
+          "symbol": "BTWUSDT",
+          "trades": 166,
+          "return_pct": 0.3851,
+          "win_rate": 32.53,
+          "max_drawdown_pct": -15.7984,
+          "random_mean_pct": -17.2696
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "trades": 212,
+          "return_pct": -2.6065,
+          "win_rate": 31.6,
+          "max_drawdown_pct": -25.7246,
+          "random_mean_pct": -21.2793
+        },
+        {
+          "symbol": "CAKEUSDT",
+          "trades": 137,
+          "return_pct": 2.4895,
+          "win_rate": 32.12,
+          "max_drawdown_pct": -10.2622,
+          "random_mean_pct": -13.6193
+        },
+        {
+          "symbol": "CAPUSDT",
+          "trades": 158,
+          "return_pct": -16.1703,
+          "win_rate": 35.44,
+          "max_drawdown_pct": -32.1423,
+          "random_mean_pct": -6.045
+        },
+        {
+          "symbol": "CHIPUSDT",
+          "trades": 244,
+          "return_pct": 2.1329,
+          "win_rate": 38.11,
+          "max_drawdown_pct": -17.8454,
+          "random_mean_pct": -21.4549
+        },
+        {
+          "symbol": "COTIUSDT",
+          "trades": 120,
+          "return_pct": -1.8649,
+          "win_rate": 36.67,
+          "max_drawdown_pct": -15.4021,
+          "random_mean_pct": -11.1695
+        },
+        {
+          "symbol": "DASHUSDT",
+          "trades": 236,
+          "return_pct": -27.0241,
+          "win_rate": 28.81,
+          "max_drawdown_pct": -28.8275,
+          "random_mean_pct": -15.1373
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "trades": 228,
+          "return_pct": -17.4291,
+          "win_rate": 28.51,
+          "max_drawdown_pct": -29.0817,
+          "random_mean_pct": -23.2411
+        },
+        {
+          "symbol": "DOODUSDT",
+          "trades": 235,
+          "return_pct": -44.4685,
+          "win_rate": 28.09,
+          "max_drawdown_pct": -49.87,
+          "random_mean_pct": -40.1089
+        },
+        {
+          "symbol": "DOSUSDT",
+          "trades": 105,
+          "return_pct": -22.303,
+          "win_rate": 31.43,
+          "max_drawdown_pct": -25.6522,
+          "random_mean_pct": -11.2797
+        },
+        {
+          "symbol": "DOTUSDT",
+          "trades": 232,
+          "return_pct": -17.1583,
+          "win_rate": 34.48,
+          "max_drawdown_pct": -25.4074,
+          "random_mean_pct": -19.2859
+        },
+        {
+          "symbol": "EIGENUSDT",
+          "trades": 123,
+          "return_pct": -8.3856,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -17.1523,
+          "random_mean_pct": -10.9323
+        },
+        {
+          "symbol": "ENAUSDT",
+          "trades": 230,
+          "return_pct": -7.4089,
+          "win_rate": 34.78,
+          "max_drawdown_pct": -22.9633,
+          "random_mean_pct": -14.253
+        },
+        {
+          "symbol": "ERAUSDT",
+          "trades": 235,
+          "return_pct": -9.3873,
+          "win_rate": 33.62,
+          "max_drawdown_pct": -36.7864,
+          "random_mean_pct": -15.6461
+        },
+        {
+          "symbol": "ETHUSDT",
+          "trades": 216,
+          "return_pct": -19.615,
+          "win_rate": 29.63,
+          "max_drawdown_pct": -25.0692,
+          "random_mean_pct": -19.5161
+        },
+        {
+          "symbol": "FETUSDT",
+          "trades": 125,
+          "return_pct": -5.3663,
+          "win_rate": 32.0,
+          "max_drawdown_pct": -13.0936,
+          "random_mean_pct": -8.8053
+        },
+        {
+          "symbol": "FILUSDT",
+          "trades": 240,
+          "return_pct": -23.2749,
+          "win_rate": 30.83,
+          "max_drawdown_pct": -32.8344,
+          "random_mean_pct": -17.1897
+        },
+        {
+          "symbol": "GALAUSDT",
+          "trades": 111,
+          "return_pct": -18.4326,
+          "win_rate": 27.03,
+          "max_drawdown_pct": -20.0545,
+          "random_mean_pct": -21.6398
+        },
+        {
+          "symbol": "GTCUSDT",
+          "trades": 112,
+          "return_pct": 6.9886,
+          "win_rate": 37.5,
+          "max_drawdown_pct": -8.9697,
+          "random_mean_pct": -13.0401
+        },
+        {
+          "symbol": "HBARUSDT",
+          "trades": 129,
+          "return_pct": -10.858,
+          "win_rate": 28.68,
+          "max_drawdown_pct": -15.3258,
+          "random_mean_pct": -12.0007
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "trades": 213,
+          "return_pct": -15.8693,
+          "win_rate": 31.92,
+          "max_drawdown_pct": -27.151,
+          "random_mean_pct": -17.8642
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "trades": 133,
+          "return_pct": -27.4503,
+          "win_rate": 24.06,
+          "max_drawdown_pct": -27.7974,
+          "random_mean_pct": -13.7157
+        },
+        {
+          "symbol": "INJUSDT",
+          "trades": 233,
+          "return_pct": -23.4732,
+          "win_rate": 27.9,
+          "max_drawdown_pct": -32.8513,
+          "random_mean_pct": -13.7455
+        },
+        {
+          "symbol": "IOSTUSDT",
+          "trades": 120,
+          "return_pct": -28.4053,
+          "win_rate": 31.67,
+          "max_drawdown_pct": -33.1212,
+          "random_mean_pct": -38.4102
+        },
+        {
+          "symbol": "IRYSUSDT",
+          "trades": 229,
+          "return_pct": -26.3672,
+          "win_rate": 27.51,
+          "max_drawdown_pct": -47.9793,
+          "random_mean_pct": -17.6633
+        },
+        {
+          "symbol": "JCTUSDT",
+          "trades": 229,
+          "return_pct": -27.9136,
+          "win_rate": 30.57,
+          "max_drawdown_pct": -36.7725,
+          "random_mean_pct": -15.3251
+        },
+        {
+          "symbol": "KATUSDT",
+          "trades": 235,
+          "return_pct": -30.9238,
+          "win_rate": 31.91,
+          "max_drawdown_pct": -37.025,
+          "random_mean_pct": -32.3599
+        },
+        {
+          "symbol": "LINKUSDT",
+          "trades": 236,
+          "return_pct": -5.3119,
+          "win_rate": 36.86,
+          "max_drawdown_pct": -21.7922,
+          "random_mean_pct": -20.971
+        },
+        {
+          "symbol": "LITUSDT",
+          "trades": 268,
+          "return_pct": -38.3999,
+          "win_rate": 29.48,
+          "max_drawdown_pct": -44.8577,
+          "random_mean_pct": -20.9543
+        },
+        {
+          "symbol": "LTCUSDT",
+          "trades": 227,
+          "return_pct": -29.4346,
+          "win_rate": 31.28,
+          "max_drawdown_pct": -30.598,
+          "random_mean_pct": -20.7081
+        },
+        {
+          "symbol": "LYNUSDT",
+          "trades": 121,
+          "return_pct": -30.4082,
+          "win_rate": 27.27,
+          "max_drawdown_pct": -33.5313,
+          "random_mean_pct": -14.9871
+        },
+        {
+          "symbol": "MAGICUSDT",
+          "trades": 108,
+          "return_pct": 4.0015,
+          "win_rate": 37.04,
+          "max_drawdown_pct": -10.0926,
+          "random_mean_pct": -7.1129
+        },
+        {
+          "symbol": "MAGMAUSDT",
+          "trades": 109,
+          "return_pct": 22.5227,
+          "win_rate": 36.7,
+          "max_drawdown_pct": -13.9292,
+          "random_mean_pct": -2.8565
+        },
+        {
+          "symbol": "MANAUSDT",
+          "trades": 125,
+          "return_pct": -25.2689,
+          "win_rate": 28.8,
+          "max_drawdown_pct": -30.8541,
+          "random_mean_pct": -12.4595
+        },
+        {
+          "symbol": "METUSDT",
+          "trades": 136,
+          "return_pct": -4.0141,
+          "win_rate": 33.09,
+          "max_drawdown_pct": -17.6338,
+          "random_mean_pct": -6.9074
+        },
+        {
+          "symbol": "MORPHOUSDT",
+          "trades": 131,
+          "return_pct": -18.57,
+          "win_rate": 30.53,
+          "max_drawdown_pct": -22.8595,
+          "random_mean_pct": -12.3178
+        },
+        {
+          "symbol": "MOVRUSDT",
+          "trades": 126,
+          "return_pct": 15.4097,
+          "win_rate": 35.71,
+          "max_drawdown_pct": -14.4823,
+          "random_mean_pct": -11.3418
+        },
+        {
+          "symbol": "NEARUSDT",
+          "trades": 240,
+          "return_pct": -17.3119,
+          "win_rate": 32.5,
+          "max_drawdown_pct": -23.651,
+          "random_mean_pct": -14.7399
+        },
+        {
+          "symbol": "NILUSDT",
+          "trades": 236,
+          "return_pct": 0.4935,
+          "win_rate": 33.05,
+          "max_drawdown_pct": -35.4902,
+          "random_mean_pct": -9.0128
+        },
+        {
+          "symbol": "OGNUSDT",
+          "trades": 124,
+          "return_pct": -25.6961,
+          "win_rate": 26.61,
+          "max_drawdown_pct": -31.4134,
+          "random_mean_pct": -6.7979
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "trades": 243,
+          "return_pct": -35.6568,
+          "win_rate": 27.57,
+          "max_drawdown_pct": -43.0531,
+          "random_mean_pct": -15.7557
+        },
+        {
+          "symbol": "OPUSDT",
+          "trades": 122,
+          "return_pct": -7.1621,
+          "win_rate": 32.79,
+          "max_drawdown_pct": -15.0999,
+          "random_mean_pct": -7.7538
+        },
+        {
+          "symbol": "ORDERUSDT",
+          "trades": 229,
+          "return_pct": -35.5333,
+          "win_rate": 28.38,
+          "max_drawdown_pct": -39.6103,
+          "random_mean_pct": -16.7664
+        },
+        {
+          "symbol": "PAXGUSDT",
+          "trades": 260,
+          "return_pct": -22.4665,
+          "win_rate": 25.77,
+          "max_drawdown_pct": -23.8638,
+          "random_mean_pct": -23.9531
+        },
+        {
+          "symbol": "PENDLEUSDT",
+          "trades": 136,
+          "return_pct": -20.642,
+          "win_rate": 30.15,
+          "max_drawdown_pct": -23.446,
+          "random_mean_pct": -13.2527
+        },
+        {
+          "symbol": "PENGUUSDT",
+          "trades": 237,
+          "return_pct": -37.6741,
+          "win_rate": 29.11,
+          "max_drawdown_pct": -43.1108,
+          "random_mean_pct": -26.6688
+        },
+        {
+          "symbol": "POLUSDT",
+          "trades": 120,
+          "return_pct": -25.5593,
+          "win_rate": 27.5,
+          "max_drawdown_pct": -27.1252,
+          "random_mean_pct": -11.7944
+        },
+        {
+          "symbol": "PROMUSDT",
+          "trades": 119,
+          "return_pct": -10.3238,
+          "win_rate": 31.09,
+          "max_drawdown_pct": -22.8667,
+          "random_mean_pct": -11.765
+        },
+        {
+          "symbol": "PUMPUSDT",
+          "trades": 241,
+          "return_pct": -35.2952,
+          "win_rate": 31.12,
+          "max_drawdown_pct": -39.779,
+          "random_mean_pct": -31.6722
+        },
+        {
+          "symbol": "QNTUSDT",
+          "trades": 240,
+          "return_pct": -26.1769,
+          "win_rate": 27.08,
+          "max_drawdown_pct": -38.8601,
+          "random_mean_pct": -11.9675
+        },
+        {
+          "symbol": "QUSDT",
+          "trades": 209,
+          "return_pct": -49.5148,
+          "win_rate": 26.32,
+          "max_drawdown_pct": -51.7622,
+          "random_mean_pct": -13.533
+        },
+        {
+          "symbol": "RAREUSDT",
+          "trades": 131,
+          "return_pct": -16.851,
+          "win_rate": 29.77,
+          "max_drawdown_pct": -23.5993,
+          "random_mean_pct": -12.6857
+        },
+        {
+          "symbol": "RIVERUSDT",
+          "trades": 122,
+          "return_pct": -3.9588,
+          "win_rate": 32.79,
+          "max_drawdown_pct": -21.6646,
+          "random_mean_pct": -10.2728
+        },
+        {
+          "symbol": "RLCUSDT",
+          "trades": 116,
+          "return_pct": 54.8242,
+          "win_rate": 40.52,
+          "max_drawdown_pct": -15.7181,
+          "random_mean_pct": -0.0712
+        },
+        {
+          "symbol": "RUNEUSDT",
+          "trades": 129,
+          "return_pct": -11.0393,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -11.577,
+          "random_mean_pct": -12.0863
+        },
+        {
+          "symbol": "SAGAUSDT",
+          "trades": 124,
+          "return_pct": -18.4528,
+          "win_rate": 26.61,
+          "max_drawdown_pct": -28.0456,
+          "random_mean_pct": -9.5013
+        },
+        {
+          "symbol": "SANDUSDT",
+          "trades": 115,
+          "return_pct": -0.6579,
+          "win_rate": 30.43,
+          "max_drawdown_pct": -14.7223,
+          "random_mean_pct": -9.1451
+        },
+        {
+          "symbol": "SKYUSDT",
+          "trades": 116,
+          "return_pct": 8.4669,
+          "win_rate": 32.76,
+          "max_drawdown_pct": -11.5926,
+          "random_mean_pct": -10.1472
+        },
+        {
+          "symbol": "SOLUSDT",
+          "trades": 234,
+          "return_pct": -22.1769,
+          "win_rate": 29.49,
+          "max_drawdown_pct": -30.9368,
+          "random_mean_pct": -19.4678
+        },
+        {
+          "symbol": "SOONUSDT",
+          "trades": 242,
+          "return_pct": -49.1597,
+          "win_rate": 25.21,
+          "max_drawdown_pct": -49.9188,
+          "random_mean_pct": -10.4391
+        },
+        {
+          "symbol": "STRKUSDT",
+          "trades": 242,
+          "return_pct": -4.9667,
+          "win_rate": 32.23,
+          "max_drawdown_pct": -28.9538,
+          "random_mean_pct": -16.4926
+        },
+        {
+          "symbol": "SUIUSDT",
+          "trades": 211,
+          "return_pct": -18.1783,
+          "win_rate": 28.91,
+          "max_drawdown_pct": -38.4552,
+          "random_mean_pct": -15.6682
+        },
+        {
+          "symbol": "TAGUSDT",
+          "trades": 226,
+          "return_pct": -26.1469,
+          "win_rate": 30.97,
+          "max_drawdown_pct": -37.5389,
+          "random_mean_pct": -46.8026
+        },
+        {
+          "symbol": "TAOUSDT",
+          "trades": 252,
+          "return_pct": -32.6237,
+          "win_rate": 27.78,
+          "max_drawdown_pct": -45.7451,
+          "random_mean_pct": -17.8087
+        },
+        {
+          "symbol": "TIAUSDT",
+          "trades": 234,
+          "return_pct": -22.3077,
+          "win_rate": 29.49,
+          "max_drawdown_pct": -25.0066,
+          "random_mean_pct": -14.0256
+        },
+        {
+          "symbol": "TRUMPUSDT",
+          "trades": 228,
+          "return_pct": -27.8412,
+          "win_rate": 28.51,
+          "max_drawdown_pct": -34.2656,
+          "random_mean_pct": -23.2037
+        },
+        {
+          "symbol": "UNIUSDT",
+          "trades": 238,
+          "return_pct": -0.2735,
+          "win_rate": 33.19,
+          "max_drawdown_pct": -17.7824,
+          "random_mean_pct": -18.1297
+        },
+        {
+          "symbol": "WLDUSDT",
+          "trades": 223,
+          "return_pct": 3.1112,
+          "win_rate": 36.32,
+          "max_drawdown_pct": -21.0268,
+          "random_mean_pct": -15.7218
+        },
+        {
+          "symbol": "XAUTUSDT",
+          "trades": 251,
+          "return_pct": -23.2855,
+          "win_rate": 25.1,
+          "max_drawdown_pct": -24.2901,
+          "random_mean_pct": -23.2443
+        },
+        {
+          "symbol": "XLMUSDT",
+          "trades": 247,
+          "return_pct": -27.2466,
+          "win_rate": 29.96,
+          "max_drawdown_pct": -31.3295,
+          "random_mean_pct": -15.7477
+        },
+        {
+          "symbol": "XMRUSDT",
+          "trades": 249,
+          "return_pct": -38.618,
+          "win_rate": 31.73,
+          "max_drawdown_pct": -40.8314,
+          "random_mean_pct": -19.5552
+        },
+        {
+          "symbol": "XRPUSDT",
+          "trades": 229,
+          "return_pct": -21.9818,
+          "win_rate": 30.57,
+          "max_drawdown_pct": -27.945,
+          "random_mean_pct": -22.3859
+        },
+        {
+          "symbol": "ZROUSDT",
+          "trades": 234,
+          "return_pct": -25.6554,
+          "win_rate": 30.77,
+          "max_drawdown_pct": -33.9925,
+          "random_mean_pct": -20.4403
+        }
+      ]
+    },
+    {
+      "id": "G4",
+      "label": "Long Only · 脚本原样成本",
+      "dir_mode": 1,
+      "fee_rate": 0.0005,
+      "slippage_mode": "2ticks",
+      "slippage_note": "2 ticks 每币标量近似（R15）",
+      "slippage_used": [
+        2.616e-07,
+        2.761e-07,
+        5.032e-07,
+        8.091e-07,
+        8.498e-07,
+        2.0519e-06,
+        2.0907e-06,
+        2.0993e-06,
+        2.3563e-06,
+        2.4733e-06,
+        2.5013e-06,
+        2.5988e-06,
+        2.9691e-06,
+        2.9696e-06,
+        3.0912e-06,
+        3.241e-06,
+        3.937e-06,
+        3.9471e-06,
+        4.6743e-06,
+        4.6745e-06,
+        4.9677e-06,
+        5.005e-06,
+        5.2124e-06,
+        5.3996e-06,
+        5.5979e-06,
+        6.3512e-06,
+        8.2232e-06,
+        8.8496e-06,
+        8.9047e-06,
+        9.4366e-06,
+        9.5831e-06,
+        9.7752e-06,
+        1.01574e-05,
+        1.05319e-05,
+        1.08578e-05,
+        1.0917e-05,
+        1.17509e-05,
+        1.27967e-05,
+        1.85469e-05,
+        1.94761e-05,
+        1.9978e-05,
+        2.0949e-05,
+        2.0971e-05,
+        2.33291e-05,
+        2.38834e-05,
+        2.57136e-05,
+        2.64306e-05,
+        2.68456e-05,
+        2.68781e-05,
+        2.71739e-05,
+        2.73785e-05,
+        2.87315e-05,
+        2.92997e-05,
+        3.43407e-05,
+        3.86623e-05,
+        3.87973e-05,
+        3.8937e-05,
+        4.33276e-05,
+        4.48732e-05,
+        4.76985e-05,
+        5.14403e-05,
+        5.26593e-05,
+        5.55864e-05,
+        5.66572e-05,
+        5.73806e-05,
+        5.98623e-05,
+        6.03682e-05,
+        7.08717e-05,
+        8.45201e-05,
+        8.59328e-05,
+        8.7146e-05,
+        9.23446e-05,
+        9.35651e-05,
+        9.93049e-05,
+        9.99675e-05,
+        0.0001067236,
+        0.0001072961,
+        0.0001117506,
+        0.0001161778,
+        0.0001263424,
+        0.0001292825,
+        0.0001365561,
+        0.0001535744,
+        0.0001536216,
+        0.0001587302,
+        0.0001592357,
+        0.0001878111,
+        0.0001992627,
+        0.0002687089,
+        0.0004151962,
+        0.0005334187,
+        0.0005832604,
+        0.0009259259,
+        0.0010958904,
+        0.0012232416,
+        0.0012978585,
+        0.0021141649,
+        0.0023148148,
+        0.0026262228
+      ],
+      "symbols_total": 99,
+      "symbols_with_trades": 99,
+      "trades": 9118,
+      "signal_bars": 17673,
+      "account_return_median_pct": -5.2819,
+      "account_return_mean_pct": -3.4362,
+      "positive_symbols": 37,
+      "max_drawdown_mean_pct": -16.2117,
+      "exposure_mean_pct": 14.3209,
+      "beats_random_ratio": 0.2121,
+      "random_mean_pct": -8.0056,
+      "expectancy_ci": {
+        "trades": 9118,
+        "mean_return_pct": -0.0374,
+        "ci_low_pct": -0.1194,
+        "ci_high_pct": 0.0484,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.2045,
+        "verdict": "inconclusive"
+      },
+      "side_split": {
+        "long": {
+          "trades": 9118,
+          "mean_return_pct": -0.0374,
+          "ci_low_pct": -0.1194,
+          "ci_high_pct": 0.0484,
+          "confidence": 0.95,
+          "n_boot": 2000,
+          "positive_share": 0.2045,
+          "verdict": "inconclusive"
+        },
+        "short": {
+          "trades": 0,
+          "verdict": "no_trades"
+        }
+      },
+      "status_counts": {
+        "stop_loss": 9117,
+        "take_profit_1": 1
+      },
+      "fill_status_counts": {
+        "stop_loss": 9117,
+        "take_profit_1": 2219
+      },
+      "tp1_positions": 2219,
+      "tp1_position_ratio": 0.2434,
+      "blocked": {
+        "stop_order_requires_dedicated_broker": 1368672
+      },
+      "htf_degraded_symbols": [],
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "trades": 62,
+          "return_pct": -4.7011,
+          "win_rate": 27.42,
+          "max_drawdown_pct": -12.5415,
+          "random_mean_pct": -1.4403
+        },
+        {
+          "symbol": "1000PEPEUSDT",
+          "trades": 65,
+          "return_pct": -4.9716,
+          "win_rate": 33.85,
+          "max_drawdown_pct": -12.4851,
+          "random_mean_pct": -9.5302
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "trades": 121,
+          "return_pct": -5.6632,
+          "win_rate": 31.4,
+          "max_drawdown_pct": -9.9234,
+          "random_mean_pct": -7.3993
+        },
+        {
+          "symbol": "ADAUSDT",
+          "trades": 112,
+          "return_pct": 4.0261,
+          "win_rate": 30.36,
+          "max_drawdown_pct": -11.9893,
+          "random_mean_pct": -6.9787
+        },
+        {
+          "symbol": "AGTUSDT",
+          "trades": 115,
+          "return_pct": 14.8045,
+          "win_rate": 37.39,
+          "max_drawdown_pct": -14.3504,
+          "random_mean_pct": -13.0774
+        },
+        {
+          "symbol": "AINUSDT",
+          "trades": 107,
+          "return_pct": 4.0737,
+          "win_rate": 26.17,
+          "max_drawdown_pct": -25.2612,
+          "random_mean_pct": -1.6034
+        },
+        {
+          "symbol": "AKEUSDT",
+          "trades": 53,
+          "return_pct": 7.652,
+          "win_rate": 39.62,
+          "max_drawdown_pct": -9.9545,
+          "random_mean_pct": -3.0319
+        },
+        {
+          "symbol": "APRUSDT",
+          "trades": 92,
+          "return_pct": 7.2865,
+          "win_rate": 31.52,
+          "max_drawdown_pct": -18.2506,
+          "random_mean_pct": -5.3389
+        },
+        {
+          "symbol": "APTUSDT",
+          "trades": 114,
+          "return_pct": -21.5468,
+          "win_rate": 25.44,
+          "max_drawdown_pct": -23.3892,
+          "random_mean_pct": -10.251
+        },
+        {
+          "symbol": "ARBUSDT",
+          "trades": 106,
+          "return_pct": 10.3443,
+          "win_rate": 33.96,
+          "max_drawdown_pct": -10.9748,
+          "random_mean_pct": -7.0481
+        },
+        {
+          "symbol": "ARCUSDT",
+          "trades": 49,
+          "return_pct": -3.7092,
+          "win_rate": 30.61,
+          "max_drawdown_pct": -15.4748,
+          "random_mean_pct": -4.2551
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "trades": 116,
+          "return_pct": 9.226,
+          "win_rate": 35.34,
+          "max_drawdown_pct": -13.8209,
+          "random_mean_pct": -5.0349
+        },
+        {
+          "symbol": "ARUSDT",
+          "trades": 67,
+          "return_pct": 1.8227,
+          "win_rate": 20.9,
+          "max_drawdown_pct": -18.1914,
+          "random_mean_pct": -4.2863
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "trades": 122,
+          "return_pct": -27.5831,
+          "win_rate": 22.95,
+          "max_drawdown_pct": -29.4385,
+          "random_mean_pct": -11.8021
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "trades": 121,
+          "return_pct": -9.5498,
+          "win_rate": 30.58,
+          "max_drawdown_pct": -20.1304,
+          "random_mean_pct": -11.7559
+        },
+        {
+          "symbol": "AXSUSDT",
+          "trades": 61,
+          "return_pct": -13.0811,
+          "win_rate": 27.87,
+          "max_drawdown_pct": -15.0893,
+          "random_mean_pct": -2.2972
+        },
+        {
+          "symbol": "BANKUSDT",
+          "trades": 98,
+          "return_pct": -15.9721,
+          "win_rate": 27.55,
+          "max_drawdown_pct": -22.9715,
+          "random_mean_pct": -7.6976
+        },
+        {
+          "symbol": "BATUSDT",
+          "trades": 64,
+          "return_pct": -6.5026,
+          "win_rate": 29.69,
+          "max_drawdown_pct": -12.6343,
+          "random_mean_pct": 0.7503
+        },
+        {
+          "symbol": "BCHUSDT",
+          "trades": 108,
+          "return_pct": 8.6437,
+          "win_rate": 36.11,
+          "max_drawdown_pct": -12.5118,
+          "random_mean_pct": -6.9198
+        },
+        {
+          "symbol": "BEAMXUSDT",
+          "trades": 62,
+          "return_pct": 11.8921,
+          "win_rate": 35.48,
+          "max_drawdown_pct": -15.6038,
+          "random_mean_pct": -8.8477
+        },
+        {
+          "symbol": "BEATUSDT",
+          "trades": 110,
+          "return_pct": 3.7112,
+          "win_rate": 36.36,
+          "max_drawdown_pct": -9.3672,
+          "random_mean_pct": -8.2012
+        },
+        {
+          "symbol": "BIRBUSDT",
+          "trades": 57,
+          "return_pct": 1.7374,
+          "win_rate": 35.09,
+          "max_drawdown_pct": -9.5766,
+          "random_mean_pct": -3.7497
+        },
+        {
+          "symbol": "BNBUSDT",
+          "trades": 59,
+          "return_pct": 7.0232,
+          "win_rate": 45.76,
+          "max_drawdown_pct": -5.9873,
+          "random_mean_pct": -6.3089
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "trades": 61,
+          "return_pct": -0.852,
+          "win_rate": 37.7,
+          "max_drawdown_pct": -21.1649,
+          "random_mean_pct": -17.4845
+        },
+        {
+          "symbol": "BRUSDT",
+          "trades": 109,
+          "return_pct": -9.1773,
+          "win_rate": 29.36,
+          "max_drawdown_pct": -23.1781,
+          "random_mean_pct": -10.6976
+        },
+        {
+          "symbol": "BTCUSDT",
+          "trades": 120,
+          "return_pct": -21.0742,
+          "win_rate": 21.67,
+          "max_drawdown_pct": -21.3342,
+          "random_mean_pct": -11.033
+        },
+        {
+          "symbol": "BTWUSDT",
+          "trades": 100,
+          "return_pct": 27.8065,
+          "win_rate": 38.0,
+          "max_drawdown_pct": -9.3203,
+          "random_mean_pct": -9.4356
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "trades": 115,
+          "return_pct": 7.8537,
+          "win_rate": 35.65,
+          "max_drawdown_pct": -12.9587,
+          "random_mean_pct": -14.1797
+        },
+        {
+          "symbol": "CAKEUSDT",
+          "trades": 75,
+          "return_pct": 4.8148,
+          "win_rate": 34.67,
+          "max_drawdown_pct": -9.0207,
+          "random_mean_pct": -6.6459
+        },
+        {
+          "symbol": "CAPUSDT",
+          "trades": 88,
+          "return_pct": -5.8784,
+          "win_rate": 36.36,
+          "max_drawdown_pct": -20.1818,
+          "random_mean_pct": -3.5589
+        },
+        {
+          "symbol": "CHIPUSDT",
+          "trades": 112,
+          "return_pct": 12.3193,
+          "win_rate": 46.43,
+          "max_drawdown_pct": -7.4826,
+          "random_mean_pct": -7.6926
+        },
+        {
+          "symbol": "COTIUSDT",
+          "trades": 62,
+          "return_pct": -9.6451,
+          "win_rate": 29.03,
+          "max_drawdown_pct": -14.6872,
+          "random_mean_pct": -7.8037
+        },
+        {
+          "symbol": "DASHUSDT",
+          "trades": 110,
+          "return_pct": -10.1846,
+          "win_rate": 27.27,
+          "max_drawdown_pct": -15.5953,
+          "random_mean_pct": -8.9281
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "trades": 108,
+          "return_pct": -5.6302,
+          "win_rate": 27.78,
+          "max_drawdown_pct": -19.9277,
+          "random_mean_pct": -13.0489
+        },
+        {
+          "symbol": "DOODUSDT",
+          "trades": 112,
+          "return_pct": -30.4873,
+          "win_rate": 25.0,
+          "max_drawdown_pct": -35.1572,
+          "random_mean_pct": -19.6256
+        },
+        {
+          "symbol": "DOSUSDT",
+          "trades": 61,
+          "return_pct": -14.1612,
+          "win_rate": 29.51,
+          "max_drawdown_pct": -17.2648,
+          "random_mean_pct": -10.9244
+        },
+        {
+          "symbol": "DOTUSDT",
+          "trades": 113,
+          "return_pct": -7.9627,
+          "win_rate": 30.97,
+          "max_drawdown_pct": -17.3756,
+          "random_mean_pct": -9.8405
+        },
+        {
+          "symbol": "EIGENUSDT",
+          "trades": 62,
+          "return_pct": 0.909,
+          "win_rate": 33.87,
+          "max_drawdown_pct": -9.4133,
+          "random_mean_pct": -5.5484
+        },
+        {
+          "symbol": "ENAUSDT",
+          "trades": 108,
+          "return_pct": 10.663,
+          "win_rate": 37.96,
+          "max_drawdown_pct": -13.7903,
+          "random_mean_pct": -4.9024
+        },
+        {
+          "symbol": "ERAUSDT",
+          "trades": 113,
+          "return_pct": -8.8642,
+          "win_rate": 31.86,
+          "max_drawdown_pct": -24.5389,
+          "random_mean_pct": -10.1651
+        },
+        {
+          "symbol": "ETHUSDT",
+          "trades": 114,
+          "return_pct": -13.6064,
+          "win_rate": 28.07,
+          "max_drawdown_pct": -13.8158,
+          "random_mean_pct": -10.8348
+        },
+        {
+          "symbol": "FETUSDT",
+          "trades": 65,
+          "return_pct": -1.5575,
+          "win_rate": 26.15,
+          "max_drawdown_pct": -9.3243,
+          "random_mean_pct": -5.8152
+        },
+        {
+          "symbol": "FILUSDT",
+          "trades": 123,
+          "return_pct": -10.7503,
+          "win_rate": 31.71,
+          "max_drawdown_pct": -17.673,
+          "random_mean_pct": -9.4224
+        },
+        {
+          "symbol": "GALAUSDT",
+          "trades": 53,
+          "return_pct": -5.2819,
+          "win_rate": 30.19,
+          "max_drawdown_pct": -12.3322,
+          "random_mean_pct": -11.5256
+        },
+        {
+          "symbol": "GTCUSDT",
+          "trades": 53,
+          "return_pct": 9.9064,
+          "win_rate": 35.85,
+          "max_drawdown_pct": -6.723,
+          "random_mean_pct": -3.2824
+        },
+        {
+          "symbol": "HBARUSDT",
+          "trades": 67,
+          "return_pct": 1.3388,
+          "win_rate": 32.84,
+          "max_drawdown_pct": -9.8749,
+          "random_mean_pct": -6.8648
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "trades": 101,
+          "return_pct": 1.6918,
+          "win_rate": 32.67,
+          "max_drawdown_pct": -12.101,
+          "random_mean_pct": -9.3232
+        },
+        {
+          "symbol": "HYPEUSDT",
+          "trades": 69,
+          "return_pct": -13.3472,
+          "win_rate": 24.64,
+          "max_drawdown_pct": -13.8838,
+          "random_mean_pct": -6.4081
+        },
+        {
+          "symbol": "INJUSDT",
+          "trades": 113,
+          "return_pct": -4.4062,
+          "win_rate": 31.86,
+          "max_drawdown_pct": -15.8939,
+          "random_mean_pct": -5.1623
+        },
+        {
+          "symbol": "IOSTUSDT",
+          "trades": 59,
+          "return_pct": -11.4837,
+          "win_rate": 30.51,
+          "max_drawdown_pct": -15.8412,
+          "random_mean_pct": -21.3226
+        },
+        {
+          "symbol": "IRYSUSDT",
+          "trades": 117,
+          "return_pct": -13.0705,
+          "win_rate": 24.79,
+          "max_drawdown_pct": -37.0495,
+          "random_mean_pct": -12.8624
+        },
+        {
+          "symbol": "JCTUSDT",
+          "trades": 117,
+          "return_pct": -1.5138,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -17.5605,
+          "random_mean_pct": -6.9279
+        },
+        {
+          "symbol": "KATUSDT",
+          "trades": 113,
+          "return_pct": -27.1442,
+          "win_rate": 25.66,
+          "max_drawdown_pct": -28.6447,
+          "random_mean_pct": -16.7422
+        },
+        {
+          "symbol": "LINKUSDT",
+          "trades": 108,
+          "return_pct": 13.6133,
+          "win_rate": 38.89,
+          "max_drawdown_pct": -9.2552,
+          "random_mean_pct": -9.2617
+        },
+        {
+          "symbol": "LITUSDT",
+          "trades": 140,
+          "return_pct": -13.6491,
+          "win_rate": 31.43,
+          "max_drawdown_pct": -18.0713,
+          "random_mean_pct": -11.7455
+        },
+        {
+          "symbol": "LTCUSDT",
+          "trades": 116,
+          "return_pct": -9.7641,
+          "win_rate": 32.76,
+          "max_drawdown_pct": -13.6391,
+          "random_mean_pct": -13.0758
+        },
+        {
+          "symbol": "LYNUSDT",
+          "trades": 58,
+          "return_pct": -9.698,
+          "win_rate": 36.21,
+          "max_drawdown_pct": -14.9676,
+          "random_mean_pct": -8.1705
+        },
+        {
+          "symbol": "MAGICUSDT",
+          "trades": 62,
+          "return_pct": 5.188,
+          "win_rate": 35.48,
+          "max_drawdown_pct": -10.257,
+          "random_mean_pct": -5.696
+        },
+        {
+          "symbol": "MAGMAUSDT",
+          "trades": 58,
+          "return_pct": 31.0046,
+          "win_rate": 43.1,
+          "max_drawdown_pct": -10.5954,
+          "random_mean_pct": -0.5447
+        },
+        {
+          "symbol": "MANAUSDT",
+          "trades": 69,
+          "return_pct": -21.5187,
+          "win_rate": 23.19,
+          "max_drawdown_pct": -24.0708,
+          "random_mean_pct": -7.3077
+        },
+        {
+          "symbol": "METUSDT",
+          "trades": 63,
+          "return_pct": 4.632,
+          "win_rate": 30.16,
+          "max_drawdown_pct": -8.0209,
+          "random_mean_pct": -1.7865
+        },
+        {
+          "symbol": "MORPHOUSDT",
+          "trades": 64,
+          "return_pct": -6.7961,
+          "win_rate": 29.69,
+          "max_drawdown_pct": -8.5299,
+          "random_mean_pct": -5.3444
+        },
+        {
+          "symbol": "MOVRUSDT",
+          "trades": 56,
+          "return_pct": 8.0456,
+          "win_rate": 30.36,
+          "max_drawdown_pct": -14.1914,
+          "random_mean_pct": -4.9748
+        },
+        {
+          "symbol": "NEARUSDT",
+          "trades": 125,
+          "return_pct": 1.5038,
+          "win_rate": 33.6,
+          "max_drawdown_pct": -12.8097,
+          "random_mean_pct": -4.0534
+        },
+        {
+          "symbol": "NILUSDT",
+          "trades": 113,
+          "return_pct": 12.5391,
+          "win_rate": 32.74,
+          "max_drawdown_pct": -24.388,
+          "random_mean_pct": -4.4668
+        },
+        {
+          "symbol": "OGNUSDT",
+          "trades": 69,
+          "return_pct": -12.8258,
+          "win_rate": 27.54,
+          "max_drawdown_pct": -16.9566,
+          "random_mean_pct": -0.5918
+        },
+        {
+          "symbol": "ONDOUSDT",
+          "trades": 113,
+          "return_pct": -12.5027,
+          "win_rate": 29.2,
+          "max_drawdown_pct": -15.4983,
+          "random_mean_pct": -7.2782
+        },
+        {
+          "symbol": "OPUSDT",
+          "trades": 57,
+          "return_pct": 4.6122,
+          "win_rate": 36.84,
+          "max_drawdown_pct": -9.4058,
+          "random_mean_pct": -3.0542
+        },
+        {
+          "symbol": "ORDERUSDT",
+          "trades": 104,
+          "return_pct": -25.1125,
+          "win_rate": 25.96,
+          "max_drawdown_pct": -26.6548,
+          "random_mean_pct": -6.8731
+        },
+        {
+          "symbol": "PAXGUSDT",
+          "trades": 122,
+          "return_pct": -12.3834,
+          "win_rate": 23.77,
+          "max_drawdown_pct": -13.8971,
+          "random_mean_pct": -12.6907
+        },
+        {
+          "symbol": "PENDLEUSDT",
+          "trades": 68,
+          "return_pct": -10.5526,
+          "win_rate": 26.47,
+          "max_drawdown_pct": -13.2922,
+          "random_mean_pct": -6.7242
+        },
+        {
+          "symbol": "PENGUUSDT",
+          "trades": 118,
+          "return_pct": -12.4965,
+          "win_rate": 32.2,
+          "max_drawdown_pct": -17.3321,
+          "random_mean_pct": -13.2188
+        },
+        {
+          "symbol": "POLUSDT",
+          "trades": 65,
+          "return_pct": -15.0989,
+          "win_rate": 29.23,
+          "max_drawdown_pct": -19.1324,
+          "random_mean_pct": -6.0157
+        },
+        {
+          "symbol": "PROMUSDT",
+          "trades": 63,
+          "return_pct": -3.1648,
+          "win_rate": 33.33,
+          "max_drawdown_pct": -16.2501,
+          "random_mean_pct": -5.1783
+        },
+        {
+          "symbol": "PUMPUSDT",
+          "trades": 109,
+          "return_pct": 0.4825,
+          "win_rate": 38.53,
+          "max_drawdown_pct": -14.1995,
+          "random_mean_pct": -16.0985
+        },
+        {
+          "symbol": "QNTUSDT",
+          "trades": 119,
+          "return_pct": -8.4144,
+          "win_rate": 26.05,
+          "max_drawdown_pct": -27.9249,
+          "random_mean_pct": -3.8037
+        },
+        {
+          "symbol": "QUSDT",
+          "trades": 97,
+          "return_pct": -13.2984,
+          "win_rate": 30.93,
+          "max_drawdown_pct": -18.9257,
+          "random_mean_pct": -4.0472
+        },
+        {
+          "symbol": "RAREUSDT",
+          "trades": 68,
+          "return_pct": -8.9788,
+          "win_rate": 29.41,
+          "max_drawdown_pct": -17.7265,
+          "random_mean_pct": -6.7998
+        },
+        {
+          "symbol": "RIVERUSDT",
+          "trades": 56,
+          "return_pct": -0.5504,
+          "win_rate": 32.14,
+          "max_drawdown_pct": -16.9086,
+          "random_mean_pct": -6.5985
+        },
+        {
+          "symbol": "RLCUSDT",
+          "trades": 57,
+          "return_pct": 57.6745,
+          "win_rate": 42.11,
+          "max_drawdown_pct": -15.6479,
+          "random_mean_pct": 2.5054
+        },
+        {
+          "symbol": "RUNEUSDT",
+          "trades": 67,
+          "return_pct": -2.8054,
+          "win_rate": 31.34,
+          "max_drawdown_pct": -9.8927,
+          "random_mean_pct": -4.8742
+        },
+        {
+          "symbol": "SAGAUSDT",
+          "trades": 68,
+          "return_pct": -8.4702,
+          "win_rate": 26.47,
+          "max_drawdown_pct": -19.6939,
+          "random_mean_pct": -3.9431
+        },
+        {
+          "symbol": "SANDUSDT",
+          "trades": 60,
+          "return_pct": -0.445,
+          "win_rate": 30.0,
+          "max_drawdown_pct": -11.476,
+          "random_mean_pct": -5.6366
+        },
+        {
+          "symbol": "SKYUSDT",
+          "trades": 57,
+          "return_pct": 8.4757,
+          "win_rate": 38.6,
+          "max_drawdown_pct": -7.3149,
+          "random_mean_pct": -6.4675
+        },
+        {
+          "symbol": "SOLUSDT",
+          "trades": 115,
+          "return_pct": -7.9305,
+          "win_rate": 27.83,
+          "max_drawdown_pct": -14.2852,
+          "random_mean_pct": -10.9978
+        },
+        {
+          "symbol": "SOONUSDT",
+          "trades": 122,
+          "return_pct": -27.8845,
+          "win_rate": 24.59,
+          "max_drawdown_pct": -30.4742,
+          "random_mean_pct": -1.9062
+        },
+        {
+          "symbol": "STRKUSDT",
+          "trades": 110,
+          "return_pct": 10.1551,
+          "win_rate": 30.91,
+          "max_drawdown_pct": -19.4089,
+          "random_mean_pct": -6.4386
+        },
+        {
+          "symbol": "SUIUSDT",
+          "trades": 100,
+          "return_pct": -11.9282,
+          "win_rate": 26.0,
+          "max_drawdown_pct": -23.7295,
+          "random_mean_pct": -8.384
+        },
+        {
+          "symbol": "TAGUSDT",
+          "trades": 96,
+          "return_pct": -4.2335,
+          "win_rate": 36.46,
+          "max_drawdown_pct": -15.8438,
+          "random_mean_pct": -25.5865
+        },
+        {
+          "symbol": "TAOUSDT",
+          "trades": 121,
+          "return_pct": -16.6048,
+          "win_rate": 28.1,
+          "max_drawdown_pct": -26.1221,
+          "random_mean_pct": -10.4607
+        },
+        {
+          "symbol": "TIAUSDT",
+          "trades": 119,
+          "return_pct": 0.8538,
+          "win_rate": 33.61,
+          "max_drawdown_pct": -11.7083,
+          "random_mean_pct": -8.2818
+        },
+        {
+          "symbol": "TRUMPUSDT",
+          "trades": 108,
+          "return_pct": -5.4029,
+          "win_rate": 29.63,
+          "max_drawdown_pct": -14.9175,
+          "random_mean_pct": -12.4588
+        },
+        {
+          "symbol": "UNIUSDT",
+          "trades": 121,
+          "return_pct": 13.0543,
+          "win_rate": 37.19,
+          "max_drawdown_pct": -11.6164,
+          "random_mean_pct": -9.959
+        },
+        {
+          "symbol": "WLDUSDT",
+          "trades": 108,
+          "return_pct": 21.1324,
+          "win_rate": 41.67,
+          "max_drawdown_pct": -6.6415,
+          "random_mean_pct": -8.586
+        },
+        {
+          "symbol": "XAUTUSDT",
+          "trades": 110,
+          "return_pct": -11.099,
+          "win_rate": 23.64,
+          "max_drawdown_pct": -12.1255,
+          "random_mean_pct": -11.84
+        },
+        {
+          "symbol": "XLMUSDT",
+          "trades": 114,
+          "return_pct": -19.2597,
+          "win_rate": 27.19,
+          "max_drawdown_pct": -23.9747,
+          "random_mean_pct": -8.7982
+        },
+        {
+          "symbol": "XMRUSDT",
+          "trades": 139,
+          "return_pct": -20.711,
+          "win_rate": 33.09,
+          "max_drawdown_pct": -23.4052,
+          "random_mean_pct": -8.6327
+        },
+        {
+          "symbol": "XRPUSDT",
+          "trades": 112,
+          "return_pct": -10.5877,
+          "win_rate": 27.68,
+          "max_drawdown_pct": -14.4105,
+          "random_mean_pct": -10.2996
+        },
+        {
+          "symbol": "ZROUSDT",
+          "trades": 120,
+          "return_pct": -19.1752,
+          "win_rate": 25.83,
+          "max_drawdown_pct": -26.3382,
+          "random_mean_pct": -11.9967
+        }
+      ]
+    }
+  ],
+  "baseline": {
+    "id": "G1",
+    "label": "Long & Short · 项目全局成本",
+    "dir_mode": 0,
+    "fee_rate": 0.0004,
+    "slippage_mode": 0.0002,
+    "slippage_note": "比例滑点（项目全局）",
+    "slippage_used": 0.0002,
+    "symbols_total": 99,
+    "symbols_with_trades": 99,
+    "trades": 18497,
+    "signal_bars": 17673,
+    "account_return_median_pct": -16.7208,
+    "account_return_mean_pct": -15.1599,
+    "positive_symbols": 14,
+    "max_drawdown_mean_pct": -26.5673,
+    "exposure_mean_pct": 29.3073,
+    "beats_random_ratio": 0.1313,
+    "random_mean_pct": -15.4588,
+    "expectancy_ci": {
+      "trades": 18497,
+      "mean_return_pct": -0.1665,
+      "ci_low_pct": -0.215,
+      "ci_high_pct": -0.1161,
+      "confidence": 0.95,
+      "n_boot": 2000,
+      "positive_share": 0.0,
+      "verdict": "negative"
+    },
+    "side_split": {
+      "long": {
+        "trades": 9118,
+        "mean_return_pct": -0.0267,
+        "ci_low_pct": -0.1086,
+        "ci_high_pct": 0.0593,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.2755,
+        "verdict": "inconclusive"
+      },
+      "short": {
+        "trades": 9379,
+        "mean_return_pct": -0.3024,
+        "ci_low_pct": -0.3589,
+        "ci_high_pct": -0.2442,
+        "confidence": 0.95,
+        "n_boot": 2000,
+        "positive_share": 0.0,
+        "verdict": "negative"
+      }
+    },
+    "status_counts": {
+      "stop_loss": 18496,
+      "take_profit_1": 1
+    },
+    "fill_status_counts": {
+      "stop_loss": 18496,
+      "take_profit_1": 3860
+    },
+    "tp1_positions": 3860,
+    "tp1_position_ratio": 0.2087,
+    "blocked": {
+      "stop_order_requires_dedicated_broker": 1368672
+    },
+    "htf_degraded_symbols": [],
+    "per_symbol": [
+      {
+        "symbol": "0GUSDT",
+        "trades": 125,
+        "return_pct": -4.678,
+        "win_rate": 32.8,
+        "max_drawdown_pct": -14.4332,
+        "random_mean_pct": -6.7362
+      },
+      {
+        "symbol": "1000PEPEUSDT",
+        "trades": 120,
+        "return_pct": -4.4771,
+        "win_rate": 33.33,
+        "max_drawdown_pct": -12.04,
+        "random_mean_pct": -10.6317
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "trades": 240,
+        "return_pct": -18.1943,
+        "win_rate": 31.67,
+        "max_drawdown_pct": -21.7934,
+        "random_mean_pct": -19.5048
+      },
+      {
+        "symbol": "ADAUSDT",
+        "trades": 228,
+        "return_pct": -12.1493,
+        "win_rate": 29.82,
+        "max_drawdown_pct": -22.9443,
+        "random_mean_pct": -18.446
+      },
+      {
+        "symbol": "AGTUSDT",
+        "trades": 218,
+        "return_pct": -5.7472,
+        "win_rate": 33.49,
+        "max_drawdown_pct": -21.8032,
+        "random_mean_pct": -21.504
+      },
+      {
+        "symbol": "AINUSDT",
+        "trades": 221,
+        "return_pct": -8.498,
+        "win_rate": 27.15,
+        "max_drawdown_pct": -33.2216,
+        "random_mean_pct": -9.4544
+      },
+      {
+        "symbol": "AKEUSDT",
+        "trades": 113,
+        "return_pct": -13.2922,
+        "win_rate": 32.74,
+        "max_drawdown_pct": -18.8522,
+        "random_mean_pct": -10.3219
+      },
+      {
+        "symbol": "APRUSDT",
+        "trades": 210,
+        "return_pct": -9.3419,
+        "win_rate": 31.9,
+        "max_drawdown_pct": -25.477,
+        "random_mean_pct": -17.8917
+      },
+      {
+        "symbol": "APTUSDT",
+        "trades": 237,
+        "return_pct": -41.7113,
+        "win_rate": 26.58,
+        "max_drawdown_pct": -45.0528,
+        "random_mean_pct": -20.3692
+      },
+      {
+        "symbol": "ARBUSDT",
+        "trades": 238,
+        "return_pct": -27.4095,
+        "win_rate": 28.99,
+        "max_drawdown_pct": -30.1168,
+        "random_mean_pct": -18.077
+      },
+      {
+        "symbol": "ARCUSDT",
+        "trades": 104,
+        "return_pct": 2.0025,
+        "win_rate": 30.77,
+        "max_drawdown_pct": -19.1985,
+        "random_mean_pct": -6.9508
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "trades": 232,
+        "return_pct": 4.9057,
+        "win_rate": 34.48,
+        "max_drawdown_pct": -15.3632,
+        "random_mean_pct": -15.0268
+      },
+      {
+        "symbol": "ARUSDT",
+        "trades": 128,
+        "return_pct": -3.8179,
+        "win_rate": 26.56,
+        "max_drawdown_pct": -20.1034,
+        "random_mean_pct": -12.3842
+      },
+      {
+        "symbol": "ASTERUSDT",
+        "trades": 236,
+        "return_pct": -55.4283,
+        "win_rate": 22.46,
+        "max_drawdown_pct": -56.0817,
+        "random_mean_pct": -25.4014
+      },
+      {
+        "symbol": "AVAXUSDT",
+        "trades": 247,
+        "return_pct": -28.1289,
+        "win_rate": 29.55,
+        "max_drawdown_pct": -30.5941,
+        "random_mean_pct": -24.0022
+      },
+      {
+        "symbol": "AXSUSDT",
+        "trades": 128,
+        "return_pct": -16.8984,
+        "win_rate": 32.81,
+        "max_drawdown_pct": -23.7627,
+        "random_mean_pct": -10.5606
+      },
+      {
+        "symbol": "BANKUSDT",
+        "trades": 207,
+        "return_pct": -26.6209,
+        "win_rate": 28.99,
+        "max_drawdown_pct": -36.9497,
+        "random_mean_pct": -20.3522
+      },
+      {
+        "symbol": "BATUSDT",
+        "trades": 121,
+        "return_pct": -14.2672,
+        "win_rate": 33.06,
+        "max_drawdown_pct": -14.497,
+        "random_mean_pct": -6.4754
+      },
+      {
+        "symbol": "BCHUSDT",
+        "trades": 240,
+        "return_pct": -3.8418,
+        "win_rate": 30.42,
+        "max_drawdown_pct": -15.3813,
+        "random_mean_pct": -21.2087
+      },
+      {
+        "symbol": "BEAMXUSDT",
+        "trades": 123,
+        "return_pct": -0.7184,
+        "win_rate": 31.71,
+        "max_drawdown_pct": -17.7214,
+        "random_mean_pct": -9.1494
+      },
+      {
+        "symbol": "BEATUSDT",
+        "trades": 230,
+        "return_pct": -2.5287,
+        "win_rate": 34.35,
+        "max_drawdown_pct": -17.8422,
+        "random_mean_pct": -17.6887
+      },
+      {
+        "symbol": "BIRBUSDT",
+        "trades": 121,
+        "return_pct": -10.6469,
+        "win_rate": 33.88,
+        "max_drawdown_pct": -21.831,
+        "random_mean_pct": -10.7084
+      },
+      {
+        "symbol": "BNBUSDT",
+        "trades": 115,
+        "return_pct": 2.9332,
+        "win_rate": 40.0,
+        "max_drawdown_pct": -7.5794,
+        "random_mean_pct": -14.7717
+      },
+      {
+        "symbol": "BOMEUSDT",
+        "trades": 129,
+        "return_pct": -0.7702,
+        "win_rate": 31.78,
+        "max_drawdown_pct": -23.3289,
+        "random_mean_pct": -10.6911
+      },
+      {
+        "symbol": "BRUSDT",
+        "trades": 226,
+        "return_pct": -23.5729,
+        "win_rate": 30.09,
+        "max_drawdown_pct": -28.3006,
+        "random_mean_pct": -19.5019
+      },
+      {
+        "symbol": "BTCUSDT",
+        "trades": 238,
+        "return_pct": -40.2193,
+        "win_rate": 23.53,
+        "max_drawdown_pct": -41.3043,
+        "random_mean_pct": -25.9469
+      },
+      {
+        "symbol": "BTWUSDT",
+        "trades": 166,
+        "return_pct": -0.3215,
+        "win_rate": 32.53,
+        "max_drawdown_pct": -15.9378,
+        "random_mean_pct": -18.2689
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "trades": 212,
+        "return_pct": -1.9538,
+        "win_rate": 31.6,
+        "max_drawdown_pct": -25.5308,
+        "random_mean_pct": -20.5726
+      },
+      {
+        "symbol": "CAKEUSDT",
+        "trades": 137,
+        "return_pct": 2.3325,
+        "win_rate": 32.12,
+        "max_drawdown_pct": -10.292,
+        "random_mean_pct": -13.7591
+      },
+      {
+        "symbol": "CAPUSDT",
+        "trades": 158,
+        "return_pct": -16.7208,
+        "win_rate": 35.44,
+        "max_drawdown_pct": -32.3976,
+        "random_mean_pct": -6.7852
+      },
+      {
+        "symbol": "CHIPUSDT",
+        "trades": 244,
+        "return_pct": 1.0241,
+        "win_rate": 38.11,
+        "max_drawdown_pct": -18.5791,
+        "random_mean_pct": -22.4803
+      },
+      {
+        "symbol": "COTIUSDT",
+        "trades": 120,
+        "return_pct": -1.316,
+        "win_rate": 36.67,
+        "max_drawdown_pct": -15.1017,
+        "random_mean_pct": -10.603
+      },
+      {
+        "symbol": "DASHUSDT",
+        "trades": 236,
+        "return_pct": -29.0583,
+        "win_rate": 28.39,
+        "max_drawdown_pct": -30.6588,
+        "random_mean_pct": -17.7563
+      },
+      {
+        "symbol": "DOGEUSDT",
+        "trades": 228,
+        "return_pct": -19.895,
+        "win_rate": 27.63,
+        "max_drawdown_pct": -30.3916,
+        "random_mean_pct": -25.703
+      },
+      {
+        "symbol": "DOODUSDT",
+        "trades": 235,
+        "return_pct": -20.0015,
+        "win_rate": 31.06,
+        "max_drawdown_pct": -33.7186,
+        "random_mean_pct": -11.5923
+      },
+      {
+        "symbol": "DOSUSDT",
+        "trades": 105,
+        "return_pct": -23.0022,
+        "win_rate": 31.43,
+        "max_drawdown_pct": -26.3014,
+        "random_mean_pct": -12.1468
+      },
+      {
+        "symbol": "DOTUSDT",
+        "trades": 232,
+        "return_pct": -19.8205,
+        "win_rate": 34.05,
+        "max_drawdown_pct": -27.5356,
+        "random_mean_pct": -22.1033
+      },
+      {
+        "symbol": "EIGENUSDT",
+        "trades": 123,
+        "return_pct": -9.528,
+        "win_rate": 33.33,
+        "max_drawdown_pct": -17.6293,
+        "random_mean_pct": -12.2193
+      },
+      {
+        "symbol": "ENAUSDT",
+        "trades": 230,
+        "return_pct": -9.1796,
+        "win_rate": 34.35,
+        "max_drawdown_pct": -23.9816,
+        "random_mean_pct": -16.258
+      },
+      {
+        "symbol": "ERAUSDT",
+        "trades": 235,
+        "return_pct": -11.4013,
+        "win_rate": 33.19,
+        "max_drawdown_pct": -37.8255,
+        "random_mean_pct": -17.6353
+      },
+      {
+        "symbol": "ETHUSDT",
+        "trades": 216,
+        "return_pct": -22.4952,
+        "win_rate": 29.63,
+        "max_drawdown_pct": -27.0603,
+        "random_mean_pct": -22.6293
+      },
+      {
+        "symbol": "FETUSDT",
+        "trades": 125,
+        "return_pct": -6.5971,
+        "win_rate": 32.0,
+        "max_drawdown_pct": -13.6388,
+        "random_mean_pct": -10.1975
+      },
+      {
+        "symbol": "FILUSDT",
+        "trades": 240,
+        "return_pct": -25.6039,
+        "win_rate": 30.0,
+        "max_drawdown_pct": -34.4931,
+        "random_mean_pct": -20.0198
+      },
+      {
+        "symbol": "GALAUSDT",
+        "trades": 111,
+        "return_pct": -5.9771,
+        "win_rate": 29.73,
+        "max_drawdown_pct": -16.471,
+        "random_mean_pct": -8.0532
+      },
+      {
+        "symbol": "GTCUSDT",
+        "trades": 112,
+        "return_pct": 5.9756,
+        "win_rate": 37.5,
+        "max_drawdown_pct": -9.1682,
+        "random_mean_pct": -14.0205
+      },
+      {
+        "symbol": "HBARUSDT",
+        "trades": 129,
+        "return_pct": -12.2596,
+        "win_rate": 27.91,
+        "max_drawdown_pct": -16.2416,
+        "random_mean_pct": -13.43
+      },
+      {
+        "symbol": "HUMAUSDT",
+        "trades": 213,
+        "return_pct": -16.151,
+        "win_rate": 31.92,
+        "max_drawdown_pct": -27.2927,
+        "random_mean_pct": -18.1524
+      },
+      {
+        "symbol": "HYPEUSDT",
+        "trades": 133,
+        "return_pct": -28.9536,
+        "win_rate": 24.06,
+        "max_drawdown_pct": -29.23,
+        "random_mean_pct": -15.4819
+      },
+      {
+        "symbol": "INJUSDT",
+        "trades": 233,
+        "return_pct": -24.6455,
+        "win_rate": 27.9,
+        "max_drawdown_pct": -33.7862,
+        "random_mean_pct": -15.2367
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "trades": 120,
+        "return_pct": 7.3019,
+        "win_rate": 35.83,
+        "max_drawdown_pct": -13.7076,
+        "random_mean_pct": -5.0707
+      },
+      {
+        "symbol": "IRYSUSDT",
+        "trades": 229,
+        "return_pct": -25.7768,
+        "win_rate": 27.95,
+        "max_drawdown_pct": -47.601,
+        "random_mean_pct": -16.9314
+      },
+      {
+        "symbol": "JCTUSDT",
+        "trades": 229,
+        "return_pct": -22.16,
+        "win_rate": 31.0,
+        "max_drawdown_pct": -32.3438,
+        "random_mean_pct": -6.4615
+      },
+      {
+        "symbol": "KATUSDT",
+        "trades": 235,
+        "return_pct": -23.6015,
+        "win_rate": 31.91,
+        "max_drawdown_pct": -31.4319,
+        "random_mean_pct": -24.3863
+      },
+      {
+        "symbol": "LINKUSDT",
+        "trades": 236,
+        "return_pct": -8.2889,
+        "win_rate": 36.44,
+        "max_drawdown_pct": -23.2061,
+        "random_mean_pct": -23.5817
+      },
+      {
+        "symbol": "LITUSDT",
+        "trades": 268,
+        "return_pct": -38.5966,
+        "win_rate": 29.48,
+        "max_drawdown_pct": -45.0042,
+        "random_mean_pct": -21.2635
+      },
+      {
+        "symbol": "LTCUSDT",
+        "trades": 227,
+        "return_pct": -32.1509,
+        "win_rate": 30.84,
+        "max_drawdown_pct": -33.2536,
+        "random_mean_pct": -24.0199
+      },
+      {
+        "symbol": "LYNUSDT",
+        "trades": 121,
+        "return_pct": -30.825,
+        "win_rate": 27.27,
+        "max_drawdown_pct": -33.9011,
+        "random_mean_pct": -15.5597
+      },
+      {
+        "symbol": "MAGICUSDT",
+        "trades": 108,
+        "return_pct": 3.1039,
+        "win_rate": 37.04,
+        "max_drawdown_pct": -10.6215,
+        "random_mean_pct": -7.9561
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "trades": 109,
+        "return_pct": 21.5384,
+        "win_rate": 36.7,
+        "max_drawdown_pct": -14.1229,
+        "random_mean_pct": -3.79
+      },
+      {
+        "symbol": "MANAUSDT",
+        "trades": 125,
+        "return_pct": -26.2992,
+        "win_rate": 28.8,
+        "max_drawdown_pct": -31.592,
+        "random_mean_pct": -13.723
+      },
+      {
+        "symbol": "METUSDT",
+        "trades": 136,
+        "return_pct": -5.3755,
+        "win_rate": 33.09,
+        "max_drawdown_pct": -18.183,
+        "random_mean_pct": -8.3634
+      },
+      {
+        "symbol": "MORPHOUSDT",
+        "trades": 131,
+        "return_pct": -18.7986,
+        "win_rate": 30.53,
+        "max_drawdown_pct": -22.9922,
+        "random_mean_pct": -12.5755
+      },
+      {
+        "symbol": "MOVRUSDT",
+        "trades": 126,
+        "return_pct": 16.8561,
+        "win_rate": 35.71,
+        "max_drawdown_pct": -14.3246,
+        "random_mean_pct": -10.0235
+      },
+      {
+        "symbol": "NEARUSDT",
+        "trades": 240,
+        "return_pct": -17.3272,
+        "win_rate": 32.5,
+        "max_drawdown_pct": -23.6626,
+        "random_mean_pct": -14.7579
+      },
+      {
+        "symbol": "NILUSDT",
+        "trades": 236,
+        "return_pct": -0.5925,
+        "win_rate": 33.05,
+        "max_drawdown_pct": -35.8151,
+        "random_mean_pct": -10.185
+      },
+      {
+        "symbol": "OGNUSDT",
+        "trades": 124,
+        "return_pct": -25.5934,
+        "win_rate": 26.61,
+        "max_drawdown_pct": -31.3228,
+        "random_mean_pct": -6.6549
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "trades": 243,
+        "return_pct": -37.3922,
+        "win_rate": 27.57,
+        "max_drawdown_pct": -44.393,
+        "random_mean_pct": -18.216
+      },
+      {
+        "symbol": "OPUSDT",
+        "trades": 122,
+        "return_pct": -8.2521,
+        "win_rate": 31.97,
+        "max_drawdown_pct": -15.8201,
+        "random_mean_pct": -8.9407
+      },
+      {
+        "symbol": "ORDERUSDT",
+        "trades": 229,
+        "return_pct": -36.4182,
+        "win_rate": 27.95,
+        "max_drawdown_pct": -40.3733,
+        "random_mean_pct": -17.9684
+      },
+      {
+        "symbol": "PAXGUSDT",
+        "trades": 260,
+        "return_pct": -26.2162,
+        "win_rate": 25.0,
+        "max_drawdown_pct": -27.4804,
+        "random_mean_pct": -27.8661
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "trades": 136,
+        "return_pct": -20.6425,
+        "win_rate": 30.15,
+        "max_drawdown_pct": -23.4464,
+        "random_mean_pct": -13.2537
+      },
+      {
+        "symbol": "PENGUUSDT",
+        "trades": 237,
+        "return_pct": -34.3573,
+        "win_rate": 29.11,
+        "max_drawdown_pct": -40.2206,
+        "random_mean_pct": -22.3448
+      },
+      {
+        "symbol": "POLUSDT",
+        "trades": 120,
+        "return_pct": -26.5979,
+        "win_rate": 27.5,
+        "max_drawdown_pct": -28.1404,
+        "random_mean_pct": -13.0964
+      },
+      {
+        "symbol": "PROMUSDT",
+        "trades": 119,
+        "return_pct": -10.8751,
+        "win_rate": 31.09,
+        "max_drawdown_pct": -23.2521,
+        "random_mean_pct": -12.3711
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "trades": 241,
+        "return_pct": -22.9705,
+        "win_rate": 32.78,
+        "max_drawdown_pct": -30.1323,
+        "random_mean_pct": -14.1877
+      },
+      {
+        "symbol": "QNTUSDT",
+        "trades": 240,
+        "return_pct": -28.7562,
+        "win_rate": 26.67,
+        "max_drawdown_pct": -40.4721,
+        "random_mean_pct": -15.2174
+      },
+      {
+        "symbol": "QUSDT",
+        "trades": 209,
+        "return_pct": -49.5908,
+        "win_rate": 26.32,
+        "max_drawdown_pct": -51.832,
+        "random_mean_pct": -13.6737
+      },
+      {
+        "symbol": "RAREUSDT",
+        "trades": 131,
+        "return_pct": -15.9122,
+        "win_rate": 29.77,
+        "max_drawdown_pct": -22.8882,
+        "random_mean_pct": -11.6648
+      },
+      {
+        "symbol": "RIVERUSDT",
+        "trades": 122,
+        "return_pct": -3.2172,
+        "win_rate": 32.79,
+        "max_drawdown_pct": -21.3914,
+        "random_mean_pct": -9.4553
+      },
+      {
+        "symbol": "RLCUSDT",
+        "trades": 116,
+        "return_pct": 52.6288,
+        "win_rate": 39.66,
+        "max_drawdown_pct": -15.9096,
+        "random_mean_pct": -1.6163
+      },
+      {
+        "symbol": "RUNEUSDT",
+        "trades": 129,
+        "return_pct": -12.8162,
+        "win_rate": 32.56,
+        "max_drawdown_pct": -13.232,
+        "random_mean_pct": -13.9005
+      },
+      {
+        "symbol": "SAGAUSDT",
+        "trades": 124,
+        "return_pct": -18.2743,
+        "win_rate": 26.61,
+        "max_drawdown_pct": -27.9134,
+        "random_mean_pct": -9.2681
+      },
+      {
+        "symbol": "SANDUSDT",
+        "trades": 115,
+        "return_pct": -1.466,
+        "win_rate": 30.43,
+        "max_drawdown_pct": -14.9968,
+        "random_mean_pct": -9.9519
+      },
+      {
+        "symbol": "SKYUSDT",
+        "trades": 116,
+        "return_pct": 7.1109,
+        "win_rate": 32.76,
+        "max_drawdown_pct": -11.8343,
+        "random_mean_pct": -11.2935
+      },
+      {
+        "symbol": "SOLUSDT",
+        "trades": 234,
+        "return_pct": -25.2698,
+        "win_rate": 29.06,
+        "max_drawdown_pct": -33.0016,
+        "random_mean_pct": -22.8021
+      },
+      {
+        "symbol": "SOONUSDT",
+        "trades": 242,
+        "return_pct": -50.4791,
+        "win_rate": 25.21,
+        "max_drawdown_pct": -51.1293,
+        "random_mean_pct": -12.9605
+      },
+      {
+        "symbol": "STRKUSDT",
+        "trades": 242,
+        "return_pct": -6.0197,
+        "win_rate": 31.82,
+        "max_drawdown_pct": -29.408,
+        "random_mean_pct": -17.5462
+      },
+      {
+        "symbol": "SUIUSDT",
+        "trades": 211,
+        "return_pct": -20.5584,
+        "win_rate": 28.44,
+        "max_drawdown_pct": -39.7149,
+        "random_mean_pct": -18.2359
+      },
+      {
+        "symbol": "TAGUSDT",
+        "trades": 226,
+        "return_pct": 9.8033,
+        "win_rate": 32.74,
+        "max_drawdown_pct": -19.2328,
+        "random_mean_pct": -15.9174
+      },
+      {
+        "symbol": "TAOUSDT",
+        "trades": 252,
+        "return_pct": -34.9012,
+        "win_rate": 27.38,
+        "max_drawdown_pct": -47.1916,
+        "random_mean_pct": -20.7953
+      },
+      {
+        "symbol": "TIAUSDT",
+        "trades": 234,
+        "return_pct": -24.1738,
+        "win_rate": 29.49,
+        "max_drawdown_pct": -26.728,
+        "random_mean_pct": -16.4043
+      },
+      {
+        "symbol": "TRUMPUSDT",
+        "trades": 228,
+        "return_pct": -27.6966,
+        "win_rate": 28.51,
+        "max_drawdown_pct": -34.159,
+        "random_mean_pct": -23.0301
+      },
+      {
+        "symbol": "UNIUSDT",
+        "trades": 238,
+        "return_pct": -1.6759,
+        "win_rate": 33.19,
+        "max_drawdown_pct": -18.045,
+        "random_mean_pct": -19.374
+      },
+      {
+        "symbol": "WLDUSDT",
+        "trades": 223,
+        "return_pct": 1.0252,
+        "win_rate": 36.32,
+        "max_drawdown_pct": -21.8939,
+        "random_mean_pct": -17.7243
+      },
+      {
+        "symbol": "XAUTUSDT",
+        "trades": 251,
+        "return_pct": -26.8725,
+        "win_rate": 23.9,
+        "max_drawdown_pct": -27.7511,
+        "random_mean_pct": -27.0022
+      },
+      {
+        "symbol": "XLMUSDT",
+        "trades": 247,
+        "return_pct": -29.6531,
+        "win_rate": 29.96,
+        "max_drawdown_pct": -33.2619,
+        "random_mean_pct": -18.7117
+      },
+      {
+        "symbol": "XMRUSDT",
+        "trades": 249,
+        "return_pct": -40.823,
+        "win_rate": 31.73,
+        "max_drawdown_pct": -42.8437,
+        "random_mean_pct": -22.5205
+      },
+      {
+        "symbol": "XRPUSDT",
+        "trades": 229,
+        "return_pct": -20.2448,
+        "win_rate": 30.57,
+        "max_drawdown_pct": -27.0215,
+        "random_mean_pct": -20.5757
+      },
+      {
+        "symbol": "ZROUSDT",
+        "trades": 234,
+        "return_pct": -24.0222,
+        "win_rate": 30.77,
+        "max_drawdown_pct": -33.1245,
+        "random_mean_pct": -18.3671
+      }
+    ]
+  }
+}

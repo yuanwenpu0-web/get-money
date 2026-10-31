@@ -135,3 +135,4 @@ cd D:/UGit/get-money/backend
 | 日期 | 变更 | 原因 | 影响 |
 |---|---|---|---|
 | 2026-10-30 | v1.0 初版 | 契约完成 + 用户 4 决策 + 总监门禁（4 处瑕疵裁决：HTF attach 衔接 / 平票注释 / R14 边界 / gap 笔误 → AC-10/11/12 + A28–A30） | 全范围 |
+| 2026-10-31 | v1.1 实现期口径修正（Phase 3 实测） | ① Pine `tp1Hit` 只是「价格曾触」的保本 latch，**不等于** `strategy.exit(qty_percent=50)` 已成交；单一 bool 兼做「保本」与「撤单」会在价格触达但订单未成交时永久撤掉 TP1，导致 50% 部分平永不发生 → 必须拆 `tp1_seen` / `tp1_filled`（AC-05 落地口径）。② `trades.py:27` 的 `aggregate_positions` 合并同仓位多腿时用**后一腿 status 覆盖前一腿**，仓位级 `status_counts` 天然看不到 `take_profit_1`；实测 BTCUSDT 分腿 238 stop_loss + 45 take_profit_1 → 报告必须同时给「仓位级最终出场」与「腿级成交」两张表并披露 TP1 触发率（AC-13 落地口径）。 | 出场统计口径 + 回测报告结构 |
