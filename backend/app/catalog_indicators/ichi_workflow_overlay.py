@@ -44,7 +44,7 @@ from ._pine import (
     lowest,
     ohlcv,
 )
-from ._tf import calendar_frame
+from ._tf import _period_starts, calendar_frame
 
 __all__ = ["ichi_workflow_overlay"]
 
@@ -215,16 +215,22 @@ def ichi_workflow_overlay(
         "tk": np.roll(d_tk, 1), "chikou": np.roll(d_chikou, 1),
     }
     prev_ctf = np.roll(d_ctf, 1)
-    prev_states["price"][0] = 0
-    prev_states["future"][0] = 0
-    prev_states["tk"][0] = 0
-    prev_states["chikou"][0] = 0
-    prev_ctf[0] = 0
-    period_keys = index.floor({"D": "D", "W": "W", "M": "M"}.get(htf_rule, htf_rule))
+    if len(prev_ctf):  # 数据不足一个完整周期时 HTF 序列为空
+        prev_states["price"][0] = 0
+        prev_states["future"][0] = 0
+        prev_states["tk"][0] = 0
+        prev_states["chikou"][0] = 0
+        prev_ctf[0] = 0
+    # 上一已完成日历周期 -> 基础 bar（calendar_frame 的索引是 period start，
+    # 所以必须按 period-1 的 start_time 取，不能用 floor("W")）。
+    previous_starts = _period_starts(
+        (index.tz_localize(None).to_period(htf_rule) - 1))
     lifted = {}
     for name, values in prev_states.items():
-        lifted[name] = pd.Series(values, index=daily.index).reindex(period_keys).to_numpy(dtype=float)
-    htf_ctf_lift = pd.Series(prev_ctf, index=daily.index).reindex(period_keys).to_numpy(dtype=float)
+        lifted[name] = pd.Series(values, index=daily.index).reindex(
+            previous_starts).to_numpy(dtype=float)
+    htf_ctf_lift = pd.Series(prev_ctf, index=daily.index).reindex(
+        previous_starts).to_numpy(dtype=float)
 
     allow_long = direction_filter != "Short Only"
     allow_short = direction_filter != "Long Only"

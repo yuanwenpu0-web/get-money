@@ -164,6 +164,66 @@ def pivotlow(series: pd.Series, left: int, right: int) -> pd.Series:
     return _pivot(series, left, right, False)
 
 
+def pivot_strict(series: pd.Series, left: int, right: int, highest_pivot: bool) -> pd.Series:
+    """Strict pivot (ta.pivotlow / ta.pivothigh semantics).
+
+    A bar ``i`` is a pivot only when its value is strictly lower (pivot low) or
+    strictly higher (pivot high) than *every* neighbour in ``[i-left, i-1]``
+    and ``[i+1, i+right]``. The value is reported at the confirmation bar
+    ``i + right``, so ``c - right`` is the actual pivot bar.
+
+    Prefer this over ``pivothigh``/``pivotlow`` for new ports: ``_pivot`` uses a
+    looser neighbour comparison that over-reports pivot lows by ~20x. Existing
+    modules depend on the current (loose) behaviour and their tests are written
+    against it, so ``_pivot`` is left as-is.
+    """
+    s = series.astype(float)
+    v = s.to_numpy(dtype=float)
+    n = len(v)
+    out = np.full(n, np.nan)
+    if n < left + right + 1:
+        return pd.Series(out, index=s.index)
+    if highest_pivot:
+        l_neigh = s.rolling(left).max().shift(1) if left else pd.Series(np.nan, index=s.index)
+        r = s[::-1]
+        r_neigh = r.rolling(right).max().shift(1)[::-1] if right else pd.Series(np.nan, index=s.index)
+        neigh = np.full(n, -np.inf)
+        if left:
+            neigh = np.fmax(neigh, l_neigh.fillna(-np.inf).to_numpy())
+        if right:
+            neigh = np.fmax(neigh, r_neigh.fillna(-np.inf).to_numpy())
+        cmp_ok = v > neigh
+    else:
+        l_neigh = s.rolling(left).min().shift(1) if left else pd.Series(np.nan, index=s.index)
+        r = s[::-1]
+        r_neigh = r.rolling(right).min().shift(1)[::-1] if right else pd.Series(np.nan, index=s.index)
+        neigh = np.full(n, np.inf)
+        if left:
+            neigh = np.fmin(neigh, l_neigh.fillna(np.inf).to_numpy())
+        if right:
+            neigh = np.fmin(neigh, r_neigh.fillna(np.inf).to_numpy())
+        cmp_ok = v < neigh
+    mask = np.ones(n, dtype=bool)
+    if left:
+        mask &= ~np.isnan(l_neigh.to_numpy())
+    if right:
+        mask &= ~np.isnan(r_neigh.to_numpy())
+    valid = mask & cmp_ok
+    idx = np.where(valid)[0]
+    out[idx + right] = v[idx]
+    return pd.Series(out, index=s.index)
+
+
+def pivothigh_strict(series: pd.Series, left: int, right: int) -> pd.Series:
+    """Strict ta.pivothigh: value appears `right` bars after the pivot bar."""
+    return pivot_strict(series, left, right, True)
+
+
+def pivotlow_strict(series: pd.Series, left: int, right: int) -> pd.Series:
+    """Strict ta.pivotlow: value appears `right` bars after the pivot bar."""
+    return pivot_strict(series, left, right, False)
+
+
 def crossover(left, right) -> pd.Series:
     """Pine's ta.crossover; either side may be a scalar level."""
     left, right = _broadcast_pair(left, right)

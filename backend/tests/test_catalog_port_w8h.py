@@ -70,6 +70,6 @@ def test_targets_and_active_setup_state():
 def test_htf_score_lags_the_base_bars():
     frame = _trend_frame()
     result = ichi_workflow_overlay(frame, htf_rule="D")
-    # The first day has no completed HTF period -> the lagged score is 0.
-    assert result.htf_ctf_score.iloc[:96].eq(0).all()
+    # The first day has no completed HTF period -> NaN (no previous period).
+    assert result.htf_ctf_score.iloc[:96].isna().all()
     assert result.htf_ctf_score.dropna().between(-4, 4).all()

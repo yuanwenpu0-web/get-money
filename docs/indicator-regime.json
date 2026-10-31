@@ -1,0 +1,1277 @@
+{
+  "config": {
+    "generated_at": "2026-11-01 01:42:01",
+    "source": "docs/indicator-lab-long.json",
+    "stake": 10.0,
+    "round_trip_pct": 0.12,
+    "regimes": "market_ema:200,market_ema:100,own_ema:200,own_ema_4h:200",
+    "top": 5
+  },
+  "dataset": {
+    "interval": "1h",
+    "source": "native",
+    "symbols": 40,
+    "bars_total": 379000,
+    "start": "2025-09-26 18:00:00+00:00",
+    "end": "2026-10-26 12:00:00+00:00",
+    "split": "2026-06-30 01:48:00+00:00",
+    "bar_ms": 3600000
+  },
+  "candidates": [
+    {
+      "label": "rsi_reversal(high=75,low=25,n=14)",
+      "params": {
+        "n": 14,
+        "low": 25,
+        "high": 75
+      },
+      "base": {
+        "train": {
+          "trades": 1067,
+          "win_rate": 0.5867,
+          "payoff": 0.945,
+          "profit_factor": 1.342,
+          "total_pnl": 65.0189,
+          "avg_pnl": 0.0609,
+          "avg_net_pct": 0.60936,
+          "t_stat": 2.158,
+          "p_value": 0.03095886838197957,
+          "max_drawdown_pct": 6.912,
+          "capital": 360.0,
+          "total_return_pct": 18.061,
+          "max_concurrent": 36,
+          "avg_bars": 32.9,
+          "long_pnl": 65.0189,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 26.68,
+          "exit_reasons": {
+            "rsi50": 1067
+          },
+          "avg_fee": 0.00803
+        },
+        "test": {
+          "trades": 341,
+          "win_rate": 0.6393,
+          "payoff": 1.391,
+          "profit_factor": 2.466,
+          "total_pnl": 59.7093,
+          "avg_pnl": 0.1751,
+          "avg_net_pct": 1.75101,
+          "t_stat": 2.16,
+          "p_value": 0.030763523974594524,
+          "max_drawdown_pct": 2.351,
+          "capital": 270.0,
+          "total_return_pct": 22.115,
+          "max_concurrent": 27,
+          "avg_bars": 31.01,
+          "long_pnl": 59.7093,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 8.53,
+          "exit_reasons": {
+            "rsi50": 337,
+            "end_of_sample": 4
+          },
+          "avg_fee": 0.00807
+        },
+        "full": {
+          "trades": 1408,
+          "win_rate": 0.5994,
+          "payoff": 1.029,
+          "profit_factor": 1.54,
+          "total_pnl": 124.7282,
+          "avg_pnl": 0.0886,
+          "avg_net_pct": 0.88585,
+          "t_stat": 3.049,
+          "p_value": 0.0022972830346815547,
+          "max_drawdown_pct": 6.912,
+          "capital": 360.0,
+          "total_return_pct": 34.647,
+          "max_concurrent": 36,
+          "avg_bars": 32.44,
+          "long_pnl": 124.7282,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 35.2,
+          "exit_reasons": {
+            "rsi50": 1404,
+            "end_of_sample": 4
+          },
+          "avg_fee": 0.00804
+        }
+      }
+    },
+    {
+      "label": "rsi_reversal(high=75,low=25,n=21)",
+      "params": {
+        "n": 21,
+        "low": 25,
+        "high": 75
+      },
+      "base": {
+        "train": {
+          "trades": 410,
+          "win_rate": 0.6268,
+          "payoff": 1.025,
+          "profit_factor": 1.722,
+          "total_pnl": 58.2076,
+          "avg_pnl": 0.142,
+          "avg_net_pct": 1.4197,
+          "t_stat": 2.276,
+          "p_value": 0.022843638746159613,
+          "max_drawdown_pct": 4.39,
+          "capital": 350.0,
+          "total_return_pct": 16.631,
+          "max_concurrent": 35,
+          "avg_bars": 36.44,
+          "long_pnl": 58.2076,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 10.25,
+          "exit_reasons": {
+            "rsi50": 410
+          },
+          "avg_fee": 0.00806
+        },
+        "test": {
+          "trades": 86,
+          "win_rate": 0.686,
+          "payoff": 1.052,
+          "profit_factor": 2.299,
+          "total_pnl": 14.5861,
+          "avg_pnl": 0.1696,
+          "avg_net_pct": 1.69606,
+          "t_stat": 1.945,
+          "p_value": 0.05182715093263258,
+          "max_drawdown_pct": 2.293,
+          "capital": 160.0,
+          "total_return_pct": 9.116,
+          "max_concurrent": 16,
+          "avg_bars": 30.28,
+          "long_pnl": 14.5861,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 2.15,
+          "exit_reasons": {
+            "rsi50": 85,
+            "end_of_sample": 1
+          },
+          "avg_fee": 0.00807
+        },
+        "full": {
+          "trades": 496,
+          "win_rate": 0.6371,
+          "payoff": 1.021,
+          "profit_factor": 1.793,
+          "total_pnl": 72.7937,
+          "avg_pnl": 0.1468,
+          "avg_net_pct": 1.46761,
+          "t_stat": 2.733,
+          "p_value": 0.006279868241390247,
+          "max_drawdown_pct": 4.39,
+          "capital": 350.0,
+          "total_return_pct": 20.798,
+          "max_concurrent": 35,
+          "avg_bars": 35.37,
+          "long_pnl": 72.7937,
+          "short_pnl": 0.0,
+          "trades_per_symbol": 12.4,
+          "exit_reasons": {
+            "rsi50": 495,
+            "end_of_sample": 1
+          },
+          "avg_fee": 0.00806
+        }
+      }
+    }
+  ],
+  "benchmarks": {
+    "buy_hold": {
+      "train": {
+        "trades": 40,
+        "win_rate": 0.05,
+        "payoff": 2.25,
+        "profit_factor": 0.118,
+        "total_pnl": -221.4126,
+        "avg_pnl": -5.5353,
+        "avg_net_pct": -55.35316,
+        "t_stat": -5.702,
+        "p_value": 1.181370681106025e-08,
+        "max_drawdown_pct": 54.955,
+        "capital": 400.0,
+        "total_return_pct": -55.353,
+        "max_concurrent": 40,
+        "avg_bars": 0.0,
+        "long_pnl": -221.4126,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.0,
+        "exit_reasons": {
+          "buy_hold": 40
+        },
+        "avg_fee": 0.0
+      },
+      "test": {
+        "trades": 40,
+        "win_rate": 0.975,
+        "payoff": 2164.367,
+        "profit_factor": 84410.318,
+        "total_pnl": 506.7596,
+        "avg_pnl": 12.669,
+        "avg_net_pct": 126.6899,
+        "t_stat": 2.367,
+        "p_value": 0.01794904380522493,
+        "max_drawdown_pct": 0.001,
+        "capital": 400.0,
+        "total_return_pct": 126.69,
+        "max_concurrent": 40,
+        "avg_bars": 0.0,
+        "long_pnl": 506.7596,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.0,
+        "exit_reasons": {
+          "buy_hold": 40
+        },
+        "avg_fee": 0.0
+      },
+      "full": {
+        "trades": 40,
+        "win_rate": 0.175,
+        "payoff": 4.09,
+        "profit_factor": 0.868,
+        "total_pnl": -23.9191,
+        "avg_pnl": -0.598,
+        "avg_net_pct": -5.97978,
+        "t_stat": -0.195,
+        "p_value": 0.8450840318761195,
+        "max_drawdown_pct": 20.214,
+        "capital": 400.0,
+        "total_return_pct": -5.98,
+        "max_concurrent": 40,
+        "avg_bars": 0.0,
+        "long_pnl": -23.9191,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.0,
+        "exit_reasons": {
+          "buy_hold": 40
+        },
+        "avg_fee": 0.0
+      }
+    },
+    "always_long": {
+      "train": {
+        "trades": 15373,
+        "win_rate": 0.3836,
+        "payoff": 1.292,
+        "profit_factor": 0.804,
+        "total_pnl": -354.1832,
+        "avg_pnl": -0.023,
+        "avg_net_pct": -0.23039,
+        "t_stat": -5.019,
+        "p_value": 5.183139718010987e-07,
+        "max_drawdown_pct": 90.055,
+        "capital": 400.0,
+        "total_return_pct": -88.546,
+        "max_concurrent": 40,
+        "avg_bars": 15.71,
+        "long_pnl": -354.1832,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 384.32,
+        "exit_reasons": {
+          "rsi50": 15373
+        },
+        "avg_fee": 0.00799
+      },
+      "test": {
+        "trades": 6658,
+        "win_rate": 0.3919,
+        "payoff": 2.201,
+        "profit_factor": 1.418,
+        "total_pnl": 251.1348,
+        "avg_pnl": 0.0377,
+        "avg_net_pct": 0.37719,
+        "t_stat": 4.092,
+        "p_value": 4.275791198622736e-05,
+        "max_drawdown_pct": 7.417,
+        "capital": 400.0,
+        "total_return_pct": 62.784,
+        "max_concurrent": 40,
+        "avg_bars": 16.04,
+        "long_pnl": 251.1348,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 166.45,
+        "exit_reasons": {
+          "rsi50": 6619,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 22054,
+        "win_rate": 0.3862,
+        "payoff": 1.521,
+        "profit_factor": 0.957,
+        "total_pnl": -103.821,
+        "avg_pnl": -0.0047,
+        "avg_net_pct": -0.04708,
+        "t_stat": -1.109,
+        "p_value": 0.26745653700361427,
+        "max_drawdown_pct": 90.055,
+        "capital": 400.0,
+        "total_return_pct": -25.955,
+        "max_concurrent": 40,
+        "avg_bars": 15.82,
+        "long_pnl": -103.821,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 551.35,
+        "exit_reasons": {
+          "rsi50": 22015,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.008
+      }
+    }
+  },
+  "rows": [
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=14)",
+      "regime": "market_ema(200) · 等权市场指数 4h",
+      "on_ratio": 0.46068601583113455,
+      "lift_full": -9.43,
+      "train": {
+        "trades": 192,
+        "win_rate": 0.5417,
+        "payoff": 1.113,
+        "profit_factor": 1.316,
+        "total_pnl": 11.2511,
+        "avg_pnl": 0.0586,
+        "avg_net_pct": 0.58599,
+        "t_stat": 0.615,
+        "p_value": 0.5388508293633386,
+        "max_drawdown_pct": 3.965,
+        "capital": 270.0,
+        "total_return_pct": 4.167,
+        "max_concurrent": 27,
+        "avg_bars": 31.79,
+        "long_pnl": 11.2511,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 4.8,
+        "exit_reasons": {
+          "rsi50": 192
+        },
+        "avg_fee": 0.00803
+      },
+      "test": {
+        "trades": 290,
+        "win_rate": 0.6379,
+        "payoff": 1.452,
+        "profit_factor": 2.558,
+        "total_pnl": 56.8393,
+        "avg_pnl": 0.196,
+        "avg_net_pct": 1.95998,
+        "t_stat": 2.066,
+        "p_value": 0.03880860463458477,
+        "max_drawdown_pct": 2.348,
+        "capital": 270.0,
+        "total_return_pct": 21.052,
+        "max_concurrent": 27,
+        "avg_bars": 31.35,
+        "long_pnl": 56.8393,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 7.25,
+        "exit_reasons": {
+          "rsi50": 286,
+          "end_of_sample": 4
+        },
+        "avg_fee": 0.00808
+      },
+      "full": {
+        "trades": 482,
+        "win_rate": 0.5996,
+        "payoff": 1.299,
+        "profit_factor": 1.944,
+        "total_pnl": 68.0904,
+        "avg_pnl": 0.1413,
+        "avg_net_pct": 1.41266,
+        "t_stat": 2.061,
+        "p_value": 0.039350707169108885,
+        "max_drawdown_pct": 3.965,
+        "capital": 270.0,
+        "total_return_pct": 25.219,
+        "max_concurrent": 27,
+        "avg_bars": 31.52,
+        "long_pnl": 68.0904,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 12.05,
+        "exit_reasons": {
+          "rsi50": 478,
+          "end_of_sample": 4
+        },
+        "avg_fee": 0.00806
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=21)",
+      "regime": "market_ema(200) · 等权市场指数 4h",
+      "on_ratio": 0.46068601583113455,
+      "lift_full": -1.76,
+      "train": {
+        "trades": 44,
+        "win_rate": 0.5227,
+        "payoff": 2.518,
+        "profit_factor": 2.758,
+        "total_pnl": 18.4689,
+        "avg_pnl": 0.4197,
+        "avg_net_pct": 4.19749,
+        "t_stat": 0.885,
+        "p_value": 0.3761192156229878,
+        "max_drawdown_pct": 1.927,
+        "capital": 100.0,
+        "total_return_pct": 18.469,
+        "max_concurrent": 10,
+        "avg_bars": 32.52,
+        "long_pnl": 18.4689,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.1,
+        "exit_reasons": {
+          "rsi50": 44
+        },
+        "avg_fee": 0.00817
+      },
+      "test": {
+        "trades": 70,
+        "win_rate": 0.6714,
+        "payoff": 1.126,
+        "profit_factor": 2.301,
+        "total_pnl": 11.9872,
+        "avg_pnl": 0.1712,
+        "avg_net_pct": 1.71245,
+        "t_stat": 1.762,
+        "p_value": 0.07811080778982772,
+        "max_drawdown_pct": 2.328,
+        "capital": 160.0,
+        "total_return_pct": 7.492,
+        "max_concurrent": 16,
+        "avg_bars": 29.93,
+        "long_pnl": 11.9872,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.75,
+        "exit_reasons": {
+          "rsi50": 69,
+          "end_of_sample": 1
+        },
+        "avg_fee": 0.00807
+      },
+      "full": {
+        "trades": 114,
+        "win_rate": 0.614,
+        "payoff": 1.599,
+        "profit_factor": 2.544,
+        "total_pnl": 30.4561,
+        "avg_pnl": 0.2672,
+        "avg_net_pct": 2.67159,
+        "t_stat": 1.394,
+        "p_value": 0.16318385329010274,
+        "max_drawdown_pct": 2.101,
+        "capital": 160.0,
+        "total_return_pct": 19.035,
+        "max_concurrent": 16,
+        "avg_bars": 30.93,
+        "long_pnl": 30.4561,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 2.85,
+        "exit_reasons": {
+          "rsi50": 113,
+          "end_of_sample": 1
+        },
+        "avg_fee": 0.00811
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=14)",
+      "regime": "market_ema(100) · 等权市场指数 4h",
+      "on_ratio": 0.5033245382585751,
+      "lift_full": -22.31,
+      "train": {
+        "trades": 185,
+        "win_rate": 0.5081,
+        "payoff": 1.428,
+        "profit_factor": 1.476,
+        "total_pnl": 19.9458,
+        "avg_pnl": 0.1078,
+        "avg_net_pct": 1.07815,
+        "t_stat": 0.896,
+        "p_value": 0.37003123379445224,
+        "max_drawdown_pct": 4.965,
+        "capital": 270.0,
+        "total_return_pct": 7.387,
+        "max_concurrent": 27,
+        "avg_bars": 32.79,
+        "long_pnl": 19.9458,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 4.62,
+        "exit_reasons": {
+          "rsi50": 185
+        },
+        "avg_fee": 0.00805
+      },
+      "test": {
+        "trades": 252,
+        "win_rate": 0.5992,
+        "payoff": 0.905,
+        "profit_factor": 1.353,
+        "total_pnl": 13.36,
+        "avg_pnl": 0.053,
+        "avg_net_pct": 0.53016,
+        "t_stat": 0.894,
+        "p_value": 0.3712794486505939,
+        "max_drawdown_pct": 2.282,
+        "capital": 270.0,
+        "total_return_pct": 4.948,
+        "max_concurrent": 27,
+        "avg_bars": 30.25,
+        "long_pnl": 13.36,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 6.3,
+        "exit_reasons": {
+          "rsi50": 248,
+          "end_of_sample": 4
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 437,
+        "win_rate": 0.5606,
+        "payoff": 1.111,
+        "profit_factor": 1.418,
+        "total_pnl": 33.3058,
+        "avg_pnl": 0.0762,
+        "avg_net_pct": 0.76215,
+        "t_stat": 1.244,
+        "p_value": 0.21349105681905564,
+        "max_drawdown_pct": 4.965,
+        "capital": 270.0,
+        "total_return_pct": 12.335,
+        "max_concurrent": 27,
+        "avg_bars": 31.33,
+        "long_pnl": 33.3058,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 10.93,
+        "exit_reasons": {
+          "rsi50": 433,
+          "end_of_sample": 4
+        },
+        "avg_fee": 0.00803
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=21)",
+      "regime": "market_ema(100) · 等权市场指数 4h",
+      "on_ratio": 0.5033245382585751,
+      "lift_full": -2.66,
+      "train": {
+        "trades": 41,
+        "win_rate": 0.439,
+        "payoff": 2.607,
+        "profit_factor": 2.041,
+        "total_pnl": 17.422,
+        "avg_pnl": 0.4249,
+        "avg_net_pct": 4.24928,
+        "t_stat": 0.787,
+        "p_value": 0.43100618136967006,
+        "max_drawdown_pct": 20.217,
+        "capital": 50.0,
+        "total_return_pct": 34.844,
+        "max_concurrent": 5,
+        "avg_bars": 36.49,
+        "long_pnl": 17.422,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.02,
+        "exit_reasons": {
+          "rsi50": 41
+        },
+        "avg_fee": 0.00817
+      },
+      "test": {
+        "trades": 54,
+        "win_rate": 0.5926,
+        "payoff": 0.741,
+        "profit_factor": 1.078,
+        "total_pnl": 0.7113,
+        "avg_pnl": 0.0132,
+        "avg_net_pct": 0.13173,
+        "t_stat": 0.142,
+        "p_value": 0.8867582974114085,
+        "max_drawdown_pct": 5.066,
+        "capital": 100.0,
+        "total_return_pct": 0.711,
+        "max_concurrent": 10,
+        "avg_bars": 29.15,
+        "long_pnl": 0.7113,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 1.35,
+        "exit_reasons": {
+          "rsi50": 53,
+          "end_of_sample": 1
+        },
+        "avg_fee": 0.00801
+      },
+      "full": {
+        "trades": 95,
+        "win_rate": 0.5263,
+        "payoff": 1.53,
+        "profit_factor": 1.7,
+        "total_pnl": 18.1334,
+        "avg_pnl": 0.1909,
+        "avg_net_pct": 1.90878,
+        "t_stat": 0.802,
+        "p_value": 0.4226147991346058,
+        "max_drawdown_pct": 10.1,
+        "capital": 100.0,
+        "total_return_pct": 18.133,
+        "max_concurrent": 10,
+        "avg_bars": 32.32,
+        "long_pnl": 18.1334,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 2.38,
+        "exit_reasons": {
+          "rsi50": 94,
+          "end_of_sample": 1
+        },
+        "avg_fee": 0.00808
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=14)",
+      "regime": "own_ema(200) · 币自身 1h",
+      "on_ratio": 0.40119261213720314,
+      "lift_full": 18.99,
+      "train": {
+        "trades": 24,
+        "win_rate": 0.4583,
+        "payoff": 1.297,
+        "profit_factor": 1.097,
+        "total_pnl": 0.5734,
+        "avg_pnl": 0.0239,
+        "avg_net_pct": 0.23892,
+        "t_stat": 0.137,
+        "p_value": 0.8912537960109699,
+        "max_drawdown_pct": 9.212,
+        "capital": 40.0,
+        "total_return_pct": 1.434,
+        "max_concurrent": 4,
+        "avg_bars": 32.67,
+        "long_pnl": 0.5734,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.6,
+        "exit_reasons": {
+          "rsi50": 24
+        },
+        "avg_fee": 0.00801
+      },
+      "test": {
+        "trades": 10,
+        "win_rate": 0.7,
+        "payoff": 3.997,
+        "profit_factor": 9.327,
+        "total_pnl": 20.8814,
+        "avg_pnl": 2.0881,
+        "avg_net_pct": 20.88136,
+        "t_stat": 0.911,
+        "p_value": 0.3620996408733241,
+        "max_drawdown_pct": 4.388,
+        "capital": 30.0,
+        "total_return_pct": 69.605,
+        "max_concurrent": 3,
+        "avg_bars": 25.6,
+        "long_pnl": 20.8814,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.25,
+        "exit_reasons": {
+          "rsi50": 10
+        },
+        "avg_fee": 0.00884
+      },
+      "full": {
+        "trades": 34,
+        "win_rate": 0.5294,
+        "payoff": 3.157,
+        "profit_factor": 3.551,
+        "total_pnl": 21.4548,
+        "avg_pnl": 0.631,
+        "avg_net_pct": 6.31023,
+        "t_stat": 0.927,
+        "p_value": 0.3536932875824445,
+        "max_drawdown_pct": 9.212,
+        "capital": 40.0,
+        "total_return_pct": 53.637,
+        "max_concurrent": 4,
+        "avg_bars": 30.59,
+        "long_pnl": 21.4548,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.85,
+        "exit_reasons": {
+          "rsi50": 34
+        },
+        "avg_fee": 0.00826
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=21)",
+      "regime": "own_ema(200) · 币自身 1h",
+      "on_ratio": 0.40119261213720314,
+      "lift_full": -14.93,
+      "train": {
+        "trades": 2,
+        "win_rate": 1.0,
+        "payoff": null,
+        "profit_factor": null,
+        "total_pnl": 0.5864,
+        "avg_pnl": 0.2932,
+        "avg_net_pct": 2.93207,
+        "t_stat": 1.294,
+        "p_value": 0.19577495404737993,
+        "max_drawdown_pct": 0.0,
+        "capital": 10.0,
+        "total_return_pct": 5.864,
+        "max_concurrent": 1,
+        "avg_bars": 13.5,
+        "long_pnl": 0.5864,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.05,
+        "exit_reasons": {
+          "rsi50": 2
+        },
+        "avg_fee": 0.00812
+      },
+      "test": {
+        "trades": 0,
+        "win_rate": null,
+        "payoff": null,
+        "profit_factor": null,
+        "total_pnl": 0.0,
+        "avg_pnl": 0.0,
+        "avg_net_pct": 0.0,
+        "t_stat": 0.0,
+        "p_value": 1.0,
+        "max_drawdown_pct": 0.0,
+        "capital": 10.0,
+        "total_return_pct": 0.0,
+        "max_concurrent": 0,
+        "avg_bars": 0.0,
+        "long_pnl": 0.0,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.0,
+        "exit_reasons": {},
+        "avg_fee": 0.0
+      },
+      "full": {
+        "trades": 2,
+        "win_rate": 1.0,
+        "payoff": null,
+        "profit_factor": null,
+        "total_pnl": 0.5864,
+        "avg_pnl": 0.2932,
+        "avg_net_pct": 2.93207,
+        "t_stat": 1.294,
+        "p_value": 0.19577495404737993,
+        "max_drawdown_pct": 0.0,
+        "capital": 10.0,
+        "total_return_pct": 5.864,
+        "max_concurrent": 1,
+        "avg_bars": 13.5,
+        "long_pnl": 0.5864,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.05,
+        "exit_reasons": {
+          "rsi50": 2
+        },
+        "avg_fee": 0.00812
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=14)",
+      "regime": "own_ema_4h(200) · 币自身 4h",
+      "on_ratio": 0.3365250659630607,
+      "lift_full": -21.48,
+      "train": {
+        "trades": 91,
+        "win_rate": 0.4945,
+        "payoff": 1.108,
+        "profit_factor": 1.083,
+        "total_pnl": 1.7001,
+        "avg_pnl": 0.0187,
+        "avg_net_pct": 0.18683,
+        "t_stat": 0.208,
+        "p_value": 0.8348767011193475,
+        "max_drawdown_pct": 7.973,
+        "capital": 70.0,
+        "total_return_pct": 2.429,
+        "max_concurrent": 7,
+        "avg_bars": 34.04,
+        "long_pnl": 1.7001,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 2.27,
+        "exit_reasons": {
+          "rsi50": 91
+        },
+        "avg_fee": 0.00801
+      },
+      "test": {
+        "trades": 100,
+        "win_rate": 0.57,
+        "payoff": 1.573,
+        "profit_factor": 2.085,
+        "total_pnl": 20.6877,
+        "avg_pnl": 0.2069,
+        "avg_net_pct": 2.06877,
+        "t_stat": 1.397,
+        "p_value": 0.1625590996497141,
+        "max_drawdown_pct": 2.293,
+        "capital": 170.0,
+        "total_return_pct": 12.169,
+        "max_concurrent": 17,
+        "avg_bars": 36.09,
+        "long_pnl": 20.6877,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 2.5,
+        "exit_reasons": {
+          "rsi50": 100
+        },
+        "avg_fee": 0.00809
+      },
+      "full": {
+        "trades": 191,
+        "win_rate": 0.534,
+        "payoff": 1.368,
+        "profit_factor": 1.568,
+        "total_pnl": 22.3878,
+        "avg_pnl": 0.1172,
+        "avg_net_pct": 1.17214,
+        "t_stat": 1.323,
+        "p_value": 0.1857383259791367,
+        "max_drawdown_pct": 3.38,
+        "capital": 170.0,
+        "total_return_pct": 13.169,
+        "max_concurrent": 17,
+        "avg_bars": 35.12,
+        "long_pnl": 22.3878,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 4.78,
+        "exit_reasons": {
+          "rsi50": 191
+        },
+        "avg_fee": 0.00805
+      }
+    },
+    {
+      "candidate": "rsi_reversal(high=75,low=25,n=21)",
+      "regime": "own_ema_4h(200) · 币自身 4h",
+      "on_ratio": 0.3365250659630607,
+      "lift_full": 22.85,
+      "train": {
+        "trades": 15,
+        "win_rate": 0.3333,
+        "payoff": 7.997,
+        "profit_factor": 3.998,
+        "total_pnl": 16.1969,
+        "avg_pnl": 1.0798,
+        "avg_net_pct": 10.79795,
+        "t_stat": 0.787,
+        "p_value": 0.4315038000955811,
+        "max_drawdown_pct": 14.473,
+        "capital": 20.0,
+        "total_return_pct": 80.985,
+        "max_concurrent": 2,
+        "avg_bars": 33.13,
+        "long_pnl": 16.1969,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.38,
+        "exit_reasons": {
+          "rsi50": 15
+        },
+        "avg_fee": 0.00844
+      },
+      "test": {
+        "trades": 15,
+        "win_rate": 0.5333,
+        "payoff": 1.081,
+        "profit_factor": 1.235,
+        "total_pnl": 1.264,
+        "avg_pnl": 0.0843,
+        "avg_net_pct": 0.84265,
+        "t_stat": 0.206,
+        "p_value": 0.8370388715255871,
+        "max_drawdown_pct": 9.915,
+        "capital": 40.0,
+        "total_return_pct": 3.16,
+        "max_concurrent": 4,
+        "avg_bars": 35.93,
+        "long_pnl": 1.264,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.38,
+        "exit_reasons": {
+          "rsi50": 15
+        },
+        "avg_fee": 0.00804
+      },
+      "full": {
+        "trades": 30,
+        "win_rate": 0.4333,
+        "payoff": 3.426,
+        "profit_factor": 2.62,
+        "total_pnl": 17.4609,
+        "avg_pnl": 0.582,
+        "avg_net_pct": 5.8203,
+        "t_stat": 0.82,
+        "p_value": 0.412255217992945,
+        "max_drawdown_pct": 7.301,
+        "capital": 40.0,
+        "total_return_pct": 43.652,
+        "max_concurrent": 4,
+        "avg_bars": 34.53,
+        "long_pnl": 17.4609,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 0.75,
+        "exit_reasons": {
+          "rsi50": 30
+        },
+        "avg_fee": 0.00824
+      }
+    }
+  ],
+  "regime_only": [
+    {
+      "regime": "market_ema(200) · 等权市场指数 4h",
+      "on_ratio": 0.46068601583113455,
+      "train": {
+        "trades": 5220,
+        "win_rate": 0.3634,
+        "payoff": 1.445,
+        "profit_factor": 0.825,
+        "total_pnl": -103.8175,
+        "avg_pnl": -0.0199,
+        "avg_net_pct": -0.19888,
+        "t_stat": -2.502,
+        "p_value": 0.012347587183619354,
+        "max_drawdown_pct": 25.968,
+        "capital": 400.0,
+        "total_return_pct": -25.954,
+        "max_concurrent": 40,
+        "avg_bars": 15.8,
+        "long_pnl": -103.8175,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 130.5,
+        "exit_reasons": {
+          "rsi50": 5220
+        },
+        "avg_fee": 0.008
+      },
+      "test": {
+        "trades": 6053,
+        "win_rate": 0.3747,
+        "payoff": 2.276,
+        "profit_factor": 1.364,
+        "total_pnl": 207.9048,
+        "avg_pnl": 0.0343,
+        "avg_net_pct": 0.34347,
+        "t_stat": 3.419,
+        "p_value": 0.0006285880569076403,
+        "max_drawdown_pct": 11.786,
+        "capital": 400.0,
+        "total_return_pct": 51.976,
+        "max_concurrent": 40,
+        "avg_bars": 16.07,
+        "long_pnl": 207.9048,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 151.32,
+        "exit_reasons": {
+          "rsi50": 6014,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 11273,
+        "win_rate": 0.3695,
+        "payoff": 1.859,
+        "profit_factor": 1.089,
+        "total_pnl": 104.0873,
+        "avg_pnl": 0.0092,
+        "avg_net_pct": 0.09233,
+        "t_stat": 1.413,
+        "p_value": 0.15768712219005768,
+        "max_drawdown_pct": 37.741,
+        "capital": 400.0,
+        "total_return_pct": 26.022,
+        "max_concurrent": 40,
+        "avg_bars": 15.94,
+        "long_pnl": 104.0873,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 281.82,
+        "exit_reasons": {
+          "rsi50": 11234,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.00801
+      }
+    },
+    {
+      "regime": "market_ema(100) · 等权市场指数 4h",
+      "on_ratio": 0.5033245382585751,
+      "train": {
+        "trades": 6643,
+        "win_rate": 0.3667,
+        "payoff": 1.333,
+        "profit_factor": 0.772,
+        "total_pnl": -178.3698,
+        "avg_pnl": -0.0269,
+        "avg_net_pct": -0.26851,
+        "t_stat": -3.905,
+        "p_value": 9.404374602820583e-05,
+        "max_drawdown_pct": 45.353,
+        "capital": 400.0,
+        "total_return_pct": -44.592,
+        "max_concurrent": 40,
+        "avg_bars": 16.0,
+        "long_pnl": -178.3698,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 166.07,
+        "exit_reasons": {
+          "rsi50": 6643
+        },
+        "avg_fee": 0.00799
+      },
+      "test": {
+        "trades": 6210,
+        "win_rate": 0.3771,
+        "payoff": 2.174,
+        "profit_factor": 1.317,
+        "total_pnl": 186.2366,
+        "avg_pnl": 0.03,
+        "avg_net_pct": 0.2999,
+        "t_stat": 3.53,
+        "p_value": 0.00041491135145641303,
+        "max_drawdown_pct": 13.258,
+        "capital": 400.0,
+        "total_return_pct": 46.559,
+        "max_concurrent": 40,
+        "avg_bars": 16.21,
+        "long_pnl": 186.2366,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 155.25,
+        "exit_reasons": {
+          "rsi50": 6171,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 12853,
+        "win_rate": 0.3717,
+        "payoff": 1.7,
+        "profit_factor": 1.006,
+        "total_pnl": 7.8667,
+        "avg_pnl": 0.0006,
+        "avg_net_pct": 0.00612,
+        "t_stat": 0.113,
+        "p_value": 0.9103263641497485,
+        "max_drawdown_pct": 55.706,
+        "capital": 400.0,
+        "total_return_pct": 1.967,
+        "max_concurrent": 40,
+        "avg_bars": 16.1,
+        "long_pnl": 7.8667,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 321.32,
+        "exit_reasons": {
+          "rsi50": 12814,
+          "end_of_sample": 39
+        },
+        "avg_fee": 0.008
+      }
+    },
+    {
+      "regime": "own_ema(200) · 币自身 1h",
+      "on_ratio": 0.40119261213720314,
+      "train": {
+        "trades": 7842,
+        "win_rate": 0.3303,
+        "payoff": 1.689,
+        "profit_factor": 0.833,
+        "total_pnl": -164.1461,
+        "avg_pnl": -0.0209,
+        "avg_net_pct": -0.20932,
+        "t_stat": -2.997,
+        "p_value": 0.002726126659089963,
+        "max_drawdown_pct": 44.701,
+        "capital": 390.0,
+        "total_return_pct": -42.089,
+        "max_concurrent": 39,
+        "avg_bars": 14.45,
+        "long_pnl": -164.1461,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 196.05,
+        "exit_reasons": {
+          "rsi50": 7842
+        },
+        "avg_fee": 0.00799
+      },
+      "test": {
+        "trades": 4368,
+        "win_rate": 0.3402,
+        "payoff": 2.643,
+        "profit_factor": 1.363,
+        "total_pnl": 171.3588,
+        "avg_pnl": 0.0392,
+        "avg_net_pct": 0.39231,
+        "t_stat": 3.211,
+        "p_value": 0.0013207293908505786,
+        "max_drawdown_pct": 10.595,
+        "capital": 400.0,
+        "total_return_pct": 42.84,
+        "max_concurrent": 40,
+        "avg_bars": 15.63,
+        "long_pnl": 171.3588,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 109.2,
+        "exit_reasons": {
+          "rsi50": 4354,
+          "end_of_sample": 14
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 12225,
+        "win_rate": 0.3339,
+        "payoff": 2.002,
+        "profit_factor": 1.004,
+        "total_pnl": 5.4619,
+        "avg_pnl": 0.0004,
+        "avg_net_pct": 0.00447,
+        "t_stat": 0.071,
+        "p_value": 0.9431144823741402,
+        "max_drawdown_pct": 50.967,
+        "capital": 400.0,
+        "total_return_pct": 1.365,
+        "max_concurrent": 40,
+        "avg_bars": 14.88,
+        "long_pnl": 5.4619,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 305.62,
+        "exit_reasons": {
+          "rsi50": 12211,
+          "end_of_sample": 14
+        },
+        "avg_fee": 0.008
+      }
+    },
+    {
+      "regime": "own_ema_4h(200) · 币自身 4h",
+      "on_ratio": 0.3365250659630607,
+      "train": {
+        "trades": 4650,
+        "win_rate": 0.366,
+        "payoff": 1.45,
+        "profit_factor": 0.837,
+        "total_pnl": -104.0652,
+        "avg_pnl": -0.0224,
+        "avg_net_pct": -0.2238,
+        "t_stat": -2.187,
+        "p_value": 0.028726468438781596,
+        "max_drawdown_pct": 32.341,
+        "capital": 370.0,
+        "total_return_pct": -28.126,
+        "max_concurrent": 37,
+        "avg_bars": 15.69,
+        "long_pnl": -104.0652,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 116.25,
+        "exit_reasons": {
+          "rsi50": 4650
+        },
+        "avg_fee": 0.00799
+      },
+      "test": {
+        "trades": 4112,
+        "win_rate": 0.3835,
+        "payoff": 2.177,
+        "profit_factor": 1.354,
+        "total_pnl": 163.7533,
+        "avg_pnl": 0.0398,
+        "avg_net_pct": 0.39823,
+        "t_stat": 3.278,
+        "p_value": 0.0010469573453867791,
+        "max_drawdown_pct": 7.791,
+        "capital": 390.0,
+        "total_return_pct": 41.988,
+        "max_concurrent": 39,
+        "avg_bars": 16.63,
+        "long_pnl": 163.7533,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 102.8,
+        "exit_reasons": {
+          "rsi50": 4097,
+          "end_of_sample": 15
+        },
+        "avg_fee": 0.00802
+      },
+      "full": {
+        "trades": 8769,
+        "win_rate": 0.3743,
+        "payoff": 1.76,
+        "profit_factor": 1.053,
+        "total_pnl": 58.4298,
+        "avg_pnl": 0.0067,
+        "avg_net_pct": 0.06663,
+        "t_stat": 0.846,
+        "p_value": 0.3975387437354107,
+        "max_drawdown_pct": 35.948,
+        "capital": 390.0,
+        "total_return_pct": 14.982,
+        "max_concurrent": 39,
+        "avg_bars": 16.14,
+        "long_pnl": 58.4298,
+        "short_pnl": 0.0,
+        "trades_per_symbol": 219.22,
+        "exit_reasons": {
+          "rsi50": 8754,
+          "end_of_sample": 15
+        },
+        "avg_fee": 0.00801
+      }
+    }
+  ],
+  "scan": [
+    {
+      "regime": "market_ema(200) · 等权市场指数 4h",
+      "cells": 111,
+      "median_lift": 19.46,
+      "share_improved": 0.928,
+      "median_base_return": 2.12,
+      "median_gated_return": 22.35,
+      "median_trades": 2482,
+      "sample_collapse_share": 0.0
+    },
+    {
+      "regime": "own_ema(200) · 币自身 1h",
+      "cells": 111,
+      "median_lift": -2.47,
+      "share_improved": 0.306,
+      "median_base_return": 2.12,
+      "median_gated_return": -0.68,
+      "median_trades": 2958,
+      "sample_collapse_share": 0.027
+    }
+  ],
+  "findings": [
+    "可判定样本内最好的组合：`rsi_reversal(high=75,low=25,n=14)` + market_ema(200) · 等权市场指数 4h，全期 25.22%、样本外 21.05%（290 笔），相对同信号不加门控 -9.43 个百分点。",
+    "名义最高的是 `rsi_reversal(high=75,low=25,n=14)` + own_ema(200) · 币自身 1h（全期 53.64%），但全期仅 34 笔、样本外 10 笔，属样本塌缩，不采信。",
+    "对照组（只用 market_ema(200) · 等权市场指数 4h 一直做多、完全不用指标信号）全期 26.02%、样本外 51.98%、11273 笔：不低于最好的「信号 + 门控」组合（25.22%），说明增量主要来自市场状态判断，而不是指标本身。",
+    "不加门控的最好信号全期 34.65%，加门控后 25.22%（-9.43）。",
+    "全族扫描 market_ema(200)：111 个候选里 93% 收益提升，中位 +19.46 个百分点，中位交易数 2482，样本塌缩 0% —— 是普遍效应，但中位加门控收益仍未超过 regime 单独做多。",
+    "全族扫描 own_ema(200)：仅 31% 的候选提升，中位 -2.47 个百分点，样本塌缩 3% —— 币自身均线过滤会砍掉大部分样本，头部单元格的高收益是小样本放大，不可用。"
+  ],
+  "limitations": [
+    "regime 只用一种定义（均线位置），没有测波动率、资金费率、宽度等状态变量",
+    "regime 仅拦入场、不强制平仓，持仓期间状态反转不会提前退出",
+    "样本外窗口是单边牛市（买入持有 +126.69%），任何降低曝露的门控都会在样本外吃亏",
+    "本轮又叠加了 4 个 regime × 5 个信号 = 20 次比较，未再做多重比较校正，只能当探索性结论"
+  ],
+  "elapsed_seconds": 146.6
+}
