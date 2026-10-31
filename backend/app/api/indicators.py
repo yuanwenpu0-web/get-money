@@ -1,7 +1,7 @@
-"""Read-only catalog of the third-party Pine indicator collections.
+"""Catalog of the third-party Pine indicator collections.
 
 The local indexes and source files are the catalog data. Strategies are
-intentionally excluded; catalog entries are not executed by this application.
+intentionally excluded; Pine source is never executed by this application.
 """
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 from ..config import DATA_DIR
+from ..catalog_indicators import list_indicators as list_python_indicators
 
 router = APIRouter(prefix="/indicators", tags=["indicators"])
 _COLLECTIONS = ("pine-collection", "pine-crypto-collection")
@@ -55,6 +56,8 @@ def _license_text(root: Path, relative: str) -> str | None:
 
 def _catalog(data_dir: Path) -> list[dict]:
     results = []
+    bindings = {(item.collection, item.path, item.source_sha256): item.name
+                for item in list_python_indicators()}
     for collection in _COLLECTIONS:
         root = data_dir / collection
         index = root / "index.json"
@@ -75,6 +78,7 @@ def _catalog(data_dir: Path) -> list[dict]:
             category = parts[1] if collection == "pine-collection" and len(parts) > 1 else entry.get("collection", "")
             results.append({
                 "id": hashlib.sha256(f"{collection}/{relative}".encode("utf-8")).hexdigest(),
+                "python_method": bindings.get((collection, Path(relative).as_posix(), hashlib.sha256(path.read_bytes()).hexdigest())),
                 "title": entry.get("title_zh") or entry.get("title") or path.stem,
                 "description": entry.get("description_zh") or entry.get("original_description") or "",
                 "category": category,

@@ -21,7 +21,7 @@
 | 参数寻优 | 一键对全部有足够历史的币种做参数网格搜索：**周期本身也是搜索维度**（多选 15m/1h/4h，每币再选最优周期）；训练段选参、验证段只做判定（每笔期望 95% CI，池化须 ≥30 笔才下结论）；进程池按「(币种, 周期)」分片吃满 CPU（默认留 4 核给巡检），单任务独占、可取消、可看实时进度与 ETA；结果可一键写入币种级覆盖，或按参数聚类生成新池 + 绑定 |
 | 交易 | 模拟盘与合约（测试网/主网）：开仓（杠杆、步长/最小名义价值校验、市价或 `limit_maker` postOnly）、交易所侧止损止盈、撤改单、reduceOnly 平仓、状态周期同步、反手；账户级熔断；本地保证金与权益核算、追加/提取/重置资金 |
 | 巡检 | 由**生效绑定**驱动：绑定启用 + 策略总开关启用 + 池启用 → 展开成 `(symbol, binding)` 逐对评估，每对带自己的参数与周期；APScheduler 每 N 秒同步最新K线（默认最多 8 路并发、共享连接池）、单轮内复用指标帧、检查止损止盈/保本/时间止损/信号反转；周期日志记录绑定数、币种数与各阶段耗时 |
-| 指标目录 | 读取 `data/pine-collection`、`data/pine-crypto-collection` 的第三方 Pine 指标索引，支持搜索与源码查看（只读资料，不参与计算） |
+| 指标目录 | 读取第三方 Pine 指标索引，支持搜索与源码查看；已移植条目提供 Python 方法名，未移植的仍为只读资料 |
 | 前端 | Vue 3 + Element Plus + ECharts：总览、订单、策略、寻优、回测、行情、指标目录、设置；按需加载、独立空态与重试；订单/回测历史/成交/本地数据列表服务端分页（默认 20） |
 
 ## 2. 目录
@@ -72,6 +72,7 @@ get-money/
   - 增量巡检刷新共享 1m 来源，同币种多周期持仓只同步一次。
   - 补齐分钟历史：`.\.venv\Scripts\python.exe backend/scripts/backfill_minutes.py --days 40 --workers 4`。
 - **Pine 指标资料**：只读 `data/pine-collection/`、`data/pine-crypto-collection/` 的 `index.json` 与源码，不入库；`data/` 被 Git 忽略。
+- **Python 指标调用**：`from app.catalog_indicators import calculate`，例如 `calculate("rsi_trading_signals", frame, rsi_length=7, rsi_overbought=80)`。输入为 pandas DataFrame，返回按原索引对齐的指标值与信号；参数每次调用传入。目录接口的 `python_method` 非空表示该条目已绑定 Python 实现，空值表示尚未移植（当前 109/156）。移植遵循统一契约：一个指标一个模块 `app/catalog_indicators/<module>.py`，共享原语在 `_pine.py`（Pine `ta.*` 语义）与 `_tf.py`（多周期聚合与无未来函数投影）；只移植可计算部分，绘图/表格/告警丢弃；`request.security(..., lookahead_on)` 一律改成**上一已完成周期**，保证回测无未来函数。注册表由 `backend/scripts/sync_catalog_registry.py` 按清单（模块名 + 源路径 + sha256）自动生成，新增指标后必须重跑该脚本。需要外部列的指标（如 `coinbase_close`、`open_interest`）由调用方提供对齐序列，缺失时按契约报错或返回空值，不会自行联网拉取。该接口不会自动参与策略或交易。
 - **API Secret：Fernet 加密**，密钥 `data/fernet.key`，接口不返回明文。
 
 ## 4. 启动
