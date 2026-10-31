@@ -33,6 +33,7 @@ HAS_VBT = importlib.util.find_spec("vectorbt") is not None
 # 只能由专用撮合表达的策略：它们的 `signals()` 输出方向恒为 0，
 # 通用撮合会把它们的出场规则换成另一套，所以这里统一早路由。
 OPENING_BREAKOUT = "opening_candle_breakout"
+RGD = "rgd_donchian_v2"
 
 
 def run_zigzag_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
@@ -164,6 +165,86 @@ def run_ocb_backtest(db, symbol, interval, params, initial, fee, slippage, days,
     return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
 
 
+def run_rgd_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
+    """整窗回放 RGD：主周期帧 + 因果拼入的 HTF 电平，走专用 broker。
+
+    与 `run_zigzag_backtest` 同一范式（不做 train/test split）：脚本 32 个参数是
+    固定默认值检验，`spec.grid` 为空，没有可寻优的自由度。
+    HTF attach 必须在 `evaluate_signals` 之前、对整帧做一次——`prepare` 幂等短路
+    会让后置 attach 静默失效（契约 §7.3.1）。
+    """
+    from ..features.rgd import htf_interval_for
+    from ..features.rgd_htf import attach_htf_levels
+    from .rgd_execution import simulate_rgd
+
+    as_of = min(end_ms, now_ms()) if end_ms is not None else now_ms()
+    step = interval_ms(interval)
+    htf_interval = htf_interval_for(interval, params["auto_htf"], int(params["htf_in"]))
+    htf_step = interval_ms(htf_interval)
+    start_ms = as_of - days * 86_400_000
+    service = MarketDataService(db)
+    frame = service.load_frame(symbol, interval, start_ms=start_ms, end_ms=as_of)
+    if frame.empty:
+        raise ValueError(f"{symbol} {interval} 本地无K线数据，请先拉取历史数据")
+    frame = frame.loc[(frame.index.as_unit("ms").asi8 + step) <= as_of].copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+    if len(frame) < 3:
+        raise ValueError("已收盘K线不足 3 根")
+    htf = service.load_frame(
+        symbol, htf_interval, start_ms=start_ms - 2 * htf_step, end_ms=as_of
+    )
+    frame = attach_htf_levels(frame, htf, htf_interval, as_of)
+    if not bool(frame["rgd_htf_ok"].any()):
+        raise ValueError(
+            f"{symbol} 无已完成的 {htf_interval} HTF bar，拒绝静默零成交（契约 §7.3.1）"
+        )
+    prices = frame[["open", "high", "low", "close"]]
+    valid = np.isfinite(prices).all(axis=1) & prices.gt(0).all(axis=1)
+    valid &= frame.high.ge(frame[["open", "close", "low"]].max(axis=1))
+    valid &= frame.low.le(frame[["open", "close", "high"]].min(axis=1))
+    if not valid.all():
+        raise ValueError("行情包含无效 K 线，无法按原策略回放")
+    diffs = frame.index.to_series().diff().dt.total_seconds().mul(1000)
+    gap_count = int(diffs.gt(step).sum())
+    signals = evaluate_signals(frame, RGD, params)
+    equity, trades = simulate_rgd(frame, signals, params, initial, fee, slippage, interval)
+    metrics = metrics_from_equity(equity, trades, initial, interval)
+    metrics.update(exposure_metrics(equity, trades, interval))
+    warnings = [
+        "TP1 限价部分平 + 保本滞后一根 + 接受度加权 trailing 只能由专用撮合表达；本回放是完整窗口回放，没有训练/测试切分。",
+        "Pine 的指标状态从本地数据窗口首根开始计算；对照 TradingView 时须统一行情、历史起点和属性。",
+    ]
+    if gap_count:
+        warnings.append(f"行情存在 {gap_count} 处缺口；缺失时段的价格路径不可知。")
+    if slippage:
+        warnings.append("本地滑点按成交价百分比计算；TradingView 的 slippage 属性按最小跳动点数计算。")
+    open_end = equity.attrs.get("open_position")
+    if open_end is not None:
+        warnings.append("回放结束仍有未平仓位；末根按盯市价计入净值，不强制平仓（Pine 同口径）。")
+    metrics.update({
+        "engine": "pine_rgd_broker", "execution": "pine_rgd_orders",
+        "symbol": symbol, "interval": interval, "strategy": RGD, "pool": pool or "",
+        "algo": "rule", "fee_rate": fee, "slippage": slippage, "threshold": None,
+        "buy_hold_return_pct": round(
+            (float(frame.close.iloc[-1]) / float(frame.open.iloc[0]) - 1) * 100, 4
+        ),
+        "signal_bars": int((signals.rgd_long_break | signals.rgd_short_break).sum()),
+        "pullback_bars": int(
+            (signals.rgd_long_pull_core | signals.rgd_short_pull_core).sum()
+        ),
+        "htf_interval": htf_interval,
+        "parameters": params, "baseline": None, "random_baseline": None,
+        "validation": {"enabled": False}, "warnings": warnings,
+        "data_quality": {"raw_bars": len(frame), "gap_count": gap_count},
+        "open_position": open_end,
+        "split": {
+            "test_start": str(frame.index[0]), "test_end": str(frame.index[-1]),
+            "test_rows": len(frame), "purge_bars": 0,
+        },
+    })
+    return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
+
+
 def minimum_sample_trades(validation_bars: int) -> int:
     """小样本惩罚：验证集每 50 根K线至少 1 笔成交，下限 **30 笔**。
 
@@ -289,6 +370,12 @@ def run_backtest(
         if optimize:
             raise ValueError("开盘首根突破不支持通用验证集选参，请关闭选参后回测")
         return run_ocb_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool)
+    if strategy == RGD:
+        if optimize:
+            raise ValueError("RGD 只做固定参数检验（spec.grid 为空），请关闭选参后回测")
+        return run_rgd_backtest(
+            db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool
+        )
     horizon = int(state.get("train_horizon", 5))
     data = build_dataset(db, symbol, interval, horizon=horizon, days=days, end_ms=end_ms)
     if len(data) < 800:

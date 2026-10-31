@@ -51,7 +51,8 @@ def _out(**changes):
 # ---------- 参数层 ----------
 
 def test_builtin_strategies_are_registered():
-    codes = {CODE, "supertrend_current", "simple_zigzag_double", "opening_candle_breakout"}
+    codes = {CODE, "supertrend_current", "simple_zigzag_double", "opening_candle_breakout",
+             "rgd_donchian_v2"}
     assert {item["code"] for item in DEFAULT_STRATEGIES} == codes
     assert set(known_codes()) == codes
 

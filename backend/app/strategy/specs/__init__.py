@@ -8,12 +8,14 @@ from __future__ import annotations
 
 from . import absorption_reversal  # noqa: F401
 from . import opening_candle_breakout  # noqa: F401
+from . import rgd_donchian_v2  # noqa: F401
 from . import supertrend_current  # noqa: F401
 from . import simple_zigzag_double  # noqa: F401
 
 __all__ = [
     "absorption_reversal",
     "opening_candle_breakout",
+    "rgd_donchian_v2",
     "supertrend_current",
     "simple_zigzag_double",
 ]

@@ -4,14 +4,16 @@ import pytest
 from app.backtest.zigzag_execution import simulate_zigzag
 
 
-def replay(ohlc, rows, **overrides):
+def replay(ohlc, rows, exit_policy=None, **overrides):
     idx = pd.date_range('2026-01-01', periods=len(ohlc), freq='15min', tz='UTC')
     data = pd.DataFrame(ohlc, columns=['open', 'high', 'low', 'close'], index=idx)
     signals = pd.DataFrame(rows, index=idx)
     params = dict(use_long=True, use_short=True, fixed_lot=True, lot_long=1.0,
                   lot_short=1.0, timestamp_end=4102444800000)
     params.update(overrides)
-    equity, trades = simulate_zigzag(data, signals, params, 10000, 0.001, 0, '15m')
+    equity, trades = simulate_zigzag(
+        data, signals, params, 10000, 0.001, 0, '15m', exit_policy=exit_policy
+    )
     return equity, trades, idx
 
 
@@ -109,3 +111,44 @@ def test_na_lot_initially_uses_equity_then_explicit_lot_recomputed_on_position_c
     assert trades[0]['size'] == pytest.approx(10000 / 105)
     assert trades[0]['exit_price'] == 95
     assert equity.iloc[-1] < 10000
+
+
+def test_empty_exit_policy_is_bitwise_equivalent_to_default_pine_replay():
+    """Research infrastructure must never alter the normal ZigZag/Pine replay."""
+    ohlc = [(100, 101, 99, 100), (100, 106, 94, 101), (101, 110, 96, 106)]
+    rows = [row(short=False), row(short=False), row(short=False)]
+    default_equity, default_trades, _ = replay(ohlc, rows, use_short=False)
+    inert_equity, inert_trades, _ = replay(ohlc, rows, exit_policy={}, use_short=False)
+    pd.testing.assert_series_equal(default_equity, inert_equity)
+    assert default_trades == inert_trades
+
+
+def test_research_stop_waits_for_close_confirmation_then_next_open():
+    """A low wick cannot exit; prior close below stop exits at the following open."""
+    equity, trades, idx = replay(
+        [
+            (100, 101, 99, 100),  # submit a long stop at 105 with initial stop 95
+            (100, 106, 94, 100),  # entry + low wick below 95, but close is above
+            (94, 96, 90, 92),     # prior close 100 did not confirm; stay open
+            (91, 93, 89, 90),     # prior close 92 confirms below 95 -> exit at 91 open
+        ],
+        [row(short=False), row(short=False), row(short=False), row(short=False)],
+        exit_policy={"lock_initial_stop": True},
+    )
+    assert len(trades) == 1
+    assert trades[0]["status"] == "policy_stop"
+    assert trades[0]["exit_time"] == str(idx[3])
+    assert trades[0]["exit_price"] == 91
+    assert equity.attrs["open_position"] is None
+
+
+def test_time_stop_exits_at_next_open_without_same_bar_reentry():
+    """A one-bar time stop runs at the next bar's open and does not reverse there."""
+    _, trades, idx = replay(
+        [(100, 101, 99, 100), (100, 106, 99, 105), (105, 107, 104, 106)],
+        [row(short=False), row(short=False), row(short=False)],
+        exit_policy={"time_stop_bars": 1},
+    )
+    assert len(trades) == 1
+    assert trades[0]["status"] == "time_stop"
+    assert trades[0]["exit_time"] == str(idx[2])
