@@ -45,9 +45,10 @@ import pathlib
 
 import pytest
 
-# 被扫描的包目录：Pine 移植模块所在的 catalog_indicators，以及共享原语所在的 app 根。
+# 被扫描的包目录：整个 app 包（Pine 移植模块、策略、回测、行情管线一视同仁）。
+# 这个陷阱不是移植代码独有的 —— 任何「开关式门 + 布尔标量」的写法都会中招。
 APP_DIR = pathlib.Path(__file__).resolve().parents[1] / "app"
-SCAN_DIRS = (APP_DIR / "catalog_indicators",)
+SCAN_DIRS = (APP_DIR,)
 
 
 def _is_bool_annotation(node: ast.AST) -> bool:
@@ -119,11 +120,17 @@ def _scan() -> list[str]:
     for directory in SCAN_DIRS:
         if not directory.is_dir():
             continue
-        for path in sorted(directory.glob("*.py")):
-            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for path in sorted(directory.rglob("*.py")):
+            try:
+                source = path.read_text(encoding="utf-8")
+                tree = ast.parse(source, filename=str(path))
+            except (SyntaxError, UnicodeDecodeError):  # 非 Python / 损坏文件跳过
+                continue
             names = _bool_scalar_names(tree)
             for lineno, name in _find_violations(tree, names):
-                violations.append(f"{path.name}:{lineno}  ~{name}")
+                # 报告相对 app 目录的路径，便于定位
+                rel = path.relative_to(APP_DIR).as_posix()
+                violations.append(f"app/{rel}:{lineno}  ~{name}")
     return violations
 
 
