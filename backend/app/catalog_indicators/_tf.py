@@ -121,7 +121,8 @@ def calendar_frame(frame: pd.DataFrame, rule: str) -> pd.DataFrame:
     utc = aligned_index(frame, 1)
     base = base_step_minutes(frame)
     period = utc.tz_localize(None).to_period(rule)
-    grouped = frame.groupby(period.values)
+    # PeriodIndex.values 在 pandas 4 会改语义（现返回 object ndarray，已弃用）→ 用 .array
+    grouped = frame.groupby(period.array)
     counts = grouped["close"].count()
     starts = _period_starts(counts.index)
     expected = [round((item.end_time - item.start_time).total_seconds() / 60 / base)

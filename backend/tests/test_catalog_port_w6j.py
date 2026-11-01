@@ -34,8 +34,9 @@ def test_sweep_detected_and_quality_tiered():
     assert result.long_quality.dropna().between(0, 2).all()
     # Long signals respect the cooldown: gaps between consecutive fires.
     fires = result.index[result.long_signal | result.short_signal]
-    gaps = np.diff([frame.index.get_loc(i) for i in fires]) if len(fires) > 1 else [99]
-    assert (gaps > 5).all() if len(gaps) else True
+    # 无信号时 gaps 必须仍是 ndarray —— 否则 `gaps > 5` 会退化成 list 与 int 比较
+    gaps = np.diff([frame.index.get_loc(i) for i in fires]) if len(fires) > 1 else np.array([99])
+    assert (gaps > 5).all()
     with pytest.raises(ValueError, match="min_quality_long"):
         reversal_engine_score_v1(frame, min_quality_long=3)
     with pytest.raises(ValueError, match="行情列"):
@@ -51,6 +52,30 @@ def test_htf_trend_gate_blocks_against_trend():
     assert gated.bull_trend.iloc[-1] and not gated.bear_trend.iloc[-1]
     with pytest.raises(ValueError, match="整数倍"):
         reversal_engine_score_v1(frame, htf_minutes=7)
+
+
+def test_gate_switches_actually_bite():
+    """门开关必须真的改变输出。
+
+    这是 ``~bool`` 陷阱的回归测试：原实现写成 ``(~use_gate_a) | cond``，
+    而 Python 的 ``~True`` 是 ``-2``（按位取反），与布尔 Series 做 ``|`` 得到全 True，
+    于是 6 个门（a–f）**全部被静默禁用** —— 开关无论 True/False 输出都一样。
+    """
+    frame = _sweep_frame()
+    base = dict(use_gate_f=False, use_gate_d=False)
+
+    on = reversal_engine_score_v1(frame, **base, use_gate_a=True)
+    off = reversal_engine_score_v1(frame, **base, use_gate_a=False)
+    # 开启流动性扫单门后，通过门的 bar 数必须严格减少
+    assert int(off.long_gate_ok.sum()) > int(on.long_gate_ok.sum())
+    assert int(on.long_gate_ok.sum()) >= 0
+
+    # gate D（ATR 高于基准×系数）同样必须生效，且是严格收紧
+    d_on = reversal_engine_score_v1(frame, use_gate_f=False, use_gate_d=True)
+    d_off = reversal_engine_score_v1(frame, use_gate_f=False, use_gate_d=False)
+    assert int(d_off.long_gate_ok.sum()) > int(d_on.long_gate_ok.sum())
+    # 关闭门时它恒真：存在 atr_ok 为假却仍通过 long_gate 的 bar
+    assert (~d_off.atr_ok & d_off.long_gate_ok).any()
 
 
 def test_stop_target_geometry_and_direction_filter():

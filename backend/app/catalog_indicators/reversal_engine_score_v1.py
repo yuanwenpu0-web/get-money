@@ -28,6 +28,16 @@ from ._pine import (atr, boolean, choice, crossover, edge, ema, flags, highest, 
 from ._tf import base_step_minutes, htf_frame, lift_series
 
 
+def _gate(enabled: bool, condition: pd.Series) -> pd.Series:
+    """开关式门：关闭时恒真（不阻挡），开启时取条件本身。
+
+    **不能写成 ``(~enabled) | condition``** —— Python 的 ``~True`` 是 ``-2``
+    （按位取反，不是逻辑取反），与布尔 Series 做 ``|`` 会得到全 True，
+    于是「开启门」这个语义被静默吃掉，门永远不生效。
+    """
+    return flags(condition) if enabled else pd.Series(True, index=condition.index)
+
+
 def reversal_engine_score_v1(
         frame: pd.DataFrame, *, min_quality_long: int = 2, min_quality_short: int = 1,
         rsi_len: int = 14, use_gate_a: bool = True, swing_len: int = 10,
@@ -123,8 +133,8 @@ def reversal_engine_score_v1(
     body_ok = flags(body_value > atr_value * min_body_atr)
     sweep_depth_long = prev_swing_low - low
     sweep_depth_short = high - prev_swing_high
-    sweep_not_too_deep_long = flags(~use_gate_e | (sweep_depth_long <= atr_value * spike_atr_mult))
-    sweep_not_too_deep_short = flags(~use_gate_e | (sweep_depth_short <= atr_value * spike_atr_mult))
+    sweep_not_too_deep_long = _gate(use_gate_e, sweep_depth_long <= atr_value * spike_atr_mult)
+    sweep_not_too_deep_short = _gate(use_gate_e, sweep_depth_short <= atr_value * spike_atr_mult)
 
     if use_gate_i:
         utc = frame.index.tz_convert("UTC")
@@ -174,20 +184,20 @@ def reversal_engine_score_v1(
     else:
         gate_h_long = gate_h_short = flags(pd.Series(True, index=frame.index))
 
-    long_gate = flags((~use_gate_a | liquidity_sweep_long)
-                      & (~use_gate_b | close_in_upper_third)
-                      & (~use_gate_c | body_ok)
-                      & (~use_gate_d | atr_ok)
-                      & sweep_not_too_deep_long
-                      & (~use_gate_f | ~bear_trend)
-                      & gate_g_long & gate_h_long & session_ok)
-    short_gate = flags((~use_gate_a | liquidity_sweep_short)
-                       & (~use_gate_b | close_in_lower_third)
-                       & (~use_gate_c | body_ok)
-                       & (~use_gate_d | atr_ok)
-                       & sweep_not_too_deep_short
-                       & (~use_gate_f | ~bull_trend)
-                       & gate_g_short & gate_h_short & session_ok)
+    long_gate = (_gate(use_gate_a, liquidity_sweep_long)
+                 & _gate(use_gate_b, close_in_upper_third)
+                 & _gate(use_gate_c, body_ok)
+                 & _gate(use_gate_d, atr_ok)
+                 & sweep_not_too_deep_long
+                 & _gate(use_gate_f, ~bear_trend)
+                 & gate_g_long & gate_h_long & session_ok)
+    short_gate = (_gate(use_gate_a, liquidity_sweep_short)
+                  & _gate(use_gate_b, close_in_lower_third)
+                  & _gate(use_gate_c, body_ok)
+                  & _gate(use_gate_d, atr_ok)
+                  & sweep_not_too_deep_short
+                  & _gate(use_gate_f, ~bull_trend)
+                  & gate_g_short & gate_h_short & session_ok)
 
     long_quality = (rsi_value > 50).astype(float) + (~ll_flags).astype(float)
     short_quality = (rsi_value > 50).astype(float) + (~hh_flags).astype(float)

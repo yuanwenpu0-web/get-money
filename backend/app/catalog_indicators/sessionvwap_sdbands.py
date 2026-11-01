@@ -151,7 +151,11 @@ def sessionvwap_sdbands(
             last_buy = position
 
     sd_unit = np.where((~np.isnan(vwap)) & (~np.isnan(sd1u)), sd1u - vwap, np.nan)
-    distance_sd = np.where(sd_unit > 0, (close.to_numpy(dtype=float) - vwap) / sd_unit, np.nan)
+    # np.where 会**两个分支都求值**，直接除会拿 sd_unit==0 / NaN 触发
+    # divide-by-zero 与 invalid-value 警告；先把分母钳成 1.0 再按条件取用。
+    sd_ok = sd_unit > 0
+    sd_safe = np.where(sd_ok, sd_unit, 1.0)
+    distance_sd = np.where(sd_ok, (close.to_numpy(dtype=float) - vwap) / sd_safe, np.nan)
     vol_above_avg = average_volume.notna().to_numpy() & (average_volume.to_numpy() > 0) \
         & (volume_values > average_volume.to_numpy())
     state_bull = in_session_array & (~np.isnan(vwap)) & (close.to_numpy(dtype=float) > vwap) & vol_above_avg

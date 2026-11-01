@@ -65,6 +65,26 @@ def test_volume_free_feed_rescales_the_weights():
     assert quiet.impulse_pressure.dropna().between(0.0, 100.0).all()
 
 
+def test_real_volume_actually_feeds_the_score():
+    """变化的量能必须真的改变压力分。
+
+    回归测试：原实现写成 ``np.where(~volume_is_real | ..., 1.0, volume / volume_sma)``，
+    而 ``~True`` 是 **-2**（按位取反），与布尔 Series 做 ``|`` 得到全 True ——
+    于是 vol_rel 恒为 1.0，量能维度被永久忽略，放量与不放量输出完全一样。
+    """
+    closes = [100.0 + 0.5 * step for step in range(40)]
+    kwargs = dict(norm_len=20, atr_len=2, bb_len=5, vol_len=5, sr_len=10,
+                  smooth_len=1, smooth_type="SMA", bias_type="SMA", dmi_len=2)
+    burst = np.full(40, 10.0)
+    burst[30:] = 100.0  # 末段放量
+    flat = market_pressure_scale(_frame(closes, volume=np.full(40, 10.0)), **kwargs)
+    spiky = market_pressure_scale(_frame(closes, volume=burst), **kwargs)
+    for column in ("setup_pressure", "impulse_pressure"):
+        assert not flat[column].dropna().equals(spiky[column].dropna()), column
+    assert flat.setup_pressure.dropna().between(0.0, 100.0).all()
+    assert spiky.setup_pressure.dropna().between(0.0, 100.0).all()
+
+
 def test_phase_labels_and_flag_families():
     rng = np.random.default_rng(9)
     closes = 100 * np.exp(np.cumsum(rng.normal(0, 0.01, 400)))

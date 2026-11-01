@@ -123,8 +123,14 @@ def market_pressure_scale(
 
     volume_is_real = bool(volume.fillna(0.0).gt(0).any())
     volume_sma = sma(volume, vol_len)
-    vol_rel = pd.Series(np.where(~volume_is_real | volume_sma.isna() | volume_sma.le(0),
-                                 1.0, volume / volume_sma), index=frame.index)
+    # ``~volume_is_real`` 是**按位**取反（~True == -2），与布尔 Series 做 ``|`` 会得到
+    # 全 True，于是「量能不可用」恒真、真实量能被永久忽略。改成显式广播成 Series。
+    vol_usable = pd.Series(volume_is_real, index=frame.index) \
+        & volume_sma.notna() & volume_sma.gt(0)
+    safe_sma = volume_sma.where(vol_usable, 1.0)
+    vol_rel = pd.Series(np.where(vol_usable.to_numpy(dtype=bool),
+                                 volume.to_numpy(dtype=float) / safe_sma.to_numpy(dtype=float),
+                                 1.0), index=frame.index)
     bar_range = high - low
     body_size = (close - open_).abs()
     body_ratio = body_size / bar_range.clip(lower=_MINTICK)

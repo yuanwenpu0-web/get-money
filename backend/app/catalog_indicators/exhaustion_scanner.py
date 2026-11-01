@@ -303,8 +303,12 @@ def exhaustion_scanner(
                        and (bar == 0 or wt1_arr[bar - 1] <= wt2_arr[bar - 1]))
         wt_cross_dn = (wt1_arr[bar] < wt2_arr[bar]
                        and (bar == 0 or wt1_arr[bar - 1] >= wt2_arr[bar - 1]))
-        wt_was_high = (np.nanmax(wt1_arr[max(0, bar - 2):bar + 1]) >= 45)
-        wt_was_low = (np.nanmin(wt1_arr[max(0, bar - 2):bar + 1]) <= -45)
+        wt_window = wt1_arr[max(0, bar - 2):bar + 1]
+        # 暖机期整窗都是 NaN 时，np.nanmax/nanmin 会抛 All-NaN 运行时警告并返回 NaN。
+        # 这里显式判定「窗口内是否存在有限值」，语义与 NaN 比较恒假一致，但不再告警。
+        wt_has_value = bool(np.isfinite(wt_window).any())
+        wt_was_high = wt_has_value and float(np.nanmax(wt_window)) >= 45
+        wt_was_low = wt_has_value and float(np.nanmin(wt_window)) <= -45
         top_wt_trigger = wt_cross_dn and wt_was_high
         bot_wt_trigger = wt_cross_up and wt_was_low
         hl2 = (highs[bar] + lows[bar]) / 2.0
