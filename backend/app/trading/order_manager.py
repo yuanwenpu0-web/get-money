@@ -12,6 +12,7 @@ from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
 from ..strategy.bindings import resolve_order_params
 from ..strategy.registry import get_spec
+from ..strategy.specs.pool_volatility_research import HIGH_CODE, LOW_CODE
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from . import live as live_exec
 from .dispatch import close_position
@@ -34,11 +35,40 @@ def _initial_risk(db: Session, order: Order) -> float:
     return risk
 
 
+def manage_research_order(db: Session, order: Order) -> dict:
+    result = {"order_id": order.id, "actions": []}
+    step = interval_ms("1h")
+    entered = dt_ms(order.created_at)
+    hours = 120 if order.strategy == HIGH_CODE else 48
+    frame = MarketDataService(db).load_frame(order.symbol, "1h", start_ms=entered, allow_native=False)
+    if frame.empty:
+        return result
+    stamps = frame.index.as_unit("ms").asi8
+    # 研究在到期小时收盘产生卖单；缺口内没有收盘，须等待下一根实际K线收盘。
+    eligible = frame.loc[(stamps >= entered + (hours - 1) * step) & (stamps + step <= now_ms())]
+    if not eligible.empty:
+        trigger = int(eligible.index[0].timestamp() * 1000)
+        later = frame.loc[(stamps > trigger) & (stamps <= now_ms())]
+        if not later.empty:
+            price = float(later.iloc[0].open)
+            if np.isfinite(price) and price > 0:
+                close_position(db, order, price, "research_hold")
+                result["actions"].append("research_hold")
+                return result
+    complete = frame.loc[stamps + step <= now_ms()]
+    if not complete.empty:
+        order.mark_price = round_price(float(complete.iloc[-1].close))
+        db.commit()
+    return result
+
+
 def manage_order(db: Session, order: Order, signal=None) -> dict:
     """Replay only unseen, fully post-entry candles, chronologically."""
     result = {"order_id": order.id, "actions": []}
     if order.status != "OPEN" or not order.created_at:
         return result
+    if order.source == "paper" and order.strategy in (HIGH_CODE, LOW_CODE):
+        return manage_research_order(db, order)
     # 订单必须用「它所属那条绑定 + 该币种覆盖」的参数管理，否则池级或币种级覆盖
     # （止损宽度 / 目标 R / 时间止损）会失效
     params = resolve_order_params(

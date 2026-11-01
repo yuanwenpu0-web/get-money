@@ -15,6 +15,7 @@ from ..db import get_db
 from ..models import StrategyBinding, SymbolPool
 from ..schemas import PoolPayload, PoolUpdate
 from ..strategy.pools import describe_pool, load_pool_spec, pool_symbols, validate_pool
+from ..strategy.pool_maintenance import research_pool_status, run_research_pool_maintenance
 
 router = APIRouter(prefix="/pools", tags=["pools"])
 
@@ -37,6 +38,16 @@ def list_pools(db: Session = Depends(get_db)):
             members = None
         result.append(describe_pool(pool, members))
     return {"pools": result, "total": len(result)}
+
+
+@router.get("/research/maintenance")
+def get_research_maintenance(db: Session = Depends(get_db)):
+    return research_pool_status(db)
+
+
+@router.post("/research/maintenance")
+def maintain_research_pools(db: Session = Depends(get_db)):
+    return run_research_pool_maintenance(db)
 
 
 @router.post("")

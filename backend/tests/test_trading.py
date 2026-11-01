@@ -28,6 +28,61 @@ def signal(**overrides):
     )
 
 
+def test_research_entry_transaction_rolls_back_together(db, monkeypatch):
+    from app.models import AppState
+    from app.state import get_state, set_state
+    from app.strategy.specs.pool_volatility_research import HIGH_CODE
+
+    start = pd.Timestamp("2025-01-01", tz="UTC")
+    ts = int(start.timestamp() * 1000)
+    frame = pd.DataFrame({"open": [100.]}, index=[start + pd.Timedelta(hours=1)])
+    monkeypatch.setattr(paper.MarketDataService, "load_frame", lambda *a, **k: frame)
+    monkeypatch.setattr(paper, "now_ms", lambda: ts + 3600000)
+    set_state(db, "cash", 1000.)
+    original_commit = db.commit
+    calls = 0
+
+    def fail_order_commit():
+        nonlocal calls
+        calls += 1
+        if calls == 2:  # portfolio snapshot commits first
+            raise RuntimeError("模拟进程中断")
+        original_commit()
+
+    monkeypatch.setattr(db, "commit", fail_order_commit)
+    research = signal(strategy=HIGH_CODE, interval="1h", ts=ts,
+                      reason={"research_entry": True}, pool="test")
+    with pytest.raises(RuntimeError):
+        paper.open_position(db, research)
+    db.rollback()
+    assert get_state(db, "cash") == 1000.
+    assert db.query(Order).count() == 0
+    assert db.get(AppState, "last_entry:BTCUSDT:1h") is None
+    monkeypatch.setattr(db, "commit", original_commit)
+    order = paper.open_position(db, research)
+    assert order is not None
+    assert get_state(db, "last_entry:BTCUSDT:1h") == ts
+    paper.close_position(db, order, 100.)
+    assert paper.open_position(db, research) is None
+
+
+def test_paper_close_transaction_rolls_back_together(db, monkeypatch):
+    from app.state import get_state, set_state
+
+    set_state(db, "cash", 1000.)
+    order = Order(symbol="BTCUSDT", interval="1h", side="LONG", qty=1,
+                  entry_price=100, mark_price=100, margin=100, entry_fee=0,
+                  strategy="absorption_reversal", status="OPEN", source="paper")
+    db.add(order)
+    db.commit()
+    monkeypatch.setattr(db, "commit", lambda: (_ for _ in ()).throw(RuntimeError("中断")))
+    with pytest.raises(RuntimeError):
+        paper.close_position(db, order, 110.)
+    db.rollback()
+    assert get_state(db, "cash") == 1000.
+    assert db.get(Order, order.id).status == "OPEN"
+
+
 def test_paper_stop_loss_respects_fee_inclusive_risk(db):
     from app.models import StrategyConfig
 

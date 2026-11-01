@@ -1,0 +1,543 @@
+{
+  "generated_at": "2026-11-01 09:54:33",
+  "data": {
+    "source": "postgresql get_money.klines",
+    "intervals": [
+      "1h",
+      "4h"
+    ],
+    "span_days": 400,
+    "symbols_per_run": 20,
+    "cost": {
+      "fee_per_side": 0.0004,
+      "slippage_per_side": 0.0002
+    }
+  },
+  "combo_oos": {
+    "1h": {
+      "folds": [
+        {
+          "fold": 1,
+          "oos_return_pct": -15.0302,
+          "annualized_pct": -70.1,
+          "max_dd_pct": 23.6031,
+          "sharpe": -1.6234,
+          "win_rate": 0.5637,
+          "trades": 910,
+          "buy_hold_pct": -5.6621,
+          "selected": [
+            "rsi_reversal(high=75,low=25,n=21)",
+            "rsi_reversal(high=75,low=25,n=14)",
+            "rsi_reversal(high=75,low=25,n=7)"
+          ]
+        },
+        {
+          "fold": 2,
+          "oos_return_pct": -3.6956,
+          "annualized_pct": -24.3,
+          "max_dd_pct": 10.8277,
+          "sharpe": -0.3982,
+          "win_rate": 0.4198,
+          "trades": 486,
+          "buy_hold_pct": -13.6144,
+          "selected": [
+            "rsi_reversal(high=75,low=25,n=14)",
+            "rsi_reversal(high=75,low=25,n=21)",
+            "volume_break(k=3.0,n=20)"
+          ]
+        },
+        {
+          "fold": 3,
+          "oos_return_pct": -23.5911,
+          "annualized_pct": -86.4,
+          "max_dd_pct": 38.5388,
+          "sharpe": -2.189,
+          "win_rate": 0.6294,
+          "trades": 402,
+          "buy_hold_pct": 68.7176,
+          "selected": [
+            "rsi_reversal(high=75,low=25,n=14)",
+            "rsi_reversal(high=75,low=25,n=21)",
+            "rsi_reversal(high=70,low=30,n=21)"
+          ]
+        },
+        {
+          "fold": 4,
+          "oos_return_pct": 0.2843,
+          "annualized_pct": 2.1,
+          "max_dd_pct": 12.5984,
+          "sharpe": 0.014,
+          "win_rate": 0.4439,
+          "trades": 588,
+          "buy_hold_pct": 37.7483,
+          "selected": [
+            "rsi_reversal(high=75,low=25,n=14)",
+            "rsi_reversal(high=75,low=25,n=21)",
+            "volume_break(k=3.0,n=20)"
+          ]
+        }
+      ],
+      "pooled_expectancy": {
+        "trades": 2386,
+        "mean_pct": -0.01762,
+        "ci_low": -0.0382,
+        "ci_high": 0.00508,
+        "verdict": "inconclusive"
+      },
+      "config": {
+        "generated_at": "2026-11-01 09:43:08",
+        "interval": "1h",
+        "days": 400,
+        "limit": 20,
+        "capital": 10000.0,
+        "fee": 0.0004,
+        "slippage": 0.0002,
+        "side": "both",
+        "folds": 4,
+        "train_ratio": 0.5,
+        "top_k": 3,
+        "min_trades": 30,
+        "max_concurrent": 0,
+        "risk_per_trade_pct": 0.0,
+        "atr_mult": 0.0,
+        "regimes": "market_ema:200",
+        "families": null
+      }
+    },
+    "4h": {
+      "folds": [
+        {
+          "fold": 1,
+          "oos_return_pct": 9.4446,
+          "annualized_pct": 95.1,
+          "max_dd_pct": 17.2306,
+          "sharpe": 0.5318,
+          "win_rate": 0.4584,
+          "trades": 1021,
+          "buy_hold_pct": -5.5172,
+          "selected": [
+            "stoch_cross(n=14,smooth=3) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=21,smooth=5) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=21,smooth=3) + market_ema(200) · 等权市场指数 4h"
+          ]
+        },
+        {
+          "fold": 2,
+          "oos_return_pct": 0.5447,
+          "annualized_pct": 4.1,
+          "max_dd_pct": 9.5702,
+          "sharpe": 0.0728,
+          "win_rate": 0.4746,
+          "trades": 236,
+          "buy_hold_pct": -13.1511,
+          "selected": [
+            "stoch_cross(n=14,smooth=5) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=14,smooth=3) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=21,smooth=5) + market_ema(200) · 等权市场指数 4h"
+          ]
+        },
+        {
+          "fold": 3,
+          "oos_return_pct": -6.5197,
+          "annualized_pct": -39.3,
+          "max_dd_pct": 25.4645,
+          "sharpe": -0.5116,
+          "win_rate": 0.4542,
+          "trades": 1191,
+          "buy_hold_pct": 64.7993,
+          "selected": [
+            "stoch_cross(n=14,smooth=5) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=14,smooth=3) + market_ema(200) · 等权市场指数 4h",
+            "stoch_cross(n=21,smooth=5) + market_ema(200) · 等权市场指数 4h"
+          ]
+        },
+        {
+          "fold": 4,
+          "oos_return_pct": 62.3689,
+          "annualized_pct": 3525.9,
+          "max_dd_pct": 19.9179,
+          "sharpe": 1.8074,
+          "win_rate": 0.4915,
+          "trades": 942,
+          "buy_hold_pct": 37.0436,
+          "selected": [
+            "stoch_cross(n=14,smooth=5) + market_ema(200) · 等权市场指数 4h",
+            "rsi_reversal(high=65,low=35,n=14)",
+            "stoch_cross(n=21,smooth=5) + market_ema(200) · 等权市场指数 4h"
+          ]
+        }
+      ],
+      "pooled_expectancy": {
+        "trades": 3390,
+        "mean_pct": 0.01942,
+        "ci_low": -0.00325,
+        "ci_high": 0.04322,
+        "verdict": "inconclusive"
+      },
+      "config": {
+        "generated_at": "2026-11-01 09:42:14",
+        "interval": "4h",
+        "days": 400,
+        "limit": 20,
+        "capital": 10000.0,
+        "fee": 0.0004,
+        "slippage": 0.0002,
+        "side": "both",
+        "folds": 4,
+        "train_ratio": 0.5,
+        "top_k": 3,
+        "min_trades": 30,
+        "max_concurrent": 0,
+        "risk_per_trade_pct": 0.0,
+        "atr_mult": 0.0,
+        "regimes": "market_ema:200",
+        "families": null
+      }
+    }
+  },
+  "spec_oos": {
+    "supertrend_current": {
+      "per_symbol": [
+        {
+          "symbol": "BULLAUSDT",
+          "oos_return_pct": 2.4995,
+          "oos_win_rate": 40.54,
+          "oos_sharpe": 0.088,
+          "oos_trades": 37,
+          "oos_max_dd_pct": -2.3511,
+          "buy_hold_pct": 501.2312,
+          "baseline_return_pct": 2.4995,
+          "random_return_pct": 0.2242,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "COMPUSDT",
+          "oos_return_pct": 7.9552,
+          "oos_win_rate": 45.76,
+          "oos_sharpe": 0.173,
+          "oos_trades": 59,
+          "oos_max_dd_pct": -2.6857,
+          "buy_hold_pct": 18.7717,
+          "baseline_return_pct": 7.9552,
+          "random_return_pct": -6.4365,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "AGTUSDT",
+          "oos_return_pct": -3.872,
+          "oos_win_rate": 35.56,
+          "oos_sharpe": -0.133,
+          "oos_trades": 45,
+          "oos_max_dd_pct": -5.1345,
+          "buy_hold_pct": 111.2559,
+          "baseline_return_pct": -3.872,
+          "random_return_pct": -3.098,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "BTCUSDT",
+          "oos_return_pct": -5.4669,
+          "oos_win_rate": 28.57,
+          "oos_sharpe": -0.136,
+          "oos_trades": 63,
+          "oos_max_dd_pct": -7.1377,
+          "buy_hold_pct": 18.7905,
+          "baseline_return_pct": -5.4669,
+          "random_return_pct": -4.406,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "BCHUSDT",
+          "oos_return_pct": -7.9903,
+          "oos_win_rate": 29.85,
+          "oos_sharpe": -0.201,
+          "oos_trades": 67,
+          "oos_max_dd_pct": -11.3647,
+          "buy_hold_pct": 35.2541,
+          "baseline_return_pct": -7.9903,
+          "random_return_pct": -7.5312,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "BABYUSDT",
+          "oos_return_pct": 2.8093,
+          "oos_win_rate": 35.94,
+          "oos_sharpe": 0.059,
+          "oos_trades": 64,
+          "oos_max_dd_pct": -3.0472,
+          "buy_hold_pct": -1.6733,
+          "baseline_return_pct": 2.8093,
+          "random_return_pct": 8.524,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "oos_return_pct": 2.2442,
+          "oos_win_rate": 38.18,
+          "oos_sharpe": 0.056,
+          "oos_trades": 55,
+          "oos_max_dd_pct": -3.4726,
+          "buy_hold_pct": 40.372,
+          "baseline_return_pct": 2.2442,
+          "random_return_pct": -3.9283,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "ADAUSDT",
+          "oos_return_pct": -5.1804,
+          "oos_win_rate": 28.79,
+          "oos_sharpe": -0.116,
+          "oos_trades": 66,
+          "oos_max_dd_pct": -6.0141,
+          "buy_hold_pct": 15.0865,
+          "baseline_return_pct": -5.1804,
+          "random_return_pct": -0.2945,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "oos_return_pct": 3.9895,
+          "oos_win_rate": 42.0,
+          "oos_sharpe": 0.104,
+          "oos_trades": 50,
+          "oos_max_dd_pct": -4.1201,
+          "buy_hold_pct": 192.1229,
+          "baseline_return_pct": 3.9895,
+          "random_return_pct": 9.3637,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "ARBUSDT",
+          "oos_return_pct": -7.6975,
+          "oos_win_rate": 24.19,
+          "oos_sharpe": -0.202,
+          "oos_trades": 62,
+          "oos_max_dd_pct": -10.921,
+          "buy_hold_pct": 90.2501,
+          "baseline_return_pct": -7.6975,
+          "random_return_pct": -3.2644,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "oos_return_pct": 2.2095,
+          "oos_win_rate": 34.72,
+          "oos_sharpe": 0.041,
+          "oos_trades": 72,
+          "oos_max_dd_pct": -4.5868,
+          "buy_hold_pct": 37.1703,
+          "baseline_return_pct": 2.2095,
+          "random_return_pct": 1.601,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        },
+        {
+          "symbol": "DASHUSDT",
+          "oos_return_pct": 3.608,
+          "oos_win_rate": 38.89,
+          "oos_sharpe": 0.089,
+          "oos_trades": 54,
+          "oos_max_dd_pct": -3.1001,
+          "buy_hold_pct": 44.8652,
+          "baseline_return_pct": 3.608,
+          "random_return_pct": -0.877,
+          "expectancy_verdict": "inconclusive",
+          "validation": "current"
+        }
+      ],
+      "aggregate": {
+        "n": 12,
+        "mean_oos_return_pct": -0.4077,
+        "mean_oos_win_rate": 35.2492,
+        "mean_oos_sharpe": -0.0148,
+        "beats_buyhold": 1,
+        "beats_random": 5,
+        "positive_edge": 0,
+        "inconclusive_edge": 12,
+        "negative_edge": 0
+      }
+    },
+    "absorption_reversal": {
+      "per_symbol": [
+        {
+          "symbol": "BULLAUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 501.2312,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "COMPUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 18.7717,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "AGTUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 111.2559,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "BTCUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 18.7905,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "BCHUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 35.2541,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "BABYUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": -1.6733,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 40.372,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "ADAUSDT",
+          "oos_return_pct": 1.4793,
+          "oos_win_rate": 100.0,
+          "oos_sharpe": null,
+          "oos_trades": 1,
+          "oos_max_dd_pct": -0.4623,
+          "buy_hold_pct": 15.0865,
+          "baseline_return_pct": 1.4793,
+          "random_return_pct": -0.7949,
+          "expectancy_verdict": "positive",
+          "validation": "current"
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 192.1229,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "ARBUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 90.2501,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 37.1703,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        },
+        {
+          "symbol": "DASHUSDT",
+          "oos_return_pct": 0.0,
+          "oos_win_rate": 0.0,
+          "oos_sharpe": null,
+          "oos_trades": 0,
+          "oos_max_dd_pct": 0.0,
+          "buy_hold_pct": 44.8652,
+          "baseline_return_pct": 0.0,
+          "random_return_pct": 0.0,
+          "expectancy_verdict": "no_trades",
+          "validation": "current"
+        }
+      ],
+      "aggregate": {
+        "n": 12,
+        "mean_oos_return_pct": 0.1233,
+        "mean_oos_win_rate": 8.3333,
+        "mean_oos_sharpe": null,
+        "beats_buyhold": 1,
+        "beats_random": 1,
+        "positive_edge": 1,
+        "inconclusive_edge": 0,
+        "negative_edge": 0
+      }
+    }
+  },
+  "verdict": "no_statistically_significant_positive_edge"
+}

@@ -50,6 +50,44 @@ const poolForm = reactive({
   rule: '{"base": "all"}',
 })
 
+const poolEditing = ref(false)
+const metricOptions = [
+  { value: 'volatility_1h', label: '1h 对数收益标准差（小数）' },
+  { value: 'quote_volume_24h', label: '24h 成交额（USDT，缺失排除）' },
+  { value: 'funding_rate', label: '资金费率（小数，0.0001 = 0.01%）' },
+  { value: 'oi_value', label: '未平仓名义价值（USD）' },
+  { value: 'long_short_ratio', label: '全市场账户多空比' },
+  { value: 'top_long_short', label: '大户多空比' },
+  { value: 'taker_buy_sell', label: '主动买卖量比' },
+]
+const metricField = ref('funding_rate')
+const metricMin = ref('')
+const metricMax = ref('')
+const volatilityWindow = ref(24)
+const volatilityMaxAge = ref(2)
+function addMetricFilter() {
+  try {
+    const rule = parseJson(poolForm.rule || '{}', '池规则')
+    const bounds = {}
+    for (const [key, raw] of [['min', metricMin.value], ['max', metricMax.value]]) {
+      if (String(raw).trim() !== '') {
+        const value = Number(raw)
+        if (!Number.isFinite(value)) throw new Error('筛选边界必须是有限数字')
+        bounds[key] = value
+      }
+    }
+    if (!Object.keys(bounds).length) throw new Error('请至少填写一个筛选边界')
+    rule.filters ||= {}
+    rule.filters[metricField.value] = bounds
+    if (metricField.value === 'volatility_1h') {
+      rule.volatility_window_hours = volatilityWindow.value
+      rule.volatility_max_age_hours = volatilityMaxAge.value
+    }
+    rule.max_age_hours ||= 24
+    poolForm.rule = JSON.stringify(rule, null, 2)
+  } catch (err) { ElMessage.error(err.message) }
+}
+
 const poolMembersVisible = ref(false)
 const poolMembers = ref([])
 const poolMembersTitle = ref('')
@@ -115,7 +153,9 @@ async function submitCreate() {
       enabled: bindingForm.enabled,
       params,
     })
-    ElMessage.success('绑定已创建')
+    const strategy = props.strategies.find((item) => item.code === bindingForm.strategy)
+    if (!strategy?.enabled) ElMessage.warning('绑定已创建；策略总开关未启用，巡检不会执行该绑定')
+    else ElMessage.success('绑定已创建')
     bindingVisible.value = false
     await load()
     emit('change')
@@ -189,11 +229,26 @@ async function removeBinding(row) {
 }
 
 function openCreatePool() {
+  poolEditing.value = false
   poolForm.code = ''
   poolForm.name = ''
   poolForm.kind = 'rule'
   poolForm.symbols = ''
   poolForm.rule = '{"base": "all"}'
+  volatilityWindow.value = 24
+  volatilityMaxAge.value = 2
+  poolVisible.value = true
+}
+
+function openEditPool(pool) {
+  poolEditing.value = true
+  poolForm.code = pool.code
+  poolForm.name = pool.name
+  poolForm.kind = pool.kind
+  poolForm.symbols = (pool.symbols || []).join(', ')
+  poolForm.rule = JSON.stringify(pool.rule || {}, null, 2)
+  volatilityWindow.value = pool.rule?.volatility_window_hours ?? 24
+  volatilityMaxAge.value = pool.rule?.volatility_max_age_hours ?? 2
   poolVisible.value = true
 }
 
@@ -208,15 +263,20 @@ async function submitPool() {
   const symbols = poolForm.symbols.split(/[\s,;]+/).filter(Boolean)
   poolSaving.value = true
   try {
-    await api.createPool({
+    const payload = {
       code: poolForm.code,
       name: poolForm.name || poolForm.code,
       kind: poolForm.kind,
       symbols,
       rule,
-      enabled: true,
-    })
-    ElMessage.success('币种池已创建')
+    }
+    if (poolEditing.value) {
+      delete payload.code
+      await api.updatePool(poolForm.code, payload)
+    } else {
+      await api.createPool({ ...payload, enabled: true })
+    }
+    ElMessage.success('币种池已保存')
     poolVisible.value = false
     await load()
   } catch (err) {
@@ -331,6 +391,9 @@ onMounted(load)
       >
         {{ pool.name }} · {{ pool.member_count }} 币
       </el-tag>
+      <el-select placeholder="编辑币种池" style="width: 170px" :model-value="''" @change="code => openEditPool(pools.find(pool => pool.code === code))">
+        <el-option v-for="pool in pools" :key="pool.code" :label="pool.name" :value="pool.code" />
+      </el-select>
       <span v-if="!pools.length" class="muted">暂无币种池</span>
     </div>
 
@@ -379,11 +442,11 @@ onMounted(load)
       </template>
     </el-dialog>
 
-    <el-dialog v-model="poolVisible" title="新建币种池" width="520px">
+    <el-dialog v-model="poolVisible" :title="poolEditing ? '编辑币种池' : '新建币种池'" width="620px">
       <div class="form-grid">
         <div>
           <div class="muted" style="margin-bottom: 4px">代码（小写字母/数字/下划线）</div>
-          <el-input v-model="poolForm.code" placeholder="e.g. alt_top100" />
+          <el-input v-model="poolForm.code" :disabled="poolEditing" placeholder="e.g. alt_top100" />
         </div>
         <div>
           <div class="muted" style="margin-bottom: 4px">名称</div>
@@ -402,7 +465,20 @@ onMounted(load)
       <div class="muted" style="margin: 12px 0 4px">
         规则（JSON）：base=all/major/static，可加 min_quote_volume_usd、exclude_major、max_symbols、exclude
       </div>
-      <el-input v-model="poolForm.rule" type="textarea" :rows="4" class="mono" />
+      <el-input v-model="poolForm.rule" type="textarea" :rows="6" class="mono" />
+      <div v-if="poolEditing" class="form-hint">保存后，引用此池的已有绑定会使用更新后的成员范围。</div>
+      <div class="form-hint">条件取交集。资金费率与情绪默认使用 24 小时内的数据库记录；严格成交额使用交易所 24h 数据（最多缓存 1 小时），缺失或为零时排除，旧成交额门槛仍保留旧行为。</div>
+      <div class="form-hint">1h 波动率为最近 N 个小时对数收益的总体标准差，需 N+1 根连续已闭合 K 线，最新闭合时间距今不得超过指定小时数；不足、过期或缺口均排除。它是当前滚动值，不是训练期长期排名，也不适合直接作为历史时点分类。</div>
+      <div v-if="metricField === 'volatility_1h'" class="row" style="margin-top: 10px">
+        <span>收益窗口（小时）</span><el-input-number v-model="volatilityWindow" :min="2" :max="720" />
+        <span>最大数据年龄（小时）</span><el-input-number v-model="volatilityMaxAge" :min="0.1" :step="0.5" />
+      </div>
+      <div class="row" style="margin-top: 10px; flex-wrap: wrap">
+        <el-select v-model="metricField" style="width: 230px"><el-option v-for="item in metricOptions" :key="item.value" :label="item.label" :value="item.value" /></el-select>
+        <el-input v-model="metricMin" placeholder="最小值（可空）" style="width: 140px" />
+        <el-input v-model="metricMax" placeholder="最大值（可空）" style="width: 140px" />
+        <el-button @click="addMetricFilter">添加或替换条件</el-button>
+      </div>
       <template #footer>
         <el-button @click="poolVisible = false">取消</el-button>
         <el-button type="primary" :loading="poolSaving" :disabled="!poolForm.code" @click="submitPool">创建</el-button>

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import threading
 from datetime import datetime, timezone
+import logging
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from ..db import SessionLocal
 from ..state import get_state, set_state
+from ..strategy.pool_maintenance import run_research_pool_maintenance
 from .service import TradingService
 
 
@@ -23,6 +25,22 @@ class TradingScheduler:
             TradingService(db).run_cycle()
         finally:
             db.close()
+
+    def _maintain_pools(self) -> None:
+        db = SessionLocal()
+        try:
+            logging.getLogger(__name__).info("币池维护结果: %s", run_research_pool_maintenance(db))
+        finally:
+            db.close()
+
+    def start_pool_maintenance(self) -> None:
+        with self._lock:
+            if self.scheduler.get_job("research_pool_maintenance") is None:
+                self.scheduler.add_job(self._maintain_pools, "interval", hours=1,
+                                       id="research_pool_maintenance", max_instances=1,
+                                       coalesce=True, next_run_time=datetime.now(timezone.utc))
+            if not self.scheduler.running:
+                self.scheduler.start()
 
     def start(self, seconds: int) -> None:
         with self._lock:
@@ -76,6 +94,7 @@ scheduler = TradingScheduler()
 def sync_scheduler_with_state(db) -> dict:
     enabled = bool(get_state(db, "schedule_enabled", True))
     seconds = int(get_state(db, "schedule_seconds", 60))
+    scheduler.start_pool_maintenance()
     scheduler.apply(enabled, seconds)
     return scheduler.status()
 

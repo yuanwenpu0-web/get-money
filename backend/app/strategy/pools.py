@@ -26,16 +26,21 @@ from __future__ import annotations
 
 import json
 import math
+import statistics
 from typing import Callable, Iterable
 
+from datetime import datetime, timezone
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..market.universe import universe_symbols, universe_volumes
-from ..models import SymbolPool
+from ..models import FundingRate, Kline, Sentiment, SymbolPool
 from .coin_universe import BLACKLIST, MAJOR_SET, MAJOR_SYMBOLS
 
 POOL_KINDS = ("static", "rule")
-RULE_KEYS = ("base", "min_quote_volume_usd", "exclude_major", "max_symbols", "exclude")
+METRIC_FIELDS = ("funding_rate", "oi_value", "long_short_ratio", "top_long_short", "taker_buy_sell", "volatility_1h", "quote_volume_24h")
+RULE_KEYS = ("base", "min_quote_volume_usd", "exclude_major", "max_symbols", "exclude", "filters", "max_age_hours", "volatility_window_hours", "volatility_max_age_hours")
 BASE_MODES = ("all", "major", "static")
 
 
@@ -113,6 +118,47 @@ def validate_pool(kind: str, symbols: object, rule: object) -> tuple[str, list[s
     if "exclude" in rule:
         normalized_rule["exclude"] = _as_symbols(rule["exclude"])
 
+    if "filters" in rule:
+        filters = rule["filters"]
+        if not isinstance(filters, dict) or set(filters) - set(METRIC_FIELDS):
+            raise ValueError("filters 含未知指标或不是对象")
+        normalized_rule["filters"] = {}
+        for field, bounds in filters.items():
+            if not isinstance(bounds, dict) or not bounds or set(bounds) - {"min", "max"}:
+                raise ValueError(f"{field} 必须包含 min 或 max")
+            normalized_bounds = {}
+            for bound, value in bounds.items():
+                if isinstance(value, bool):
+                    raise ValueError(f"{field}.{bound} 必须是有限数字")
+                try:
+                    number = float(value)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(f"{field}.{bound} 必须是有限数字") from exc
+                if not math.isfinite(number):
+                    raise ValueError(f"{field}.{bound} 必须是有限数字")
+                normalized_bounds[bound] = number
+            if normalized_bounds.get("min", -math.inf) > normalized_bounds.get("max", math.inf):
+                raise ValueError(f"{field} 的 min 不能大于 max")
+            normalized_rule["filters"][field] = normalized_bounds
+    if "volatility_window_hours" in rule:
+        window = rule["volatility_window_hours"]
+        if isinstance(window, bool) or not isinstance(window, int) or not 2 <= window <= 720:
+            raise ValueError("volatility_window_hours 必须是 2 到 720 的整数")
+        normalized_rule["volatility_window_hours"] = window
+    for key in ("max_age_hours", "volatility_max_age_hours"):
+        if key not in rule:
+            continue
+        try:
+            age = float(rule[key])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{key} 必须是正有限数") from exc
+        if isinstance(rule[key], bool) or not math.isfinite(age) or age <= 0:
+            raise ValueError(f"{key} 必须是正有限数")
+        normalized_rule[key] = age
+    for field in ("volatility_1h", "quote_volume_24h"):
+        if any(value < 0 for value in normalized_rule.get("filters", {}).get(field, {}).values()):
+            raise ValueError(f"{field} 的边界必须非负")
+
     if kind == "static" and not normalized_symbols:
         raise ValueError("static 池必须给出 symbols 列表")
     return kind, normalized_symbols, normalized_rule
@@ -126,6 +172,7 @@ def resolve_members(
     universe: Callable[[], list[str]],
     volumes: Callable[[], dict[str, float]],
     allowed: Iterable[str] | None = None,
+    metrics: Callable[[list[str]], dict[str, dict[str, float]]] | None = None,
 ) -> list[str]:
     """纯函数版成员解析（不碰数据库，便于测试与回测复用）。
 
@@ -145,7 +192,8 @@ def resolve_members(
     threshold = rule.get("min_quote_volume_usd")
     limit = rule.get("max_symbols")
     # 门槛过滤与 TopN 排序都要成交额：任一存在就取一次（走 1h TTL 缓存）
-    volume_map = volumes() if (threshold or limit) else {}
+    filters = rule.get("filters") or {}
+    volume_map = volumes() if (threshold or limit or "quote_volume_24h" in filters) else {}
     if threshold and volume_map:
         # 宁贵不漏：成交额缺失的币种保留，只剔除明确低于门槛的
         members = [
@@ -160,11 +208,85 @@ def resolve_members(
         allow_set = set(allowed)
         members = [symbol for symbol in members if symbol in allow_set]
 
+    if filters:
+        values = metrics(members) if metrics else {}
+        def matches(symbol):
+            for field, bounds in filters.items():
+                value = volume_map.get(symbol) if field == "quote_volume_24h" else values.get(symbol, {}).get(field)
+                if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value) or (field == "quote_volume_24h" and value <= 0):
+                    return False
+                if value < bounds.get("min", -math.inf) or value > bounds.get("max", math.inf):
+                    return False
+            return True
+        members = [symbol for symbol in members if matches(symbol)]
+
     if limit:
         if volume_map:
             members.sort(key=lambda symbol: volume_map.get(symbol, 0.0), reverse=True)
         members = members[: int(limit)]
     return members
+
+
+def _latest_metrics(db: Session, symbols: list[str], filters: dict, max_age_hours: float) -> dict:
+    if not symbols:
+        return {}
+    cutoff = int(datetime.now(timezone.utc).timestamp() * 1000 - max_age_hours * 3600000)
+    now = int(datetime.now(timezone.utc).timestamp() * 1000)
+    result = {}
+    for model, timestamp, fields in (
+        (FundingRate, FundingRate.funding_time, {"funding_rate"}),
+        (Sentiment, Sentiment.ts, {"oi_value", "long_short_ratio", "top_long_short", "taker_buy_sell"}),
+    ):
+        selected = fields & filters.keys()
+        if not selected:
+            continue
+        latest = (db.query(model.symbol.label("symbol"), func.max(timestamp).label("ts"))
+                  .filter(model.symbol.in_(symbols), timestamp >= cutoff, timestamp <= now)
+                  .group_by(model.symbol).subquery())
+        rows = db.query(model).join(latest, (model.symbol == latest.c.symbol) & (timestamp == latest.c.ts)).all()
+        for row in rows:
+            for field in selected:
+                value = getattr(row, field)
+                # 情绪采集器把缺失值写为 0，故不能将零当作有效观测。
+                if value is not None and math.isfinite(value) and (field == "funding_rate" or value > 0):
+                    result.setdefault(row.symbol, {})[field] = value
+    return result
+
+
+def _pool_metrics(db: Session, symbols: list[str], rule: dict) -> dict:
+    filters = rule.get("filters") or {}
+    result = _latest_metrics(db, symbols, filters, rule.get("max_age_hours", 24))
+    if not symbols or "volatility_1h" not in filters:
+        return result
+    hour = 3600000
+    now = int(datetime.now(timezone.utc).timestamp() * 1000)
+    window = rule.get("volatility_window_hours", 24)
+    max_age = rule.get("volatility_max_age_hours", 2)
+    cutoff = int(now - max_age * hour) - (window + 1) * hour
+    rows = (db.query(Kline.symbol, Kline.open_time, Kline.close_time, Kline.close)
+            .filter(Kline.symbol.in_(symbols), Kline.interval == "1h",
+                    Kline.open_time >= cutoff, Kline.open_time + hour <= now,
+                    Kline.close_time < now)
+            .order_by(Kline.symbol, Kline.open_time.desc()).all())
+    grouped = {}
+    for row in rows:
+        group = grouped.setdefault(row.symbol, [])
+        if len(group) < window + 1:
+            group.append(row)
+    for symbol, candles in grouped.items():
+        if len(candles) != window + 1:
+            continue
+        latest = candles[0]
+        if now - (latest.open_time + hour) > max_age * hour:
+            continue
+        if any(row.open_time % hour != 0 or row.close_time != row.open_time + hour - 1
+               or row.close is None or not math.isfinite(row.close) or row.close <= 0 for row in candles):
+            continue
+        if any(candles[i].open_time - candles[i + 1].open_time != hour for i in range(window)):
+            continue
+        returns = [math.log(candles[i].close) - math.log(candles[i + 1].close) for i in range(window)]
+        result.setdefault(symbol, {})["volatility_1h"] = statistics.pstdev(returns)
+    return result
 
 
 def pool_symbols(db: Session, pool: SymbolPool, allowed: Iterable[str] | None = None) -> list[str]:
@@ -177,6 +299,7 @@ def pool_symbols(db: Session, pool: SymbolPool, allowed: Iterable[str] | None = 
         universe=lambda: universe_symbols(db),
         volumes=lambda: universe_volumes(db),
         allowed=allowed,
+        metrics=lambda members: _pool_metrics(db, members, spec["rule"]),
     )
 
 

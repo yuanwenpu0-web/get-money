@@ -8,6 +8,9 @@ const error = ref('')
 const search = ref('')
 const collection = ref('')
 const category = ref('')
+const indicatorType = ref('')
+const research = ref(null)
+const researchError = ref('')
 const page = ref(1)
 const pageSize = 20
 const detailVisible = ref(false)
@@ -22,17 +25,21 @@ const collectionOptions = computed(() => [...new Set(items.value.map((item) => i
 const categoryOptions = computed(() => [...new Set(items.value
   .filter((item) => !collection.value || item.collection === collection.value)
   .map((item) => item.category).filter(Boolean))].sort())
+const typeOptions = computed(() => [...new Set(items.value.map((item) => item.indicator_type).filter(Boolean))].sort())
+const rankedSingles = computed(() => [...(research.value?.singles_all || [])].sort((a, b) => b.train.total_pnl - a.train.total_pnl).slice(0, 10))
+const rankedCombos = computed(() => [...(research.value?.combos_all || [])].sort((a, b) => b.train.total_pnl - a.train.total_pnl).slice(0, 10))
 const filtered = computed(() => {
   const query = search.value.trim().toLocaleLowerCase()
   return items.value.filter((item) => {
     if (collection.value && item.collection !== collection.value) return false
     if (category.value && item.category !== category.value) return false
+    if (indicatorType.value && item.indicator_type !== indicatorType.value) return false
     return !query || [item.title, item.original_title, item.description, item.category, item.collection]
       .some((value) => String(value || '').toLocaleLowerCase().includes(query))
   })
 })
 const displayed = computed(() => filtered.value.slice((page.value - 1) * pageSize, page.value * pageSize))
-watch([search, category, collection], () => { page.value = 1 })
+watch([search, category, collection, indicatorType], () => { page.value = 1 })
 watch(collection, () => { category.value = '' })
 
 function load() {
@@ -83,7 +90,11 @@ function safeSourceUrl(url) {
   }
 }
 
-onMounted(load)
+onMounted(() => {
+  const pending = load()
+  if (api.getIndicatorResearch) api.getIndicatorResearch().then((data) => { if (!disposed) research.value = data }).catch((err) => { if (!disposed) researchError.value = err.message })
+  return pending
+})
 onBeforeUnmount(() => { disposed = true; detailRequest++ })
 </script>
 
@@ -94,6 +105,7 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
         <div>
           <div class="panel-title">指标目录</div>
           <div class="panel-sub">浏览已收录的 TradingView Pine 指标及其源码；目录中的脚本不会自动参与本地计算或交易。</div>
+          <div class="panel-sub">指标类型、计算概述和场景依据目录分类或逐项源码归纳；未经核实的条目标为待分类。</div>
         </div>
         <el-button size="small" :loading="loading" @click="load">刷新</el-button>
       </div>
@@ -104,6 +116,9 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
         </el-select>
         <el-select v-model="category" clearable filterable placeholder="全部分类" aria-label="指标分类" style="width: 200px">
           <el-option v-for="item in categoryOptions" :key="item" :label="item" :value="item" />
+        </el-select>
+        <el-select v-model="indicatorType" clearable placeholder="全部指标类型" aria-label="指标类型" style="width: 180px">
+          <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
         </el-select>
         <span class="muted">{{ filtered.length }} / {{ items.length }} 个指标</span>
       </div>
@@ -124,6 +139,7 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
           <template #default="{ row }">{{ row.description || '—' }}</template>
         </el-table-column>
         <el-table-column prop="category" label="分类" min-width="130" show-overflow-tooltip />
+        <el-table-column prop="indicator_type" label="指标类型" min-width="120" />
         <el-table-column label="Pine" width="80">
           <template #default="{ row }">{{ row.version ? `v${row.version}` : '—' }}</template>
         </el-table-column>
@@ -134,6 +150,32 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
       <div v-if="filtered.length > pageSize" class="table-pagination">
         <el-pagination v-model:current-page="page" :page-size="pageSize" :total="filtered.length" layout="total, prev, pager, next" />
       </div>
+    </div>
+
+    <div class="panel section-gap">
+      <div class="panel-title">指标参数与组合评估</div>
+      <p v-if="researchError" class="muted">评估报告不可用：{{ researchError }}</p>
+      <template v-if="research">
+        <p class="muted">{{ research.dataset.interval }} · {{ research.dataset.symbols }} 币 · {{ research.dataset.start }} 至 {{ research.dataset.end }} · {{ research.summary.single_tests }} 组单指标参数、{{ research.summary.combo_tests }} 组组合；{{ research.summary.passed }} 组通过检验。</p>
+        <p class="muted">多空双向；收盘确认、下一根开盘入场；RSI(14) 穿越 50 出场，最多持有 240 根；手续费和滑点合计往返 0.12%。训练集选参，样本外检验。固定每笔名义本金 10，收益率分母为各段最大并发持仓数 × 10，因此不同候选的收益率分母可能不同。</p>
+        <p class="muted">以下按训练期累计盈亏排名；样本外仅用于验证。研究信号包含 15 个家族，不等同于覆盖目录全部指标，也未测试所有参数或组合；资金费、冲击成本和实际组合资金限制未计入。</p>
+        <div v-for="group in [{ title: '单指标前十', rows: rankedSingles }, { title: '组合前十', rows: rankedCombos }]" :key="group.title" class="section-gap">
+          <div class="panel-title">{{ group.title }}</div>
+          <el-table :data="group.rows" class="table-compact">
+            <el-table-column type="index" label="排名" width="65" />
+            <el-table-column prop="label" label="指标、参数及组合规则" min-width="260" />
+            <el-table-column label="训练盈亏" width="105"><template #default="{ row }">{{ row.train.total_pnl.toFixed(3) }}</template></el-table-column>
+            <el-table-column label="训练收益率" width="110"><template #default="{ row }">{{ row.train.total_return_pct.toFixed(2) }}%</template></el-table-column>
+            <el-table-column label="样本外盈亏" width="115"><template #default="{ row }">{{ row.test.total_pnl.toFixed(3) }}</template></el-table-column>
+            <el-table-column label="样本外收益率" width="125"><template #default="{ row }">{{ row.test.total_return_pct.toFixed(2) }}%</template></el-table-column>
+            <el-table-column prop="q_value" label="q 值" width="90" />
+            <el-table-column prop="verdict" label="判定" width="120" />
+          </el-table>
+        </div>
+        <details class="section-gap"><summary>已测试信号及参数范围</summary>
+          <p v-for="(spec, name) in research.grid" :key="name" class="muted">{{ spec.label }}（{{ name }}）：{{ spec.rule }}；参数 {{ JSON.stringify(spec.params) }}；{{ spec.combos }} 组。</p>
+        </details>
+      </template>
     </div>
 
     <el-dialog v-model="detailVisible" :title="detail?.title || '指标详情'" width="min(900px, 92vw)" @close="closeDetail">
@@ -148,6 +190,8 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
         <p v-if="detail.original_title && detail.original_title !== detail.title" class="muted">{{ detail.original_title }}</p>
         <p v-if="detail.description" class="indicator-description">{{ detail.description }}</p>
         <p v-if="detail.notes" class="indicator-description">{{ detail.notes }}</p>
+        <p class="indicator-description">类型：{{ detail.indicator_type }}；计算概述：{{ detail.calculation_summary }}；适用场景：{{ detail.use_case }}。具体公式及参数以源码为准。</p>
+        <p class="indicator-description">Python 实现：{{ detail.python_method || '未绑定' }}；目录指标不会自动参与交易或上述信号实验。</p>
         <div v-if="detailLoading" class="empty-hint" role="status">正在加载源码…</div>
         <div v-else-if="detailError" class="row" role="alert">
           <span class="down">详情加载失败：{{ detailError }}</span>

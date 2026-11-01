@@ -48,6 +48,7 @@ export default {
   previewSignal: (payload) => http.post('/market/preview', payload),
 
   getIndicators: () => http.get('/indicators'),
+  getIndicatorResearch: () => http.get('/indicators/research/latest'),
   getIndicator: (id) => http.get('/indicators/' + encodeURIComponent(id)),
 
   getStrategies: () => http.get('/strategies'),
@@ -55,6 +56,8 @@ export default {
 
   // 币种池与「策略 × 池」绑定：参数的真正归属地
   getPools: () => http.get('/pools'),
+  getResearchPoolMaintenance: () => http.get('/pools/research/maintenance'),
+  refreshResearchPools: () => http.post('/pools/research/maintenance'),
   createPool: (payload) => http.post('/pools', payload),
   updatePool: (code, payload) => http.put(`/pools/${code}`, payload),
   deletePool: (code) => http.delete(`/pools/${code}`),

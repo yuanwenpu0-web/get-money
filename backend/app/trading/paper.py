@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import json
+import math
+from datetime import datetime, timezone
+
+from ..market.data_service import MarketDataService
 
 from sqlalchemy.orm import Session
 
-from ..models import Order
+from ..models import AppState, Order
 from ..state import all_state, get_state, set_state
 from ..strategy.bindings import resolve_order_params
+from ..strategy.specs.pool_volatility_research import BLOCKED_CODES
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
 from .risk import position_size
@@ -46,6 +51,8 @@ def entry_gates(db: Session, signal, params: dict, ignore_cooldown: bool = False
 
 
 def open_position(db: Session, signal, equity: float | None = None, ignore_cooldown: bool = False) -> Order | None:
+    if getattr(signal, "strategy", "") in BLOCKED_CODES:
+        return open_research_position(db, signal)
     state = all_state(db)
     # 信号自带参数（来自「策略 × 池」绑定）；否则按订单归属反查，最后才回落策略配置
     params = getattr(signal, "params", None) or resolve_order_params(
@@ -109,6 +116,62 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
     return order
 
 
+def open_research_position(db: Session, signal) -> Order | None:
+    """以已收盘信号后的首根实际小时线开盘价模拟成交。"""
+    if signal.interval != "1h" or signal.direction != "LONG" or not getattr(signal, "ts", None):
+        return None
+    if not (getattr(signal, "reason", None) or {}).get("research_entry"):
+        return None
+    step = interval_ms("1h")
+    current = now_ms()
+    if not signal.ts + step <= current < signal.ts + 2 * step:
+        return None
+    if signal.ts <= get_state(db, f"last_entry:{signal.symbol}:1h", 0):
+        return None
+    if any(order.symbol == signal.symbol for order in open_orders(db)):
+        return None
+    frame = MarketDataService(db).load_frame(signal.symbol, "1h", start_ms=signal.ts + interval_ms("1h"), allow_native=False)
+    if frame.empty:
+        return None
+    row = frame.iloc[0]
+    fill_ts = int(frame.index[0].timestamp() * 1000)
+    price = float(row.open)
+    if fill_ts > now_ms() or not math.isfinite(price) or price <= 0:
+        return None
+    from .portfolio import portfolio_snapshot
+
+    snapshot = portfolio_snapshot(db, update_marks=False)
+    state = all_state(db)
+    fee_rate = _fee_rate(state)
+    margin = min(200.0, snapshot["cash"] / (1 + fee_rate))
+    if margin < 10:
+        return None
+    entry = round_price(price * (1 + _slippage(state)))
+    qty = margin / entry
+    fee = margin * fee_rate
+    cash_row = db.get(AppState, "cash")
+    if cash_row is None:
+        cash_row = AppState(key="cash")
+        db.add(cash_row)
+    cash_row.value = json.dumps(round(snapshot["cash"] - margin - fee, 4))
+    key = f"last_entry:{signal.symbol}:1h"
+    entry_row = db.get(AppState, key)
+    if entry_row is None:
+        entry_row = AppState(key=key)
+        db.add(entry_row)
+    entry_row.value = json.dumps(signal.ts)
+    order = Order(symbol=signal.symbol, interval="1h", side="LONG", qty=qty,
+                  entry_price=entry, mark_price=price, margin=round(margin, 4),
+                  leverage=1, sl=0, tp=0, status="OPEN", source="paper",
+                  strategy=signal.strategy, pool=getattr(signal, "pool", "") or "",
+                  entry_fee=round(fee, 6), note=f"research_signal_ts={signal.ts}",
+                  created_at=datetime.fromtimestamp(fill_ts / 1000, tz=timezone.utc))
+    db.add(order)
+    db.commit()
+    db.refresh(order)
+    return order
+
+
 def close_position(db: Session, order: Order, price: float, reason: str = "manual", slippage_rate: float | None = None) -> Order:
     """本地记账结算。slippage_rate 默认取全局滑点；live 模式传入 0 用真实成交均价结算。"""
     if order.status != "OPEN":
@@ -124,7 +187,11 @@ def close_position(db: Session, order: Order, price: float, reason: str = "manua
     net = gross - order.entry_fee - exit_fee
 
     cash = float(state.get("cash", 0.0))
-    set_state(db, "cash", round(cash + order.margin + gross - exit_fee, 4))
+    cash_row = db.get(AppState, "cash")
+    if cash_row is None:
+        cash_row = AppState(key="cash")
+        db.add(cash_row)
+    cash_row.value = json.dumps(round(cash + order.margin + gross - exit_fee, 4))
 
     order.status = "CLOSED"
     order.close_price = round_price(exit_price)

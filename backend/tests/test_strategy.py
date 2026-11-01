@@ -52,9 +52,9 @@ def _out(**changes):
 
 def test_builtin_strategies_are_registered():
     codes = {CODE, "supertrend_current", "simple_zigzag_double", "opening_candle_breakout",
-             "rgd_donchian_v2"}
-    assert {item["code"] for item in DEFAULT_STRATEGIES} == codes
-    assert set(known_codes()) == codes
+             "rgd_donchian_v2", "capital41_fusion_scalp"}
+    assert codes <= set(known_codes())
+    assert {item["code"] for item in DEFAULT_STRATEGIES} == set(known_codes())
 
 
 def test_unknown_strategy_is_rejected():

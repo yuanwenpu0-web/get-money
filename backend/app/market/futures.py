@@ -12,6 +12,8 @@ import hmac
 import math
 import threading
 import time
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlencode
 
 import httpx
@@ -22,6 +24,47 @@ from .binance import BinanceError, PooledHttpClient
 # 撤单时订单不存在 / 仓位方向无需修改等可忽略的业务错误码
 IGNORED_CANCEL_CODES = {-2011}
 TIME_OFFSET_TTL_SECONDS = 600
+
+
+class _PublicRequestGate:
+    """Process-wide pacing and fail-fast cooldown for public futures requests."""
+
+    def __init__(self, interval: float = 0.35):
+        self.interval = interval
+        self.lock = threading.Lock()
+        self.next_request = 0.0
+        self.blocked_until = 0.0
+
+    def acquire(self) -> None:
+        while True:
+            with self.lock:
+                now = time.monotonic()
+                if now < self.blocked_until:
+                    raise BinanceError(f"币安行情限流冷却中，剩余 {self.blocked_until - now:.1f} 秒")
+                delay = self.next_request - now
+                if delay <= 0:
+                    self.next_request = now + self.interval
+                    return
+            time.sleep(delay)
+
+    def cool_down(self, response: httpx.Response) -> None:
+        value = response.headers.get("Retry-After", "60")
+        try:
+            seconds = float(value)
+        except ValueError:
+            try:
+                retry_at = parsedate_to_datetime(value)
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=timezone.utc)
+                seconds = (retry_at - datetime.now(timezone.utc)).total_seconds()
+            except (TypeError, ValueError, OverflowError):
+                seconds = 60.0
+        seconds = max(1.0, seconds) if math.isfinite(seconds) else 60.0
+        with self.lock:
+            self.blocked_until = max(self.blocked_until, time.monotonic() + seconds)
+
+
+_PUBLIC_GATE = _PublicRequestGate()
 
 
 class BinanceApiError(BinanceError):
@@ -61,11 +104,12 @@ class BinanceFuturesClient(PooledHttpClient):
         with self._time_lock:
             if time.time() - self._offset_checked_at < TIME_OFFSET_TTL_SECONDS:
                 return
-            data = self._request("GET", "/fapi/v1/time")
+            data = self._request("GET", "/fapi/v1/time", _time_calibration=True)
             self._time_offset_ms = int(data["serverTime"]) - int(time.time() * 1000)
             self._offset_checked_at = time.time()
 
-    def _request(self, method: str, path: str, params: dict | None = None, signed: bool = False) -> dict | list:
+    def _request(self, method: str, path: str, params: dict | None = None, signed: bool = False,
+                 _time_calibration: bool = False) -> dict | list:
         params = dict(params or {})
         headers = {}
         if signed:
@@ -82,12 +126,20 @@ class BinanceFuturesClient(PooledHttpClient):
         for attempt in range(3):
             for host in self.hosts:
                 try:
+                    if not signed and method.upper() == "GET" and not _time_calibration:
+                        _PUBLIC_GATE.acquire()
                     with self._http_client(host) as client:
                         response = client.request(method, path, params=params, headers=headers)
+                    if response.status_code in (418, 429):
+                        _PUBLIC_GATE.cool_down(response)
                     if response.status_code >= 400:
                         raise _api_error(response)
                     return response.json()
                 except (httpx.TimeoutException, httpx.NetworkError) as exc:
+                    if method.upper() != "GET":
+                        raise BinanceError(
+                            f"币安合约写请求结果未知，未自动重试；请先核对交易所订单和持仓: {exc}"
+                        ) from exc
                     last_error = exc
                     continue
             if attempt < 2:

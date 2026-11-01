@@ -80,6 +80,11 @@ def binding_params(db: Session, binding: StrategyBinding, state: dict | None = N
     overrides = json.loads(binding.params or "{}")
     if not isinstance(overrides, dict):
         raise ValueError("绑定参数必须是 JSON 对象")
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == binding.strategy_code).first()
+    strategy_params = json.loads(config.params or "{}") if config else {}
+    if not isinstance(strategy_params, dict):
+        raise ValueError("策略参数必须是 JSON 对象")
+    overrides = {**strategy_params, **overrides}
     return resolve_params(
         binding.strategy_code,
         state if state is not None else all_state(db),
@@ -104,7 +109,11 @@ def validate_binding(
         raise ValueError(f"不支持的周期: {interval}")
     if not isinstance(params, dict):
         raise ValueError("绑定参数必须是 JSON 对象")
-    return resolve_params(strategy_code, all_state(db), params or None, interval=interval)
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy_code).first()
+    strategy_params = json.loads(config.params or "{}") if config else {}
+    if not isinstance(strategy_params, dict):
+        raise ValueError("策略参数必须是 JSON 对象")
+    return resolve_params(strategy_code, all_state(db), {**strategy_params, **params}, interval=interval)
 
 
 def active_bindings(
@@ -138,6 +147,7 @@ def active_bindings(
     overrides_all = load_map(db) if rows else {}
     for row in rows:
         if row.strategy_code not in enabled_strategies:
+            errors.append(f"{row.strategy_code}×{row.pool_code}×{row.interval}: 策略不存在或总开关未启用")
             continue
         pool = pools.get(row.pool_code)
         if pool is None:
@@ -150,6 +160,7 @@ def active_bindings(
             errors.append(f"{row.strategy_code}×{row.pool_code}×{row.interval}: {exc}")
             continue
         if not members:
+            errors.append(f"{row.strategy_code}×{row.pool_code}×{row.interval}: 币种池为空或被全局交易范围过滤")
             continue
         symbol_overrides = {
             symbol: overrides_all[(row.strategy_code, symbol, row.interval)]
@@ -223,7 +234,14 @@ def resolve_order_params(
     老订单没有 pool，或手工构造的信号没有对应绑定，都会回落到策略配置，行为与改造前一致。
     """
     layer: dict = {}
-    matched = False
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
+    if config is not None:
+        try:
+            parsed = json.loads(config.params or "{}")
+        except ValueError:
+            parsed = None
+        if isinstance(parsed, dict):
+            layer.update(parsed)
     if pool:
         row = (
             db.query(StrategyBinding)
@@ -237,16 +255,6 @@ def resolve_order_params(
         if row is not None:
             try:
                 parsed = json.loads(row.params or "{}")
-            except ValueError:
-                parsed = None
-            if isinstance(parsed, dict):
-                layer.update(parsed)
-                matched = True
-    if not matched:
-        config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
-        if config is not None:
-            try:
-                parsed = json.loads(config.params or "{}")
             except ValueError:
                 parsed = None
             if isinstance(parsed, dict):

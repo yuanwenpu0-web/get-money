@@ -23,6 +23,7 @@ from ..models import Credential, JobLog, Order
 from ..security import decrypt
 from ..state import all_state, set_state
 from ..strategy.bindings import resolve_order_params
+from ..strategy.specs.pool_volatility_research import BLOCKED_CODES
 from ..utils import round_price
 from .paper import close_position as settle_close
 from .paper import entry_gates
@@ -70,6 +71,8 @@ def _close_side(direction: str) -> str:
 
 def open_live(db: Session, signal) -> Order | None:
     """实盘开仓：与 paper.open_position 对称，交易所市价成交 + 交易所侧保护单。"""
+    if getattr(signal, "strategy", "") in BLOCKED_CODES:
+        return None
     state = all_state(db)
     key, secret = load_credentials(db)
     if not key or not secret:

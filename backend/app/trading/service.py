@@ -4,6 +4,7 @@ import json
 import threading
 import time
 import traceback
+from types import SimpleNamespace
 
 from sqlalchemy.orm import Session
 
@@ -11,11 +12,12 @@ from ..config import MARKET_SYNC_WORKERS
 from ..db import SessionLocal
 from ..market.data_service import MarketDataService
 from ..models import JobLog, Order
-from ..state import all_state
+from ..state import all_state, get_state, set_state
+from ..strategy.specs.pool_volatility_research import BLOCKED_CODES as RESEARCH_CODES
 from ..strategy.bindings import active_bindings, expand
 from ..strategy.engine import StrategyEngine
 from ..strategy.registry import get_spec
-from ..utils import interval_ms, iso_utc
+from ..utils import interval_ms, iso_utc, now_ms
 from .order_manager import manage_order
 from .dispatch import close_position, open_position
 from .live_sync import sync_live
@@ -89,6 +91,7 @@ class TradingService:
             # 同一币种可能落进多个池/周期：各自独立评估，再按评分择优只开一仓
             best_signals = {}
             strategy_signals = {}
+            initially_held = {order.symbol for order in open_orders(self.db)}
             signal_errors = list(binding_errors)
             for symbol, binding in pairs:
                 try:
@@ -101,7 +104,19 @@ class TradingService:
                         pool=binding.pool,
                     )
                     strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
-                    if signal is None or signal.direction == "FLAT":
+                    if signal is None:
+                        signal_errors.append(f"{symbol}/{binding.strategy}×{binding.pool}: 数据不足或K线无效，无法生成信号")
+                        continue
+                    if (signal.strategy in RESEARCH_CODES and signal.interval == "1h"
+                            and symbol not in initially_held and signal.reason.get("research_entry")
+                            and signal.reason.get("block_reason") != "stale_data"):
+                        pending_key = f"research_pending:{symbol}:{binding.strategy}:{binding.pool}"
+                        pending = get_state(self.db, pending_key, None)
+                        if not pending:
+                            pending = signal.to_dict()
+                            pending["params"] = signal.params
+                            set_state(self.db, pending_key, pending)
+                    if signal.direction == "FLAT":
                         continue
                     current = best_signals.get(symbol)
                     if current is None or signal.score > current.score:
@@ -158,6 +173,30 @@ class TradingService:
             opened = []
             decisions = []
             held_symbols = {order.symbol for order in open_orders(self.db)}
+            for symbol, binding in pairs:
+                if binding.strategy not in RESEARCH_CODES or binding.interval != "1h":
+                    continue
+                pending_key = f"research_pending:{symbol}:{binding.strategy}:{binding.pool}"
+                pending = get_state(self.db, pending_key, None)
+                if not pending:
+                    continue
+                if (pending["ts"] + 2 * interval_ms("1h") <= now_ms()
+                        or pending["ts"] <= get_state(self.db, f"last_entry:{symbol}:1h", 0)):
+                    set_state(self.db, pending_key, None)
+                    continue
+                if symbol in held_symbols or symbol in closed_symbols:
+                    set_state(self.db, pending_key, None)
+                    continue
+                if halted:
+                    continue
+                pending["direction"] = "LONG"
+                order = open_position(self.db, SimpleNamespace(**pending))
+                if order is not None:
+                    set_state(self.db, pending_key, None)
+                    held_symbols.add(symbol)
+                    opened.append(order.id)
+                    decisions.append(f"{symbol} LONG open #{order.id} research")
+
             for symbol, signal in best_signals.items():
                 if halted:
                     decisions.append(f"{symbol} {signal.direction} skipped (账户熔断中: {halt_reason})")
@@ -221,6 +260,8 @@ class TradingService:
         sync_errors = summary.get("sync_errors", [])
         signal_errors = summary.get("signal_errors", [])
         level = "info"
+        if signal_errors:
+            level = "warning"
         if sync_errors:
             target_count = summary.get("sync_target_count", summary.get("symbol_count", 0))
             all_failed = bool(target_count) and len(sync_errors) >= target_count

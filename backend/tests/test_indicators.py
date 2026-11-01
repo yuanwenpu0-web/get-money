@@ -33,6 +33,7 @@ def test_catalog_selects_indicators_and_returns_original_source(tmp_path, monkey
     assert data["total"] == 2
     item = next(item for item in data["items"] if item["title"] == "Sample")
     assert item["category"] == "trend"
+    assert item["indicator_type"] == "待分类"
     assert item["version"] == "6"
     assert "source" not in item
     detail = client.get(f"/api/indicators/{item['id']}").json()
@@ -40,3 +41,33 @@ def test_catalog_selects_indicators_and_returns_original_source(tmp_path, monkey
     assert detail["license"] == "MIT"
     assert detail["license_text"] == "Copyright and MIT license"
     assert client.get("/api/indicators/nonexistent").status_code == 404
+
+
+def test_crypto_classification_is_specific_and_unknown_scripts_stay_unclassified(tmp_path, monkeypatch):
+    root = tmp_path / "pine-crypto-collection"
+    known = root / "tim1l" / "D1_bb90_on_m15.pine"
+    known.parent.mkdir(parents=True)
+    known.write_text('indicator("bands")', encoding="utf-8")
+    unknown = root / "tim1l" / "unknown.pine"
+    unknown.write_text('indicator("unknown")', encoding="utf-8")
+    (root / "index.json").write_text(json.dumps([
+        {"local_path": "tim1l/D1_bb90_on_m15.pine", "kind": "indicator", "collection": "tim1l"},
+        {"local_path": "tim1l/unknown.pine", "kind": "indicator", "collection": "tim1l"},
+    ]), encoding="utf-8")
+    monkeypatch.setattr(indicators, "DATA_DIR", tmp_path)
+    client = TestClient(app)
+    items = client.get("/api/indicators").json()["items"]
+    classified = next(item for item in items if item["indicator_type"] == "波动率")
+    assert classified["category"] == "tim1l"
+    assert "布林带" in classified["calculation_summary"]
+    assert client.get(f"/api/indicators/{classified['id']}").json()["use_case"] == classified["use_case"]
+    assert next(item for item in items if item["title"] == "unknown")["indicator_type"] == "待分类"
+
+
+def test_research_endpoint_exposes_experiment_and_coverage():
+    response = TestClient(app).get("/api/indicators/research/latest")
+    assert response.status_code == 200
+    report = response.json()
+    assert report["summary"]["single_tests"] == len(report["singles_all"])
+    assert report["summary"]["combo_tests"] == len(report["combos_all"])
+    assert report["dataset"]["interval"] == "1h"

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from ..models import JobLog, Order
 from ..state import get_state
+from ..strategy.specs.pool_volatility_research import BLOCKED_CODES as RESEARCH_BLOCKED_CODES
 from . import live, paper
 from .risk_halt import halt_status
 
@@ -69,7 +70,7 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
     if halted:
         _log_halt(db, reason)
         return None
-    if is_live(db) and getattr(signal, "strategy", "") in LIVE_BLOCKED_CODES:
+    if is_live(db) and getattr(signal, "strategy", "") in (*LIVE_BLOCKED_CODES, *RESEARCH_BLOCKED_CODES):
         _log_live_block(db, signal.strategy)
         return None
     if is_live(db):

@@ -1,0 +1,254 @@
+{
+  "config": {
+    "generated_at": "2026-11-01 09:41:15",
+    "interval": "1h",
+    "days": 120,
+    "limit": 5,
+    "capital": 10000.0,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "side": "both",
+    "folds": 2,
+    "train_ratio": 0.5,
+    "top_k": 2,
+    "min_trades": 10,
+    "max_concurrent": 0,
+    "risk_per_trade_pct": 0.0,
+    "atr_mult": 0.0,
+    "regimes": "market_ema:200",
+    "families": null
+  },
+  "dataset": {
+    "interval": "1h",
+    "source": "native",
+    "symbols": 5,
+    "bars_total": 13735,
+    "start": "2026-07-04 02:00:00+00:00",
+    "end": "2026-10-26 12:00:00+00:00",
+    "split": "2026-08-30 07:00:00+00:00",
+    "bar_ms": 3600000
+  },
+  "single_leg_folds": [
+    {
+      "fold": 1,
+      "start": 1788073200000,
+      "end": 1790544600000,
+      "selected": [
+        "donchian_break(n=50) + market_ema(200) · 等权市场指数 4h"
+      ],
+      "train": {
+        "donchian_break(n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 40,
+          "total_pnl": 3333.6406,
+          "return_pct": 33.3364,
+          "max_drawdown_pct": 7.2146,
+          "win_rate": 0.325,
+          "profit_factor": 3.1572,
+          "trades_per_symbol": 8.0,
+          "avg_bars": 23.65,
+          "exposure_pct": 13.78,
+          "sharpe": 1.2304,
+          "final_equity": 13333.6406
+        }
+      },
+      "test": {
+        "trades": 62,
+        "total_pnl": -509.237,
+        "return_pct": -5.0924,
+        "max_drawdown_pct": 10.3319,
+        "win_rate": 0.3065,
+        "profit_factor": 0.8419,
+        "trades_per_symbol": 12.4,
+        "avg_bars": 19.11,
+        "exposure_pct": 34.498,
+        "sharpe": -0.4293,
+        "final_equity": 9490.763
+      }
+    },
+    {
+      "fold": 2,
+      "start": 1790544600000,
+      "end": 1793016000000,
+      "selected": [
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h"
+      ],
+      "train": {
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 45,
+          "total_pnl": 3601.9181,
+          "return_pct": 36.0192,
+          "max_drawdown_pct": 7.8023,
+          "win_rate": 0.4667,
+          "profit_factor": 2.6941,
+          "trades_per_symbol": 9.0,
+          "avg_bars": 28.18,
+          "exposure_pct": 12.311,
+          "sharpe": 1.5837,
+          "final_equity": 13601.9181
+        }
+      },
+      "test": {
+        "trades": 33,
+        "total_pnl": 254.0699,
+        "return_pct": 2.5407,
+        "max_drawdown_pct": 13.5225,
+        "win_rate": 0.303,
+        "profit_factor": 1.0959,
+        "trades_per_symbol": 6.6,
+        "avg_bars": 23.06,
+        "exposure_pct": 22.187,
+        "sharpe": 0.1384,
+        "final_equity": 10254.0699
+      }
+    }
+  ],
+  "portfolio_folds": [
+    {
+      "fold": 1,
+      "start": 1788073200000,
+      "end": 1790544600000,
+      "selected": [
+        "donchian_break(n=50) + market_ema(200) · 等权市场指数 4h",
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h"
+      ],
+      "train": {
+        "donchian_break(n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 40,
+          "total_pnl": 3333.6406,
+          "return_pct": 33.3364,
+          "max_drawdown_pct": 7.2146,
+          "win_rate": 0.325,
+          "profit_factor": 3.1572,
+          "trades_per_symbol": 8.0,
+          "avg_bars": 23.65,
+          "exposure_pct": 13.78,
+          "sharpe": 1.2304,
+          "final_equity": 13333.6406
+        },
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 20,
+          "total_pnl": 3083.3598,
+          "return_pct": 30.8336,
+          "max_drawdown_pct": 3.9972,
+          "win_rate": 0.5,
+          "profit_factor": 4.859,
+          "trades_per_symbol": 4.0,
+          "avg_bars": 31.4,
+          "exposure_pct": 9.148,
+          "sharpe": 1.5372,
+          "final_equity": 13083.3598
+        }
+      },
+      "test": {
+        "trades": 87,
+        "total_pnl": 9.3213,
+        "return_pct": 0.0932,
+        "max_drawdown_pct": 16.7427,
+        "win_rate": 0.3448,
+        "profit_factor": 1.002,
+        "trades_per_symbol": 17.4,
+        "avg_bars": 20.98,
+        "exposure_pct": 53.13,
+        "sharpe": 0.0059,
+        "final_equity": 10009.3213
+      }
+    },
+    {
+      "fold": 2,
+      "start": 1790544600000,
+      "end": 1793016000000,
+      "selected": [
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h",
+        "volume_break(k=2.0,n=50) + market_ema(200) · 等权市场指数 4h"
+      ],
+      "train": {
+        "volume_break(k=3.0,n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 45,
+          "total_pnl": 3601.9181,
+          "return_pct": 36.0192,
+          "max_drawdown_pct": 7.8023,
+          "win_rate": 0.4667,
+          "profit_factor": 2.6941,
+          "trades_per_symbol": 9.0,
+          "avg_bars": 28.18,
+          "exposure_pct": 12.311,
+          "sharpe": 1.5837,
+          "final_equity": 13601.9181
+        },
+        "volume_break(k=2.0,n=50) + market_ema(200) · 等权市场指数 4h": {
+          "trades": 75,
+          "total_pnl": 2829.7431,
+          "return_pct": 28.2974,
+          "max_drawdown_pct": 8.7595,
+          "win_rate": 0.36,
+          "profit_factor": 1.798,
+          "trades_per_symbol": 15.0,
+          "avg_bars": 23.79,
+          "exposure_pct": 17.32,
+          "sharpe": 1.1912,
+          "final_equity": 12829.7431
+        }
+      },
+      "test": {
+        "trades": 74,
+        "total_pnl": 700.7427,
+        "return_pct": 7.0074,
+        "max_drawdown_pct": 25.0377,
+        "win_rate": 0.3378,
+        "profit_factor": 1.1203,
+        "trades_per_symbol": 14.8,
+        "avg_bars": 23.07,
+        "exposure_pct": 49.767,
+        "sharpe": 0.2623,
+        "final_equity": 10700.7427
+      }
+    }
+  ],
+  "buy_hold_folds": [
+    {
+      "fold": 1,
+      "start": 1788073200000,
+      "end": 1790544600000,
+      "test": {
+        "trades": 5,
+        "total_pnl": 4209.3466,
+        "return_pct": 42.0935,
+        "max_drawdown_pct": 0.0,
+        "win_rate": 0.8,
+        "profit_factor": 9.8235,
+        "trades_per_symbol": 1.0,
+        "avg_bars": 686.0,
+        "exposure_pct": 99.854,
+        "sharpe": 1.3691,
+        "final_equity": 14209.3466
+      }
+    },
+    {
+      "fold": 2,
+      "start": 1790544600000,
+      "end": 1793016000000,
+      "test": {
+        "trades": 5,
+        "total_pnl": 1872.9971,
+        "return_pct": 18.73,
+        "max_drawdown_pct": 7.5163,
+        "win_rate": 0.2,
+        "profit_factor": 1.7095,
+        "trades_per_symbol": 1.0,
+        "avg_bars": 686.0,
+        "exposure_pct": 100.0,
+        "sharpe": 0.3538,
+        "final_equity": 11872.9971
+      }
+    }
+  ],
+  "oos_expectancy": {
+    "trades": 161,
+    "mean_pct": 0.0441,
+    "ci_low": -0.30635,
+    "ci_high": 0.41651,
+    "verdict": "inconclusive"
+  },
+  "legs_count": 222,
+  "elapsed_seconds": 3.6
+}

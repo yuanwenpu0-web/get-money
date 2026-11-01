@@ -192,6 +192,16 @@ def test_resolve_order_params_prefers_binding(db):
 
 # ---------------------------------------------------------------- 注册表
 
+def test_strategy_params_inherit_through_binding_and_order(db):
+    _enable_strategy(db, params={"target_r": 2.5, "cooldown_bars": 3})
+    _pool(db)
+    row = _binding(db, params={"target_r": 4.0})
+    for params in (bindings.binding_params(db, row),
+                   bindings.resolve_order_params(db, STRATEGY, "15m", "test")):
+        assert params["target_r"] == 4.0
+        assert params["cooldown_bars"] == 3
+
+
 def test_registry_rejects_duplicate_and_unknown():
     with pytest.raises(ValueError, match="重复注册"):
         register(get_spec(STRATEGY))
@@ -255,6 +265,8 @@ def client():
 
     from app.api import bindings as bindings_api
     from app.api import pools as pools_api
+    from app.api import strategies as strategies_api
+    from app.api import trading as trading_api
     from app.db import Base, get_db
 
     engine = create_engine(
@@ -268,12 +280,51 @@ def client():
     app = FastAPI()
     app.include_router(pools_api.router, prefix="/api")
     app.include_router(bindings_api.router, prefix="/api")
+    app.include_router(strategies_api.router, prefix="/api")
+    app.include_router(trading_api.router, prefix="/api")
     app.dependency_overrides[get_db] = lambda: session
     try:
         yield TestClient(app), session
     finally:
         session.close()
         engine.dispose()
+
+
+def test_api_binding_to_paper_order_and_disabled_diagnostic(client, monkeypatch):
+    from app.models import Order, StrategyConfig
+    from app.strategy.engine import TradeSignal
+    from app.trading import live, service
+    from app.utils import now_ms
+
+    client, db = client
+    _enable_strategy(db, {"cooldown_bars": 3})
+    set_state(db, "execution_mode", "paper")
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", ["BTCUSDT"])
+    assert client.post("/api/pools", json={"code": "p1", "name": "p1", "kind": "static", "symbols": ["BTCUSDT"]}).status_code == 200
+    created = client.post("/api/bindings", json={"strategy": STRATEGY, "pool": "p1", "interval": "1m", "params": {"target_r": 3}})
+    assert created.status_code == 200
+    assert created.json()["effective_params"]["cooldown_bars"] == 3
+    monkeypatch.setattr(service, "_sync_recent_many", lambda *args: [])
+    monkeypatch.setattr(live, "open_live", lambda *args: pytest.fail("unexpected live order"))
+
+    def evaluate(self, symbol, interval, strategy, **kwargs):
+        assert kwargs["params"]["cooldown_bars"] == 3
+        return TradeSignal(symbol=symbol, interval=interval, strategy=strategy, pool=kwargs["pool"],
+                           ts=now_ms() // 60000 * 60000 - 60000, price=100, direction="LONG",
+                           score=0.8, prob_up=0.7, sl=99, tp=103, leverage=1,
+                           position_pct=0.25, atr_pct=0.01, params=kwargs["params"])
+
+    monkeypatch.setattr(service.StrategyEngine, "evaluate", evaluate)
+    result = client.post("/api/trading/run-once").json()
+    assert result["ok"] and len(result["opened"]) == 1
+    order = db.get(Order, result["opened"][0])
+    assert (order.source, order.pool, order.status) == ("paper", "p1", "OPEN")
+    assert client.post("/api/trading/run-once").json()["opened"] == []
+    db.query(StrategyConfig).filter_by(code=STRATEGY).one().enabled = 0
+    db.commit()
+    result = client.post("/api/trading/run-once").json()
+    assert any("总开关未启用" in error for error in result["signal_errors"])
 
 
 def test_pool_api_roundtrip(client):
@@ -352,13 +403,14 @@ def test_binding_api_validates_and_lists_effective_params(client):
 def test_seed_defaults_creates_pools_and_bindings_once(db):
     seed_defaults(db)
     codes = {row.code for row in db.query(SymbolPool).all()}
-    assert codes == {item["code"] for item in DEFAULT_POOLS}
-    seeded = db.query(StrategyBinding).all()
+    from app.strategy.pool_maintenance import POOL_CODES
+    assert codes == {item["code"] for item in DEFAULT_POOLS} | set(POOL_CODES)
+    seeded = db.query(StrategyBinding).filter(StrategyBinding.pool_code.notin_(POOL_CODES)).all()
     assert {(row.pool_code, row.interval) for row in seeded} == {
         (item["pool_code"], item["interval"]) for item in DEFAULT_BINDINGS
     }
 
-    # 用户删掉默认绑定后，再次 seed 不应复活它
+    # 用户删掉普通默认绑定后，再次 seed 不应复活它
     db.delete(seeded[0])
     seeds_before = db.query(StrategyBinding).count()
     seed_defaults(db)

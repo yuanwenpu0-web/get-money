@@ -16,6 +16,142 @@ from app.market.data_service import MarketDataService
 from app.market.futures import BinanceFuturesClient
 from app.models import FundingRate, Kline
 
+def test_public_gate_paces_and_shares_cooldown(monkeypatch):
+    from app.market import futures
+
+    clock = [100.0]
+    monkeypatch.setattr(futures.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(futures.time, "sleep", lambda delay: clock.__setitem__(0, clock[0] + delay))
+    gate = futures._PublicRequestGate(interval=0.35)
+    gate.acquire()
+    gate.acquire()
+    assert clock[0] == pytest.approx(100.35)
+    gate.cool_down(httpx.Response(429, headers={"Retry-After": "10"}))
+    with pytest.raises(futures.BinanceError, match="冷却中"):
+        gate.acquire()
+    clock[0] += 10
+    gate.acquire()
+
+
+def test_public_gate_handles_invalid_retry_after(monkeypatch):
+    from app.market import futures
+
+    monkeypatch.setattr(futures.time, "monotonic", lambda: 100.0)
+    gate = futures._PublicRequestGate()
+    gate.cool_down(httpx.Response(418, headers={"Retry-After": "invalid"}))
+    assert gate.blocked_until == 160.0
+
+
+def test_futures_write_timeout_is_never_retried(monkeypatch):
+    from app.market.futures import BinanceError
+
+    calls = []
+
+    class TimeoutClient:
+        def request(self, method, path, **kwargs):
+            calls.append((method, path))
+            raise httpx.ReadTimeout("response lost")
+
+    @contextmanager
+    def client_for_host(host):
+        yield TimeoutClient()
+
+    client = BinanceFuturesClient(api_key="key", api_secret="secret")
+    monkeypatch.setattr(client, "_calibrate_time", lambda: None)
+    monkeypatch.setattr(client, "_http_client", client_for_host)
+    with pytest.raises(BinanceError, match="结果未知"):
+        client._request("POST", "/fapi/v1/order", signed=True)
+    assert calls == [("POST", "/fapi/v1/order")]
+
+
+def test_cooldown_does_not_block_write_time_calibration(monkeypatch):
+    from app.market import futures
+
+    gate = futures._PublicRequestGate()
+    gate.cool_down(httpx.Response(429, headers={"Retry-After": "60"}))
+    monkeypatch.setattr(futures, "_PUBLIC_GATE", gate)
+    calls = []
+
+    class FakeClient:
+        def request(self, method, path, **kwargs):
+            calls.append((method, path))
+            return httpx.Response(200, json={"serverTime": int(time.time() * 1000)} if path.endswith("time") else {"orderId": 1})
+
+    @contextmanager
+    def client_for_host(host):
+        yield FakeClient()
+
+    client = BinanceFuturesClient(api_key="key", api_secret="secret")
+    monkeypatch.setattr(client, "_http_client", client_for_host)
+    assert client.new_order(symbol="BTCUSDT")["orderId"] == 1
+    assert calls == [("GET", "/fapi/v1/time"), ("POST", "/fapi/v1/order")]
+    with pytest.raises(futures.BinanceError, match="冷却中"):
+        client.klines("BTCUSDT", "1m")
+
+
+def test_429_stops_retry_and_cools_other_clients(monkeypatch):
+    from app.market import futures
+
+    gate = futures._PublicRequestGate(interval=0)
+    monkeypatch.setattr(futures, "_PUBLIC_GATE", gate)
+    calls = []
+
+    class FakeClient:
+        def request(self, method, path, **kwargs):
+            calls.append(path)
+            return httpx.Response(429, headers={"Retry-After": "30"}, json={"code": -1003, "msg": "limited"})
+
+    @contextmanager
+    def client_for_host(host):
+        yield FakeClient()
+
+    first, second = BinanceFuturesClient(), BinanceFuturesClient()
+    monkeypatch.setattr(first, "_http_client", client_for_host)
+    monkeypatch.setattr(second, "_http_client", client_for_host)
+    with pytest.raises(futures.BinanceApiError):
+        first.klines("BAD", "1m")
+    with pytest.raises(futures.BinanceError, match="冷却中"):
+        second.klines("GOOD", "1m")
+    assert len(calls) == 1
+
+
+def test_recent_cursor_failure_is_isolated(db, monkeypatch):
+    service = MarketDataService(db, DelayedPages(minute_rows(1), concurrency=1))
+    monkeypatch.setattr(data_service, "now_ms", lambda: START + MINUTE)
+    original = service.latest_open_time
+
+    def latest(symbol, interval):
+        if symbol == "BAD":
+            raise RuntimeError("cursor failed")
+        return original(symbol, interval)
+
+    monkeypatch.setattr(service, "latest_open_time", latest)
+    result = service.sync_recent_many(["BAD", "GOOD"], "1m", workers=1)
+    assert result == {"requested": 2, "inserted": 1, "errors": ["BAD: cursor failed"]}
+    assert db.query(Kline).one().symbol == "GOOD"
+
+
+def test_sentiment_fetch_reuses_open_interest_response():
+    class Client:
+        def __init__(self):
+            self.calls = 0
+
+        def open_interest_history(self, *args):
+            self.calls += 1
+            return [{"timestamp": 1, "sum_open_interest": 2, "sum_open_interest_value": 3}]
+
+        def long_short_ratio(self, *args):
+            return []
+
+        top_trader_long_short = long_short_ratio
+        taker_buy_sell_ratio = long_short_ratio
+
+    client = Client()
+    rows = MarketDataService._fetch_sentiment(client, "BTC")
+    assert client.calls == 1
+    assert rows[0]["open_interest"] == 2 and rows[0]["oi_value"] == 3
+
+
 START = 1_767_225_600_000
 MINUTE = 60_000
 

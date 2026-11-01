@@ -39,6 +39,55 @@ def _stub_cycle(monkeypatch, fail_for=(), evaluate=None):
     )
 
 
+def test_research_pending_expires_after_restart(db, monkeypatch):
+    from app.state import get_state
+    from app.strategy.specs.pool_volatility_research import HIGH_CODE
+
+    symbol = "BTCUSDT"
+    ts = 1_700_000_000_000
+    key = f"research_pending:{symbol}:{HIGH_CODE}:test"
+    set_state(db, key, {"ts": ts, "symbol": symbol, "strategy": HIGH_CODE,
+                        "interval": "1h", "pool": "test", "reason": {"research_entry": True}})
+    seed_binding(db, [symbol], strategy=HIGH_CODE, interval="1h")
+    _stub_cycle(monkeypatch)
+    monkeypatch.setattr(trading_service, "now_ms", lambda: ts + 2 * 3600000)
+    monkeypatch.setattr(trading_service, "open_position", lambda *args: pytest.fail("过期信号不能成交"))
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is True
+    assert result["opened"] == []
+    assert get_state(db, key) is None
+
+
+def test_research_pending_opens_on_next_cycle_after_restart(db, monkeypatch):
+    from app.state import get_state
+    from app.strategy.engine import TradeSignal
+    from app.strategy.specs.pool_volatility_research import HIGH_CODE
+    from app.trading import paper
+    import pandas as pd
+
+    ts = 1_700_000_000_000
+    key = f"research_pending:BTCUSDT:{HIGH_CODE}:test"
+    seed_binding(db, ["BTCUSDT"], strategy=HIGH_CODE, interval="1h")
+    signal = TradeSignal(symbol="BTCUSDT", interval="1h", strategy=HIGH_CODE, pool="test",
+                         ts=ts, price=100, direction="FLAT", score=.5, prob_up=.5,
+                         sl=0, tp=0, leverage=0, position_pct=0, atr_pct=0,
+                         reason={"research_entry": True}, params={})
+    _stub_cycle(monkeypatch, evaluate=lambda *a, **k: signal)
+    monkeypatch.setattr(trading_service, "now_ms", lambda: ts + 3600000)
+    monkeypatch.setattr(paper, "now_ms", lambda: ts + 3600000)
+    frame = pd.DataFrame({"open": [100.], "close": [100.]},
+                         index=pd.to_datetime([ts + 3600000], unit="ms", utc=True))
+    monkeypatch.setattr(paper.MarketDataService, "load_frame", lambda *a, **k: frame.iloc[0:0])
+    assert TradingService(db).run_cycle()["opened"] == []
+    assert get_state(db, key)["ts"] == ts
+    monkeypatch.setattr(paper.MarketDataService, "load_frame", lambda *a, **k: frame)
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is True and len(result["opened"]) == 1
+    assert get_state(db, key) is None
+    assert TradingService(db).run_cycle()["opened"] == []
+    assert db.query(Order).count() == 1
+
+
 def test_paper_mode_client_is_futures_mainnet(db):
     set_state(db, "execution_mode", "paper")
     set_state(db, "testnet", True)  # paper 不受 testnet 开关影响，固定主网
@@ -96,8 +145,18 @@ def test_cycle_log_is_compact_without_symbols_array(db, monkeypatch):
     assert len(row.message) < 4000
     assert '"symbol_count": 600' in row.message
     assert '"elapsed_ms"' in row.message
-    assert "SYM0000USDT" not in row.message
+    assert "SYM0599USDT" not in row.message  # 只保留少量错误样例
     assert "decisions" not in row.message
+
+
+def test_missing_candles_are_reported(db, monkeypatch):
+    seed_binding(db, ["BTCUSDT"])
+    set_state(db, "symbol_scope", "custom")
+    set_state(db, "symbols", ["BTCUSDT"])
+    _stub_cycle(monkeypatch)
+    result = TradingService(db).run_cycle()
+    assert any("数据不足" in item for item in result["signal_errors"])
+    assert db.query(JobLog).filter(JobLog.job == "trading_cycle").one().level == "warning"
 
 
 def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch):
@@ -120,7 +179,7 @@ def test_signal_database_failure_does_not_poison_remaining_cycle(db, monkeypatch
     result = TradingService(db).run_cycle()
     assert result["ok"] is True
     assert evaluated == ["BTCUSDT", "ETHUSDT"]
-    assert len(result["signal_errors"]) == 1
+    assert any("BTCUSDT" in error for error in result["signal_errors"])
     assert db.query(JobLog).filter(JobLog.job == "trading_cycle").count() == 1
 
 

@@ -347,11 +347,10 @@ def run_backtest(
         raise ValueError("初始资金或训练占比无效")
     # 指定池时用「策略 × 池」绑定的参数覆盖层，再叠该币种的覆盖，与实盘走同一套参数
     bound = binding_overrides(db, strategy, pool or "", interval, symbol=symbol)
+    config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
+    overrides = json.loads(config.params or "{}") if config else {}
     if bound is not None:
-        overrides = dict(bound)
-    else:
-        config = db.query(StrategyConfig).filter(StrategyConfig.code == strategy).first()
-        overrides = json.loads(config.params or "{}") if config else {}
+        overrides.update(bound)
     if param_overrides:
         if not isinstance(param_overrides, dict):
             raise ValueError("参数覆盖必须是 JSON 对象")

@@ -217,11 +217,22 @@ class MarketDataService:
         fallback = max(0, (end // step - tail_limit) * step)
         # Indexed point lookups stay on the caller thread. Grouping the entire
         # minute table by symbol here would reintroduce a full-history scan.
-        starts = {symbol: self.latest_open_time(symbol, "1m") or fallback for symbol in symbols}
-        return self._sync_pages_many(
-            symbols, lambda symbol: self._minute_pages(symbol, starts[symbol], end),
+        starts = {}
+        cursor_errors = {}
+        for index, symbol in enumerate(symbols):
+            try:
+                starts[symbol] = self.latest_open_time(symbol, "1m") or fallback
+            except Exception as exc:
+                self.db.rollback()
+                cursor_errors[index] = f"{symbol}: {exc}"
+        valid = [symbol for index, symbol in enumerate(symbols) if index not in cursor_errors]
+        result = self._sync_pages_many(
+            valid, lambda symbol: self._minute_pages(symbol, starts[symbol], end),
             lambda symbol, page: self.store(symbol, "1m", page), workers, self.client,
         )
+        result["requested"] = len(symbols)
+        result["errors"] = list(cursor_errors.values()) + result["errors"]
+        return result
 
     def sync_funding_many(
         self, symbols: list[str], days: int = 90, workers: int = MARKET_SYNC_WORKERS,
@@ -368,8 +379,9 @@ class MarketDataService:
         def to_map(rows: list[dict], key: str) -> dict[int, float]:
             return {int(r["timestamp"]): float(r[key]) for r in rows}
 
-        oi_map = to_map(client.open_interest_history(symbol, "1h", 500), "sum_open_interest")
-        oiv_map = to_map(client.open_interest_history(symbol, "1h", 500), "sum_open_interest_value")
+        oi_rows = client.open_interest_history(symbol, "1h", 500)
+        oi_map = to_map(oi_rows, "sum_open_interest")
+        oiv_map = to_map(oi_rows, "sum_open_interest_value")
         lsr_map = to_map(client.long_short_ratio(symbol, "1h", 500), "long_short_ratio")
         top_map = to_map(client.top_trader_long_short(symbol, "1h", 500), "long_short_ratio")
         taker_map = to_map(client.taker_buy_sell_ratio(symbol, "1h", 500), "buy_sell_ratio")
