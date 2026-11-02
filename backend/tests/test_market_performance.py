@@ -115,6 +115,44 @@ def test_429_stops_retry_and_cools_other_clients(monkeypatch):
     assert len(calls) == 1
 
 
+def test_recent_minute_pages_request_only_needed_candles(db, monkeypatch):
+    monkeypatch.setattr(data_service, "now_ms", lambda: START + 3 * MINUTE)
+    client = DelayedPages(minute_rows(4), concurrency=1)
+    service = MarketDataService(db, client)
+    service.store("BTC", "1m", minute_rows(2))
+    limits = []
+    original = client.klines
+
+    def record(*args, **kwargs):
+        limits.append(kwargs["limit"])
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(client, "klines", record)
+    result = service.sync_recent_many(["BTC"], "5m", workers=1)
+    assert result["errors"] == []
+    assert limits == [3]
+    assert db.query(Kline).filter(Kline.symbol == "BTC").count() == 4
+
+
+def test_futures_redirect_is_reported_without_parsing_html(monkeypatch):
+    from app.market import futures
+    monkeypatch.setattr(futures, "_PUBLIC_GATE", futures._PublicRequestGate(interval=0))
+    monkeypatch.setattr(futures.time, "sleep", lambda _: None)
+
+    class RedirectClient:
+        def request(self, *args, **kwargs):
+            return httpx.Response(302, headers={"Location": "https://example.com/"}, text="redirect")
+
+    @contextmanager
+    def client_for_host(host):
+        yield RedirectClient()
+
+    client = BinanceFuturesClient()
+    monkeypatch.setattr(client, "_http_client", client_for_host)
+    with pytest.raises(futures.BinanceError, match="重定向 302"):
+        client.klines("BTCUSDT", "1m")
+
+
 def test_recent_cursor_failure_is_isolated(db, monkeypatch):
     service = MarketDataService(db, DelayedPages(minute_rows(1), concurrency=1))
     monkeypatch.setattr(data_service, "now_ms", lambda: START + MINUTE)

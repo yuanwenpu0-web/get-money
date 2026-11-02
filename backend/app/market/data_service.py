@@ -130,7 +130,13 @@ class MarketDataService:
     def _minute_pages(self, symbol: str, start: int, end: int) -> Iterator[list[dict]]:
         """Network-only iterator: workers never touch the caller's ORM session."""
         while start <= end:
-            rows = self.client.klines(symbol, "1m", start_ms=start, limit=KLINE_PAGE_SIZE)
+            # Incremental updates usually need only a handful of candles. Binance
+            # charges by the requested limit, not the number of rows returned.
+            remaining = (end - start) // MINUTE_MS + 1
+            limit = min(KLINE_PAGE_SIZE, remaining)
+            if 100 <= limit < 500:
+                limit = min(KLINE_PAGE_SIZE, 499)
+            rows = self.client.klines(symbol, "1m", start_ms=start, limit=limit)
             parsed = sorted(
                 (row for row in parse_klines(rows) if start <= row["open_time"] <= end),
                 key=lambda row: row["open_time"],
@@ -141,7 +147,7 @@ class MarketDataService:
             cursor = parsed[-1]["open_time"] + MINUTE_MS
             if cursor <= start:
                 raise RuntimeError("1m K线分页没有前进")
-            if len(rows) < KLINE_PAGE_SIZE:
+            if len(rows) < limit:
                 break
             start = cursor
 

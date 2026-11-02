@@ -132,6 +132,10 @@ class BinanceFuturesClient(PooledHttpClient):
                         response = client.request(method, path, params=params, headers=headers)
                     if response.status_code in (418, 429):
                         _PUBLIC_GATE.cool_down(response)
+                    if 300 <= response.status_code < 400:
+                        if method.upper() != "GET":
+                            raise BinanceError(f"币安合约接口返回重定向 {response.status_code}，写请求未重试")
+                        raise BinanceError(f"币安合约接口返回重定向 {response.status_code}，请检查代理或网络")
                     if response.status_code >= 400:
                         raise _api_error(response)
                     return response.json()
