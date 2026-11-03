@@ -142,6 +142,8 @@ def parse_klines(rows: list[list]) -> list[dict]:
                 "close_time": int(row[6]),
                 "quote_volume": float(row[7]),
                 "trades": int(row[8]),
+                "taker_buy_volume": float(row[9]) if len(row) > 9 else None,
+                "taker_buy_quote_volume": float(row[10]) if len(row) > 10 else None,
             }
         )
     return parsed

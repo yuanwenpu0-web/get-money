@@ -17,7 +17,6 @@ from ..strategy.specs.pool_volatility_research import BLOCKED_CODES
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
 from .risk import position_size
-from .risk_halt import check_after_close
 
 EPS = 1e-12
 
@@ -204,8 +203,6 @@ def close_position(db: Session, order: Order, price: float, reason: str = "manua
     order.closed_at = utcnow()
     db.commit()
     db.refresh(order)
-    # 账户级熔断检查：每笔平仓记账后评估回撤/连续亏损，触发即冻结后续开仓
-    check_after_close(db)
     return order
 
 

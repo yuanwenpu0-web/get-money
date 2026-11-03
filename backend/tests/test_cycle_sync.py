@@ -39,6 +39,14 @@ def _stub_cycle(monkeypatch, fail_for=(), evaluate=None):
     )
 
 
+def test_research_pending_key_fits_database_and_preserves_existing_keys():
+    key = trading_service._research_pending_key("HAEDALUSDT", "long_strategy_name_123456789", "long_pool_name_123456789")
+    assert len(key) <= 64
+    assert key == trading_service._research_pending_key("HAEDALUSDT", "long_strategy_name_123456789", "long_pool_name_123456789")
+    assert key != trading_service._research_pending_key("ICNTUSDT", "long_strategy_name_123456789", "long_pool_name_123456789")
+    assert trading_service._research_pending_key("BTCUSDT", "s", "p") == "research_pending:BTCUSDT:s:p"
+
+
 def test_research_pending_expires_after_restart(db, monkeypatch):
     from app.state import get_state
     from app.strategy.specs.pool_volatility_research import HIGH_CODE

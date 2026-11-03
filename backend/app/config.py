@@ -119,10 +119,6 @@ DEFAULT_STATE = {
     "max_signal_age_bars": 2,
     "min_quote_volume_usd": 30_000_000,  # 流动性过滤：24h 成交额下限（0 = 不过滤）
     "symbol_blacklist": [],              # 币种黑名单（大写符号数组，从宇宙排除）
-    "risk_halt": False,                  # 账户级熔断开关（触发后需人工置 false 恢复）
-    "risk_halt_reason": "",              # 最近一次熔断原因
-    "max_drawdown_halt_pct": 0.10,       # 总回撤熔断线（0 = 关闭该检查）
-    "consecutive_loss_halt": 5,          # 连续亏损笔数熔断线（0 = 关闭该检查）
     "order_type": "market",              # 实盘开仓主单类型：market / limit_maker
     "schedule_enabled": True,
     "schedule_seconds": 60,

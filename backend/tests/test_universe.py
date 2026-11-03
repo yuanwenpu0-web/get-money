@@ -227,22 +227,15 @@ def test_ticker_map_cached_across_exchange_info_refetch(db, monkeypatch):
     assert fake.calls == 2 and fake.ticker_calls == 1
 
 
-def test_settings_validate_liquidity_and_halt_keys():
+def test_settings_validate_liquidity_and_order_type():
     _validate({"min_quote_volume_usd": 0})
     _validate({"min_quote_volume_usd": 30_000_000})
     _validate({"order_type": "limit_maker"})
-    _validate({"risk_halt": False})
-    _validate({"max_drawdown_halt_pct": 0.1})
-    _validate({"consecutive_loss_halt": 5})
     for bad in (
         {"min_quote_volume_usd": -1},
         {"min_quote_volume_usd": 1.5},
         {"min_quote_volume_usd": True},
         {"order_type": "post_only"},
-        {"risk_halt": "yes"},
-        {"max_drawdown_halt_pct": 1.5},
-        {"max_drawdown_halt_pct": -0.1},
-        {"consecutive_loss_halt": -1},
     ):
         with pytest.raises(HTTPException) as exc:
             _validate(bad)
@@ -251,15 +244,11 @@ def test_settings_validate_liquidity_and_halt_keys():
 
 def test_settings_update_persists_new_keys(db):
     result = update_settings(
-        SettingsUpdate(min_quote_volume_usd=50_000_000, order_type="limit_maker",
-                       risk_halt=True, risk_halt_reason="人工熔断测试",
-                       max_drawdown_halt_pct=0.15, consecutive_loss_halt=3),
+        SettingsUpdate(min_quote_volume_usd=50_000_000, order_type="limit_maker"),
         db,
     )
     assert result["min_quote_volume_usd"] == 50_000_000
     assert result["order_type"] == "limit_maker"
-    assert result["risk_halt"] is True and result["risk_halt_reason"] == "人工熔断测试"
-    assert result["max_drawdown_halt_pct"] == 0.15 and result["consecutive_loss_halt"] == 3
     # 负数在 schema 层即被拒（ge=0），API 返回 422 而非进入业务校验
     with pytest.raises(ValidationError):
         SettingsUpdate(min_quote_volume_usd=-5)

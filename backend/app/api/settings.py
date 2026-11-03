@@ -29,8 +29,7 @@ EDITABLE_KEYS = {
     "min_hold_bars", "sl_atr_mult", "tp_atr_mult", "min_sl_pct", "min_tp_pct",
     "backtest_trailing", "trailing_atr_mult", "max_hold_bars", "risk_per_trade_pct",
     "cooldown_bars", "trailing_enabled", "trail_activation_atr", "max_signal_age_bars",
-    "min_quote_volume_usd", "symbol_blacklist", "risk_halt", "risk_halt_reason",
-    "max_drawdown_halt_pct", "consecutive_loss_halt", "order_type",
+    "min_quote_volume_usd", "symbol_blacklist", "order_type",
     "schedule_enabled", "schedule_seconds", "train_horizon",
 }
 
@@ -96,8 +95,6 @@ def _validate(payload: dict, db: Session | None = None) -> None:
         raise HTTPException(400, "K线周期不支持")
     if "order_type" in payload and payload["order_type"] not in ("market", "limit_maker"):
         raise HTTPException(400, "order_type 仅支持 market / limit_maker")
-    if "risk_halt" in payload and not isinstance(payload["risk_halt"], bool):
-        raise HTTPException(400, "risk_halt 必须为布尔值")
     if "min_quote_volume_usd" in payload:
         volume = payload["min_quote_volume_usd"]
         if isinstance(volume, bool) or not isinstance(volume, int) or volume < 0:
@@ -131,8 +128,6 @@ def _validate(payload: dict, db: Session | None = None) -> None:
         "max_hold_bars": (0, 100000),
         "schedule_seconds": (10, 3600),
         "train_horizon": (1, 60),
-        "max_drawdown_halt_pct": (0, 1),
-        "consecutive_loss_halt": (0, 1000),
     }
     for key, (low, high) in ranges.items():
         if key in payload:
@@ -153,6 +148,8 @@ def _validate(payload: dict, db: Session | None = None) -> None:
 @router.get("")
 def read_settings(db: Session = Depends(get_db), include_stats: bool = True):
     state = all_state(db)
+    for key in ("risk_halt", "risk_halt_reason", "max_drawdown_halt_pct", "consecutive_loss_halt"):
+        state.pop(key, None)
     service = MarketDataService(db)
     stats = service.stats() if include_stats else []
     return {

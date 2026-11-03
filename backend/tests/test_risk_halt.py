@@ -1,158 +1,100 @@
-"""账户级熔断测试：回撤触发、连续亏损触发、正常流程不误伤、熔断拒绝开仓与手动恢复。"""
+"""旧账户熔断状态不再影响交易，其他入场风控仍然有效。"""
 
 from datetime import timedelta
 from types import SimpleNamespace
 
-from app.api.settings import update_settings
-from app.models import JobLog, Order, StrategyConfig, utcnow
+import pytest
+
+from app.api.settings import read_settings, update_settings
+from app.models import JobLog, Order, utcnow
 from app.schemas import SettingsUpdate
 from app.state import all_state, set_state
 from app.trading import dispatch, paper
 from app.trading.service import TradingService
-
-from fakes import seed_binding
 from app.utils import interval_ms, now_ms
+from fakes import seed_binding
 
 
 def signal(**overrides):
-    return SimpleNamespace(
-        **(
-            dict(
-                symbol="BTCUSDT",
-                interval="1m",
-                direction="LONG",
-                price=100.0,
-                sl=99.0,
-                tp=103.0,
-                leverage=10,
-                position_pct=0.25,
-                strategy="absorption_reversal",
-                score=1.0,
-                prob_up=0.8,
-                ts=now_ms() - interval_ms("1m"),  # 已收盘 bar，避免被入场闸门判为未收盘
-            )
-            | overrides
-        )
-    )
+    values = dict(symbol="BTCUSDT", interval="1m", direction="LONG", price=100.0,
+                  sl=99.0, tp=103.0, leverage=10, position_pct=0.25,
+                  strategy="absorption_reversal", score=1.0, prob_up=0.8,
+                  ts=now_ms() - interval_ms("1m"))
+    return SimpleNamespace(**(values | overrides))
 
 
 def open_order(**overrides):
-    defaults = dict(
-        symbol="BTCUSDT",
-        interval="1m",
-        side="LONG",
-        qty=1.0,
-        entry_price=100.0,
-        mark_price=100.0,
-        margin=0.0,
-        leverage=1,
-        sl=99.0,
-        tp=103.0,
-        status="OPEN",
-        source="paper",
-        strategy="absorption_reversal",
-    )
-    return Order(**(defaults | overrides))
+    values = dict(symbol="BTCUSDT", interval="1m", side="LONG", qty=1.0,
+                  entry_price=100.0, mark_price=100.0, margin=0.0, leverage=1,
+                  sl=99.0, tp=103.0, status="OPEN", source="paper",
+                  strategy="absorption_reversal")
+    return Order(**(values | overrides))
 
 
-def closed_order(pnl: float, minutes_ago: float) -> Order:
-    order = open_order(status="CLOSED", realized_pnl=pnl, close_reason="stop_loss")
-    order.closed_at = utcnow() - timedelta(minutes=minutes_ago)
-    return order
-
-
-def test_drawdown_halt_triggers_after_close(db):
+@pytest.mark.parametrize("case", ["drawdown", "losses"])
+def test_close_does_not_trigger_legacy_halt(db, case):
     set_state(db, "initial_capital", 10000.0)
     set_state(db, "total_capital", 10000.0)
-    set_state(db, "cash", 500.0)  # 平仓后权益远低于峰值，模拟深度亏损
+    set_state(db, "cash", 500.0 if case == "drawdown" else 9900.0)
+    set_state(db, "max_drawdown_halt_pct", 0.1 if case == "drawdown" else 0)
+    set_state(db, "consecutive_loss_halt", 3 if case == "losses" else 0)
+    if case == "losses":
+        for index in range(3):
+            order = open_order(status="CLOSED", realized_pnl=-10.0)
+            order.closed_at = utcnow() - timedelta(minutes=5 - index)
+            db.add(order)
     order = open_order()
     db.add(order)
     db.commit()
-    paper.close_position(db, order, 100.0, "stop_loss")
-    state = all_state(db)
-    assert state["risk_halt"] is True
-    assert "总回撤" in state["risk_halt_reason"]
-    row = db.query(JobLog).filter(JobLog.job == "risk_halt", JobLog.level == "error").first()
-    assert row is not None and "账户熔断触发" in row.message
-
-
-def test_consecutive_loss_halt_triggers_after_close(db):
-    set_state(db, "max_drawdown_halt_pct", 0)  # 隔离回撤检查，只验证连续亏损
-    set_state(db, "consecutive_loss_halt", 3)
-    set_state(db, "cash", 9900.0)
-    for index in range(3):
-        db.add(closed_order(-10.0, minutes_ago=5 - index))
-    db.commit()
-    order = open_order()
-    db.add(order)
-    db.commit()
-    paper.close_position(db, order, 99.0, "stop_loss")  # 第 4 笔连续亏损
-    state = all_state(db)
-    assert state["risk_halt"] is True
-    assert "连续亏损 4 笔" in state["risk_halt_reason"]
-
-
-def test_normal_close_does_not_halt(db):
-    winner = open_order()
-    db.add(winner)
-    db.commit()
-    paper.close_position(db, winner, 103.0, "take_profit")
-    assert all_state(db)["risk_halt"] is False
+    paper.close_position(db, order, 99.0, "stop_loss")
+    assert not all_state(db).get("risk_halt", False)
     assert db.query(JobLog).filter(JobLog.job == "risk_halt").count() == 0
-
-    loser = open_order()
-    db.add(loser)
-    db.commit()
-    paper.close_position(db, loser, 99.5, "stop_loss")  # 单笔亏损：回撤与笔数都未到线
-    assert all_state(db)["risk_halt"] is False
-    assert db.query(JobLog).filter(JobLog.job == "risk_halt").count() == 0
+    assert dispatch.open_position(db, signal(symbol="ETHUSDT")) is not None
 
 
-def test_halt_blocks_open_until_manual_recovery(db):
-    dispatch._last_halt_log_at = 0.0  # 重置日志节流，保证断言不受用例顺序影响
+def test_legacy_halt_ignored_and_other_entry_gates_remain(db):
     set_state(db, "risk_halt", True)
-    set_state(db, "risk_halt_reason", "总回撤超限")
-    assert dispatch.open_position(db, signal()) is None
-    assert db.query(Order).count() == 0
-    warnings = db.query(JobLog).filter(JobLog.job == "risk_halt", JobLog.level == "warning").all()
-    assert len(warnings) == 1 and "拒绝开仓" in warnings[0].message
-
-    # 人工复盘后在设置页恢复
-    update_settings(SettingsUpdate(risk_halt=False, risk_halt_reason="复盘后恢复"), db)
-    assert all_state(db)["risk_halt"] is False
+    set_state(db, "risk_halt_reason", "旧回撤熔断")
+    assert dispatch.open_position(db, signal(direction="INVALID")) is None
     order = dispatch.open_position(db, signal())
     assert order is not None and order.source == "paper"
+    assert dispatch.open_position(db, signal()) is None
+    assert all_state(db)["risk_halt"] is True
 
 
-def test_run_cycle_skips_open_while_halted(db, monkeypatch):
+def test_legacy_settings_are_ignored_without_database_migration(db):
+    set_state(db, "risk_halt", True)
+    set_state(db, "max_drawdown_halt_pct", 999)
+    result = update_settings(SettingsUpdate(risk_halt=True, consecutive_loss_halt=1, max_leverage=7), db)
+    for key in ("risk_halt", "risk_halt_reason", "max_drawdown_halt_pct", "consecutive_loss_halt"):
+        assert key not in result
+    assert result["max_leverage"] == 7
+    assert all_state(db)["risk_halt"] is True
+    assert all_state(db)["max_drawdown_halt_pct"] == 999
+    assert "risk_halt" not in read_settings(db, include_stats=False)
+
+
+def test_run_cycle_ignores_legacy_halt(db, monkeypatch):
     from app.trading import service as trading_service
 
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", ["BTCUSDT"])
     set_state(db, "risk_halt", True)
-    set_state(db, "risk_halt_reason", "熔断测试")
+    set_state(db, "risk_halt_reason", "旧熔断")
     seed_binding(db, ["BTCUSDT"])
 
-    class _StubService:
+    class StubService:
         def __init__(self, db, client=None):
             self.db = db
 
         def sync_recent_many(self, symbols, interval, **kwargs):
             return {"errors": []}
 
-    live_signal = SimpleNamespace(
-        symbol="BTCUSDT", interval="1m", direction="LONG", score=0.9,
-        strategy="absorption_reversal", ts=now_ms() - interval_ms("1m"), price=100.0, sl=99.0, tp=103.0,
-        leverage=5, position_pct=0.1, prob_up=0.7,
-        to_dict=lambda: {"symbol": "BTCUSDT"},
-    )
-    monkeypatch.setattr(trading_service, "MarketDataService", _StubService)
-    monkeypatch.setattr(
-        trading_service, "StrategyEngine",
-        lambda db, **kwargs: type("Stub", (), {"evaluate": lambda self, *a, **k: live_signal})(),
-    )
+    live_signal = signal(to_dict=lambda: {"symbol": "BTCUSDT"})
+    monkeypatch.setattr(trading_service, "MarketDataService", StubService)
+    monkeypatch.setattr(trading_service, "StrategyEngine", lambda db, **kwargs:
+                        type("Stub", (), {"evaluate": lambda self, *a, **k: live_signal})())
     summary = TradingService(db).run_cycle()
     assert summary["ok"] is True
-    assert summary["opened"] == []
-    assert any("账户熔断中" in decision for decision in summary["decisions"])
-    assert db.query(Order).count() == 0
+    assert len(summary["opened"]) == 1
+    assert db.query(Order).filter_by(status="OPEN").count() == 1

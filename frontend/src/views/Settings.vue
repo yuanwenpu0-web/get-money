@@ -466,7 +466,7 @@ onBeforeUnmount(() => { disposed = true })
           <div class="panel-head">
             <div>
               <div class="panel-title">策略风控</div>
-              <div class="panel-sub">按评分分配仓位，并按止损距离与双边成本限制单笔风险</div>
+              <div class="panel-sub">按评分分配仓位，并按止损距离与双边成本限制单笔风险。连续亏损和账户回撤不会触发账户级熔断。</div>
             </div>
           </div>
           <div class="form-grid">

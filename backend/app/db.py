@@ -118,6 +118,7 @@ def init_db():
 # 轻量补列表：create_all 只建缺失的表，不会给既有表加列。
 # 这里只做「ADD COLUMN」（幂等、不重建表、不动数据），够用且对两种方言都安全。
 _ADDED_COLUMNS: dict[str, dict[str, str]] = {
+    "klines": {"taker_buy_volume": "FLOAT", "taker_buy_quote_volume": "FLOAT"},
     # 引入币种池后，信号与订单需要记录自己用的是哪套池参数
     "signals": {"pool": "VARCHAR(48) DEFAULT ''"},
     "orders": {"pool": "VARCHAR(48) DEFAULT ''"},

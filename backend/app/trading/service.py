@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 import time
@@ -22,9 +23,15 @@ from .order_manager import manage_order
 from .dispatch import close_position, open_position
 from .live_sync import sync_live
 from .portfolio import open_orders, portfolio_snapshot, snapshot_equity
-from .risk_halt import halt_status
 
 SYNC_WORKERS = MARKET_SYNC_WORKERS
+
+
+def _research_pending_key(symbol: str, strategy: str, pool: str) -> str:
+    key = f"research_pending:{symbol}:{strategy}:{pool}"
+    if len(key) <= 64:
+        return key
+    return "research_pending:" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:47]
 
 
 def _sync_recent_many(symbols: list[str], interval: str, workers: int = SYNC_WORKERS) -> list[str]:
@@ -110,7 +117,7 @@ class TradingService:
                     if (signal.strategy in RESEARCH_CODES and signal.interval == "1h"
                             and symbol not in initially_held and signal.reason.get("research_entry")
                             and signal.reason.get("block_reason") != "stale_data"):
-                        pending_key = f"research_pending:{symbol}:{binding.strategy}:{binding.pool}"
+                        pending_key = _research_pending_key(symbol, binding.strategy, binding.pool)
                         pending = get_state(self.db, pending_key, None)
                         if not pending:
                             pending = signal.to_dict()
@@ -168,15 +175,13 @@ class TradingService:
                         closed_symbols.add(order.symbol)
 
             # 无持仓的币种按信号开仓；刚止损/止盈的币种本周期不再追单
-            # 账户熔断中只拒新仓，已持仓单子的管理在上面照常执行
-            halted, halt_reason = halt_status(self.db)
             opened = []
             decisions = []
             held_symbols = {order.symbol for order in open_orders(self.db)}
             for symbol, binding in pairs:
                 if binding.strategy not in RESEARCH_CODES or binding.interval != "1h":
                     continue
-                pending_key = f"research_pending:{symbol}:{binding.strategy}:{binding.pool}"
+                pending_key = _research_pending_key(symbol, binding.strategy, binding.pool)
                 pending = get_state(self.db, pending_key, None)
                 if not pending:
                     continue
@@ -187,8 +192,6 @@ class TradingService:
                 if symbol in held_symbols or symbol in closed_symbols:
                     set_state(self.db, pending_key, None)
                     continue
-                if halted:
-                    continue
                 pending["direction"] = "LONG"
                 order = open_position(self.db, SimpleNamespace(**pending))
                 if order is not None:
@@ -198,9 +201,6 @@ class TradingService:
                     decisions.append(f"{symbol} LONG open #{order.id} research")
 
             for symbol, signal in best_signals.items():
-                if halted:
-                    decisions.append(f"{symbol} {signal.direction} skipped (账户熔断中: {halt_reason})")
-                    continue
                 if symbol in closed_symbols:
                     decisions.append(f"{symbol} {signal.direction} skipped (本周期刚平仓)")
                     continue

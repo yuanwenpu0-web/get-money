@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 
+from sqlalchemy import event
 import pandas as pd
 import pytest
 
@@ -95,6 +96,26 @@ def test_asof_ranges_limits_and_minute_corrections(db):
     service.store("BTCUSDT", "1m", [corrected])
     updated = service.load_frame("BTCUSDT", "5m").iloc[0]
     assert (updated.high, updated.close, updated.volume) == (200, 199, 110)
+
+
+def test_tail_skips_one_incomplete_bucket_without_reaggregating(db):
+    rows = minutes(25)
+    del rows[17]
+    service = store(db, rows)
+    expected = service.load_frame("BTCUSDT", "5m", start_ms=START).iloc[-2:]
+    queries = []
+
+    def count_aggregates(conn, cursor, statement, parameters, context, executemany):
+        if "GROUP BY" in statement.upper():
+            queries.append(statement)
+
+    event.listen(db.get_bind(), "before_cursor_execute", count_aggregates)
+    try:
+        actual = service.load_frame("BTCUSDT", "5m", limit=2)
+    finally:
+        event.remove(db.get_bind(), "before_cursor_execute", count_aggregates)
+    pd.testing.assert_frame_equal(actual, expected)
+    assert len(queries) == 1
 
 
 def test_bucket_alignment_is_utc_even_when_client_is_in_china(db):

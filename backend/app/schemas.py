@@ -47,10 +47,6 @@ class SettingsUpdate(BaseModel):
     max_signal_age_bars: int | None = Field(default=None, ge=1, le=10)
     min_quote_volume_usd: int | None = Field(default=None, ge=0)
     symbol_blacklist: list[str] | None = None
-    risk_halt: bool | None = None
-    risk_halt_reason: str | None = Field(default=None, max_length=500)
-    max_drawdown_halt_pct: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
-    consecutive_loss_halt: int | None = Field(default=None, ge=0, le=1000)
     order_type: str | None = None
     schedule_enabled: bool | None = None
     schedule_seconds: int | None = None

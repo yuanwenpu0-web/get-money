@@ -58,6 +58,8 @@ def simulate(
     fee: float,
     slippage: float,
     interval: str,
+    *,
+    funding_rates: dict | None = None,
 ) -> tuple[pd.Series, list[dict]]:
     cash, position, next_entry = initial, None, 0
     values, trades = [], []
@@ -72,7 +74,7 @@ def simulate(
         gross = (fill - p["entry"]) * p["qty"] * p["side"]
         exit_fee = fill * p["qty"] * fee
         cash += p["margin"] + gross - exit_fee
-        net = gross - p["entry_fee"] - exit_fee
+        net = gross - p["entry_fee"] - exit_fee + p["funding_pnl"]
         trades.append(
             {
                 "entry_time": str(p["time"]),
@@ -85,6 +87,7 @@ def simulate(
                 "pnl": net,
                 "return_pct": net / p["margin"] * 100,
                 "fees": p["entry_fee"] + exit_fee,
+                "funding_pnl": p["funding_pnl"],
                 "status": reason,
                 "leverage": p["leverage"],
                 "margin": p["margin"],
@@ -100,10 +103,11 @@ def simulate(
         qty = p["qty"] * frac
         margin = p["margin"] * frac
         entry_fee = p["entry_fee"] * frac
+        funding_pnl = p["funding_pnl"] * frac
         gross = (fill - p["entry"]) * qty * p["side"]
         exit_fee = fill * qty * fee
         cash += margin + gross - exit_fee
-        net = gross - entry_fee - exit_fee
+        net = gross - entry_fee - exit_fee + funding_pnl
         trades.append(
             {
                 "entry_time": str(p["time"]),
@@ -116,6 +120,7 @@ def simulate(
                 "pnl": net,
                 "return_pct": net / margin * 100,
                 "fees": entry_fee + exit_fee,
+                "funding_pnl": funding_pnl,
                 "status": reason,
                 "leverage": p["leverage"],
                 "margin": margin,
@@ -124,6 +129,7 @@ def simulate(
         p["qty"] -= qty
         p["margin"] -= margin
         p["entry_fee"] -= entry_fee
+        p["funding_pnl"] -= funding_pnl
 
     def close_reached_targets(high, low, timestamp):
         """Fill reached targets in order; fractions refer to the original position."""
@@ -150,6 +156,15 @@ def simulate(
         previous = bars[i - 1] if i else None
         gap = i > 0 and (row.Index - previous.Index).total_seconds() * 1000 != step
         exited = False
+        # Funding is settled at the candle open for positions carried into that
+        # minute; new orders at the same open are not charged retroactively.
+        event = funding_rates.get(row.Index) if funding_rates else None
+        if position is not None and event is not None:
+            rate, mark = event
+            reference = float(mark) if mark is not None and pd.notna(mark) and mark > 0 else float(row.open)
+            payment = -position["side"] * position["qty"] * reference * float(rate)
+            cash += payment
+            position["funding_pnl"] += payment
         if position is not None:
             p = position
             hit = stop_exit(p["side"], row.open, row.open, row.open, p["sl"], p["tp"])
@@ -228,6 +243,7 @@ def simulate(
                         sl=stop,
                         tp=target,
                         entry_fee=entry_fee,
+                        funding_pnl=0.0,
                         time=row.Index,
                         index=i,
                         leverage=int(signal.leverage),

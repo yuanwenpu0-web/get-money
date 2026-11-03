@@ -92,6 +92,8 @@ class MarketDataService:
                     "quote_volume": stmt.excluded.quote_volume,
                     "close_time": stmt.excluded.close_time,
                     "trades": stmt.excluded.trades,
+                    "taker_buy_volume": func.coalesce(stmt.excluded.taker_buy_volume, Kline.taker_buy_volume),
+                    "taker_buy_quote_volume": func.coalesce(stmt.excluded.taker_buy_quote_volume, Kline.taker_buy_quote_volume),
                 },
             )
             self.db.execute(stmt)
@@ -530,7 +532,8 @@ class MarketDataService:
         if latest is None:
             return []
         step = interval_ms(interval)
-        span = max(1, limit)
+        # 多取一个桶，避免单个不完整桶导致整个窗口扩倍重聚合。
+        span = max(1, limit) + 1
         lower = max(0, int(latest) // step * step - (span - 1) * step)
         while True:
             query = self._candle_query(symbol, interval, lower, end_ms).subquery()

@@ -61,6 +61,27 @@ def test_next_open_fill_and_total_fee_accounting():
     assert sum(t["pnl"] for t in trades) == pytest.approx(equity.iloc[-1] - 10000.0)
 
 
+@pytest.mark.parametrize("side,expected", [(1, -10.0), (-1, 10.0)])
+def test_funding_charged_to_position_held_at_settlement(side, expected):
+    data, signals = fixture_bars()
+    signals.loc[:, "direction"] = 0
+    signals.iloc[0, signals.columns.get_loc("direction")] = side
+    signals.loc[:, "leverage"] = 1
+    funding = {data.index[2]: (0.01, 100.0)}
+    equity, trades = simulate(data, signals, params(max_hold_bars=2), 10000.0, 0.0, 0.0, "1m", funding_rates=funding)
+    assert trades[0]["funding_pnl"] == pytest.approx(expected)
+    assert trades[0]["pnl"] == pytest.approx(expected)
+    assert equity.iloc[-1] == pytest.approx(10000 + expected)
+
+
+def test_funding_at_entry_open_does_not_apply_to_new_position():
+    data, signals = fixture_bars()
+    signals.loc[:, "direction"] = 0
+    signals.iloc[0, signals.columns.get_loc("direction")] = 1
+    equity, trades = simulate(data, signals, params(), 10000.0, 0.0, 0.0, "1m", funding_rates={data.index[1]: (0.01, 100.0)})
+    assert trades[0]["funding_pnl"] == 0 and equity.iloc[-1] == 10000
+
+
 def test_stop_priority_and_post_exit_cooldown():
     data, signals = fixture_bars()
     data.loc[data.index[1], ["high", "low"]] = [103.0, 98.0]

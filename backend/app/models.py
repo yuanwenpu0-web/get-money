@@ -42,6 +42,8 @@ class Kline(Base):
     volume = Column(Float, nullable=False, default=0.0)
     quote_volume = Column(Float, nullable=False, default=0.0)
     trades = Column(Integer, nullable=False, default=0)
+    taker_buy_volume = Column(Float, nullable=True)
+    taker_buy_quote_volume = Column(Float, nullable=True)
 
 
 class FundingRate(Base):
