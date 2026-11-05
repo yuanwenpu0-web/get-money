@@ -11,6 +11,11 @@
 - 方向清零（有拦截原因或仓位为 0 → `direction=0`）
 
 新增策略不需要复制这段逻辑，调用 `assemble_signal_frame()` 即可。
+
+绑定层出场覆盖（`strategy/exits.py`）在 `evaluate_signals` 里产出信号后调用
+`finalize_signal_frame()` 用新距离重走一遍同样的折算，因此仓位、成本过滤与杠杆
+始终与最终止损距离一致。覆盖附带的 `exit_level` / `exit_fallback` / `exit_method`
+只用于诊断，不属于 `SIGNAL_COLUMNS`。
 """
 
 from __future__ import annotations
@@ -67,7 +72,38 @@ def assemble_signal_frame(
     score = pd.to_numeric(score, errors="coerce").fillna(0.5).clip(0.5, 1.0)
     prob_up = pd.to_numeric(prob_up, errors="coerce").fillna(0.5)
     reason = reason.reindex(index).fillna("").astype(object)
+    return finalize_signal_frame(
+        data,
+        params,
+        signed=signed,
+        score=score,
+        prob_up=prob_up,
+        sl_pct=sl_pct,
+        tp_pct=tp_pct,
+        reason=reason,
+        apply_min_distances=apply_min_distances,
+    )
 
+
+def finalize_signal_frame(
+    data: pd.DataFrame,
+    params: dict,
+    *,
+    signed: pd.Series,
+    score: pd.Series,
+    prob_up: pd.Series,
+    sl_pct,
+    tp_pct,
+    reason: pd.Series,
+    apply_min_distances: bool = True,
+) -> pd.DataFrame:
+    """把「方向 + 距离」折算成可执行信号（成本过滤、杠杆、仓位、风险截断）。
+
+    单独抽出来是为了绑定层的出场覆盖：换了止损止盈之后，净盈亏比、成本过滤、
+    杠杆与仓位必须按**新距离**重算，否则会出现「止损改了、仓位没改」的口径分裂。
+    输入须已归一化（signed/score/prob_up/reason）。
+    """
+    index = data.index
     cost = 2 * (float(params["fee_rate"]) + float(params["slippage"]))
     sl_pct = pd.to_numeric(sl_pct, errors="coerce")
     tp_pct = pd.to_numeric(tp_pct, errors="coerce")

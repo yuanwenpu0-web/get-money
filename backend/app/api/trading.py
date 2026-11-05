@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..market.data_service import MarketDataService
-from ..models import EquitySnapshot, JobLog, Order, Signal
+from ..models import EquitySnapshot, JobLog, Order, Signal, StrategyConfig
 from ..pagination import page_metadata
 from ..schemas import OrderPatch
 from ..serializers import order_dict, signal_dict
@@ -67,6 +67,7 @@ def list_orders(
     db: Session = Depends(get_db),
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int | None, Query(ge=1, le=100)] = None,
+    strategy: str | None = None,
 ):
     # Explicit page_size wins; legacy callers may still request their old limit.
     page_size = page_size if page_size is not None else (limit if limit is not None else 20)
@@ -75,6 +76,9 @@ def list_orders(
         query = query.filter(Order.status == status.upper())
     if symbol:
         query = query.filter(Order.symbol == symbol.upper())
+    selected_strategy = strategy.strip().lower() if strategy else ""
+    if selected_strategy:
+        query = query.filter(func.lower(Order.strategy) == selected_strategy)
     mark = func.coalesce(func.nullif(Order.mark_price, 0), Order.entry_price)
     pnl = (mark - Order.entry_price) * Order.qty * case((Order.side == "LONG", 1), else_=-1)
     total, open_count, closed_count, realized, unrealized = query.with_entities(
@@ -94,12 +98,31 @@ def list_orders(
     }
 
 
+@router.get("/orders/strategies")
+def list_order_strategies(db: Session = Depends(get_db)):
+    """订单里实际出现过的策略，包括已下线但仍有历史订单的策略。"""
+    rows = (
+        db.query(Order.strategy, StrategyConfig.name, func.count(Order.id))
+        .outerjoin(StrategyConfig, StrategyConfig.code == Order.strategy)
+        .filter(Order.strategy.isnot(None), Order.strategy != "")
+        .group_by(Order.strategy, StrategyConfig.name)
+        .order_by(Order.strategy.asc())
+        .all()
+    )
+    return {
+        "strategies": [
+            {"code": code, "name": name or code, "count": int(count)}
+            for code, name, count in rows
+        ]
+    }
+
+
 @router.get("/orders/{order_id}")
 def get_order(order_id: int, db: Session = Depends(get_db)):
     row = db.get(Order, order_id)
     if row is None:
         raise HTTPException(404, "订单不存在")
-    return order_dict(row)
+    return order_dict(row, include_snapshot=True)
 
 
 @router.post("/orders/{order_id}/close")
@@ -138,7 +161,10 @@ def patch_order(order_id: int, payload: OrderPatch, db: Session = Depends(get_db
 
 @router.post("/orders/{order_id}/reverse")
 def reverse_order(order_id: int, db: Session = Depends(get_db)):
-    order = TradingService(db).reverse_order(order_id)
+    try:
+        order = TradingService(db).reverse_order(order_id)
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
     if order is None:
         raise HTTPException(400, "订单不存在或已平仓")
     return order_dict(order)

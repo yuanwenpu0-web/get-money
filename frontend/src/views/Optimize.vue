@@ -457,7 +457,7 @@ onBeforeUnmount(() => {
 
     <div class="opt-form">
       <div class="opt-field">
-        <div class="muted">策略</div>
+        <div class="muted">信号指标</div>
         <el-select v-model="form.strategy" style="width: 100%">
           <el-option v-for="item in options.specs" :key="item.code" :label="item.name" :value="item.code" />
         </el-select>
@@ -770,7 +770,7 @@ onBeforeUnmount(() => {
     </div>
     <el-table :data="runs" class="table-compact" empty-text="还没有寻优任务">
       <el-table-column prop="id" label="#" width="70" />
-      <el-table-column prop="strategy" label="策略" min-width="150" />
+      <el-table-column prop="strategy" label="信号指标" min-width="150" />
       <el-table-column label="周期" width="120">
         <template #default="{ row }">{{ (row.intervals || [row.interval]).join(' / ') }}</template>
       </el-table-column>
@@ -800,7 +800,7 @@ onBeforeUnmount(() => {
   <el-dialog v-model="coverageVisible" title="币种级参数覆盖" width="820px">
     <el-table :data="coverage.items" size="small" max-height="460">
       <el-table-column prop="symbol" label="币种" width="110" />
-      <el-table-column prop="strategy" label="策略" width="150" />
+      <el-table-column prop="strategy" label="信号指标" width="150" />
       <el-table-column prop="interval" label="周期" width="70" />
       <el-table-column label="参数" min-width="300">
         <template #default="{ row }"><span class="opt-params">{{ paramsText(row.params) }}</span></template>

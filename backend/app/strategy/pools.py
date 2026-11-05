@@ -19,6 +19,12 @@
 
 所有池的最终成员都会再减去全局黑名单（`coin_universe.BLACKLIST`）。
 
+**人工增删层**（`manual_override`，与 `symbols` 分列存放）：在规则解析、指标筛选、
+TopN 截断**全部完成后**才叠加，因此手工加入的币不会被成交额/波动率条件或名额限制
+刷掉，手工剔除的币也不会被下一轮自动维护加回来。研究池每轮维护只重写 `symbols`，
+人工增删持久生效。手工加入仍受全局黑名单与 `symbol_scope=custom` 交易范围约束——
+这是安全边界，不因为手动操作而放开。
+
 解析是纯读操作，可被回测/巡检反复调用；成交额走 `market.universe` 的 1 小时 TTL 缓存。
 """
 
@@ -58,6 +64,24 @@ def _as_symbols(raw: object) -> list[str]:
     return result
 
 
+MAX_MANUAL_SYMBOLS = 200
+
+
+def normalize_manual_override(include: object, exclude: object) -> dict:
+    """归一人工增删为 `{"include": [...], "exclude": [...]}`。
+
+    同一币种同时出现在两侧时按「剔除优先」处理（保守、避免误加仓）；
+    非数组输入按空列表处理，坏数据不会让池解析失败。
+    """
+    included = _as_symbols(include)
+    excluded = _as_symbols(exclude)
+    if len(included) + len(excluded) > MAX_MANUAL_SYMBOLS:
+        raise ValueError(f"人工增删合计不能超过 {MAX_MANUAL_SYMBOLS} 个币种")
+    excluded_set = set(excluded)
+    included = [symbol for symbol in included if symbol not in excluded_set]
+    return {"include": included, "exclude": excluded}
+
+
 def load_pool_spec(row: SymbolPool) -> dict:
     """把库里的 JSON 文本解析成规范化结构（坏数据按空处理，不抛错）。"""
     try:
@@ -69,8 +93,15 @@ def load_pool_spec(row: SymbolPool) -> dict:
         rule = rule if isinstance(rule, dict) else {}
     except ValueError:
         rule = {}
+    # 老库可能还没有这一列（未跑过迁移），按空层处理即可。
+    try:
+        manual = json.loads(getattr(row, "manual_override", None) or "{}")
+        manual = manual if isinstance(manual, dict) else {}
+    except ValueError:
+        manual = {}
+    manual = normalize_manual_override(manual.get("include"), manual.get("exclude"))
     kind = row.kind if row.kind in POOL_KINDS else "static"
-    return {"kind": kind, "symbols": symbols, "rule": rule}
+    return {"kind": kind, "symbols": symbols, "rule": rule, "manual": manual}
 
 
 def validate_pool(kind: str, symbols: object, rule: object) -> tuple[str, list[str], dict]:
@@ -173,11 +204,14 @@ def resolve_members(
     volumes: Callable[[], dict[str, float]],
     allowed: Iterable[str] | None = None,
     metrics: Callable[[list[str]], dict[str, dict[str, float]]] | None = None,
+    manual: dict | None = None,
 ) -> list[str]:
     """纯函数版成员解析（不碰数据库，便于测试与回测复用）。
 
     `allowed` 是全局限制（如 `symbol_scope=custom` 的自定义列表），池在其内部再筛选。
+    `manual` 是最后叠加的人工增删层，见模块文档；它不会绕过黑名单与 `allowed`。
     """
+    allow_set = set(allowed) if allowed is not None else None
     base = rule.get("base", "static" if kind == "static" else "all")
     if base == "major":
         members = list(MAJOR_SYMBOLS)
@@ -204,8 +238,7 @@ def resolve_members(
     excluded = set(rule.get("exclude") or []) | BLACKLIST
     members = [symbol for symbol in members if symbol not in excluded]
 
-    if allowed is not None:
-        allow_set = set(allowed)
+    if allow_set is not None:
         members = [symbol for symbol in members if symbol in allow_set]
 
     if filters:
@@ -224,6 +257,20 @@ def resolve_members(
         if volume_map:
             members.sort(key=lambda symbol: volume_map.get(symbol, 0.0), reverse=True)
         members = members[: int(limit)]
+
+    # 人工增删放在最后：不受规则筛选、指标条件与 TopN 名额影响。
+    # 但仍不许越过全局黑名单与全局交易范围，避免手误把禁用币放进实盘。
+    manual = manual or {}
+    removed = set(_as_symbols(manual.get("exclude")))
+    if removed:
+        members = [symbol for symbol in members if symbol not in removed]
+    for symbol in _as_symbols(manual.get("include")):
+        if symbol in removed or symbol in BLACKLIST:
+            continue
+        if allow_set is not None and symbol not in allow_set:
+            continue
+        if symbol not in members:
+            members.append(symbol)
     return members
 
 
@@ -300,6 +347,7 @@ def pool_symbols(db: Session, pool: SymbolPool, allowed: Iterable[str] | None = 
         volumes=lambda: universe_volumes(db),
         allowed=allowed,
         metrics=lambda members: _pool_metrics(db, members, spec["rule"]),
+        manual=spec["manual"],
     )
 
 
@@ -323,6 +371,8 @@ def describe_pool(pool: SymbolPool, members: list[str] | None = None) -> dict:
         "kind": spec["kind"],
         "symbols": spec["symbols"],
         "rule": spec["rule"],
+        "manual_include": spec["manual"]["include"],
+        "manual_exclude": spec["manual"]["exclude"],
         "enabled": bool(pool.enabled),
         "updated_at": pool.updated_at.isoformat() if pool.updated_at else "",
     }

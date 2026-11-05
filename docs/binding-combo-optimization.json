@@ -1,0 +1,602 @@
+{
+ "strategy": "binding-combo-optimization",
+ "generated_at": "2026-11-05T14:17:22.335496+00:00",
+ "window": {
+  "start": "2026-04-22",
+  "end": "2026-11-05",
+  "robustness_window_days": 90
+ },
+ "universe": {
+  "A": {
+   "strategy": "research_high_turnover_high_vol",
+   "pool": "research_high_liquidity_high_volatility",
+   "interval": "1h",
+   "symbols": 24,
+   "skipped": 1
+  },
+  "B": {
+   "strategy": "research_low_turnover_high_vol",
+   "pool": "research_low_liquidity_high_volatility",
+   "interval": "1h",
+   "symbols": 21,
+   "skipped": 4
+  },
+  "C": {
+   "strategy": "supertrend_current",
+   "pool": "trend_reversal_fit",
+   "interval": "15m",
+   "symbols": 12,
+   "skipped": 0
+  },
+  "D": {
+   "strategy": "flow_imbalance_long",
+   "pool": "alt",
+   "interval": "15m",
+   "symbols": 3,
+   "skipped": 491
+  }
+ },
+ "interval": {
+  "A": "1h",
+  "B": "1h",
+  "C": "15m",
+  "D": "15m"
+ },
+ "days": {
+  "main": 180,
+  "robustness": 90
+ },
+ "costs": {
+  "fee_rate": 0.0004,
+  "slippage": 0.0002,
+  "round_trip": 0.0012,
+  "basis": "notional"
+ },
+ "split": {
+  "train": [
+   0.0,
+   0.6
+  ],
+  "valid": [
+   0.6,
+   0.8
+  ],
+  "test": [
+   0.8,
+   1.0
+  ]
+ },
+ "min_pooled_trades": 30,
+ "random_baseline_seeds": 20,
+ "combos": [
+  {
+   "key": "A",
+   "strategy": "research_high_turnover_high_vol",
+   "pool": "research_high_liquidity_high_volatility",
+   "interval": "1h",
+   "symbols": 24,
+   "grid_size": 12,
+   "current": {
+    "params": {
+     "channel_kind": 0,
+     "research_hold_hours": 120
+    },
+    "train": {
+     "trades": 367,
+     "mean": 3.0843
+    },
+    "valid": {
+     "trades": 118,
+     "mean": 2.8672,
+     "ci_low": -0.999,
+     "ci_high": 7.0789,
+     "positive_share": 0.9255,
+     "verdict": "inconclusive"
+    },
+    "test": {
+     "trades": 114,
+     "mean": 8.2151,
+     "ci_low": 0.6418,
+     "ci_high": 17.8052,
+     "positive_share": 0.984,
+     "verdict": "positive"
+    }
+   },
+   "best": {
+    "params": {
+     "channel_kind": 0,
+     "research_hold_hours": 168
+    },
+    "train": {
+     "trades": 279,
+     "mean": 3.7559
+    },
+    "valid": {
+     "trades": 78,
+     "mean": 9.0213,
+     "ci_low": -0.6141,
+     "ci_high": 21.0027,
+     "positive_share": 0.9625,
+     "verdict": "inconclusive"
+    },
+    "test": {
+     "trades": 78,
+     "mean": 14.0674,
+     "ci_low": 2.6111,
+     "ci_high": 27.8004,
+     "positive_share": 0.995,
+     "verdict": "positive"
+    }
+   },
+   "baseline_current": {
+    "kind": "random_entry",
+    "seeds": 20,
+    "symbols": 24,
+    "trades_per_seed": 120,
+    "mean_pct": 7.0735,
+    "p05_pct": 0.9992,
+    "p95_pct": 12.1754,
+    "actual_mean_pct": 2.8672,
+    "percentile": 0.15
+   },
+   "baseline_best": {
+    "kind": "random_entry",
+    "seeds": 20,
+    "symbols": 24,
+    "trades_per_seed": 72,
+    "mean_pct": 7.6467,
+    "p05_pct": 0.6444,
+    "p95_pct": 12.7573,
+    "actual_mean_pct": 9.0213,
+    "percentile": 0.55
+   },
+   "skipped": 1
+  },
+  {
+   "key": "B",
+   "strategy": "research_low_turnover_high_vol",
+   "pool": "research_low_liquidity_high_volatility",
+   "interval": "1h",
+   "symbols": 21,
+   "grid_size": 12,
+   "current": {
+    "params": {
+     "channel_kind": 1,
+     "research_hold_hours": 48
+    },
+    "train": {
+     "trades": 566,
+     "mean": -0.2281
+    },
+    "valid": {
+     "trades": 184,
+     "mean": 3.3831,
+     "ci_low": 1.2221,
+     "ci_high": 5.941,
+     "positive_share": 0.9995,
+     "verdict": "positive"
+    },
+    "test": {
+     "trades": 194,
+     "mean": -1.3394,
+     "ci_low": -3.0935,
+     "ci_high": 0.5037,
+     "positive_share": 0.081,
+     "verdict": "inconclusive"
+    }
+   },
+   "best": {
+    "params": {
+     "channel_kind": 0,
+     "research_hold_hours": 168
+    },
+    "train": {
+     "trades": 243,
+     "mean": 1.6075
+    },
+    "valid": {
+     "trades": 72,
+     "mean": 15.048,
+     "ci_low": 3.6961,
+     "ci_high": 29.0025,
+     "positive_share": 0.9985,
+     "verdict": "positive"
+    },
+    "test": {
+     "trades": 71,
+     "mean": 0.0449,
+     "ci_low": -4.4459,
+     "ci_high": 4.7551,
+     "positive_share": 0.5155,
+     "verdict": "inconclusive"
+    }
+   },
+   "baseline_current": {
+    "kind": "random_entry",
+    "seeds": 20,
+    "symbols": 21,
+    "trades_per_seed": 189,
+    "mean_pct": 2.0724,
+    "p05_pct": 0.3196,
+    "p95_pct": 3.4003,
+    "actual_mean_pct": 3.3831,
+    "percentile": 0.95
+   },
+   "baseline_best": {
+    "kind": "random_entry",
+    "seeds": 20,
+    "symbols": 21,
+    "trades_per_seed": 63,
+    "mean_pct": 8.9969,
+    "p05_pct": 4.2791,
+    "p95_pct": 15.3554,
+    "actual_mean_pct": 15.048,
+    "percentile": 0.9
+   },
+   "skipped": 4
+  },
+  {
+   "key": "C",
+   "strategy": "supertrend_current",
+   "pool": "trend_reversal_fit",
+   "interval": "15m",
+   "symbols": 12,
+   "grid_size": 36,
+   "current": {
+    "params": {
+     "sl_atr_mult": 1.5,
+     "supertrend_factor": 2.5,
+     "target_r": 3.0,
+     "use_adx_filter": false
+    },
+    "train": {
+     "trades": 3305,
+     "mean": -0.1583
+    },
+    "valid": {
+     "trades": 1101,
+     "mean": -0.1592,
+     "ci_low": -0.2265,
+     "ci_high": -0.0874,
+     "positive_share": 0.0,
+     "verdict": "negative"
+    },
+    "test": {
+     "trades": 1140,
+     "mean": -0.0533,
+     "ci_low": -0.1253,
+     "ci_high": 0.0162,
+     "positive_share": 0.0605,
+     "verdict": "inconclusive"
+    }
+   },
+   "best": {
+    "params": {
+     "sl_atr_mult": 1.5,
+     "supertrend_factor": 2.0,
+     "target_r": 3.0,
+     "use_adx_filter": false
+    },
+    "train": {
+     "trades": 4341,
+     "mean": -0.1451
+    },
+    "valid": {
+     "trades": 1442,
+     "mean": -0.2057,
+     "ci_low": -0.263,
+     "ci_high": -0.1443,
+     "positive_share": 0.0,
+     "verdict": "negative"
+    },
+    "test": {
+     "trades": 1467,
+     "mean": -0.1217,
+     "ci_low": -0.1807,
+     "ci_high": -0.0671,
+     "positive_share": 0.0,
+     "verdict": "negative"
+    }
+   },
+   "baseline_current": {
+    "kind": "direction_flip",
+    "note": "generic 组合的方向翻转基线：负 verdict 已先失败，翻转后为正只说明方向反了，不算 edge",
+    "actual_mean_pct": -0.1592,
+    "percentile": null,
+    "gross_estimate_pct": -0.0392
+   },
+   "baseline_best": {
+    "kind": "direction_flip",
+    "note": "generic 组合的方向翻转基线：负 verdict 已先失败，翻转后为正只说明方向反了，不算 edge",
+    "actual_mean_pct": -0.2057,
+    "percentile": null,
+    "gross_estimate_pct": -0.0857
+   },
+   "skipped": 0
+  },
+  {
+   "key": "D",
+   "strategy": "flow_imbalance_long",
+   "pool": "alt",
+   "interval": "15m",
+   "symbols": 3,
+   "grid_size": 144,
+   "current": {
+    "params": {
+     "entry_quantile": 0.95,
+     "flow_window": 48,
+     "max_hold_bars": 96,
+     "sl_atr_mult": 2.0,
+     "target_r": 2.0
+    },
+    "train": {
+     "trades": 211,
+     "mean": 0.043
+    },
+    "valid": {
+     "trades": 72,
+     "mean": -0.5738,
+     "ci_low": -1.459,
+     "ci_high": 0.4158,
+     "positive_share": 0.1075,
+     "verdict": "inconclusive"
+    },
+    "test": {
+     "trades": 53,
+     "mean": -0.1569,
+     "ci_low": -0.7605,
+     "ci_high": 0.4565,
+     "positive_share": 0.322,
+     "verdict": "inconclusive"
+    }
+   },
+   "best": {
+    "params": {
+     "entry_quantile": 0.98,
+     "flow_window": 48,
+     "max_hold_bars": 128,
+     "sl_atr_mult": 3.0,
+     "target_r": 2.0
+    },
+    "train": {
+     "trades": 112,
+     "mean": 0.5763
+    },
+    "valid": {
+     "trades": 43,
+     "mean": -1.9633,
+     "ci_low": -3.2843,
+     "ci_high": -0.594,
+     "positive_share": 0.0025,
+     "verdict": "negative"
+    },
+    "test": {
+     "trades": 37,
+     "mean": -0.4903,
+     "ci_low": -1.1987,
+     "ci_high": 0.2016,
+     "positive_share": 0.08,
+     "verdict": "inconclusive"
+    }
+   },
+   "baseline_current": {
+    "kind": "direction_flip",
+    "note": "generic 组合的方向翻转基线：负 verdict 已先失败，翻转后为正只说明方向反了，不算 edge",
+    "actual_mean_pct": -0.5738,
+    "percentile": null,
+    "gross_estimate_pct": -0.4538
+   },
+   "baseline_best": {
+    "kind": "direction_flip",
+    "note": "generic 组合的方向翻转基线：负 verdict 已先失败，翻转后为正只说明方向反了，不算 edge",
+    "actual_mean_pct": -1.9633,
+    "percentile": null,
+    "gross_estimate_pct": -1.8433
+   },
+   "skipped": 491
+  }
+ ],
+ "pit": {
+  "A|current|pit": {
+   "folds": 5,
+   "trades": 459,
+   "pooled": {
+    "trades": 459,
+    "mean": -1.0136,
+    "ci_low": -3.4896,
+    "ci_high": 1.5648,
+    "positive_share": 0.213,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": -1.0136,
+   "fold_means": [
+    -0.6174,
+    1.7643,
+    -1.6195,
+    -4.0851,
+    -1.2151
+   ],
+   "positive_folds": 1
+  },
+  "A|current|posthoc": {
+   "folds": 5,
+   "trades": 458,
+   "pooled": {
+    "trades": 458,
+    "mean": 7.1003,
+    "ci_low": 2.4382,
+    "ci_high": 13.4036,
+    "positive_share": 1.0,
+    "verdict": "positive"
+   },
+   "weighted_mean": 7.1003,
+   "fold_means": [
+    11.2167,
+    8.7617,
+    3.9945,
+    10.7398,
+    0.4168
+   ],
+   "positive_folds": 5
+  },
+  "A|best|pit": {
+   "folds": 5,
+   "trades": 329,
+   "pooled": {
+    "trades": 329,
+    "mean": -0.9699,
+    "ci_low": -4.8019,
+    "ci_high": 3.471,
+    "positive_share": 0.3265,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": -0.9699,
+   "fold_means": [
+    2.04,
+    4.9803,
+    -2.5833,
+    -8.1494,
+    -2.5083
+   ],
+   "positive_folds": 2
+  },
+  "A|best|posthoc": {
+   "folds": 5,
+   "trades": 332,
+   "pooled": {
+    "trades": 332,
+    "mean": 10.8439,
+    "ci_low": 4.8976,
+    "ci_high": 18.3428,
+    "positive_share": 1.0,
+    "verdict": "positive"
+   },
+   "weighted_mean": 10.8439,
+   "fold_means": [
+    18.6478,
+    16.9104,
+    8.5574,
+    7.7252,
+    1.6338
+   ],
+   "positive_folds": 5
+  },
+  "B|current|pit": {
+   "folds": 5,
+   "trades": 867,
+   "pooled": {
+    "trades": 867,
+    "mean": 0.4231,
+    "ci_low": -0.9403,
+    "ci_high": 2.0565,
+    "positive_share": 0.698,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": 0.4231,
+   "fold_means": [
+    -2.5668,
+    1.6734,
+    2.7475,
+    0.0987,
+    0.7877
+   ],
+   "positive_folds": 4
+  },
+  "B|current|posthoc": {
+   "folds": 5,
+   "trades": 835,
+   "pooled": {
+    "trades": 835,
+    "mean": 0.3215,
+    "ci_low": -0.6159,
+    "ci_high": 1.3225,
+    "positive_share": 0.738,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": 0.3215,
+   "fold_means": [
+    -1.6795,
+    3.4255,
+    0.3073,
+    0.3332,
+    -0.5366
+   ],
+   "positive_folds": 3
+  },
+  "B|best|pit": {
+   "folds": 5,
+   "trades": 314,
+   "pooled": {
+    "trades": 314,
+    "mean": 0.0129,
+    "ci_low": -2.416,
+    "ci_high": 2.8008,
+    "positive_share": 0.5005,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": 0.0128,
+   "fold_means": [
+    -5.7689,
+    3.2759,
+    0.7539,
+    -0.3023,
+    3.0097
+   ],
+   "positive_folds": 3
+  },
+  "B|best|posthoc": {
+   "folds": 5,
+   "trades": 305,
+   "pooled": {
+    "trades": 305,
+    "mean": 1.6191,
+    "ci_low": -0.7829,
+    "ci_high": 3.9878,
+    "positive_share": 0.905,
+    "verdict": "inconclusive"
+   },
+   "weighted_mean": 1.619,
+   "fold_means": [
+    -1.554,
+    5.7512,
+    2.8081,
+    2.4148,
+    -1.2443
+   ],
+   "positive_folds": 3
+  }
+ },
+ "verdict": "inconclusive",
+ "default_enabled": false,
+ "applied": [
+  {
+   "at": "2026-11-05 22:35:10+08:00",
+   "binding_id": 10,
+   "combo": "C",
+   "binding": "supertrend_current × trend_reversal_fit × 15m",
+   "change": "enabled: 1 → 0",
+   "reason": "verdict=negative，1100 笔、两窗口同号、毛收益 −0.04% < 0"
+  },
+  {
+   "at": "2026-11-05 22:35:10+08:00",
+   "binding_id": 43,
+   "combo": "D",
+   "binding": "flow_imbalance_long × alt × 15m",
+   "change": "enabled: 1 → 0",
+   "reason": "verdict=insufficient，原生 15m 无 taker，494 个池成员里仅 3 个可回测"
+  }
+ ],
+ "applied_notes": [
+  "A（#8）、B（#9）保持 `enabled=1`、参数不动：A 维持 `research_hold_hours=120`，不改成网格冠军 168h（PIT 与 90 天口径都更差）；B 维持 48h，标注「未经统计支持」。",
+  "停用只挡新开仓：`trading/service.py` 的持仓管理走 `open_orders(db)`，与绑定无关，`resolve_order_params` 也按 (策略, 池, 周期) 读仍存在的那行绑定，所以停用当时未平的 3 笔 supertrend 仓位（LTC/TIA/SOL）继续按原止损止盈跑完，不会被强平或失去管理。",
+  "副产物：周期内同步目标从 505 个币降到约 50 个（alt 池 494 成员此前每轮全量同步）。"
+ ],
+ "limitations": [
+  "未模拟资金费率、盘口深度、强平与分批建仓；下一根开盘及时成交是乐观假设。",
+  "A/B 的研究池成员每次维护都会整体重写，实盘的池与回测里的池不可能完全一致。",
+  "PIT 重建放宽了「窗口内必须有完整 1m」这条（1m 只覆盖约 90 个币），成员构成与线上维护会有差异。",
+  "15m 的主动买入量只能由 1m 聚合得到，原生 15m 没有任何一行 taker，D 组因此只剩 3 币。",
+  "微盘币单笔波动可达 ±100%，bootstrap CI 在重尾分布上偏窄，读 CI 必须同时看笔数与分位。",
+  "本报告为名义本金口径，不得与 margin 口径报告直接相减。"
+ ]
+}

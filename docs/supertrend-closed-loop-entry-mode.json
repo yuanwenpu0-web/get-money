@@ -1,0 +1,125 @@
+{
+  "report_type": "engineering_change_note",
+  "title": "订单闭环进场价模式（cl_entry_mode）· 工程实现，非 edge 判定",
+  "generated_at": "2026-11-05T23:09:43+08:00",
+  "playbook_section_0_exception": true,
+  "statistical_gates_waived": ["Gate 1 IC 探针", "Gate 4 统计判定"],
+  "hard_constraints_honoured": ["H3", "H8", "H9", "H10", "H12"],
+  "prior_report": "docs/supertrend-closed-loop.md",
+  "hypothesis": "三种进场价来源可共用同一套状态机与退出逻辑，且默认档逐位复现改造前读数；只验证工程时序，不验证收益",
+  "h2_stop_loss_line": "现货 OHLCV 价格预测与支撑位判定均已证伪／inconclusive；本轮不新增特征、不调阈值、不换周期、不跑网格、不比收益，只把既有价格来源显式参数化",
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip_pct": 0.12,
+    "basis": "名义本金",
+    "source": "回测请求全局口径，专用 broker 单点扣费，策略参数不得覆盖"
+  },
+  "preflight": {
+    "result": "21 PASS / 0 WARN / 0 FAIL",
+    "caveat": "预检为关键词匹配；文中「窗口/币池/CI/随机基线」均出现在『本轮不适用』的说明语境，JSON 对应字段为 null，不得误读为已具备统计读数"
+  },
+  "trades": null,
+  "ci": null,
+  "window": null,
+  "universe": null,
+  "random_baseline": null,
+  "fdr": null,
+  "not_applicable_reason": "本轮为工程实现与合成帧时序单测，未接 DB、未加载行情、未做收益回测；窗口／样本期／币池／成交样本／95% CI／随机基线／FDR 均不适用，不伪造统计字段",
+  "verdict": "insufficient",
+  "verdict_note": "统计证据不足（未跑 Gate 3/4），不表示策略亏损或无效；工程验收通过",
+  "enabled": false,
+  "default_enabled": false,
+  "binding_changed": false,
+  "entry_modes": {
+    "0": {
+      "name": "市价进场",
+      "default": false,
+      "price_source": "信号 bar s 收盘提交，s+1 开盘价成交；开盘缺失回退该根收盘",
+      "level_used": null,
+      "fill_on_gap": "不适用",
+      "planned_levels_reference": "信号收盘价"
+    },
+    "1": {
+      "name": "反向回踩支撑位挂单",
+      "default": true,
+      "price_source": "多头 st_support／空头 st_resistance，缺失回退近端摆动极值；须在现价有利一侧",
+      "fill_on_gap": "按对交易者更优的开盘价（旧口径逐位不变）",
+      "planned_levels_reference": "限价触发价"
+    },
+    "2": {
+      "name": "对侧电平突破挂单",
+      "default": false,
+      "price_source": "多头 st_resistance／空头 st_support，缺失回退对应摆动极值；须在现价不利一侧",
+      "fill_on_gap": "按更保守（更差）的开盘价，stop 语义",
+      "planned_levels_reference": "限价触发价"
+    }
+  },
+  "new_params": {
+    "cl_entry_mode": 1,
+    "ranges": [0, 2],
+    "int_only": true,
+    "prepare_key": true,
+    "grid_registered": false,
+    "validate": "只接受 0/1/2；市价档跳过『缓冲 > 最大挂单距离』校验"
+  },
+  "new_events": ["skip_invalid_atr", "cancel_market_unfilled"],
+  "new_columns": ["st_cl_entry_mode"],
+  "changed_files": [
+    {"path": "backend/app/strategy/closed_loop.py", "kind": "modified", "lines_total": 300},
+    {"path": "backend/app/strategy/specs/supertrend_current.py", "kind": "modified", "lines_total": 429},
+    {"path": "backend/app/backtest/runner.py", "kind": "modified", "added_lines": 12},
+    {"path": "frontend/src/views/Strategies.vue", "kind": "modified", "note": "新增进场方式下拉"},
+    {"path": "backend/tests/test_closed_loop_entry_mode.py", "kind": "new", "lines": 229, "tests": 17},
+    {"path": "docs/supertrend-closed-loop-entry-mode.md", "kind": "new"},
+    {"path": "docs/supertrend-closed-loop-entry-mode.json", "kind": "new"}
+  ],
+  "unchanged": [
+    "backtest/closed_loop_execution.py（三档共用一个扣费路径）",
+    "SIGNAL_COLUMNS 与 prepare/signals 签名",
+    "prepare() 早退判据（只认原 7 个 st_* 指标列）",
+    "direction=0 早路由与 api/strategies.py 条件式拒 gate",
+    "spec.grid / default_enabled=False / 绑定层"
+  ],
+  "acceptance": {
+    "targeted_tests": "54 passed (17 new + 17 closed-loop + 20 legacy)",
+    "full_pytest": "1630 passed / 3 failed（3 项为既存基线失败，共 1633 项）",
+    "full_pytest_with_deselect": "1630 passed / 3 deselected / 0 failed",
+    "preexisting_failures": [
+      "test_pool_volatility_research.py::test_live_entrypoints_reject (2) — dispatch.halt_status 属性缺失",
+      "test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range — 行情查询下界断言"
+    ],
+    "compileall": "backend/app OK",
+    "frontend_tests": "74/74 pass",
+    "frontend_build": "vite build OK, dist rebuilt",
+    "service_restart": "QuantDesk-GetMoney 已 Stop + Start；GET /api/strategies = 200",
+    "api_check": {
+      "effective_params.cl_entry_mode": 1,
+      "default_params.cl_entry_mode": 1,
+      "cl_enabled": false,
+      "cl_keys_visible": 9
+    },
+    "deterministic_fingerprints": {
+      "market": "支撑位=1.0 时回踩档 skip_no_support；市价档 submit→fill，成交 100.5，planned_sl=98.5 / planned_tp=104.5，成交后 sl=99.0 / tp=105.0",
+      "breakout_long": "st_cl_level=100.4（阻力）、pending_price=100.5、开盘 100.8 → 按 100.8 成交",
+      "breakout_short": "st_cl_level=99.6（支撑）、pending_price=99.5",
+      "no_touch": "submit → cancel_expired，零 fill",
+      "missing_price": "submit → cancel_market_unfilled，零 fill",
+      "invariants": "三档 × 200 根随机帧状态转移合法、被平 order_id 不重复、平仓数 ≤ 成交数；市价档截断 30/60/85 根前缀逐列一致"
+    }
+  },
+  "interface_compatibility": {
+    "legacy_mode_behaviour": "cl_enabled=False 行为不变；cl_enabled=True 且未配置时 cl_entry_mode=1 与改造前 assert_frame_equal 逐位一致",
+    "columns": "既有 18 个 st_cl_* 列名与顺序不变，仅末尾追加 st_cl_entry_mode",
+    "frontend": "下拉从 JSON 参数文本抽出并回写，其他策略编辑界面不受影响"
+  },
+  "limitations": [
+    "合成帧只验证时序，不产出任何收益、CI、随机基线或 FDR 读数",
+    "bar 级 OHLC 无盘中先后：突破单 / 止损 / 止盈同根时沿用既有优先级，只平一次",
+    "未模拟盘口深度、maker/taker 差异、部分成交、资金费率、逐笔成交顺序、多所现货腿",
+    "闭环仅回测可用；cl_enabled=True 时 direction 恒 0，API 拒 gate 阻断模拟盘/实盘",
+    "支撑/阻力仍为枢轴连线 + 摆动极值回退，support-level-evaluation 的 inconclusive 结论不变",
+    "不启用策略、不改动绑定，default_enabled=False"
+  ],
+  "next_step_if_needed": "若要比三档优劣，另起课题按 Gate 0–5 做受控 A/B（唯一变量 cl_entry_mode）+ 池化 95% CI + 多种子随机基线；本报告读数不得用于启用决策"
+}

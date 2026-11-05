@@ -18,6 +18,9 @@ from ..trading.service import TradingService
 # 只能由专用撮合表达的策略：连锁信号帧方向恒为 0，开启巡检只会得到一个永不交易的空策略
 # （simple_zigzag_double 已完成模拟盘集成：挂单触价信号 + 跟随止损 + 同周期反手）
 BROKER_ONLY_CODES = ("opening_candle_breakout",)
+# 订单闭环只在 cl_enabled=True 时接管；此时 signals() 方向恒 0，巡检/模拟盘会得到一个
+# 永不交易的空策略。按手册 H10 登记拒 gate：允许旧模式，禁止把闭环模式开到巡检上。
+CLOSED_LOOP_CODE = "supertrend_current"
 
 router = APIRouter(prefix="/strategies", tags=["strategies"])
 
@@ -78,8 +81,8 @@ def list_strategies(db: Session = Depends(get_db)):
 def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(get_db)):
     if code not in ALLOWED_CODES:
         raise HTTPException(404, "策略不存在")
-    if code in BROKER_ONLY_CODES and payload.enabled:
-        raise HTTPException(400, "此策略目前仅支持回测，模拟盘和实盘尚不支持挂单/会话强平")
+    if payload.enabled is not None:
+        raise HTTPException(409, "策略总开关已停用，请在完整策略绑定中操作启停")
     row = db.query(StrategyConfig).filter(StrategyConfig.code == code).first()
     if row is None:
         raise HTTPException(404, "策略不存在")
@@ -88,8 +91,6 @@ def update_strategy(code: str, payload: StrategyUpdate, db: Session = Depends(ge
             resolve_params(code, all_state(db), payload.params)
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
-    if payload.enabled is not None:
-        row.enabled = 1 if payload.enabled else 0
     if payload.params is not None:
         row.params = json.dumps(payload.params, ensure_ascii=False)
     db.commit()

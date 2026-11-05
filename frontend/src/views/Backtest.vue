@@ -412,6 +412,7 @@ onBeforeUnmount(() => {
         回测设置加载失败：{{ settingsError }}
         <el-button size="small" text @click="loadSettings">重试</el-button>
       </div>
+      <div class="form-hint">回测针对所选单个币种；选择策略仅引用其参数和周期，不代表对整个币种池回测，也不校验该币种是否属于池。</div>
       <div class="form-grid">
         <div>
           <div class="muted" style="margin-bottom: 4px">币种</div>
@@ -426,17 +427,17 @@ onBeforeUnmount(() => {
           </el-select>
         </div>
         <div>
-          <div class="muted" style="margin-bottom: 4px">策略</div>
+          <div class="muted" style="margin-bottom: 4px">信号指标</div>
           <el-select v-model="form.strategy" style="width: 100%" @change="onStrategyChange">
             <el-option v-for="item in strategyChoices" :key="item.code" :label="item.name" :value="item.code" />
           </el-select>
         </div>
         <div>
-          <div class="muted" style="margin-bottom: 4px">参数层（策略 × 池绑定）</div>
+          <div class="muted" style="margin-bottom: 4px">策略参数层（指标 × 币种池 × 周期）</div>
           <el-select
             v-model="selectedBinding"
             clearable
-            placeholder="策略默认参数"
+            placeholder="指标默认参数"
             style="width: 100%"
             @change="applyBinding"
           >
@@ -598,7 +599,7 @@ onBeforeUnmount(() => {
         <el-table-column prop="id" label="#" width="56" />
         <el-table-column prop="symbol" label="币种" width="96" />
         <el-table-column prop="interval" label="周期" width="70" />
-        <el-table-column prop="strategy" label="策略" min-width="120" />
+        <el-table-column prop="strategy" label="信号指标" min-width="120" />
         <el-table-column label="状态" width="90">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" :type="row.status === 'done' ? 'success' : row.status === 'failed' ? 'danger' : 'warning'">{{ row.status }}</el-tag>

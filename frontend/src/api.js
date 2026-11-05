@@ -33,6 +33,7 @@ export default {
 
   getDashboard: () => http.get('/trading/dashboard', { params: { include_market: false } }),
   getOrders: (params) => http.get('/trading/orders', { params }),
+  getOrderStrategies: () => http.get('/trading/orders/strategies'),
   getOrder: (id) => http.get(`/trading/orders/${id}`),
   closeOrder: (id) => http.post(`/trading/orders/${id}/close`),
   patchOrder: (id, payload) => http.patch(`/trading/orders/${id}`, payload),
@@ -64,6 +65,8 @@ export default {
   getPoolMembers: (code) => http.get(`/pools/${code}/members`),
 
   getBindings: (params) => http.get('/bindings', { params }),
+  // 绑定层出场覆盖：可选出场方法与支撑线指标
+  getBindingExitOptions: () => http.get('/bindings/exit-options'),
   createBinding: (payload) => http.post('/bindings', payload),
   updateBinding: (id, payload) => http.put(`/bindings/${id}`, payload),
   deleteBinding: (id) => http.delete(`/bindings/${id}`),

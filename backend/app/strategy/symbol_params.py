@@ -52,6 +52,8 @@ def load_map(
     db: Session,
     strategy: str | None = None,
     interval: str | None = None,
+    *,
+    strict: bool = False,
 ) -> dict[tuple[str, str, str], dict]:
     """一次性取出覆盖表 → `{(strategy, symbol, interval): params}`。
 
@@ -67,9 +69,15 @@ def load_map(
     for row in query.all():
         try:
             params = json.loads(row.params or "{}")
-        except ValueError:
+        except (TypeError, ValueError) as exc:
+            if strict:
+                raise ValueError(f"币种覆盖 {row.id} JSON 无效") from exc
             continue
-        if isinstance(params, dict) and params:
+        if not isinstance(params, dict):
+            if strict:
+                raise ValueError(f"币种覆盖 {row.id} 必须是对象")
+            continue
+        if params:
             result[(row.strategy_code, row.symbol, row.interval)] = params
     return result
 

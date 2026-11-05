@@ -63,7 +63,7 @@ DEFAULT_POOLS = [
 # 原因：absorption_reversal 在池化样本上 CI 跨 0（见 docs/absorption-reversal-strategy.md），
 # spec.default_enabled 也是 False；若种子绑定直接 enabled=1，而库里策略行又被手工开过，
 # 部署后巡检会立刻真跑一个没有验证过 edge 的策略。
-# 开启方式：策略页绑定向导里勾「启用」，并把策略总开关打开。
+# 开启方式：在绑定上勾选「启用」；旧策略总开关不再控制绑定。
 DEFAULT_BINDINGS = [
     {
         "strategy_code": "absorption_reversal",

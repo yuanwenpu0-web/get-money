@@ -1,0 +1,1102 @@
+{
+  "generated_at": "2026-11-04T17:45:15.149078+00:00",
+  "strategy": "supertrend_current",
+  "pool": "trend_reversal_fit",
+  "days": 300,
+  "periods": [
+    {
+      "interval": "15m",
+      "days": 300,
+      "members": [
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TIAUSDT",
+        "BTCUSDT"
+      ],
+      "holders": [
+        2,
+        4,
+        8,
+        16,
+        24,
+        32,
+        48,
+        96
+      ],
+      "trades": 8954,
+      "net": [
+        {
+          "hold": 2,
+          "trades": 8968,
+          "mean_pct": -0.1283,
+          "median_pct": -0.1602,
+          "win_rate": 0.3576,
+          "ci_low_pct": -0.1428,
+          "ci_high_pct": -0.1137,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 8968,
+          "mean_pct": -0.1383,
+          "median_pct": -0.1736,
+          "win_rate": 0.3757,
+          "ci_low_pct": -0.1571,
+          "ci_high_pct": -0.1205,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 8968,
+          "mean_pct": -0.1217,
+          "median_pct": -0.1732,
+          "win_rate": 0.4061,
+          "ci_low_pct": -0.1453,
+          "ci_high_pct": -0.0972,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 8958,
+          "mean_pct": -0.121,
+          "median_pct": -0.1449,
+          "win_rate": 0.4379,
+          "ci_low_pct": -0.1511,
+          "ci_high_pct": -0.0881,
+          "verdict": "negative"
+        },
+        {
+          "hold": 24,
+          "trades": 8950,
+          "mean_pct": -0.116,
+          "median_pct": -0.1562,
+          "win_rate": 0.4497,
+          "ci_low_pct": -0.1522,
+          "ci_high_pct": -0.0767,
+          "verdict": "negative"
+        },
+        {
+          "hold": 32,
+          "trades": 8950,
+          "mean_pct": -0.1255,
+          "median_pct": -0.1746,
+          "win_rate": 0.4483,
+          "ci_low_pct": -0.1678,
+          "ci_high_pct": -0.0813,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 8949,
+          "mean_pct": -0.1219,
+          "median_pct": -0.1692,
+          "win_rate": 0.4582,
+          "ci_low_pct": -0.1738,
+          "ci_high_pct": -0.0651,
+          "verdict": "negative"
+        },
+        {
+          "hold": 96,
+          "trades": 8925,
+          "mean_pct": -0.1241,
+          "median_pct": -0.157,
+          "win_rate": 0.4754,
+          "ci_low_pct": -0.1982,
+          "ci_high_pct": -0.0476,
+          "verdict": "negative"
+        }
+      ],
+      "gross": [
+        {
+          "hold": 2,
+          "trades": 8968,
+          "mean_pct": -0.0483,
+          "median_pct": -0.0802,
+          "win_rate": 0.4262,
+          "ci_low_pct": -0.0628,
+          "ci_high_pct": -0.0337,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 8968,
+          "mean_pct": -0.0583,
+          "median_pct": -0.0937,
+          "win_rate": 0.4305,
+          "ci_low_pct": -0.0771,
+          "ci_high_pct": -0.0405,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 8968,
+          "mean_pct": -0.0417,
+          "median_pct": -0.0931,
+          "win_rate": 0.4461,
+          "ci_low_pct": -0.0653,
+          "ci_high_pct": -0.0172,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 8958,
+          "mean_pct": -0.041,
+          "median_pct": -0.0649,
+          "win_rate": 0.4713,
+          "ci_low_pct": -0.0711,
+          "ci_high_pct": -0.0081,
+          "verdict": "negative"
+        },
+        {
+          "hold": 24,
+          "trades": 8950,
+          "mean_pct": -0.036,
+          "median_pct": -0.0762,
+          "win_rate": 0.4753,
+          "ci_low_pct": -0.0722,
+          "ci_high_pct": 0.0033,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 32,
+          "trades": 8950,
+          "mean_pct": -0.0455,
+          "median_pct": -0.0946,
+          "win_rate": 0.4735,
+          "ci_low_pct": -0.0878,
+          "ci_high_pct": -0.0013,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 8949,
+          "mean_pct": -0.0419,
+          "median_pct": -0.0892,
+          "win_rate": 0.4768,
+          "ci_low_pct": -0.0938,
+          "ci_high_pct": 0.0148,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 8925,
+          "mean_pct": -0.0442,
+          "median_pct": -0.077,
+          "win_rate": 0.4885,
+          "ci_low_pct": -0.1183,
+          "ci_high_pct": 0.0323,
+          "verdict": "inconclusive"
+        }
+      ],
+      "inverse": [
+        {
+          "hold": 2,
+          "trades": 8968,
+          "mean_pct": -0.0317,
+          "median_pct": 0.0001,
+          "win_rate": 0.5002,
+          "ci_low_pct": -0.0463,
+          "ci_high_pct": -0.0172,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 8968,
+          "mean_pct": -0.0217,
+          "median_pct": 0.0137,
+          "win_rate": 0.5095,
+          "ci_low_pct": -0.0395,
+          "ci_high_pct": -0.0028,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 8968,
+          "mean_pct": -0.0383,
+          "median_pct": 0.0131,
+          "win_rate": 0.507,
+          "ci_low_pct": -0.0628,
+          "ci_high_pct": -0.0147,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 8958,
+          "mean_pct": -0.039,
+          "median_pct": -0.0151,
+          "win_rate": 0.494,
+          "ci_low_pct": -0.0719,
+          "ci_high_pct": -0.0088,
+          "verdict": "negative"
+        },
+        {
+          "hold": 24,
+          "trades": 8950,
+          "mean_pct": -0.044,
+          "median_pct": -0.0038,
+          "win_rate": 0.4975,
+          "ci_low_pct": -0.0833,
+          "ci_high_pct": -0.0078,
+          "verdict": "negative"
+        },
+        {
+          "hold": 32,
+          "trades": 8950,
+          "mean_pct": -0.0345,
+          "median_pct": 0.0146,
+          "win_rate": 0.5039,
+          "ci_low_pct": -0.0787,
+          "ci_high_pct": 0.0078,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 48,
+          "trades": 8949,
+          "mean_pct": -0.0381,
+          "median_pct": 0.0092,
+          "win_rate": 0.5026,
+          "ci_low_pct": -0.0948,
+          "ci_high_pct": 0.0138,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 8925,
+          "mean_pct": -0.0358,
+          "median_pct": -0.003,
+          "win_rate": 0.4995,
+          "ci_low_pct": -0.1123,
+          "ci_high_pct": 0.0383,
+          "verdict": "inconclusive"
+        }
+      ],
+      "long": [
+        {
+          "hold": 2,
+          "trades": 4468,
+          "mean_pct": -0.1228,
+          "median_pct": -0.1681,
+          "win_rate": 0.3543,
+          "ci_low_pct": -0.1449,
+          "ci_high_pct": -0.1017,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 4468,
+          "mean_pct": -0.1445,
+          "median_pct": -0.1851,
+          "win_rate": 0.3666,
+          "ci_low_pct": -0.1727,
+          "ci_high_pct": -0.1162,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 4468,
+          "mean_pct": -0.126,
+          "median_pct": -0.1841,
+          "win_rate": 0.3979,
+          "ci_low_pct": -0.1603,
+          "ci_high_pct": -0.0904,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 4459,
+          "mean_pct": -0.14,
+          "median_pct": -0.1982,
+          "win_rate": 0.4236,
+          "ci_low_pct": -0.1841,
+          "ci_high_pct": -0.0936,
+          "verdict": "negative"
+        },
+        {
+          "hold": 24,
+          "trades": 4459,
+          "mean_pct": -0.1377,
+          "median_pct": -0.1956,
+          "win_rate": 0.4317,
+          "ci_low_pct": -0.1902,
+          "ci_high_pct": -0.0855,
+          "verdict": "negative"
+        },
+        {
+          "hold": 32,
+          "trades": 4459,
+          "mean_pct": -0.1794,
+          "median_pct": -0.2642,
+          "win_rate": 0.4248,
+          "ci_low_pct": -0.2395,
+          "ci_high_pct": -0.1191,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 4458,
+          "mean_pct": -0.1401,
+          "median_pct": -0.2314,
+          "win_rate": 0.4412,
+          "ci_low_pct": -0.2155,
+          "ci_high_pct": -0.0675,
+          "verdict": "negative"
+        },
+        {
+          "hold": 96,
+          "trades": 4443,
+          "mean_pct": -0.2315,
+          "median_pct": -0.3428,
+          "win_rate": 0.4434,
+          "ci_low_pct": -0.3404,
+          "ci_high_pct": -0.1266,
+          "verdict": "negative"
+        }
+      ],
+      "short": [
+        {
+          "hold": 2,
+          "trades": 4500,
+          "mean_pct": -0.1338,
+          "median_pct": -0.1534,
+          "win_rate": 0.3609,
+          "ci_low_pct": -0.1545,
+          "ci_high_pct": -0.1148,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 4500,
+          "mean_pct": -0.1321,
+          "median_pct": -0.1644,
+          "win_rate": 0.3847,
+          "ci_low_pct": -0.1581,
+          "ci_high_pct": -0.1064,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 4500,
+          "mean_pct": -0.1174,
+          "median_pct": -0.1643,
+          "win_rate": 0.4142,
+          "ci_low_pct": -0.1491,
+          "ci_high_pct": -0.0857,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 4499,
+          "mean_pct": -0.1021,
+          "median_pct": -0.106,
+          "win_rate": 0.4521,
+          "ci_low_pct": -0.1471,
+          "ci_high_pct": -0.0574,
+          "verdict": "negative"
+        },
+        {
+          "hold": 24,
+          "trades": 4491,
+          "mean_pct": -0.0946,
+          "median_pct": -0.12,
+          "win_rate": 0.4676,
+          "ci_low_pct": -0.1484,
+          "ci_high_pct": -0.0414,
+          "verdict": "negative"
+        },
+        {
+          "hold": 32,
+          "trades": 4491,
+          "mean_pct": -0.0719,
+          "median_pct": -0.0914,
+          "win_rate": 0.4716,
+          "ci_low_pct": -0.1321,
+          "ci_high_pct": -0.0148,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 4491,
+          "mean_pct": -0.1039,
+          "median_pct": -0.12,
+          "win_rate": 0.4749,
+          "ci_low_pct": -0.1794,
+          "ci_high_pct": -0.0314,
+          "verdict": "negative"
+        },
+        {
+          "hold": 96,
+          "trades": 4482,
+          "mean_pct": -0.0176,
+          "median_pct": 0.0405,
+          "win_rate": 0.5071,
+          "ci_low_pct": -0.1223,
+          "ci_high_pct": 0.0863,
+          "verdict": "inconclusive"
+        }
+      ],
+      "by_status": {
+        "8": [
+          {
+            "status": "stop_loss",
+            "trades": 5595,
+            "mean_pct": -0.634,
+            "win_rate": 0.1687,
+            "ci_low_pct": -0.6577,
+            "ci_high_pct": -0.6112,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 1852,
+            "mean_pct": 0.9802,
+            "win_rate": 0.8531,
+            "ci_low_pct": 0.9299,
+            "ci_high_pct": 1.0379,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 1521,
+            "mean_pct": 0.4211,
+            "win_rate": 0.735,
+            "ci_low_pct": 0.3872,
+            "ci_high_pct": 0.4566,
+            "verdict": "positive"
+          }
+        ],
+        "16": [
+          {
+            "status": "stop_loss",
+            "trades": 5593,
+            "mean_pct": -0.7575,
+            "win_rate": 0.2121,
+            "ci_low_pct": -0.7883,
+            "ci_high_pct": -0.7216,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 1844,
+            "mean_pct": 1.3976,
+            "win_rate": 0.9067,
+            "ci_low_pct": 1.3292,
+            "ci_high_pct": 1.4693,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 1521,
+            "mean_pct": 0.3786,
+            "win_rate": 0.7002,
+            "ci_low_pct": 0.3356,
+            "ci_high_pct": 0.4198,
+            "verdict": "positive"
+          }
+        ],
+        "32": [
+          {
+            "status": "stop_loss",
+            "trades": 5585,
+            "mean_pct": -0.8251,
+            "win_rate": 0.2741,
+            "ci_low_pct": -0.8712,
+            "ci_high_pct": -0.7766,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 1844,
+            "mean_pct": 1.8173,
+            "win_rate": 0.8877,
+            "ci_low_pct": 1.7255,
+            "ci_high_pct": 1.918,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 1521,
+            "mean_pct": 0.0884,
+            "win_rate": 0.5549,
+            "ci_low_pct": 0.0266,
+            "ci_high_pct": 0.1491,
+            "verdict": "positive"
+          }
+        ]
+      },
+      "status_share": {
+        "stop_loss": 5593,
+        "take_profit": 1844,
+        "signal_reverse": 1521
+      },
+      "per_symbol": {
+        "ETHUSDT": 742,
+        "SOLUSDT": 731,
+        "XRPUSDT": 737,
+        "DOGEUSDT": 753,
+        "ADAUSDT": 690,
+        "LINKUSDT": 730,
+        "AVAXUSDT": 783,
+        "LTCUSDT": 732,
+        "DOTUSDT": 738,
+        "SUIUSDT": 770,
+        "TIAUSDT": 786,
+        "BTCUSDT": 755
+      }
+    },
+    {
+      "interval": "1h",
+      "days": 300,
+      "members": [
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TIAUSDT",
+        "BTCUSDT"
+      ],
+      "holders": [
+        2,
+        4,
+        8,
+        16,
+        24,
+        32,
+        48,
+        96
+      ],
+      "trades": 2234,
+      "net": [
+        {
+          "hold": 2,
+          "trades": 2252,
+          "mean_pct": -0.1764,
+          "median_pct": -0.1927,
+          "win_rate": 0.4054,
+          "ci_low_pct": -0.2375,
+          "ci_high_pct": -0.1145,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 2252,
+          "mean_pct": -0.168,
+          "median_pct": -0.1863,
+          "win_rate": 0.4294,
+          "ci_low_pct": -0.2373,
+          "ci_high_pct": -0.0968,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 2251,
+          "mean_pct": -0.1697,
+          "median_pct": -0.1548,
+          "win_rate": 0.4527,
+          "ci_low_pct": -0.2581,
+          "ci_high_pct": -0.0801,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 2232,
+          "mean_pct": -0.0563,
+          "median_pct": -0.1415,
+          "win_rate": 0.4682,
+          "ci_low_pct": -0.174,
+          "ci_high_pct": 0.0575,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 24,
+          "trades": 2232,
+          "mean_pct": -0.1479,
+          "median_pct": -0.1687,
+          "win_rate": 0.4821,
+          "ci_low_pct": -0.3037,
+          "ci_high_pct": 0.0026,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 32,
+          "trades": 2225,
+          "mean_pct": -0.2026,
+          "median_pct": -0.3077,
+          "win_rate": 0.462,
+          "ci_low_pct": -0.3689,
+          "ci_high_pct": -0.0393,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 2224,
+          "mean_pct": -0.1805,
+          "median_pct": -0.021,
+          "win_rate": 0.4987,
+          "ci_low_pct": -0.4153,
+          "ci_high_pct": 0.0461,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 2211,
+          "mean_pct": -0.3138,
+          "median_pct": -0.4894,
+          "win_rate": 0.4586,
+          "ci_low_pct": -0.6067,
+          "ci_high_pct": -0.0159,
+          "verdict": "negative"
+        }
+      ],
+      "gross": [
+        {
+          "hold": 2,
+          "trades": 2252,
+          "mean_pct": -0.0964,
+          "median_pct": -0.1127,
+          "win_rate": 0.4445,
+          "ci_low_pct": -0.1575,
+          "ci_high_pct": -0.0345,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 2252,
+          "mean_pct": -0.088,
+          "median_pct": -0.1063,
+          "win_rate": 0.4609,
+          "ci_low_pct": -0.1573,
+          "ci_high_pct": -0.0168,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 2251,
+          "mean_pct": -0.0897,
+          "median_pct": -0.0748,
+          "win_rate": 0.4811,
+          "ci_low_pct": -0.1781,
+          "ci_high_pct": -0.0,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 2232,
+          "mean_pct": 0.0237,
+          "median_pct": -0.0615,
+          "win_rate": 0.4861,
+          "ci_low_pct": -0.094,
+          "ci_high_pct": 0.1375,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 24,
+          "trades": 2232,
+          "mean_pct": -0.068,
+          "median_pct": -0.0887,
+          "win_rate": 0.4892,
+          "ci_low_pct": -0.2237,
+          "ci_high_pct": 0.0826,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 32,
+          "trades": 2225,
+          "mean_pct": -0.1227,
+          "median_pct": -0.2276,
+          "win_rate": 0.4751,
+          "ci_low_pct": -0.289,
+          "ci_high_pct": 0.0406,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 48,
+          "trades": 2224,
+          "mean_pct": -0.1006,
+          "median_pct": 0.0589,
+          "win_rate": 0.5072,
+          "ci_low_pct": -0.3353,
+          "ci_high_pct": 0.126,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 2211,
+          "mean_pct": -0.2339,
+          "median_pct": -0.4095,
+          "win_rate": 0.4659,
+          "ci_low_pct": -0.5268,
+          "ci_high_pct": 0.0639,
+          "verdict": "inconclusive"
+        }
+      ],
+      "inverse": [
+        {
+          "hold": 2,
+          "trades": 2252,
+          "mean_pct": 0.0164,
+          "median_pct": 0.0327,
+          "win_rate": 0.516,
+          "ci_low_pct": -0.0455,
+          "ci_high_pct": 0.0775,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 4,
+          "trades": 2252,
+          "mean_pct": 0.008,
+          "median_pct": 0.0263,
+          "win_rate": 0.5089,
+          "ci_low_pct": -0.0632,
+          "ci_high_pct": 0.0774,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 8,
+          "trades": 2251,
+          "mean_pct": 0.0097,
+          "median_pct": -0.0052,
+          "win_rate": 0.4989,
+          "ci_low_pct": -0.08,
+          "ci_high_pct": 0.098,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 16,
+          "trades": 2232,
+          "mean_pct": -0.1036,
+          "median_pct": -0.0185,
+          "win_rate": 0.4946,
+          "ci_low_pct": -0.2174,
+          "ci_high_pct": 0.014,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 24,
+          "trades": 2232,
+          "mean_pct": -0.0119,
+          "median_pct": 0.0087,
+          "win_rate": 0.5018,
+          "ci_low_pct": -0.1625,
+          "ci_high_pct": 0.1438,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 32,
+          "trades": 2225,
+          "mean_pct": 0.0428,
+          "median_pct": 0.1475,
+          "win_rate": 0.5151,
+          "ci_low_pct": -0.1205,
+          "ci_high_pct": 0.2091,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 48,
+          "trades": 2224,
+          "mean_pct": 0.0207,
+          "median_pct": -0.1389,
+          "win_rate": 0.4847,
+          "ci_low_pct": -0.2058,
+          "ci_high_pct": 0.2553,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 2211,
+          "mean_pct": 0.154,
+          "median_pct": 0.3297,
+          "win_rate": 0.5296,
+          "ci_low_pct": -0.1438,
+          "ci_high_pct": 0.4469,
+          "verdict": "inconclusive"
+        }
+      ],
+      "long": [
+        {
+          "hold": 2,
+          "trades": 1122,
+          "mean_pct": -0.1516,
+          "median_pct": -0.2237,
+          "win_rate": 0.4002,
+          "ci_low_pct": -0.2292,
+          "ci_high_pct": -0.0727,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 1122,
+          "mean_pct": -0.1739,
+          "median_pct": -0.2802,
+          "win_rate": 0.4082,
+          "ci_low_pct": -0.2687,
+          "ci_high_pct": -0.0714,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 1121,
+          "mean_pct": -0.1625,
+          "median_pct": -0.2453,
+          "win_rate": 0.4344,
+          "ci_low_pct": -0.2949,
+          "ci_high_pct": -0.0255,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 1111,
+          "mean_pct": -0.1536,
+          "median_pct": -0.346,
+          "win_rate": 0.432,
+          "ci_low_pct": -0.3333,
+          "ci_high_pct": 0.031,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 24,
+          "trades": 1111,
+          "mean_pct": -0.372,
+          "median_pct": -0.4507,
+          "win_rate": 0.4401,
+          "ci_low_pct": -0.5751,
+          "ci_high_pct": -0.1481,
+          "verdict": "negative"
+        },
+        {
+          "hold": 32,
+          "trades": 1104,
+          "mean_pct": -0.4599,
+          "median_pct": -0.6819,
+          "win_rate": 0.4004,
+          "ci_low_pct": -0.7011,
+          "ci_high_pct": -0.2266,
+          "verdict": "negative"
+        },
+        {
+          "hold": 48,
+          "trades": 1104,
+          "mean_pct": -0.4013,
+          "median_pct": -0.4732,
+          "win_rate": 0.4556,
+          "ci_low_pct": -0.7096,
+          "ci_high_pct": -0.1,
+          "verdict": "negative"
+        },
+        {
+          "hold": 96,
+          "trades": 1098,
+          "mean_pct": -0.6596,
+          "median_pct": -1.203,
+          "win_rate": 0.3825,
+          "ci_low_pct": -1.0819,
+          "ci_high_pct": -0.2239,
+          "verdict": "negative"
+        }
+      ],
+      "short": [
+        {
+          "hold": 2,
+          "trades": 1130,
+          "mean_pct": -0.2011,
+          "median_pct": -0.1628,
+          "win_rate": 0.4106,
+          "ci_low_pct": -0.2907,
+          "ci_high_pct": -0.1161,
+          "verdict": "negative"
+        },
+        {
+          "hold": 4,
+          "trades": 1130,
+          "mean_pct": -0.1621,
+          "median_pct": -0.12,
+          "win_rate": 0.4504,
+          "ci_low_pct": -0.2625,
+          "ci_high_pct": -0.0639,
+          "verdict": "negative"
+        },
+        {
+          "hold": 8,
+          "trades": 1130,
+          "mean_pct": -0.1769,
+          "median_pct": -0.0805,
+          "win_rate": 0.4708,
+          "ci_low_pct": -0.3043,
+          "ci_high_pct": -0.0538,
+          "verdict": "negative"
+        },
+        {
+          "hold": 16,
+          "trades": 1121,
+          "mean_pct": 0.0402,
+          "median_pct": 0.0337,
+          "win_rate": 0.504,
+          "ci_low_pct": -0.1277,
+          "ci_high_pct": 0.2012,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 24,
+          "trades": 1121,
+          "mean_pct": 0.0742,
+          "median_pct": 0.1595,
+          "win_rate": 0.5236,
+          "ci_low_pct": -0.1261,
+          "ci_high_pct": 0.2849,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 32,
+          "trades": 1121,
+          "mean_pct": 0.0509,
+          "median_pct": 0.1846,
+          "win_rate": 0.5227,
+          "ci_low_pct": -0.1957,
+          "ci_high_pct": 0.3029,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 48,
+          "trades": 1120,
+          "mean_pct": 0.0372,
+          "median_pct": 0.442,
+          "win_rate": 0.5411,
+          "ci_low_pct": -0.3014,
+          "ci_high_pct": 0.3494,
+          "verdict": "inconclusive"
+        },
+        {
+          "hold": 96,
+          "trades": 1113,
+          "mean_pct": 0.0274,
+          "median_pct": 0.418,
+          "win_rate": 0.5337,
+          "ci_low_pct": -0.3674,
+          "ci_high_pct": 0.4339,
+          "verdict": "inconclusive"
+        }
+      ],
+      "by_status": {
+        "8": [
+          {
+            "status": "stop_loss",
+            "trades": 1364,
+            "mean_pct": -1.1746,
+            "win_rate": 0.2141,
+            "ci_low_pct": -1.2704,
+            "ci_high_pct": -1.0836,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 484,
+            "mean_pct": 1.8473,
+            "win_rate": 0.8781,
+            "ci_low_pct": 1.6776,
+            "ci_high_pct": 2.0304,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 403,
+            "mean_pct": 0.809,
+            "win_rate": 0.7494,
+            "ci_low_pct": 0.6909,
+            "ci_high_pct": 0.9342,
+            "verdict": "positive"
+          }
+        ],
+        "16": [
+          {
+            "status": "stop_loss",
+            "trades": 1356,
+            "mean_pct": -1.2913,
+            "win_rate": 0.2353,
+            "ci_low_pct": -1.426,
+            "ci_high_pct": -1.1577,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 474,
+            "mean_pct": 2.7495,
+            "win_rate": 0.9219,
+            "ci_low_pct": 2.5445,
+            "ci_high_pct": 2.9883,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 402,
+            "mean_pct": 0.8014,
+            "win_rate": 0.7189,
+            "ci_low_pct": 0.6583,
+            "ci_high_pct": 0.9466,
+            "verdict": "positive"
+          }
+        ],
+        "32": [
+          {
+            "status": "stop_loss",
+            "trades": 1349,
+            "mean_pct": -1.6361,
+            "win_rate": 0.2817,
+            "ci_low_pct": -1.8424,
+            "ci_high_pct": -1.4273,
+            "verdict": "negative"
+          },
+          {
+            "status": "take_profit",
+            "trades": 474,
+            "mean_pct": 3.589,
+            "win_rate": 0.9008,
+            "ci_low_pct": 3.2695,
+            "ci_high_pct": 3.9131,
+            "verdict": "positive"
+          },
+          {
+            "status": "signal_reverse",
+            "trades": 402,
+            "mean_pct": 0.1374,
+            "win_rate": 0.5498,
+            "ci_low_pct": -0.0794,
+            "ci_high_pct": 0.351,
+            "verdict": "inconclusive"
+          }
+        ]
+      },
+      "status_share": {
+        "stop_loss": 1356,
+        "take_profit": 474,
+        "signal_reverse": 402
+      },
+      "per_symbol": {
+        "ETHUSDT": 187,
+        "SOLUSDT": 189,
+        "XRPUSDT": 185,
+        "DOGEUSDT": 190,
+        "ADAUSDT": 188,
+        "LINKUSDT": 168,
+        "AVAXUSDT": 214,
+        "LTCUSDT": 188,
+        "DOTUSDT": 167,
+        "SUIUSDT": 188,
+        "TIAUSDT": 177,
+        "BTCUSDT": 190
+      }
+    }
+  ]
+}

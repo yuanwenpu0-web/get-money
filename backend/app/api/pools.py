@@ -14,7 +14,13 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import StrategyBinding, SymbolPool
 from ..schemas import PoolPayload, PoolUpdate
-from ..strategy.pools import describe_pool, load_pool_spec, pool_symbols, validate_pool
+from ..strategy.pools import (
+    describe_pool,
+    load_pool_spec,
+    normalize_manual_override,
+    pool_symbols,
+    validate_pool,
+)
 from ..strategy.pool_maintenance import research_pool_status, run_research_pool_maintenance
 
 router = APIRouter(prefix="/pools", tags=["pools"])
@@ -56,6 +62,7 @@ def create_pool(payload: PoolPayload, db: Session = Depends(get_db)):
         raise HTTPException(400, f"币种池已存在: {payload.code}")
     try:
         kind, symbols, rule = validate_pool(payload.kind, payload.symbols, payload.rule)
+        manual = normalize_manual_override(payload.manual_include, payload.manual_exclude)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     pool = SymbolPool(
@@ -65,6 +72,7 @@ def create_pool(payload: PoolPayload, db: Session = Depends(get_db)):
         kind=kind,
         symbols=json.dumps(symbols, ensure_ascii=False),
         rule=json.dumps(rule, ensure_ascii=False),
+        manual_override=json.dumps(manual, ensure_ascii=False),
         enabled=1 if payload.enabled else 0,
     )
     db.add(pool)
@@ -90,6 +98,24 @@ def update_pool(code: str, payload: PoolUpdate, db: Session = Depends(get_db)):
         kind, symbols, rule = validate_pool(kind, symbols, rule)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
+
+    # 人工增删层是独立字段：只改规则/成员时不传就不动，传空数组才清空。
+    if payload.manual_include is not None or payload.manual_exclude is not None:
+        include = (
+            payload.manual_include
+            if payload.manual_include is not None
+            else spec["manual"]["include"]
+        )
+        exclude = (
+            payload.manual_exclude
+            if payload.manual_exclude is not None
+            else spec["manual"]["exclude"]
+        )
+        try:
+            manual = normalize_manual_override(include, exclude)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        pool.manual_override = json.dumps(manual, ensure_ascii=False)
 
     if payload.name is not None:
         pool.name = payload.name
@@ -121,4 +147,13 @@ def pool_members(code: str, db: Session = Depends(get_db)):
     """成员预览：调参数前先看这个池到底会跑多少个币。"""
     pool = _get_pool(db, code)
     members = pool_symbols(db, pool)
-    return {"code": code, "count": len(members), "symbols": members}
+    spec = load_pool_spec(pool)
+    return {
+        "code": code,
+        "count": len(members),
+        "symbols": members,
+        "manual_include": spec["manual"]["include"],
+        "manual_exclude": spec["manual"]["exclude"],
+        # 实际生效的手工加入（可能被全局范围/黑名单拦下），前端用来提示
+        "manual_added": [s for s in spec["manual"]["include"] if s in members],
+    }

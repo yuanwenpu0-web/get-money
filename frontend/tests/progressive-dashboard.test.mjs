@@ -119,6 +119,7 @@ test('Orders render before settings finish and refresh polling starts immediatel
   const settings = deferred(), orders = deferred()
   const subject = view('Orders', {
     getSettings: () => settings.promise,
+    getOrderStrategies: async () => ({ strategies: [] }),
     getOrders: () => orders.promise,
   }, ['orders', 'ordersLoaded', 'loading', 'settingsLoading'])
   await subject.mount()
@@ -137,6 +138,7 @@ test('Orders render before settings finish and refresh polling starts immediatel
 test('Orders keep loaded data when optional settings fail', async () => {
   const subject = view('Orders', {
     getSettings: async () => { throw new Error('settings offline') },
+    getOrderStrategies: async () => ({ strategies: [] }),
     getOrders: async () => ({ orders: [{ id: 8, symbol: 'ETHUSDT' }] }),
   }, ['load', 'loadSettings', 'orders', 'ordersLoaded', 'ordersError', 'settingsError'])
   await Promise.all([subject.load(), subject.loadSettings()])

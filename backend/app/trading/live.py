@@ -22,7 +22,7 @@ from ..market.futures import (
 from ..models import Credential, JobLog, Order
 from ..security import decrypt
 from ..state import all_state, set_state
-from ..strategy.bindings import resolve_order_params
+from ..strategy.bindings import encode_order_params, ensure_execution_supported, resolve_order_params
 from ..strategy.specs.pool_volatility_research import BLOCKED_CODES
 from ..utils import round_price
 from .paper import close_position as settle_close
@@ -85,6 +85,8 @@ def open_live(db: Session, signal) -> Order | None:
         getattr(signal, "pool", ""),
         symbol=getattr(signal, "symbol", ""),
     )
+    ensure_execution_supported(signal.strategy, params)
+    params_snapshot = encode_order_params(signal.strategy, signal.interval, params)
     if not entry_gates(db, signal, params, ignore_cooldown=False):
         return None
 
@@ -107,7 +109,7 @@ def open_live(db: Session, signal) -> Order | None:
     try:
         client = BinanceFuturesClient(key, secret, testnet=bool(state.get("testnet", True)), proxy=state.get("proxy_url") or None)
         order_type = str(state.get("order_type", "market") or "market")
-        return _place_live(db, client, signal, margin, qty, entry, leverage, fee_rate, cash, order_type)
+        return _place_live(db, client, signal, margin, qty, entry, leverage, fee_rate, cash, order_type, params_snapshot)
     except (BinanceError, ValueError, KeyError, TypeError) as exc:
         log(db, "error", f"live 开仓失败 {signal.symbol}: {exc}")
         return None
@@ -125,7 +127,7 @@ def _line_logger(db: Session):
 
 
 def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, entry, leverage, fee_rate, cash,
-                order_type: str = "market") -> Order | None:
+                order_type: str = "market", params_snapshot: str | None = None) -> Order | None:
     filters = symbol_filters(client.exchange_info(signal.symbol), signal.symbol)
     lot = filters.get("LOT_SIZE", {})
     price_filter = filters.get("PRICE_FILTER", {})
@@ -180,6 +182,8 @@ def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, 
         source="live",
         strategy=signal.strategy,
         pool=getattr(signal, "pool", "") or "",
+        binding_id=getattr(signal, "binding_id", None),
+        params_snapshot=params_snapshot,
         entry_fee=round(fee, 6),
         note=note,
     )

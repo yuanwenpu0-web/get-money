@@ -116,6 +116,76 @@ def test_db_none_client_is_futures_mainnet():
     assert default_market_client(None).hosts == FUTURES_MAIN_HOSTS
 
 
+@pytest.mark.parametrize("raw", ["{", "{}", "[]", '{"max_hold_bars": 12}'])
+def test_cycle_isolates_bad_snapshot_and_manages_next_order(db, monkeypatch, raw):
+    import pandas as pd
+    from app.trading import order_manager
+
+    _stub_cycle(monkeypatch)
+    bad = Order(symbol="BADUSDT", interval="1m", side="LONG", qty=1, entry_price=100,
+                mark_price=100, margin=10, sl=90, tp=110, strategy="absorption_reversal",
+                status="OPEN", source="paper", params_snapshot=raw)
+    good = Order(symbol="GOODUSDT", interval="1m", side="LONG", qty=1, entry_price=100,
+                 mark_price=100, margin=10, sl=90, tp=110, strategy="absorption_reversal",
+                 status="OPEN", source="paper", params_snapshot=None)
+    db.add_all([bad, good])
+    db.commit()
+    visited = []
+    original = trading_service.manage_order
+
+    def manage(session, order, signal):
+        visited.append(order.id)
+        return original(session, order, signal)
+
+    monkeypatch.setattr(trading_service, "manage_order", manage)
+    monkeypatch.setattr(order_manager.MarketDataService, "load_frame", lambda *a, **k: pd.DataFrame())
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is True
+    assert visited == [bad.id, good.id]
+    assert db.get(Order, bad.id).status == "OPEN"
+    assert any(f"订单 #{bad.id} 管理失败" in item for item in result["signal_errors"])
+    assert any(f"订单 #{bad.id} 管理失败" in row.message and row.level == "error"
+               for row in db.query(JobLog).all())
+
+
+@pytest.mark.parametrize("failure_stage", ["manage", "live_sync"])
+def test_order_database_failure_rolls_back_and_continues(db, monkeypatch, failure_stage):
+    from app.models import ModelRecord
+
+    _stub_cycle(monkeypatch)
+    first = Order(symbol="BADUSDT", interval="1m", side="LONG", qty=1, entry_price=100,
+                  mark_price=100, margin=10, strategy="absorption_reversal", status="OPEN",
+                  source="live" if failure_stage == "live_sync" else "paper")
+    second = Order(symbol="GOODUSDT", interval="1m", side="LONG", qty=1, entry_price=100,
+                   mark_price=100, margin=10, strategy="absorption_reversal", status="OPEN",
+                   source="paper")
+    db.add_all([first, second])
+    db.commit()
+    first_id, second_id = first.id, second.id
+    visited = []
+
+    def fail_flush():
+        db.add(ModelRecord(symbol="BADUSDT", interval="1h", algo="x", path=None))
+        db.flush()
+
+    def manage(session, order, signal):
+        visited.append(order.id)
+        if order.id == first_id and failure_stage == "manage":
+            fail_flush()
+        assert db.query(ModelRecord).count() == 0
+        return {"order_id": order.id, "actions": []}
+
+    def sync(session, order):
+        fail_flush()
+
+    monkeypatch.setattr(trading_service, "manage_order", manage)
+    monkeypatch.setattr(trading_service, "sync_live", sync)
+    result = TradingService(db).run_cycle()
+    assert result["ok"] is True and second_id in visited
+    assert any(row.level == "error" and f"#{first_id}" in row.message
+               for row in db.query(JobLog).all())
+
+
 def test_cycle_log_warning_on_partial_sync_failure(db, monkeypatch):
     symbols = ["AAAUSDT", "BBBUSDT", "CCCUSDT"]
     set_state(db, "symbol_scope", "custom")

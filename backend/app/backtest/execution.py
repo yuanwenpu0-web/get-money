@@ -209,7 +209,17 @@ def simulate(
             entry = row.open * (1 + side * slippage)
             stop = previous.close * (1 - side * signal.sl_pct)
             target = previous.close * (1 + side * signal.tp_pct)
-            scaled = all(k in params for k in ("tp1_r", "tp2_r", "target_r", "tp1_fraction", "tp2_fraction", "tp3_fraction"))
+            # 分批止盈只在真的分成多档时才走 targets 分支：只有一档被激活时，档位价
+            # 与 signal.tp_pct 完全等价，走单目标路径可以保持这类策略的成交状态仍是
+            # `take_profit`（历史报告、下游按状态分组的统计都不需要改口径）。
+            has_split_keys = all(
+                k in params
+                for k in ("tp1_r", "tp2_r", "target_r", "tp1_fraction", "tp2_fraction", "tp3_fraction")
+            )
+            active_levels = sum(
+                1 for n in (1, 2, 3) if has_split_keys and float(params[f"tp{n}_fraction"]) > 0
+            )
+            scaled = has_split_keys and active_levels >= 2
             target_levels = []
             if scaled:
                 risk_from_signal = abs(previous.close - stop)

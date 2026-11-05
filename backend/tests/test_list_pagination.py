@@ -11,7 +11,7 @@ from sqlalchemy import event
 from app.api import backtests, trading
 from app.db import get_db
 from app.market.data_service import MarketDataService
-from app.models import BacktestRun, JobLog, Order
+from app.models import BacktestRun, JobLog, Order, StrategyConfig
 
 
 CREATED = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -26,9 +26,11 @@ def seed_backtests(db, count):
     db.commit()
 
 
-def order(db, symbol="BTCUSDT", status="OPEN", side="LONG", pnl=0, mark=105):
+def order(db, symbol="BTCUSDT", status="OPEN", side="LONG", pnl=0, mark=105,
+          strategy="absorption_reversal"):
     row = Order(symbol=symbol, interval="1h", side=side, status=status, qty=2,
-                entry_price=100, mark_price=mark, realized_pnl=pnl, created_at=CREATED)
+                entry_price=100, mark_price=mark, realized_pnl=pnl,
+                strategy=strategy, created_at=CREATED)
     db.add(row)
     return row
 
@@ -51,6 +53,35 @@ def test_order_summary_covers_entire_filtered_set_and_mark_fallback(db):
     assert closed["summary"] == {"open": 0, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 0}
     assert [row["id"] for row in closed["orders"]] == [2]
     assert [row["id"] for row in trading.list_orders(status="closed", symbol="BTCUSDT", page=2, page_size=1, db=db)["orders"]] == [1]
+
+
+def test_order_strategy_filter_applies_to_rows_totals_and_summary(db):
+    order(db, strategy="absorption_reversal", status="CLOSED", pnl=5)
+    order(db, strategy="absorption_reversal", mark=105)
+    order(db, strategy="retired_strategy", status="CLOSED", pnl=7)
+    order(db, strategy="", status="CLOSED", pnl=99)
+    db.add(StrategyConfig(code="absorption_reversal", name="吸收反转", enabled=1, params="{}"))
+    db.commit()
+
+    result = trading.list_orders(strategy="ABSORPTION_REVERSAL", page_size=1, db=db)
+    assert result["total"] == 2
+    assert result["summary"] == {"open": 1, "closed": 1, "realized_pnl": 5, "unrealized_pnl": 10}
+    assert [row["strategy"] for row in result["orders"]] == ["absorption_reversal"]
+    assert [row["strategy"] for row in trading.list_orders(strategy="retired_strategy", db=db)["orders"]] == ["retired_strategy"]
+
+    options = trading.list_order_strategies(db)
+    assert options == {"strategies": [
+        {"code": "absorption_reversal", "name": "吸收反转", "count": 2},
+        {"code": "retired_strategy", "name": "retired_strategy", "count": 1},
+    ]}
+
+
+def test_order_strategy_options_route_is_not_shadowed_by_order_id():
+    # `/orders/{order_id}` 是 int 路径；静态路径必须先注册，否则 FastAPI 会先把
+    # "strategies" 当成订单 ID 解析并返回 422。这里不启动 TestClient，避免内存
+    # SQLite 连接跨 TestClient 工作线程使用。
+    paths = [route.path for route in trading.router.routes]
+    assert paths.index("/trading/orders/strategies") < paths.index("/trading/orders/{order_id}")
 
 
 def test_order_and_log_legacy_limits_are_bounded_and_explicit_page_size_wins(db):

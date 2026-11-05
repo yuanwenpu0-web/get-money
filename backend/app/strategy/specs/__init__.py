@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from . import absorption_reversal  # noqa: F401
 from . import capital41_fusion_scalp  # noqa: F401
+from . import flow_imbalance_long  # noqa: F401
 from . import opening_candle_breakout  # noqa: F401
 from . import pool_volatility_research  # noqa: F401
 from . import rgd_donchian_v2  # noqa: F401
@@ -17,6 +18,7 @@ from . import simple_zigzag_double  # noqa: F401
 __all__ = [
     "absorption_reversal",
     "capital41_fusion_scalp",
+    "flow_imbalance_long",
     "opening_candle_breakout",
     "rgd_donchian_v2",
     "supertrend_current",

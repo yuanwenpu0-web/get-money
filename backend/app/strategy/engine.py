@@ -13,8 +13,12 @@ from ..market.data_service import MarketDataService
 from ..models import Signal, StrategyConfig
 from ..state import all_state
 from ..utils import interval_ms, now_ms, round_price
-from .registry import StrategySpec, get_spec
-from .rules import evaluate_signals, prepare_frame, resolve_params
+from .bindings import ensure_execution_supported
+from .exits import EXIT_KEY, label as exit_label
+from .indicators import StrategyIndicator
+from .registry import PrepareContext, get_spec
+from .rules import apply_exit_overlay
+from .signals import SIGNAL_COLUMNS
 from .symbol_params import get_override
 
 
@@ -42,10 +46,12 @@ class TradeSignal:
     reason: dict = field(default_factory=dict)
     # 产生该信号的绑定参数（进程内透传给撮合，避免再按策略配置解析一次而用错池参数）
     params: dict = field(default_factory=dict, repr=False)
+    binding_id: int | None = None
 
     def to_dict(self) -> dict:
         data = asdict(self)
         data.pop("params", None)
+        data.pop("binding_id", None)
         return data
 
 
@@ -105,17 +111,17 @@ class StrategyEngine:
         self,
         symbol: str,
         interval: str,
-        spec: StrategySpec,
+        indicator: StrategyIndicator,
         params: dict,
     ) -> pd.DataFrame | None:
         """取指标帧并按策略补上下文；同轮同参数的重复请求走缓存。"""
-        limit = spec.lookback(params)
+        limit = indicator.lookback(params)
         key = (symbol, interval, limit, _fingerprint(params))
         if self.cycle_snapshot and key in self._frames:
             return self._frames[key]
         data = self._prepare_features(symbol, interval, limit)
         if data is not None:
-            data = prepare_frame(data, spec.code, params, symbol=symbol, service=self.service)
+            data = indicator.prepare(data, params, PrepareContext(symbol=symbol, service=self.service))
         if self.cycle_snapshot:
             # 巡检按「绑定 × 币种」遍历，只保留当前序列，避免宇宙级缓存堆积
             self._frames.clear()
@@ -137,23 +143,24 @@ class StrategyEngine:
 
         `params` 一般由 `bindings.active_bindings()` 解析好传入（已含池参数覆盖）；
         不传时按策略配置 + 全局设置自行解析，供预演等临时调用使用。
-        `respect_enabled=False` 用于「预演」：策略总开关关闭时也允许算一次看看。
+        `respect_enabled=False` 用于「预演」；绑定传入有效参数时由绑定控制启停。
         """
         if strategy_code in (None, "auto"):
             return None
-        spec = get_spec(strategy_code)
+        indicator = StrategyIndicator(get_spec(strategy_code))
+        spec = indicator.spec
         config = self._get_config(strategy_code)
-        if respect_enabled and config is not None and not config.enabled:
+        if respect_enabled and params is None and config is not None and not config.enabled:
             return None
         if params is None:
             merged = json.loads(config.params or "{}") if config else {}
             # 未显式传入时也叠上该币种的参数覆盖，保证「不传 params」的调用
             # 与巡检/回测取出同一套参数
             merged.update(get_override(self.db, strategy_code, symbol, interval))
-            params = resolve_params(
-                strategy_code, self._get_state(), merged or None, interval=interval
-            )
-        data = self._frame(symbol, interval, spec, params)
+            params = indicator.resolve_params(self._get_state(), merged or None, interval=interval)
+        if respect_enabled:
+            ensure_execution_supported(strategy_code, params)
+        data = self._frame(symbol, interval, indicator, params)
         if data is None:
             return None
         step = interval_ms(interval)
@@ -174,13 +181,36 @@ class StrategyEngine:
             metrics_features = self._metrics[symbol]
         else:
             metrics_features = metrics_mod.load_latest_metrics(self.db, symbol) or {}
-        decision = evaluate_signals(data.iloc[-1:], strategy_code, params, symbol=symbol).iloc[0]
+        # 绑定层出场覆盖需要整帧历史（枢轴确认、滚动水平池），单行切片会让支撑位
+        # 全部打成回退；只有真的启用了覆盖时才付这份计算成本，默认路径仍是末行评估。
+        exit_config = params.get(EXIT_KEY) or {}
+        window = data if (exit_config.get("method") or "strategy") != "strategy" else data.iloc[-1:]
+        window = indicator.prepare(window, params, PrepareContext(symbol=symbol))
+        signals = indicator.signals(window, params)
+        missing = set(SIGNAL_COLUMNS) - set(signals.columns)
+        if missing:
+            raise ValueError(f"{strategy_code} 输出的信号帧缺少列: {', '.join(sorted(missing))}")
+        decision = apply_exit_overlay(window, signals, params).iloc[-1]
         ts = int(data.index[-1].timestamp() * 1000)
         stale = now_ms() - (ts + step) > params["max_signal_age_bars"] * step
         direction = 0 if stale else int(decision.direction)
         price = float(row["close"])
         atr_pct = float(row["atr_pct"]) if math.isfinite(float(row["atr_pct"])) else 0.0
         observation = spec.describe(row) if spec.describe else {}
+        # 出场口径观测：方法、用到的支撑位水平、是否回退 ATR（支撑位缺失/过远）
+        raw_level = getattr(decision, "exit_level", None)
+        exit_level = (
+            float(raw_level)
+            if raw_level is not None and math.isfinite(float(raw_level))
+            else 0.0
+        )
+        exit_reason = {
+            "method": exit_config.get("method", "strategy"),
+            "support": exit_config.get("support", ""),
+            "label": exit_label(exit_config),
+            "level": exit_level,
+            "fallback": int(getattr(decision, "exit_fallback", 0) or 0),
+        }
         signal = TradeSignal(
             symbol=symbol,
             interval=interval,
@@ -211,6 +241,7 @@ class StrategyEngine:
                 if math.isfinite(float(decision.net_reward_risk))
                 else 0.0,
                 "pool": pool,
+                "exit": exit_reason,
                 "metrics": metrics_features,  # 观测用多源指标快照（附件，不影响决策）
                 **observation,
             },

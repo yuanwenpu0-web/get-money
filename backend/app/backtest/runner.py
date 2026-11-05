@@ -18,7 +18,7 @@ from ..models import StrategyConfig
 from ..market.data_service import MarketDataService
 from ..strategy.bindings import binding_overrides
 from ..state import all_state
-from ..strategy.rules import evaluate_signals, resolve_params
+from ..strategy.rules import evaluate_signals, prepare_frame, resolve_params
 from ..utils import interval_ms, now_ms
 from .execution import exposure_metrics, randomize_directions, simulate
 from .metrics import downsample, metrics_from_equity
@@ -34,6 +34,7 @@ HAS_VBT = importlib.util.find_spec("vectorbt") is not None
 # 通用撮合会把它们的出场规则换成另一套，所以这里统一早路由。
 OPENING_BREAKOUT = "opening_candle_breakout"
 RGD = "rgd_donchian_v2"
+CLOSED_LOOP = "supertrend_current"
 
 
 def run_zigzag_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
@@ -245,6 +246,78 @@ def run_rgd_backtest(db, symbol, interval, params, initial, fee, slippage, days,
     return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
 
 
+def run_closed_loop_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool):
+    """闭环模式整窗回放：prepare 产出订单状态列，专用 broker 按事件撮合。
+
+    与 `run_zigzag_backtest` 同一范式（不做 train/test split、不支持通用选参），
+    成本用回测请求的 fee/slippage，策略参数不覆盖。
+    """
+    from .closed_loop_execution import simulate_closed_loop
+
+    as_of = min(end_ms, now_ms()) if end_ms is not None else now_ms()
+    step = interval_ms(interval)
+    frame = MarketDataService(db).load_frame(
+        symbol, interval, start_ms=as_of - days * 86_400_000, end_ms=as_of
+    )
+    if frame.empty:
+        raise ValueError(f"{symbol} {interval} 本地无K线数据，请先拉取历史数据")
+    frame = frame.loc[(frame.index.as_unit("ms").asi8 + step) <= as_of].copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+    if len(frame) < 3:
+        raise ValueError("已收盘K线不足 3 根")
+    prices = frame[["open", "high", "low", "close"]]
+    valid = np.isfinite(prices).all(axis=1) & prices.gt(0).all(axis=1)
+    valid &= frame.high.ge(frame[["open", "close", "low"]].max(axis=1))
+    valid &= frame.low.le(frame[["open", "close", "high"]].min(axis=1))
+    if not valid.all():
+        raise ValueError("行情包含无效 K 线，无法按闭环状态机回放")
+    diffs = frame.index.to_series().diff().dt.total_seconds().mul(1000)
+    gap_count = int(diffs.gt(step).sum())
+    enriched = prepare_frame(frame, CLOSED_LOOP, params, symbol=symbol)
+    signals = evaluate_signals(enriched, CLOSED_LOOP, params)
+    equity, trades = simulate_closed_loop(enriched, signals, params, initial, fee, slippage, interval)
+    metrics = metrics_from_equity(equity, trades, initial, interval)
+    metrics.update(exposure_metrics(equity, trades, interval))
+    event_counts = enriched["st_cl_event"].value_counts().to_dict()
+    entry_mode = int(params.get("cl_entry_mode", 1))
+    fill_modes = (
+        enriched.loc[enriched["st_cl_event"] == "fill", "st_cl_entry_mode"]
+        .value_counts().to_dict()
+    )
+    status_counts: dict[str, int] = {}
+    for trade in trades:
+        status_counts[trade["status"]] = status_counts.get(trade["status"], 0) + 1
+    mode_label = {0: "市价（下一根开盘）", 1: "反向回踩支撑位挂单", 2: "对侧电平突破挂单"}.get(
+        entry_mode, "未知"
+    )
+    warnings = [
+        "工程回放，非 edge 判定：本结果只验证订单闭环时序，不构成收益结论。",
+        f"进场价模式 cl_entry_mode={entry_mode}（{mode_label}）；三档共用同一套退出与全局成本口径。",
+        "挂单在 bar s 收盘提交、s+1 起可成交；撤单/趋势破位平仓同样在下一根生效。",
+        "指标有效性按已收盘 K 线判断，bar 内先触价成交、后判定失效无法避免。",
+        "Pine 的指标状态从本地数据窗口首根开始计算；对照 TradingView 时须统一行情与历史起点。",
+    ]
+    if gap_count:
+        warnings.append(f"行情存在 {gap_count} 处缺口；缺失时段的价格路径不可知。")
+    metrics.update({
+        "engine": "closed_loop_state_machine", "execution": "closed_loop_broker",
+        "symbol": symbol, "interval": interval, "strategy": CLOSED_LOOP,
+        "pool": pool or "", "algo": "rule", "fee_rate": fee, "slippage": slippage,
+        "threshold": None, "buy_hold_return_pct": round((float(frame.close.iloc[-1]) / float(frame.open.iloc[0]) - 1) * 100, 4),
+        "signal_bars": int((enriched["st_cl_event"] == "submit").sum()),
+        "closed_loop_entry_mode": entry_mode,
+        "closed_loop_fill_modes": {str(k): int(v) for k, v in fill_modes.items()},
+        "closed_loop_events": {str(k): int(v) for k, v in event_counts.items()},
+        "status_counts": status_counts,
+        "parameters": params, "baseline": None, "random_baseline": None,
+        "validation": {"enabled": False}, "warnings": warnings,
+        "data_quality": {"raw_bars": len(frame), "gap_count": gap_count},
+        "split": {"test_start": str(frame.index[0]), "test_end": str(frame.index[-1]),
+                  "test_rows": len(frame), "purge_bars": 0},
+    })
+    return {"metrics": metrics, "equity_curve": downsample(equity), "trades": trades[-500:]}
+
+
 def minimum_sample_trades(validation_bars: int) -> int:
     """小样本惩罚：验证集每 50 根K线至少 1 笔成交，下限 **30 笔**。
 
@@ -361,6 +434,10 @@ def run_backtest(
         strategy, {**state, "fee_rate": fee, "slippage": slippage}, overrides,
         interval=interval,
     )
+    if strategy == CLOSED_LOOP and params.get("cl_enabled"):
+        if optimize:
+            raise ValueError("订单闭环模式不支持通用验证集选参，请关闭选参后回测")
+        return run_closed_loop_backtest(db, symbol, interval, params, initial, fee, slippage, days, end_ms, pool)
     if is_zigzag:
         if optimize:
             raise ValueError("Simple ZigZag Double 不支持通用验证集选参，请关闭选参后回测")

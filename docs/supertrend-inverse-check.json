@@ -1,0 +1,367 @@
+{
+  "generated_at": "2026-11-04T17:50:21.493984+00:00",
+  "strategy": "supertrend_current",
+  "pool": "trend_reversal_fit",
+  "days": 300,
+  "periods": [
+    {
+      "interval": "15m",
+      "days": 300,
+      "members": [
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TIAUSDT",
+        "BTCUSDT"
+      ],
+      "normal": {
+        "trades": 8967,
+        "mean_pct": -0.4577,
+        "ci_low_pct": -0.5159,
+        "ci_high_pct": -0.3964,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -47.8667,
+        "account_mean_pct": -46.2176,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "inverse": {
+        "trades": 7924,
+        "mean_pct": -0.4611,
+        "ci_low_pct": -0.5243,
+        "ci_high_pct": -0.4015,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -42.0391,
+        "account_mean_pct": -41.8463,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "normal_long": {
+        "trades": 4467,
+        "mean_pct": -0.5539,
+        "ci_low_pct": -0.6412,
+        "ci_high_pct": -0.4682,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -47.8667,
+        "account_mean_pct": -46.2176,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "normal_short": {
+        "trades": 4500,
+        "mean_pct": -0.3623,
+        "ci_low_pct": -0.4499,
+        "ci_high_pct": -0.2732,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -47.8667,
+        "account_mean_pct": -46.2176,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "inverse_long": {
+        "trades": 3879,
+        "mean_pct": -0.5533,
+        "ci_low_pct": -0.6409,
+        "ci_high_pct": -0.4664,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -42.0391,
+        "account_mean_pct": -41.8463,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "inverse_short": {
+        "trades": 4045,
+        "mean_pct": -0.3727,
+        "ci_low_pct": -0.4581,
+        "ci_high_pct": -0.2861,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -42.0391,
+        "account_mean_pct": -41.8463,
+        "positive_symbols": 0,
+        "symbols": 12
+      },
+      "per_symbol": [
+        {
+          "symbol": "ETHUSDT",
+          "normal_pct": -47.0714,
+          "inverse_pct": -51.4002,
+          "trades": 744
+        },
+        {
+          "symbol": "SOLUSDT",
+          "normal_pct": -55.8708,
+          "inverse_pct": -40.5342,
+          "trades": 733
+        },
+        {
+          "symbol": "XRPUSDT",
+          "normal_pct": -54.5594,
+          "inverse_pct": -44.9824,
+          "trades": 739
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "normal_pct": -53.0921,
+          "inverse_pct": -34.8175,
+          "trades": 755
+        },
+        {
+          "symbol": "ADAUSDT",
+          "normal_pct": -37.7641,
+          "inverse_pct": -35.8124,
+          "trades": 691
+        },
+        {
+          "symbol": "LINKUSDT",
+          "normal_pct": -34.5308,
+          "inverse_pct": -45.1946,
+          "trades": 729
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "normal_pct": -31.777,
+          "inverse_pct": -43.5439,
+          "trades": 785
+        },
+        {
+          "symbol": "LTCUSDT",
+          "normal_pct": -48.7454,
+          "inverse_pct": -50.458,
+          "trades": 733
+        },
+        {
+          "symbol": "DOTUSDT",
+          "normal_pct": -48.6621,
+          "inverse_pct": -37.8718,
+          "trades": 741
+        },
+        {
+          "symbol": "SUIUSDT",
+          "normal_pct": -44.0823,
+          "inverse_pct": -32.4018,
+          "trades": 772
+        },
+        {
+          "symbol": "TIAUSDT",
+          "normal_pct": -39.2931,
+          "inverse_pct": -29.5081,
+          "trades": 788
+        },
+        {
+          "symbol": "BTCUSDT",
+          "normal_pct": -59.1633,
+          "inverse_pct": -55.6311,
+          "trades": 757
+        }
+      ],
+      "status_normal": {
+        "stop_loss": 5593,
+        "take_profit_1": 4450,
+        "signal_reverse": 1520,
+        "take_profit_2": 2768,
+        "take_profit_3": 1851,
+        "close_at_end": 3
+      },
+      "status_inverse": {
+        "take_profit_1": 3879,
+        "take_profit_2": 1460,
+        "take_profit_3": 251,
+        "stop_loss": 5108,
+        "signal_reverse": 2563,
+        "close_at_end": 2
+      }
+    },
+    {
+      "interval": "1h",
+      "days": 300,
+      "members": [
+        "ETHUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOGEUSDT",
+        "ADAUSDT",
+        "LINKUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "DOTUSDT",
+        "SUIUSDT",
+        "TIAUSDT",
+        "BTCUSDT"
+      ],
+      "normal": {
+        "trades": 2252,
+        "mean_pct": -0.1902,
+        "ci_low_pct": -0.3193,
+        "ci_high_pct": -0.0601,
+        "positive_share": 0.0015,
+        "verdict": "negative",
+        "account_median_pct": -8.0061,
+        "account_mean_pct": -6.8114,
+        "positive_symbols": 3,
+        "symbols": 12
+      },
+      "inverse": {
+        "trades": 1991,
+        "mean_pct": -0.1616,
+        "ci_low_pct": -0.2853,
+        "ci_high_pct": -0.0394,
+        "positive_share": 0.005,
+        "verdict": "negative",
+        "account_median_pct": -5.2947,
+        "account_mean_pct": -5.2504,
+        "positive_symbols": 2,
+        "symbols": 12
+      },
+      "normal_long": {
+        "trades": 1122,
+        "mean_pct": -0.3778,
+        "ci_low_pct": -0.536,
+        "ci_high_pct": -0.2049,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -8.0061,
+        "account_mean_pct": -6.8114,
+        "positive_symbols": 3,
+        "symbols": 12
+      },
+      "normal_short": {
+        "trades": 1130,
+        "mean_pct": -0.004,
+        "ci_low_pct": -0.1959,
+        "ci_high_pct": 0.1857,
+        "positive_share": 0.465,
+        "verdict": "inconclusive",
+        "account_median_pct": -8.0061,
+        "account_mean_pct": -6.8114,
+        "positive_symbols": 3,
+        "symbols": 12
+      },
+      "inverse_long": {
+        "trades": 955,
+        "mean_pct": -0.3348,
+        "ci_low_pct": -0.5129,
+        "ci_high_pct": -0.1486,
+        "positive_share": 0.0,
+        "verdict": "negative",
+        "account_median_pct": -5.2947,
+        "account_mean_pct": -5.2504,
+        "positive_symbols": 2,
+        "symbols": 12
+      },
+      "inverse_short": {
+        "trades": 1036,
+        "mean_pct": -0.0018,
+        "ci_low_pct": -0.1925,
+        "ci_high_pct": 0.1839,
+        "positive_share": 0.471,
+        "verdict": "inconclusive",
+        "account_median_pct": -5.2947,
+        "account_mean_pct": -5.2504,
+        "positive_symbols": 2,
+        "symbols": 12
+      },
+      "per_symbol": [
+        {
+          "symbol": "ETHUSDT",
+          "normal_pct": -9.5139,
+          "inverse_pct": -8.6381,
+          "trades": 189
+        },
+        {
+          "symbol": "SOLUSDT",
+          "normal_pct": 0.5619,
+          "inverse_pct": -4.2405,
+          "trades": 191
+        },
+        {
+          "symbol": "XRPUSDT",
+          "normal_pct": -9.1983,
+          "inverse_pct": -10.8966,
+          "trades": 187
+        },
+        {
+          "symbol": "DOGEUSDT",
+          "normal_pct": -13.3608,
+          "inverse_pct": -6.3489,
+          "trades": 192
+        },
+        {
+          "symbol": "ADAUSDT",
+          "normal_pct": -6.3729,
+          "inverse_pct": -0.3995,
+          "trades": 190
+        },
+        {
+          "symbol": "LINKUSDT",
+          "normal_pct": 3.0271,
+          "inverse_pct": -17.8353,
+          "trades": 169
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "normal_pct": -6.557,
+          "inverse_pct": 4.3042,
+          "trades": 216
+        },
+        {
+          "symbol": "LTCUSDT",
+          "normal_pct": -11.4013,
+          "inverse_pct": -3.295,
+          "trades": 190
+        },
+        {
+          "symbol": "DOTUSDT",
+          "normal_pct": 1.9669,
+          "inverse_pct": -17.0419,
+          "trades": 168
+        },
+        {
+          "symbol": "SUIUSDT",
+          "normal_pct": -13.6752,
+          "inverse_pct": 10.7628,
+          "trades": 190
+        },
+        {
+          "symbol": "TIAUSDT",
+          "normal_pct": -6.8138,
+          "inverse_pct": -2.3249,
+          "trades": 178
+        },
+        {
+          "symbol": "BTCUSDT",
+          "normal_pct": -10.3996,
+          "inverse_pct": -7.0507,
+          "trades": 192
+        }
+      ],
+      "status_normal": {
+        "take_profit_1": 1110,
+        "take_profit_2": 712,
+        "stop_loss": 1364,
+        "take_profit_3": 484,
+        "signal_reverse": 403,
+        "close_at_end": 1
+      },
+      "status_inverse": {
+        "stop_loss": 1261,
+        "take_profit_1": 945,
+        "signal_reverse": 664,
+        "take_profit_2": 395,
+        "take_profit_3": 66
+      }
+    }
+  ]
+}

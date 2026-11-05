@@ -1,0 +1,3753 @@
+{
+  "generated_at_ms": 1793811374721,
+  "last_complete_hour_ms": 1793804400000,
+  "universe_size": 535,
+  "dry_run": false,
+  "status_counts": {
+    "ok": 531,
+    "fresh": 2,
+    "error": 2
+  },
+  "rows_inserted": 257764,
+  "results": [
+    {
+      "symbol": "0GUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000CHEEMSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000SATSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000FLOKIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000000MOGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "1000SHIBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000RATSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000LUNCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1MBABYDOGEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000XECUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "2ZUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1INCHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ACHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "4USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ACUUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AEVOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ACEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AGTUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "AIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AGLDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "1000CATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ADAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "AIOTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AIXBTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AIGENSYNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ALCHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AIOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ALGOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AEROUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ALLOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ACTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ALTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AKEUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "ALLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ANIMEUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "ALICEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ANKRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "API3USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ALPINEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "APEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ARCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARBUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ARKMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AKTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ASRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ASTRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ATHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ARPAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AVAAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "APRUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "AVAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ASTERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "APTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AXLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AUCTIONUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BANANAS31USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AXSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AVNTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "B2USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AWEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BANKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BANUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BABYUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "BARDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BASEDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AZTECUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BASUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BCHUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "1000WHYUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "BATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BEAMXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BANANAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BIGTIMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BILLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BICOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BANDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BIOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BLESSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BIRBUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "BELUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BNTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BLURUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BEATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BNBUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "BLUAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BROCCOLI714USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BMTUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "BRETTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BTCUSDT",
+      "status": "fresh",
+      "latest": 1793804400000,
+      "rows": 0
+    },
+    {
+      "symbol": "BRUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "BOMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BREVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BSVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BULLAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "BSBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BTCDOMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CAKEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "C98USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BERAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CARVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CELOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CAPUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "CETUSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BTRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CGPTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CFGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CELRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CHIPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BTWUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "CHZUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CFXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "BROCCOLIF3BUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CLANKERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CKBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "AIUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "CATIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CHILLGUYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "COAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CROSSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "COOKIEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "COMPUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "COWUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "COLLECTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CHRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CTRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CTSIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CTUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "CTKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CYSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CVCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CRVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CLOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DASHUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "DEEPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DODOXUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "DOGSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "DOODUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "DATAIPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DEXEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CYBERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DOLOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DUSKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DYDXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DOTUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "EDENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "CVXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DYMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "EIGENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "EDGEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "EGLDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ENAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "DRIFTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ENSOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ELSAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ENJUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "COTIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ETHUSDT",
+      "status": "fresh",
+      "latest": 1793804400000,
+      "rows": 0
+    },
+    {
+      "symbol": "EDUUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ETCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "DOSUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ENSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ESPORTSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ETHWUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ERAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "FETUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "EVAAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "EULUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FIDAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FIGHTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ESPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FILUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "FFUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FLUIDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FHEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FOGOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ETHFIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FLOCKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FORMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FLUXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GALAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FARTCOINUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "FLOWUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GENIUSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GLMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GMXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GMTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FRAXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GRAMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GRASSUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "GASUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GPSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GRTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GRVTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GIGGLEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GUNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GOATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GUAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HANAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GRIFFAINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HEIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GTCUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "FOLKSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HEMIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HIVEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HAEDALUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HOLOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "GWEIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HBARUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HUMAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HOMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HYPERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HYPEUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "HMSTRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ICPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IDOLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ICNTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "INITUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ILVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "INJUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "INUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "INXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "HOTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IOSTUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "IOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IOTXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IMXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "JCTUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "JELLYJELLYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "JSTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "JASMYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KAIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KASUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "EPICUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "IOTAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "JTOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "FXSUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "KATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "JOEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KERNELUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IRYSUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "KAVAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KITEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KOMAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LABUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LAYERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KMNOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KNCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KGENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LDOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LISTAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LITUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "LPTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KAITOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LIGHTUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "LINEAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LQTYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "KSMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LYNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LSKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LINKUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "MAGICUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MAGMAUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "LTCUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "MANTAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MASKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MAVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "IRUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 7638
+    },
+    {
+      "symbol": "MEGAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MARSCOINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MANAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MELANIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MANTRAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MAVIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "METUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MEMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MERLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "METISUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MMTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MEWUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MONUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MINAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MOODENGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MOCAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MIRAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MOVEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MOVRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LUNA2USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MTLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MUBARAKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "LUMIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NEIROUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MYXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NEWTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MORPHOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NMRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NEOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NOTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NOMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NAORISUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NEARUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "NILUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ONDOUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "OGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ONEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ONGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ONTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "OPGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "OPENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "OPNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NXPCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NIGHTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "OGNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ORDERUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "OUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ONUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PAXGUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "ORCAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "OPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PHAROSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PENDLEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PEOPLEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PHAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PARTIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PIXELUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PENGUUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "PLUMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "POLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PNUTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PIPPINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ORDIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "POPCATUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PLAYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PORTALUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PIEVERSEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PREDICTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "POLYXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PONSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PROVEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PRLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "POWERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PUNDIXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PYTHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "POWRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "QTUMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PROMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PUMPUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "QUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "RAREUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RAVEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "QNTUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "RECALLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "NTRNUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "RESOLVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RENDERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "MITOUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "REZUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RIFUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RIVERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RAYSOLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RLCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "REDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ROBOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RPLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RONINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ROSEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RUNEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RSRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SAHARAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PUMPBTCUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "REUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SAFEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RVNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SAGAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SANDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SAPIENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SFPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SANTOSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SENTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SEIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SIGNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SKLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SKRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SCRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SKYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SHELLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SLPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SKYAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SIRENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SNXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "RDNTUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "SOLUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "PTBUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "SOMIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SONICUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SLXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SPACEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SPKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SPORTFUNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SPXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SQDUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SPELLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "QUICKUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "SSVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SOONUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "SOLVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SOPHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "STBLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "STEEMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "STRKUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "STABLEUSDT",
+      "status": "error",
+      "reason": "币安合约接口返回重定向 302，请检查代理或网络"
+    },
+    {
+      "symbol": "STARUSDT",
+      "status": "error",
+      "reason": "币安合约接口返回重定向 302，请检查代理或网络"
+    },
+    {
+      "symbol": "STOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "PROMPTUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "STXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SUIUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "SUNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SXTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SYNUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SWARMSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SUSHIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TAGUSDT",
+      "status": "ok",
+      "latest": 1792972800000,
+      "target": 1793804400000,
+      "rows": 234
+    },
+    {
+      "symbol": "TAIKOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TAOUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "TAKEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "THETAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TACUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TLMUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SUPERUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TOSHIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TNSRUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TIAUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "TOWNSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TREEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRADOORUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRUTHUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRUSTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRUMPUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "TRIAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRXUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "TURBOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TRBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TSTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TUTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "THEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TURTLEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TWTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "UNIUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "UBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "UAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "TUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "USDCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "USTCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VANAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "USELESSUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "USUALUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "USUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "SLERFUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "VELODROMEUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VELVETUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VVVUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WAXPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WETUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VETUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WIFUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VIRTUALUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WLDUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "WLFIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "VTHOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "UMAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XAIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XMRUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "WCTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XAUTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XANUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WALUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XRPUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "XPLUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "WOOUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XLMUSDT",
+      "status": "ok",
+      "latest": 1793016000000,
+      "target": 1793804400000,
+      "rows": 222
+    },
+    {
+      "symbol": "YBUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XVSUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZAMAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XVGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZBTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XNYUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "STGUSDT",
+      "status": "ok",
+      "latest": 0,
+      "target": 1793804400000,
+      "rows": 9601
+    },
+    {
+      "symbol": "ZENUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "XPINUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZECUSDT",
+      "status": "ok",
+      "latest": 1792936800000,
+      "target": 1793804400000,
+      "rows": 244
+    },
+    {
+      "symbol": "XTZUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "YFIUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZEREBROUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZKCUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZETAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZKPUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "YGGUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZRXUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZILUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "我踏马来了USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZROUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZKUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "牛来USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "龙虾USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "币安人生USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "哈基米USDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZORAUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    },
+    {
+      "symbol": "ZESTUSDT",
+      "status": "ok",
+      "latest": 1792933200000,
+      "target": 1793804400000,
+      "rows": 245
+    }
+  ]
+}

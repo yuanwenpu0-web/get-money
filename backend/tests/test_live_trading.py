@@ -3,6 +3,8 @@
 
 import json
 
+import pytest
+
 from app.market.futures import BinanceApiError
 from app.models import Order
 from app.state import set_state
@@ -25,8 +27,18 @@ def test_open_live_floors_qty_to_step_and_builds_protection_orders(db, monkeypat
     assert tp["closePosition"] == "true" and tp["stopPrice"] == "103"
     note = json.loads(order.note)
     assert note["exchange_order_id"] and note["sl_order_id"] and note["tp_order_id"]
+    assert json.loads(order.params_snapshot)["params"]["exit"]["method"] == "strategy"
     assert order.entry_price == 100.5  # 用交易所成交均价入账
     assert order.sl == 99.0 and order.tp == 103.0
+
+
+def test_live_rejects_incomplete_snapshot_before_exchange(db, monkeypatch):
+    fake = FakeFuturesClient()
+    patch_live(db, monkeypatch, fake)
+    with pytest.raises(ValueError, match="快照不完整"):
+        live.open_live(db, signal(params={"max_hold_bars": 12}))
+    assert fake.calls == []
+    assert db.query(Order).count() == 0
 
 
 def test_open_live_rejects_below_min_notional(db, monkeypatch):

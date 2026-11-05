@@ -19,7 +19,7 @@ from .api import (
     trading,
 )
 from .config import BASE_DIR
-from .db import SessionLocal, init_db
+from .db import SessionLocal, init_db, pool_status
 from .state import all_state, ensure_default_state
 from .strategy.defaults import seed_defaults
 from .trading.scheduler import scheduler, sync_scheduler_with_state
@@ -66,6 +66,15 @@ app.include_router(trading.router, prefix="/api")
 @app.get("/api/health")
 def health():
     return {"ok": True, "service": "quant-trading", "mode": "paper"}
+
+
+@app.get("/api/db/pool")
+def db_pool(probe: bool = False):
+    """数据库连接池判断：是否复用连接、容量占用、物理建连次数与告警。
+
+    只读诊断端点，不返回连接串/账号/密码；`?probe=true` 会额外探活并读 PG 连接数。
+    """
+    return pool_status(probe=probe)
 
 
 DIST_DIR = BASE_DIR / "frontend" / "dist"

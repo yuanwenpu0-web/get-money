@@ -66,6 +66,9 @@ class PoolPayload(BaseModel):
     kind: Literal['static', 'rule'] = 'rule'
     symbols: list[str] = Field(default_factory=list)
     rule: dict = Field(default_factory=dict)
+    # 人工增删层：规则解析后最后叠加，不受筛选条件与自动维护的影响
+    manual_include: list[str] = Field(default_factory=list)
+    manual_exclude: list[str] = Field(default_factory=list)
     enabled: bool = True
 
 
@@ -75,25 +78,38 @@ class PoolUpdate(BaseModel):
     kind: Literal['static', 'rule'] | None = None
     symbols: list[str] | None = None
     rule: dict | None = None
+    # None = 不改这一侧；传空数组 = 明确清空这一侧
+    manual_include: list[str] | None = None
+    manual_exclude: list[str] | None = None
     enabled: bool | None = None
 
 
 class BindingPayload(BaseModel):
-    """一条「策略 × 币种池」绑定：周期与参数都在这条记录上。"""
+    """一条「策略 × 币种池」绑定：周期、参数与出场口径都在这条记录上。"""
 
     strategy: str = Field(min_length=1, max_length=48)
     pool: str = Field(min_length=1, max_length=48)
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d']
-    enabled: bool = True
+    enabled: bool = False
     priority: int = Field(default=100, ge=0, le=10_000)
     params: dict = Field(default_factory=dict)
+    # 出场覆盖：方法与参数经 strategy/exits.py 注册表校验，未知取值直接 400
+    exit_method: str = Field(default="strategy", max_length=32)
+    support_indicator: str = Field(default="", max_length=48)
+    exit_params: dict = Field(default_factory=dict)
 
 
 class BindingUpdate(BaseModel):
+    # 绑定的身份字段也允许改：改完仍要满足 (策略, 池, 周期) 唯一
+    strategy: str | None = Field(default=None, min_length=1, max_length=48)
+    pool: str | None = Field(default=None, min_length=1, max_length=48)
     enabled: bool | None = None
     priority: int | None = Field(default=None, ge=0, le=10_000)
     interval: Literal['1m', '5m', '15m', '1h', '4h', '1d'] | None = None
     params: dict | None = None
+    exit_method: str | None = Field(default=None, max_length=32)
+    support_indicator: str | None = Field(default=None, max_length=48)
+    exit_params: dict | None = None
 
 
 class SyncRequest(BaseModel):

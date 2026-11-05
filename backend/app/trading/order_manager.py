@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-
 import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
@@ -10,7 +8,7 @@ from ..features.indicators import build_features
 from ..market.data_service import MarketDataService
 from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
-from ..strategy.bindings import resolve_order_params
+from ..strategy.bindings import decode_order_params, resolve_order_params
 from ..strategy.registry import get_spec
 from ..strategy.specs.pool_volatility_research import HIGH_CODE, LOW_CODE
 from ..utils import dt_ms, interval_ms, now_ms, round_price
@@ -71,13 +69,16 @@ def manage_order(db: Session, order: Order, signal=None) -> dict:
         return manage_research_order(db, order)
     # 订单必须用「它所属那条绑定 + 该币种覆盖」的参数管理，否则池级或币种级覆盖
     # （止损宽度 / 目标 R / 时间止损）会失效
-    params = resolve_order_params(
-        db,
-        order.strategy,
-        order.interval,
-        getattr(order, "pool", ""),
-        symbol=order.symbol,
-    )
+    if order.params_snapshot is not None:
+        params = decode_order_params(order.strategy, order.interval, order.params_snapshot)
+    else:
+        params = resolve_order_params(
+            db,
+            order.strategy,
+            order.interval,
+            getattr(order, "pool", ""),
+            symbol=order.symbol,
+        )
     step, created = interval_ms(order.interval), dt_ms(order.created_at)
     key = f"order_cursor:{order.id}"
     cursor = get_state(db, key, 0)

@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from ..models import AppState, Order
 from ..state import all_state, get_state, set_state
-from ..strategy.bindings import resolve_order_params
+from ..strategy.bindings import encode_order_params, ensure_execution_supported, resolve_order_params
 from ..strategy.specs.pool_volatility_research import BLOCKED_CODES
 from ..utils import dt_ms, interval_ms, now_ms, round_price
 from .portfolio import open_orders, position_unrealized
@@ -61,6 +61,8 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
         getattr(signal, "pool", ""),
         symbol=getattr(signal, "symbol", ""),
     )
+    ensure_execution_supported(signal.strategy, params)
+    params_snapshot = encode_order_params(signal.strategy, signal.interval, params)
     if not entry_gates(db, signal, params, ignore_cooldown):
         return None
 
@@ -103,6 +105,8 @@ def open_position(db: Session, signal, equity: float | None = None, ignore_coold
         source="paper",
         strategy=signal.strategy,
         pool=getattr(signal, "pool", "") or "",
+        binding_id=getattr(signal, "binding_id", None),
+        params_snapshot=params_snapshot,
         entry_fee=round(fee, 6),
         note=f"score={signal.score} prob_up={signal.prob_up}",
     )
@@ -121,6 +125,11 @@ def open_research_position(db: Session, signal) -> Order | None:
         return None
     if not (getattr(signal, "reason", None) or {}).get("research_entry"):
         return None
+    params = getattr(signal, "params", None) or resolve_order_params(
+        db, signal.strategy, signal.interval, getattr(signal, "pool", ""), symbol=signal.symbol
+    )
+    ensure_execution_supported(signal.strategy, params)
+    params_snapshot = encode_order_params(signal.strategy, signal.interval, params)
     step = interval_ms("1h")
     current = now_ms()
     if not signal.ts + step <= current < signal.ts + 2 * step:
@@ -163,6 +172,7 @@ def open_research_position(db: Session, signal) -> Order | None:
                   entry_price=entry, mark_price=price, margin=round(margin, 4),
                   leverage=1, sl=0, tp=0, status="OPEN", source="paper",
                   strategy=signal.strategy, pool=getattr(signal, "pool", "") or "",
+                  binding_id=getattr(signal, "binding_id", None), params_snapshot=params_snapshot,
                   entry_fee=round(fee, 6), note=f"research_signal_ts={signal.ts}",
                   created_at=datetime.fromtimestamp(fill_ts / 1000, tz=timezone.utc))
     db.add(order)

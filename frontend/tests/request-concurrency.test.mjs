@@ -40,6 +40,35 @@ function view(name, api, exports) {
   }
 }
 
+test('Strategy preview follows the selected binding and clears it when the indicator changes', async () => {
+  let payload
+  const subject = view('Strategies', {
+    previewSignal: async (request) => { payload = request; return {} },
+  }, ['form', 'bindings', 'previewBinding', 'onPreviewBindingChange', 'onPreviewStrategyChange', 'runPreview'])
+  subject.form.strategy = 'first'
+  subject.bindings.value = [{ id: 12, strategy: 'first', pool: 'major', interval: '1h' }]
+  subject.previewBinding.value = 12
+  subject.onPreviewBindingChange(12)
+  await subject.runPreview()
+  assert.equal(payload.pool, 'major')
+  assert.equal(payload.interval, '1h')
+  subject.form.strategy = 'second'
+  subject.onPreviewStrategyChange()
+  await subject.runPreview()
+  assert.equal(payload.strategy, 'second')
+  assert.equal(payload.pool, null)
+  assert.equal(subject.previewBinding.value, '')
+})
+
+test('Strategy page keeps binding management and removes independent indicator controls', () => {
+  const source = readFileSync(new URL('../src/views/Strategies.vue', import.meta.url), 'utf8')
+  assert.match(source, /<BindingMatrix :strategies="strategies" @change="loadBindings"\s*\/>/)
+  assert.match(source, /@click="runCycle"/)
+  assert.match(source, /@click="runPreview\(\)"/)
+  assert.match(source, /信号指标加载失败[\s\S]*?@click="loadStrategies"/)
+  assert.doesNotMatch(source, /strategy-card|api\.updateStrategy|openEdit\(|editVisible/)
+})
+
 test('Orders serializes refreshes and keeps a refresh requested after filters change', async () => {
   const requests = []
   const subject = view('Orders', {
@@ -90,10 +119,11 @@ test('Orders loads settings and orders together and clears its timer on unmount'
   const calls = []
   const subject = view('Orders', {
     getSettings() { calls.push('settings'); return settings.promise },
+    getOrderStrategies() { calls.push('strategies'); return Promise.resolve({ strategies: [] }) },
     getOrders() { calls.push('orders'); return orders.promise },
   }, [])
   const pending = subject.mount()
-  assert.deepEqual(calls, ['settings', 'orders'])
+  assert.deepEqual(calls, ['settings', 'strategies', 'orders'])
   subject.unmount()
   settings.resolve({ symbols: ['BTCUSDT'] })
   orders.resolve({ orders: [] })

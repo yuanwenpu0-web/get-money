@@ -311,7 +311,7 @@ onBeforeUnmount(() => {
         <el-table-column label="止损 / 止盈" min-width="150">
           <template #default="{ row }"><span class="mono">{{ price(row.sl) }} / {{ price(row.tp) }}</span></template>
         </el-table-column>
-        <el-table-column label="策略" min-width="130">
+        <el-table-column label="信号指标" min-width="130">
           <template #default="{ row }">{{ strategyLabel(row.strategy) }}</template>
         </el-table-column>
       </el-table>
@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
           <el-table-column label="杠杆 / 仓位" width="110">
             <template #default="{ row }"><span class="mono">×{{ row.leverage }} · {{ (row.position_pct * 100).toFixed(1) }}%</span></template>
           </el-table-column>
-          <el-table-column label="策略" min-width="120"><template #default="{ row }">{{ strategyLabel(row.strategy) }}</template></el-table-column>
+          <el-table-column label="信号指标" min-width="120"><template #default="{ row }">{{ strategyLabel(row.strategy) }}</template></el-table-column>
         </el-table>
       </div>
 

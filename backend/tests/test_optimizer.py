@@ -272,7 +272,7 @@ def test_load_map_slices_by_strategy_and_interval(db):
     assert (CODE, "BTCUSDT", "15m") in everything
 
 
-def test_broken_override_row_does_not_break_binding(db):
+def test_broken_override_row_rejects_execution(db):
     db.add(SymbolPool(code="p4", name="p4", kind="static", symbols=json.dumps(["BTCUSDT"])))
     db.add(StrategyConfig(code=CODE, name=CODE, enabled=1, params="{}"))
     db.commit()
@@ -282,7 +282,7 @@ def test_broken_override_row_does_not_break_binding(db):
         )
     )
     db.commit()
-    # 手改库写进一个非法值：应回落到绑定参数，而不是让这个币种消失
+    # 手改库写进非法值时必须拒绝执行。
     db.add(
         SymbolParam(
             strategy_code=CODE, symbol="BTCUSDT", interval="15m",
@@ -291,8 +291,8 @@ def test_broken_override_row_does_not_break_binding(db):
     )
     db.commit()
     bindings, _ = active_bindings(db, state=all_state(db))
-    # 非法覆盖被丢弃 → 回落到绑定/策略默认，币种不能因此从巡检里消失
-    assert bindings[0].params_for("BTCUSDT")["target_r"] == 2.0
+    with pytest.raises(ValueError):
+        bindings[0].params_for("BTCUSDT")
 
 
 # ---------------------------------------------------------------- 多周期寻优

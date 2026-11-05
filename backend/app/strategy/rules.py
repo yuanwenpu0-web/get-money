@@ -16,8 +16,9 @@ import pandas as pd
 
 from ..config import DEFAULT_STATE
 from . import specs  # noqa: F401  导入即注册内置策略
+from .exits import DEFAULT_EXIT, EXIT_KEY, ensure_allowed, normalize as normalize_exit, overlay_distances
 from .registry import PrepareContext, available_codes, get_spec
-from .signals import SIGNAL_COLUMNS
+from .signals import SIGNAL_COLUMNS, finalize_signal_frame
 
 # 通用规则开关与默认值（与具体策略无关）
 RULE_DEFAULTS = {
@@ -32,6 +33,8 @@ RULE_DEFAULTS = {
     "trailing_enabled": True,
     "trail_activation_atr": 1.5,
     "max_signal_age_bars": 2,
+    # 绑定层出场覆盖：{method, support, params}，见 strategy/exits.py
+    EXIT_KEY: dict(DEFAULT_EXIT),
 }
 
 # 允许被全局设置（state）驱动的键：这些是账户级/撮合级参数，不对单个策略开放
@@ -116,6 +119,10 @@ def resolve_params(
     bool_keys = set(SHARED_BOOL_KEYS) | set(spec.bool_keys)
     int_keys = set(spec.int_keys) | {"max_leverage"}
     for key, value in params.items():
+        if key == EXIT_KEY:
+            # 结构化配置：由出场注册表校验，不参与数值区间检查
+            params[key] = normalize_exit(value)
+            continue
         if key in bool_keys:
             if not isinstance(value, bool):
                 raise ValueError(f"{key} 必须是布尔值")
@@ -138,6 +145,7 @@ def resolve_params(
         raise ValueError("最大持仓K线数不能小于最小持仓K线数")
     if spec.validate is not None:
         spec.validate(params)
+    ensure_allowed(code, params[EXIT_KEY], params)
     return params
 
 
@@ -165,10 +173,56 @@ def evaluate_signals(
 
     `symbol` / `service` 只在策略需要更低周期数据时使用（如 intrabar delta）；
     回测与特征测试不传也能跑——策略内部会降级。
+    产出后再叠加绑定层的出场覆盖（见 `apply_exit_overlay`）。
     """
     frame = prepare_frame(data, code, params, symbol=symbol, service=service)
     result = get_spec(code).signals(frame, params)
     missing = set(SIGNAL_COLUMNS) - set(result.columns)
     if missing:
         raise ValueError(f"{code} 输出的信号帧缺少列: {', '.join(sorted(missing))}")
+    return apply_exit_overlay(frame, result, params)
+
+
+def apply_exit_overlay(frame: pd.DataFrame, signals: pd.DataFrame, params: dict) -> pd.DataFrame:
+    """按绑定的出场方法重算止损/止盈，并用**新距离**重算仓位与成本过滤。
+
+    `method=strategy`（默认）时原样返回，行为与改造前完全一致。
+    支撑位来源需要整帧历史（枢轴确认、滚动池），因此调用方给单行切片时 `support_r`
+    会全部回退 ATR —— 实时巡检因此改为整帧评估后取末行（见 `engine.evaluate`）。
+    """
+    config = params.get(EXIT_KEY) or DEFAULT_EXIT
+    if (config.get("method") or "strategy") == "strategy":
+        return signals
+    if not signals.index.equals(frame.index):
+        # 覆盖层按整帧计算距离，索引必须对齐，否则会静默产生 NaN 止损
+        signals = signals.reindex(frame.index)
+
+    sl_pct, _, level, fallback = overlay_distances(frame, signals, config)
+    target_r = float(config["params"]["target_r"])
+    # 显式价格距离：只做下限保护（费用占比过小的止损/止盈没有意义），
+    # 距离无效（ATR 缺失、支撑位算不出）的行交给 finalize 标记为 invalid_distance。
+    sl_pct = sl_pct.clip(lower=float(params["min_sl_pct"]))
+    tp_pct = (sl_pct * target_r).clip(lower=float(params["min_tp_pct"]))
+
+    reason = signals["block_reason"].astype(object)
+    # 上一轮基于旧距离打的标签必须清掉，否则新距离明明达标也会被挡住
+    reason = reason.mask(reason.isin(("cost_filter", "invalid_distance")), "")
+    rebuilt = finalize_signal_frame(
+        frame,
+        params,
+        signed=signals["signed"],
+        score=signals["score"],
+        prob_up=signals["prob_up"],
+        sl_pct=sl_pct,
+        tp_pct=tp_pct,
+        reason=reason,
+        apply_min_distances=False,
+    )
+    # 保留策略自己的附加列（如 ema_exit 的 exit_long、zigzag 的通道列）
+    result = signals.copy()
+    for name in rebuilt.columns:
+        result[name] = rebuilt[name]
+    result["exit_level"] = level.to_numpy(dtype=float)
+    result["exit_fallback"] = fallback.to_numpy(dtype=int)
+    result["exit_method"] = config.get("method", "")
     return result

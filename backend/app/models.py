@@ -107,6 +107,9 @@ class SymbolPool(Base):
     kind = Column(String(16), default="static")   # static / rule
     symbols = Column(Text, default="[]")          # JSON 数组，static 池的成员
     rule = Column(Text, default="{}")             # JSON 对象，rule 池的筛选条件
+    # JSON 对象 {"include": [...], "exclude": [...]}：规则解析完成后叠加的人工增删。
+    # 与 symbols 分列存放，研究池的自动维护只覆盖 symbols，不会冲掉人工修改。
+    manual_override = Column(Text, default="{}")
     enabled = Column(Integer, default=1)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
@@ -137,10 +140,12 @@ class SymbolParam(Base):
 
 
 class StrategyBinding(Base):
-    """策略 × 币种池 的运行绑定：一条绑定 = 一套完整参数 + 一个K线周期。
+    """策略 × 币种池 的运行绑定：一条绑定 = 一套完整参数 + 一个K线周期 + 一套出场口径。
 
     同一策略可以有多条绑定（主流 15m / 山寨 5m / 山寨 1m），各自参数互不影响。
     参数优先级：全局设置 < 策略默认 < 本条绑定的 params。
+    出场覆盖（`exit_method` / `support_indicator` / `exit_params`）在本条绑定上独立生效，
+    由 `strategy/exits.py` 校验并在信号产出后统一改写止损止盈距离。
     """
 
     __tablename__ = "strategy_bindings"
@@ -155,6 +160,11 @@ class StrategyBinding(Base):
     enabled = Column(Integer, default=1)
     priority = Column(Integer, default=100)       # 仅用于展示排序；同币多绑定时按评分择优
     params = Column(Text, default="{}")           # JSON 对象，覆盖策略默认
+    # 出场覆盖（见 strategy/exits.py）：方法、支撑位来源、方法参数。
+    # 独立于 params 存放，因为它们是执行口径而不是策略参数，且要参与注册表校验。
+    exit_method = Column(String(32), default="strategy")   # strategy / atr_r / support_r
+    support_indicator = Column(String(48), default="")     # 支撑位来源，见 support_levels.METHODS
+    exit_params = Column(Text, default="{}")               # JSON 对象，方法参数
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
@@ -242,6 +252,8 @@ class Order(Base):
     source = Column(String(16), default="paper")
     strategy = Column(String(48), default="")
     pool = Column(String(48), default="")  # 该仓位所用参数所属的币种池
+    binding_id = Column(Integer, nullable=True)
+    params_snapshot = Column(Text, nullable=True)
     signal_id = Column(Integer, default=0)
     entry_fee = Column(Float, default=0.0)
     exit_fee = Column(Float, default=0.0)

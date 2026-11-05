@@ -52,6 +52,48 @@ def _enable_strategy(db, params=None):
     return row
 
 
+def test_order_snapshot_versions_and_legacy_additions():
+    params = resolve_params("supertrend_current", {"fee_rate": 0.001}, {"target_r": 4}, interval="15m")
+    raw = bindings.encode_order_params("supertrend_current", "15m", params)
+    assert json.loads(raw) == {"version": 1, "params": params}
+    assert bindings.decode_order_params("supertrend_current", "15m", raw) == params
+    legacy = {key: value for key, value in params.items()
+              if key != "exit" and key not in bindings._LEGACY_SUPERTREND_ADDITIONS}
+    decoded = bindings.decode_order_params("supertrend_current", "15m", json.dumps(legacy))
+    assert decoded == params
+    assert all(decoded[key] == value for key, value in legacy.items())
+
+
+@pytest.mark.parametrize("damage", ["missing", "unknown", "range", "partial_exit", "nan", "version", "duplicate"])
+def test_order_snapshot_rejects_damage(damage):
+    params = resolve_params(STRATEGY, {}, None, interval="15m")
+    if damage == "missing":
+        del params["max_hold_bars"]
+    elif damage == "unknown":
+        params["unknown"] = 1
+    elif damage == "range":
+        params["target_r"] = -1
+    elif damage == "partial_exit":
+        params["exit"] = {"method": "strategy"}
+    elif damage == "nan":
+        params["target_r"] = float("nan")
+    if damage == "version":
+        raw = json.dumps({"version": 2, "params": params})
+    elif damage == "duplicate":
+        raw = '{"version": 1, "version": 1, "params": {}}'
+    else:
+        raw = json.dumps(params)
+    with pytest.raises(ValueError, match="订单参数快照无效"):
+        bindings.decode_order_params(STRATEGY, "15m", raw)
+
+
+def test_versioned_snapshot_does_not_fill_missing_fields():
+    params = resolve_params(STRATEGY, {}, None, interval="15m")
+    del params["exit"]
+    with pytest.raises(ValueError, match="订单参数快照无效"):
+        bindings.decode_order_params(STRATEGY, "15m", json.dumps({"version": 1, "params": params}))
+
+
 # ---------------------------------------------------------------- 池
 
 def test_static_pool_members_are_normalized(db):
@@ -151,7 +193,7 @@ def test_bad_binding_does_not_block_others(db):
     assert any("币种池不存在" in message for message in errors)
 
 
-def test_disabled_binding_or_strategy_is_skipped(db):
+def test_binding_enablement_is_independent_of_legacy_strategy_switch(db):
     _enable_strategy(db)
     _pool(db)
     binding = _binding(db, enabled=0)
@@ -163,7 +205,7 @@ def test_disabled_binding_or_strategy_is_skipped(db):
 
     db.query(StrategyConfig).filter(StrategyConfig.code == STRATEGY).one().enabled = 0
     db.commit()
-    assert bindings.active_bindings(db)[0] == []
+    assert [item.id for item in bindings.active_bindings(db)[0]] == [binding.id]
 
 
 def test_expand_repeats_symbol_across_pools(db):
@@ -302,7 +344,7 @@ def test_api_binding_to_paper_order_and_disabled_diagnostic(client, monkeypatch)
     set_state(db, "symbol_scope", "custom")
     set_state(db, "symbols", ["BTCUSDT"])
     assert client.post("/api/pools", json={"code": "p1", "name": "p1", "kind": "static", "symbols": ["BTCUSDT"]}).status_code == 200
-    created = client.post("/api/bindings", json={"strategy": STRATEGY, "pool": "p1", "interval": "1m", "params": {"target_r": 3}})
+    created = client.post("/api/bindings", json={"strategy": STRATEGY, "pool": "p1", "interval": "1m", "enabled": True, "params": {"target_r": 3}})
     assert created.status_code == 200
     assert created.json()["effective_params"]["cooldown_bars"] == 3
     monkeypatch.setattr(service, "_sync_recent_many", lambda *args: [])
@@ -324,7 +366,108 @@ def test_api_binding_to_paper_order_and_disabled_diagnostic(client, monkeypatch)
     db.query(StrategyConfig).filter_by(code=STRATEGY).one().enabled = 0
     db.commit()
     result = client.post("/api/trading/run-once").json()
-    assert any("总开关未启用" in error for error in result["signal_errors"])
+    assert not any("总开关未启用" in error for error in result["signal_errors"])
+
+
+def test_legacy_strategy_switch_is_explicitly_rejected(client):
+    client, db = client
+    _enable_strategy(db)
+    _pool(db)
+    row = _binding(db)
+    for enabled in (False, True):
+        response = client.put(f"/api/strategies/{STRATEGY}", json={"enabled": enabled})
+        assert response.status_code == 409
+        assert "绑定" in response.json()["detail"]
+    db.refresh(row)
+    assert row.enabled == 1
+
+
+def test_binding_api_blocks_broker_modes_and_allows_disabled_drafts(client):
+    client, db = client
+    _pool(db)
+    base = {"pool": "test", "interval": "15m", "params": {}}
+    ocb = client.post("/api/bindings", json={**base, "strategy": "opening_candle_breakout", "enabled": True})
+    assert ocb.status_code == 400 and "专用撮合" in ocb.json()["detail"]
+    draft = client.post("/api/bindings", json={**base, "strategy": "opening_candle_breakout", "enabled": False})
+    assert draft.status_code == 200
+    assert client.put(f"/api/bindings/{draft.json()['id']}", json={"enabled": True}).status_code == 400
+    st = client.post("/api/bindings", json={**base, "strategy": "supertrend_current", "enabled": True})
+    assert st.status_code == 200
+    result = client.put(f"/api/bindings/{st.json()['id']}", json={"params": {"cl_enabled": True}})
+    assert result.status_code == 400 and "闭环" in result.json()["detail"]
+    db.expire_all()
+    assert db.get(StrategyBinding, st.json()["id"]).params == "{}"
+
+
+def test_binding_gate_uses_inherited_and_symbol_parameters(client):
+    from app.models import StrategyConfig, SymbolParam
+
+    client, db = client
+    _pool(db, symbols=("BTCUSDT",))
+    db.add(StrategyConfig(code="supertrend_current", name="ST", enabled=0, params='{"cl_enabled": true}'))
+    db.commit()
+    body = {"strategy": "supertrend_current", "pool": "test", "interval": "1h", "enabled": True, "params": {}}
+    assert client.post("/api/bindings", json=body).status_code == 400
+    body["params"] = {"cl_enabled": False}
+    db.add(SymbolParam(strategy_code="supertrend_current", interval="1h", symbol="BTCUSDT", params='{"cl_enabled": true}'))
+    db.commit()
+    assert client.post("/api/bindings", json=body).status_code == 400
+    row = _binding(db, interval="1h", strategy="supertrend_current", params={"cl_enabled": False})
+    resolved, errors = bindings.active_bindings(db)
+    assert not errors and len(resolved) == 1
+    with pytest.raises(ValueError, match="闭环"):
+        resolved[0].params_for("BTCUSDT")
+    row.strategy_code = "opening_candle_breakout"
+    db.commit()
+    resolved, errors = bindings.active_bindings(db)
+    assert resolved == [] and any("专用撮合" in error for error in errors)
+
+
+@pytest.mark.parametrize("strategy,overrides", [
+    ("opening_candle_breakout", {}),
+    ("supertrend_current", {"cl_enabled": True}),
+])
+def test_direct_execution_rejects_unsupported_final_params(db, monkeypatch, strategy, overrides):
+    from app.strategy.engine import StrategyEngine
+    from app.trading import live, paper
+
+    params = resolve_params(strategy, {}, overrides, interval="15m")
+    engine = StrategyEngine(db)
+    monkeypatch.setattr(engine, "_frame", lambda *args: pytest.fail("不应读取行情"))
+    with pytest.raises(ValueError):
+        engine.evaluate("BTCUSDT", "15m", strategy, params=params)
+    signal = SimpleNamespace(strategy=strategy, interval="15m", symbol="BTCUSDT", params=params)
+    with pytest.raises(ValueError):
+        paper.open_position(db, signal)
+    monkeypatch.setattr(live, "load_credentials", lambda db: ("test", "test"))
+    with pytest.raises(ValueError):
+        live.open_live(db, signal)
+
+
+def test_binding_creation_defaults_to_disabled(client):
+    client, db = client
+    _pool(db)
+    response = client.post("/api/bindings", json={"strategy": STRATEGY, "pool": "test", "interval": "1h"})
+    assert response.status_code == 200 and response.json()["enabled"] is False
+    assert db.get(StrategyBinding, response.json()["id"]).enabled == 0
+    assert bindings.active_bindings(db)[0] == []
+
+
+def test_invalid_symbol_override_never_falls_back(db):
+    _pool(db, symbols=("BTCUSDT",))
+    _binding(db, interval="1h", strategy="supertrend_current")
+    from app.models import SymbolParam
+    override = SymbolParam(strategy_code="supertrend_current", interval="1h", symbol="BTCUSDT",
+                           params='{"cl_enabled": true, "unknown": 1}')
+    db.add(override)
+    db.commit()
+    active, _ = bindings.active_bindings(db)
+    with pytest.raises(ValueError):
+        active[0].params_for("BTCUSDT")
+    override.params = '{invalid'
+    db.commit()
+    with pytest.raises(ValueError, match="JSON 无效"):
+        bindings.active_bindings(db)
 
 
 def test_pool_api_roundtrip(client):

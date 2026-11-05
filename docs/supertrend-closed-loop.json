@@ -1,0 +1,83 @@
+{
+  "report_type": "engineering_change_note",
+  "title": "Supertrend 订单闭环改造 · 工程实现，非 edge 判定",
+  "playbook_section_0_exception": true,
+  "statistical_gates_waived": ["Gate 1 IC 探针", "Gate 4 统计判定"],
+  "hard_constraints_honoured": ["H3", "H8", "H9", "H10", "H12"],
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip_pct": 0.12,
+    "basis": "名义本金",
+    "source": "回测请求全局口径，策略参数不得覆盖"
+  },
+  "trades": null,
+  "ci": null,
+  "window": null,
+  "universe": null,
+  "not_applicable_reason": "本轮为工程实现与时序单测，未接 DB、未做收益回测，窗口/币池/成交样本/CI/随机基线均不适用；不伪造统计字段",
+  "preflight": {
+    "result": "21 PASS / 0 WARN / 0 FAIL",
+    "caveat": "预检为关键词匹配；文中「窗口/币池/CI/随机基线/判定词」出现在『本轮不适用』的说明语境中，JSON 对应字段均为 null，不得误读为已具备统计读数"
+  },
+  "verdict": "insufficient",
+  "verdict_note": "统计证据不足（未跑 Gate 3/4），不表示策略亏损或无效；工程验收通过",
+  "enabled": false,
+  "default_enabled": false,
+  "binding_changed": false,
+  "changed_files": [
+    {"path": "backend/app/strategy/closed_loop.py", "kind": "new", "lines": 251},
+    {"path": "backend/app/backtest/closed_loop_execution.py", "kind": "new", "lines": 85},
+    {"path": "backend/app/strategy/specs/supertrend_current.py", "kind": "modified", "added_lines": 119},
+    {"path": "backend/app/backtest/runner.py", "kind": "modified", "added_lines": 68},
+    {"path": "backend/app/api/strategies.py", "kind": "modified", "added_lines": 10},
+    {"path": "backend/tests/test_supertrend_closed_loop.py", "kind": "new", "lines": 285}
+  ],
+  "states": {"FLAT": 0, "PENDING": 1, "OPEN": 2},
+  "events": [
+    "submit", "skip_no_support", "fill", "cancel_indicator", "cancel_expired",
+    "close_stop_loss", "close_take_profit", "close_take_profit_dynamic", "close_trend_break"
+  ],
+  "close_reasons": ["stop_loss", "take_profit", "take_profit_dynamic", "trend_break"],
+  "close_priority": ["保护价（止损/动态追踪）", "固定止盈", "收盘趋势破位决定（下一根开盘执行）"],
+  "timing": "bar s 收盘决策 → s+1 生效；阶段1 执行旧决策 / 阶段2 撮合 / 阶段3 收盘复核",
+  "new_params": {
+    "cl_enabled": false,
+    "cl_tp_mode": 0,
+    "cl_support_buffer_atr": 0.10,
+    "cl_max_entry_distance_atr": 3.0,
+    "cl_pending_expire_bars": 8,
+    "cl_dynamic_activate_r": 1.0,
+    "cl_trailing_atr_mult": 1.5,
+    "cl_cooldown_bars": 0
+  },
+  "tp_modes": {"0": "固定 3R 止盈（target_r × R）", "1": "动态追踪止盈（最优价 − N×ATR）"},
+  "interface_compatibility": {
+    "preserved_names": ["CODE", "DEFAULTS", "RANGES", "validate", "lookback", "_rma", "_setup_signals", "prepare", "signals", "describe", "SPEC"],
+    "signal_columns_unchanged": true,
+    "legacy_mode_behaviour": "cl_enabled=False 时与改造前一致（20 项既有单测全绿）",
+    "additive_columns": ["st_support", "st_resistance", "18 个 st_cl_* 列"],
+    "early_routing": "cl_enabled=True 时 direction 恒 0 + block_reason=closed_loop_requires_dedicated_broker",
+    "h10_gate": "api/strategies.py 条件式拒 gate：禁止把 cl_enabled=True 启用到巡检/模拟盘"
+  },
+  "acceptance": {
+    "targeted_tests": "37 passed (17 new + 20 legacy)",
+    "full_pytest": "1589 passed / 3 failed",
+    "preexisting_failures": [
+      "test_pool_volatility_research.py::test_live_entrypoints_reject (2) — dispatch.halt_status 属性缺失，文件未改动且 HEAD 同样缺失",
+      "test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range — data_service 查询下界断言，行情数据层，与本次改动无关"
+    ],
+    "deterministic_event_sequence": "submit → fill → close_take_profit（planned_sl=97.1, planned_tp=103.1, fill=98.6, exit=103.1, 全场 1 次平仓）",
+    "cancel_sequence": "submit → PENDING×3 → cancel_indicator（零 fill、零重复撤单）",
+    "trend_break_sequence": "bar6 收盘方向翻转 → bar7 开盘 close_trend_break @102.0",
+    "causality": "截断到 30/60/85 根的 st_cl_* 前缀逐列 assert_frame_equal 通过",
+    "idempotency_invariants": "220 根随机帧：状态转移合法、被平 order_id 无重复、成交数 >= 平仓数"
+  },
+  "limitations": [
+    "bar 级数据下，t 盘中先触价成交、t 收盘指标才转坏无法预先撤单",
+    "闭环仅支持回测；模拟盘/实盘由 direction=0 早路由与 API 拒 gate 阻断",
+    "支撑位主用枢轴连线（需两个已确认枢轴），缺失时回退近端摆动极值，两者皆失效则不挂单",
+    "未模拟部分成交、盘口深度、maker/taker 差异、资金费率、逐笔成交顺序、多所现货腿",
+    "不产生收益结论，不改动历史 verdict，不启用策略、不改动绑定"
+  ]
+}

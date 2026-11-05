@@ -49,6 +49,14 @@ DEFAULTS = {
     # 出场与风险
     "sl_buffer_atr": 0.25,
     "target_r": 2.0,
+    # 分批止盈（与 supertrend_current 同一套通用撮合结构）：R 倍数 + 各档平仓比例。
+    # 默认 `0/0/1` = 只在 target_r 一次性平掉，与加入这组参数之前的行为完全一致；
+    # 三档比例之和必须为 1，比例 >0 的档位才会真的挂单。
+    "tp1_r": 0.5,
+    "tp2_r": 1.0,
+    "tp1_fraction": 0.0,
+    "tp2_fraction": 0.0,
+    "tp3_fraction": 1.0,
     "be_trigger_r": 1.0,     # 浮盈达到该 R 后止损移到保本价（0 = 禁用）
     "min_sl_atr": 0.30,
     "max_sl_atr": 3.00,
@@ -80,6 +88,11 @@ RANGES = {
     "session_end_hour": (0, 24),
     "sl_buffer_atr": (0, 5),
     "target_r": (1, 50),
+    "tp1_r": (0.05, 50),
+    "tp2_r": (0.1, 50),
+    "tp1_fraction": (0, 1),
+    "tp2_fraction": (0, 1),
+    "tp3_fraction": (0, 1),
     "be_trigger_r": (0, 20),
     "min_sl_atr": (0, 10),
     "max_sl_atr": (0.1, 20),

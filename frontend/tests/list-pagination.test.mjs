@@ -68,6 +68,58 @@ test('Orders page changes retain filters and filter/page-size changes return to 
   assert.deepEqual(calls.at(-1), { page: 1, page_size: 50, status: 'OPEN', symbol: 'ETHUSDT' })
 })
 
+test('Orders strategy filter is sent with pagination, status and symbol', async () => {
+  const calls = []
+  const subject = view('Orders', {
+    getOrders: async (params) => {
+      calls.push({ ...params })
+      return page({ orders: [{ id: params.page }] }, 100, params.page, params.page_size)
+    },
+  }, ['filters', 'pagination', 'changeFilters', 'changePage', 'changePageSize'])
+  subject.filters.symbol = 'BTCUSDT'
+  subject.filters.strategy = 'simple_zigzag_double'
+  await subject.changeFilters()
+  assert.deepEqual(calls.at(-1), { page: 1, page_size: 20, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
+  await subject.changePage(2)
+  assert.deepEqual(calls.at(-1), { page: 2, page_size: 20, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
+  await subject.changePageSize(50)
+  assert.deepEqual(calls.at(-1), { page: 1, page_size: 50, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
+  subject.filters.strategy = ''
+  await subject.changeFilters()
+  assert.equal('strategy' in calls.at(-1), false)
+})
+
+test('Orders strategy options combine full history with the current page', async () => {
+  const subject = view('Orders', {
+    getOrderStrategies: async () => ({ strategies: [{ code: 'absorption_reversal', name: '吸收反转' }] }),
+  }, ['orders', 'filters', 'strategyOptions', 'loadOrderStrategies'])
+  await subject.loadOrderStrategies()
+  subject.orders.value = [{ strategy: 'legacy_strategy' }, { strategy: 'absorption_reversal' }]
+  subject.filters.strategy = 'manual_strategy'
+  assert.deepEqual(JSON.parse(JSON.stringify(subject.strategyOptions.value)), [
+    { code: 'absorption_reversal', label: '吸收反转' },
+    { code: 'legacy_strategy', label: 'legacy_strategy' },
+    { code: 'manual_strategy', label: 'manual_strategy' },
+  ])
+})
+
+test('Orders disables an ineffective strategy filter when the backend endpoint is missing', async () => {
+  const calls = []
+  const subject = view('Orders', {
+    getOrderStrategies: async () => { throw new Error('422') },
+    getOrders: async (params) => {
+      calls.push({ ...params })
+      return page({ orders: [] }, 0, params.page, params.page_size)
+    },
+  }, ['filters', 'strategiesUnavailable', 'strategiesError', 'loadOrderStrategies'])
+  subject.filters.strategy = 'simple_zigzag_double'
+  await subject.loadOrderStrategies()
+  await tick()
+  assert.equal(subject.strategiesUnavailable.value, true)
+  assert.equal(subject.filters.strategy, '')
+  assert.equal('strategy' in calls.at(-1), false)
+})
+
 test('Orders does not apply a response from a page that is no longer selected', async () => {
   const requests = []
   const subject = view('Orders', {

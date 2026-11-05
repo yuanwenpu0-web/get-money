@@ -15,9 +15,9 @@ def dt_iso(value: datetime | None) -> str:
     return value.isoformat()
 
 
-def order_dict(order: Order) -> dict:
+def order_dict(order: Order, *, include_snapshot: bool = False) -> dict:
     unrealized = position_unrealized(order) if order.status == "OPEN" else 0.0
-    return {
+    result = {
         "id": order.id,
         "symbol": order.symbol,
         "interval": order.interval,
@@ -32,6 +32,8 @@ def order_dict(order: Order) -> dict:
         "status": order.status,
         "source": order.source,
         "strategy": order.strategy,
+        "pool": order.pool or "",
+        "binding_id": order.binding_id,
         "entry_fee": round(order.entry_fee, 4),
         "exit_fee": round(order.exit_fee, 4),
         "realized_pnl": round(order.realized_pnl, 4),
@@ -42,6 +44,20 @@ def order_dict(order: Order) -> dict:
         "created_at": dt_iso(order.created_at),
         "closed_at": dt_iso(order.closed_at),
     }
+    if include_snapshot:
+        from .strategy.bindings import decode_order_params
+
+        result["params_snapshot"] = None
+        result["params_snapshot_status"] = "legacy"
+        if order.params_snapshot is not None:
+            try:
+                result["params_snapshot"] = decode_order_params(
+                    order.strategy, order.interval, order.params_snapshot
+                )
+                result["params_snapshot_status"] = "valid"
+            except (ValueError, KeyError):
+                result["params_snapshot_status"] = "invalid"
+    return result
 
 
 def signal_dict(signal: Signal) -> dict:

@@ -1,0 +1,3333 @@
+{
+  "config": {
+    "days": 90,
+    "notional": 200.0,
+    "fee": 0.0004,
+    "slippage": 0.0002,
+    "sl_atr": 1.5,
+    "split": [
+      [
+        1.0,
+        0.16666666666666666
+      ],
+      [
+        2.0,
+        0.3333333333333333
+      ],
+      [
+        3.0,
+        0.5
+      ]
+    ],
+    "warmup": 200,
+    "hold_hours": {
+      "research_high_turnover_high_vol": 120,
+      "research_low_turnover_high_vol": 48
+    }
+  },
+  "cells": {
+    "research_high_turnover_high_vol|hold_only|15m": {
+      "symbols": 13,
+      "errors": 12,
+      "trades": 208,
+      "pooled": {
+        "n": 208,
+        "mean": 9.7024,
+        "ci_low": 3.5449,
+        "ci_high": 16.8809,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 155.24,
+      "median_symbol_pct": 127.68,
+      "pct_symbols_positive": 1.0,
+      "exit_reason": {
+        "time_exit": 208
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_only|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 292,
+      "pooled": {
+        "n": 292,
+        "mean": 6.4718,
+        "ci_low": 2.2536,
+        "ci_high": 11.4221,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 78.74,
+      "median_symbol_pct": 65.36,
+      "pct_symbols_positive": 0.7917,
+      "exit_reason": {
+        "time_exit": 292
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_stop|15m": {
+      "symbols": 13,
+      "errors": 12,
+      "trades": 988,
+      "pooled": {
+        "n": 988,
+        "mean": 0.6797,
+        "ci_low": -0.3451,
+        "ci_high": 1.8617,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 51.66,
+      "median_symbol_pct": 94.68,
+      "pct_symbols_positive": 0.6154,
+      "exit_reason": {
+        "stop_loss": 904,
+        "time_exit": 84
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_stop|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 659,
+      "pooled": {
+        "n": 659,
+        "mean": 2.9797,
+        "ci_low": 0.3456,
+        "ci_high": 6.3173,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 81.82,
+      "median_symbol_pct": 20.11,
+      "pct_symbols_positive": 0.625,
+      "exit_reason": {
+        "stop_loss": 560,
+        "time_exit": 99
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_high_turnover_high_vol|split_1_2_3|15m": {
+      "symbols": 13,
+      "errors": 12,
+      "trades": 1872,
+      "pooled": {
+        "n": 1872,
+        "mean": 0.0926,
+        "ci_low": -0.1404,
+        "ci_high": 0.3211,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 13.34,
+      "median_symbol_pct": 7.64,
+      "pct_symbols_positive": 0.5385,
+      "exit_reason": {
+        "stop_loss": 1388,
+        "take_profit": 472,
+        "time_exit": 12
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|split_1_2_3|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 843,
+      "pooled": {
+        "n": 843,
+        "mean": 0.2947,
+        "ci_low": -0.1927,
+        "ci_high": 0.794,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 10.35,
+      "median_symbol_pct": 9.94,
+      "pct_symbols_positive": 0.625,
+      "exit_reason": {
+        "stop_loss": 605,
+        "take_profit": 209,
+        "time_exit": 29
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_only|15m": {
+      "symbols": 8,
+      "errors": 17,
+      "trades": 293,
+      "pooled": {
+        "n": 293,
+        "mean": 0.5664,
+        "ci_low": -1.0864,
+        "ci_high": 2.2258,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 20.74,
+      "median_symbol_pct": 50.26,
+      "pct_symbols_positive": 0.75,
+      "exit_reason": {
+        "time_exit": 293
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_only|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 523,
+      "pooled": {
+        "n": 523,
+        "mean": 0.2858,
+        "ci_low": -0.8433,
+        "ci_high": 1.468,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 6.23,
+      "median_symbol_pct": 10.93,
+      "pct_symbols_positive": 0.625,
+      "exit_reason": {
+        "time_exit": 523
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_stop|15m": {
+      "symbols": 8,
+      "errors": 17,
+      "trades": 799,
+      "pooled": {
+        "n": 799,
+        "mean": 0.2918,
+        "ci_low": -0.2322,
+        "ci_high": 0.8882,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 29.14,
+      "median_symbol_pct": 40.32,
+      "pct_symbols_positive": 0.75,
+      "exit_reason": {
+        "stop_loss": 685,
+        "time_exit": 114
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_stop|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 804,
+      "pooled": {
+        "n": 804,
+        "mean": -0.483,
+        "ci_low": -1.037,
+        "ci_high": 0.0876,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -16.18,
+      "median_symbol_pct": -11.74,
+      "pct_symbols_positive": 0.375,
+      "exit_reason": {
+        "stop_loss": 626,
+        "time_exit": 178
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|split_1_2_3|15m": {
+      "symbols": 8,
+      "errors": 17,
+      "trades": 1191,
+      "pooled": {
+        "n": 1191,
+        "mean": -0.0228,
+        "ci_low": -0.2123,
+        "ci_high": 0.1775,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -3.4,
+      "median_symbol_pct": 5.22,
+      "pct_symbols_positive": 0.5,
+      "exit_reason": {
+        "stop_loss": 882,
+        "take_profit": 298,
+        "time_exit": 11
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|split_1_2_3|1h": {
+      "symbols": 24,
+      "errors": 1,
+      "trades": 891,
+      "pooled": {
+        "n": 891,
+        "mean": -0.2265,
+        "ci_low": -0.5574,
+        "ci_high": 0.106,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -8.41,
+      "median_symbol_pct": -1.88,
+      "pct_symbols_positive": 0.4583,
+      "exit_reason": {
+        "stop_loss": 632,
+        "take_profit": 194,
+        "time_exit": 65
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    }
+  },
+  "fair_cells": {
+    "research_high_turnover_high_vol|hold_only|15m": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 208,
+      "pooled": {
+        "n": 208,
+        "mean": 9.7024,
+        "ci_low": 3.5449,
+        "ci_high": 16.8809,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 155.24,
+      "median_symbol_pct": 127.68,
+      "pct_symbols_positive": 1.0,
+      "exit_reason": {
+        "time_exit": 208
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_only|1h": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 156,
+      "pooled": {
+        "n": 156,
+        "mean": 9.8719,
+        "ci_low": 2.7648,
+        "ci_high": 17.7,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 118.46,
+      "median_symbol_pct": 126.8,
+      "pct_symbols_positive": 0.9231,
+      "exit_reason": {
+        "time_exit": 156
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_stop|15m": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 988,
+      "pooled": {
+        "n": 988,
+        "mean": 0.6797,
+        "ci_low": -0.3451,
+        "ci_high": 1.8617,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 51.66,
+      "median_symbol_pct": 94.68,
+      "pct_symbols_positive": 0.6154,
+      "exit_reason": {
+        "stop_loss": 904,
+        "time_exit": 84
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|hold_stop|1h": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 346,
+      "pooled": {
+        "n": 346,
+        "mean": 3.979,
+        "ci_low": 0.6034,
+        "ci_high": 8.471,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 105.9,
+      "median_symbol_pct": 93.79,
+      "pct_symbols_positive": 0.6923,
+      "exit_reason": {
+        "stop_loss": 279,
+        "time_exit": 67
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_high_turnover_high_vol|split_1_2_3|15m": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 1872,
+      "pooled": {
+        "n": 1872,
+        "mean": 0.0926,
+        "ci_low": -0.1404,
+        "ci_high": 0.3211,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 13.34,
+      "median_symbol_pct": 7.64,
+      "pct_symbols_positive": 0.5385,
+      "exit_reason": {
+        "stop_loss": 1388,
+        "take_profit": 472,
+        "time_exit": 12
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_high_turnover_high_vol|split_1_2_3|1h": {
+      "symbols": 13,
+      "errors": 0,
+      "trades": 459,
+      "pooled": {
+        "n": 459,
+        "mean": 0.9757,
+        "ci_low": 0.1693,
+        "ci_high": 1.7651,
+        "verdict": "positive"
+      },
+      "mean_symbol_pct": 34.45,
+      "median_symbol_pct": 20.42,
+      "pct_symbols_positive": 0.8462,
+      "exit_reason": {
+        "stop_loss": 306,
+        "take_profit": 134,
+        "time_exit": 19
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_only|15m": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 293,
+      "pooled": {
+        "n": 293,
+        "mean": 0.5664,
+        "ci_low": -1.0864,
+        "ci_high": 2.2258,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 20.74,
+      "median_symbol_pct": 50.26,
+      "pct_symbols_positive": 0.75,
+      "exit_reason": {
+        "time_exit": 293
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_only|1h": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 177,
+      "pooled": {
+        "n": 177,
+        "mean": 0.8199,
+        "ci_low": -1.211,
+        "ci_high": 3.0177,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 18.14,
+      "median_symbol_pct": 32.71,
+      "pct_symbols_positive": 0.625,
+      "exit_reason": {
+        "time_exit": 177
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_stop|15m": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 799,
+      "pooled": {
+        "n": 799,
+        "mean": 0.2918,
+        "ci_low": -0.2322,
+        "ci_high": 0.8882,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": 29.14,
+      "median_symbol_pct": 40.32,
+      "pct_symbols_positive": 0.75,
+      "exit_reason": {
+        "stop_loss": 685,
+        "time_exit": 114
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|hold_stop|1h": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 258,
+      "pooled": {
+        "n": 258,
+        "mean": -0.1351,
+        "ci_low": -1.2823,
+        "ci_high": 1.1804,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -4.36,
+      "median_symbol_pct": -1.73,
+      "pct_symbols_positive": 0.5,
+      "exit_reason": {
+        "stop_loss": 192,
+        "time_exit": 66
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    },
+    "research_low_turnover_high_vol|split_1_2_3|15m": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 1191,
+      "pooled": {
+        "n": 1191,
+        "mean": -0.0228,
+        "ci_low": -0.2123,
+        "ci_high": 0.1775,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -3.4,
+      "median_symbol_pct": 5.22,
+      "pct_symbols_positive": 0.5,
+      "exit_reason": {
+        "stop_loss": 882,
+        "take_profit": 298,
+        "time_exit": 11
+      },
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00"
+    },
+    "research_low_turnover_high_vol|split_1_2_3|1h": {
+      "symbols": 8,
+      "errors": 0,
+      "trades": 287,
+      "pooled": {
+        "n": 287,
+        "mean": -0.3599,
+        "ci_low": -1.0004,
+        "ci_high": 0.2935,
+        "verdict": "inconclusive"
+      },
+      "mean_symbol_pct": -12.91,
+      "median_symbol_pct": -10.55,
+      "pct_symbols_positive": 0.375,
+      "exit_reason": {
+        "stop_loss": 199,
+        "take_profit": 65,
+        "time_exit": 23
+      },
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00"
+    }
+  },
+  "paired_15m_minus_1h": {
+    "research_high_turnover_high_vol|hold_only": {
+      "pairs": 13,
+      "median_diff_pct": 43.99,
+      "pct_15m_better": 0.6923,
+      "ci": {
+        "n": 13,
+        "mean": 36.775,
+        "ci_low": -2.4709,
+        "ci_high": 79.5174,
+        "verdict": "inconclusive"
+      }
+    },
+    "research_high_turnover_high_vol|hold_stop": {
+      "pairs": 13,
+      "median_diff_pct": -18.57,
+      "pct_15m_better": 0.3846,
+      "ci": {
+        "n": 13,
+        "mean": -54.2431,
+        "ci_low": -135.4013,
+        "ci_high": 12.3393,
+        "verdict": "inconclusive"
+      }
+    },
+    "research_high_turnover_high_vol|split_1_2_3": {
+      "pairs": 13,
+      "median_diff_pct": -12.78,
+      "pct_15m_better": 0.3846,
+      "ci": {
+        "n": 13,
+        "mean": -21.1106,
+        "ci_low": -57.4243,
+        "ci_high": 12.7588,
+        "verdict": "inconclusive"
+      }
+    },
+    "research_low_turnover_high_vol|hold_only": {
+      "pairs": 8,
+      "median_diff_pct": 10.77,
+      "pct_15m_better": 0.625,
+      "ci": {
+        "n": 8,
+        "mean": 2.6035,
+        "ci_low": -49.5974,
+        "ci_high": 52.2741,
+        "verdict": "inconclusive"
+      }
+    },
+    "research_low_turnover_high_vol|hold_stop": {
+      "pairs": 8,
+      "median_diff_pct": 23.85,
+      "pct_15m_better": 0.875,
+      "ci": {
+        "n": 8,
+        "mean": 33.5002,
+        "ci_low": 0.0621,
+        "ci_high": 70.4754,
+        "verdict": "positive"
+      }
+    },
+    "research_low_turnover_high_vol|split_1_2_3": {
+      "pairs": 8,
+      "median_diff_pct": 12.09,
+      "pct_15m_better": 0.625,
+      "ci": {
+        "n": 8,
+        "mean": 9.5112,
+        "ci_low": -33.2628,
+        "ci_high": 54.4315,
+        "verdict": "inconclusive"
+      }
+    }
+  },
+  "per_symbol": [
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "ENAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 85.18116728140595
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "AINUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 295.853799479919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "IDOLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "HAEDALUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "QUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.335158207293304
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "EVAAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "ESPORTSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "LSKUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BEAMXUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 182.25469728601254
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "ONUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "APRUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -78.0880829015544
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "AKEUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 1.2160944850365452
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "INITUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "AGTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 230.68920676202862
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "PARTIUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BULLAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 396.4008859357697
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BLESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "MAGMAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.669416795973184
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "JCTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 2.8301886792452935
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "LITUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.3344509639564
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "REZUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "XPLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BTWUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 596.4899279121472
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "ARIAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 319.19439579684763
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "ENAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 85.18116728140595
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "AINUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 295.853799479919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "IDOLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "HAEDALUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "QUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.335158207293304
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "EVAAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "ESPORTSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "LSKUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BEAMXUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 182.25469728601254
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "ONUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "APRUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -78.0880829015544
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "AKEUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 1.2160944850365452
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "INITUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "AGTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 230.68920676202862
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "PARTIUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BULLAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 396.4008859357697
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BLESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "MAGMAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.669416795973184
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "JCTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 2.8301886792452935
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "LITUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.3344509639564
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "REZUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "XPLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BTWUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 596.4899279121472
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "ARIAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 319.19439579684763
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "ENAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 85.18116728140595
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "AINUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 295.853799479919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "IDOLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "HAEDALUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "QUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.335158207293304
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "EVAAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "ESPORTSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "LSKUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BEAMXUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 182.25469728601254
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "ONUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "APRUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -78.0880829015544
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "AKEUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 1.2160944850365452
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "INITUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "AGTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 230.68920676202862
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "PARTIUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BULLAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 396.4008859357697
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BLESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "MAGMAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 44.669416795973184
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "JCTUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 2.8301886792452935
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "LITUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.3344509639564
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "REZUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "XPLUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BTWUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 596.4899279121472
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "ARIAUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 319.19439579684763
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "ENAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.76025543890032
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "AINUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 296.7709238343469
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "IDOLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 21.638246041412913
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "HAEDALUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 78.34566240753193
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "QUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 46.91159803551188
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "EVAAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 72.28498962416417
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "ESPORTSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -31.8918918918919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "LSKUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.4685343077548
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BEAMXUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.08108108108104
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "ONUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -50.61654135338346
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "APRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -78.23468862583634
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "AKEUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 1.5591654322227422
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "INITUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 155.31171101184694
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "AGTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 228.9780077619664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "PARTIUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.85973597359737
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BULLAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 394.9278862742392
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BLESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.20734092162664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "MAGMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 45.50091352009744
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "JCTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 3.4892000949442226
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "LITUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 57.26121765034444
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "REZUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 51.21664050235479
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "XPLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -17.687427165609215
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BTWUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 608.8104216660953
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "ARIAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 319.92982456140345
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "ENAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.76025543890032
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "AINUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 296.7709238343469
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "IDOLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 21.638246041412913
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "HAEDALUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 78.34566240753193
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "QUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 46.91159803551188
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "EVAAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 72.28498962416417
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "ESPORTSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -31.8918918918919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "LSKUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.4685343077548
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BEAMXUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.08108108108104
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "ONUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -50.61654135338346
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "APRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -78.23468862583634
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "AKEUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 1.5591654322227422
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "INITUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 155.31171101184694
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "AGTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 228.9780077619664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "PARTIUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.85973597359737
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BULLAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 394.9278862742392
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BLESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.20734092162664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "MAGMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 45.50091352009744
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "JCTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 3.4892000949442226
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "LITUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 57.26121765034444
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "REZUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 51.21664050235479
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "XPLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -17.687427165609215
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BTWUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 608.8104216660953
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "ARIAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 319.92982456140345
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "ENAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.76025543890032
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "AINUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 296.7709238343469
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "IDOLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 21.638246041412913
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "HAEDALUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 78.34566240753193
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "QUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 46.91159803551188
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "EVAAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 72.28498962416417
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "ESPORTSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -31.8918918918919
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "LSKUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.4685343077548
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BEAMXUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.08108108108104
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "ONUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -50.61654135338346
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "APRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -78.23468862583634
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "AKEUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 1.5591654322227422
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "INITUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 155.31171101184694
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "AGTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 228.9780077619664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "PARTIUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 84.85973597359737
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BULLAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 394.9278862742392
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BLESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.20734092162664
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "MAGMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 45.50091352009744
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "JCTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 3.4892000949442226
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "LITUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 57.26121765034444
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "REZUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 51.21664050235479
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "XPLUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -17.687427165609215
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BTWUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 608.8104216660953
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "牛来USDT",
+      "error": "ValueError('历史不足: 2026-08-30 起')"
+    },
+    {
+      "strategy": "research_high_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "ARIAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 319.92982456140345
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "GTCUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 180.6108224559625
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "SOPHUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "ZROUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 142.6189245087901
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "USELESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "COLLECTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "HANAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BEATUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -96.20438560198593
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "AVAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "XANUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "GUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "BLURUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "LABUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "AIOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "RSRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "PROMUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 174.9482401656315
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "HOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "PLAYUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "DOODUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "LIGHTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "REDUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "HUMAUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 12.746876259572737
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "OGNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.19769673704413
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "LYNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -40.52044609665428
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_only",
+      "symbol": "POWRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "GTCUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 180.6108224559625
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "SOPHUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "ZROUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 142.6189245087901
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "USELESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "COLLECTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "HANAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BEATUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -96.20438560198593
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "AVAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "XANUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "GUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "BLURUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "LABUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "AIOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "RSRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "PROMUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 174.9482401656315
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "HOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "PLAYUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "DOODUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "LIGHTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "REDUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "HUMAUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 12.746876259572737
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "OGNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.19769673704413
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "LYNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -40.52044609665428
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "hold_stop",
+      "symbol": "POWRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "GTCUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 180.6108224559625
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "SOPHUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "ZROUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 142.6189245087901
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "USELESSUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "COLLECTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "HANAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BEATUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -96.20438560198593
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "AVAUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "XANUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "GUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "BLURUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "LABUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "AIOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "RSRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "PROMUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 174.9482401656315
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "HOTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "PLAYUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "DOODUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "LIGHTUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "REDUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "HUMAUSDT",
+      "bars": 8641,
+      "start": "2026-08-05 17:30:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 12.746876259572737
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "OGNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": 57.19769673704413
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "LYNUSDT",
+      "bars": 8640,
+      "start": "2026-08-05 17:45:00+00:00",
+      "end": "2026-11-03 17:30:00+00:00",
+      "buy_hold_pct": -40.52044609665428
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "15m",
+      "mode": "split_1_2_3",
+      "symbol": "POWRUSDT",
+      "error": "ValueError('历史不足: 2026-10-15 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "GTCUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.8609979633401
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "SOPHUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -61.357086717317266
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "ZROUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.11816305469557
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "USELESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 178.10378804466828
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "COLLECTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.57026669188576
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "HANAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -51.77394034536892
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BEATUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -96.21378456458936
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "AVAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 60.289210233592904
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "XANUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -28.204016760583727
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "GUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -12.117104906478716
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "BLURUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -41.449704142011846
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "LABUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -70.13671875
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "AIOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 111.79749187180677
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "RSRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 17.874794069192745
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "PROMUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 175.09062661833246
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "HOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.398104265402836
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "PLAYUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -60.72992700729927
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "DOODUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "LIGHTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.06443129520052
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "REDUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.20930232558142
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "HUMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 13.3465025578686
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "OGNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.89655172413794
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "LYNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -40.7913464275548
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_only",
+      "symbol": "POWRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 38.04755944931164
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "GTCUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.8609979633401
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "SOPHUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -61.357086717317266
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "ZROUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.11816305469557
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "USELESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 178.10378804466828
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "COLLECTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.57026669188576
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "HANAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -51.77394034536892
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BEATUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -96.21378456458936
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "AVAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 60.289210233592904
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "XANUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -28.204016760583727
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "GUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -12.117104906478716
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "BLURUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -41.449704142011846
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "LABUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -70.13671875
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "AIOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 111.79749187180677
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "RSRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 17.874794069192745
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "PROMUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 175.09062661833246
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "HOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.398104265402836
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "PLAYUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -60.72992700729927
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "DOODUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "LIGHTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.06443129520052
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "REDUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.20930232558142
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "HUMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 13.3465025578686
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "OGNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.89655172413794
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "LYNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -40.7913464275548
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "hold_stop",
+      "symbol": "POWRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 38.04755944931164
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "GTCUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 181.8609979633401
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "SOPHUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -61.357086717317266
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "ZROUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 142.11816305469557
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "USELESSUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 178.10378804466828
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "COLLECTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -55.57026669188576
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "HANAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -51.77394034536892
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BEATUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -96.21378456458936
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "AVAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 60.289210233592904
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "XANUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -28.204016760583727
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "GUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -12.117104906478716
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "BLURUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -41.449704142011846
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "LABUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -70.13671875
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "AIOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 111.79749187180677
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "RSRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 17.874794069192745
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "PROMUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 175.09062661833246
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "PONSUSDT",
+      "error": "ValueError('历史不足: 2026-09-06 起')"
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "HOTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.398104265402836
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "PLAYUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -60.72992700729927
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "DOODUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 37.708830548925995
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "LIGHTUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.06443129520052
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "REDUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 62.20930232558142
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "HUMAUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 13.3465025578686
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "OGNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 56.89655172413794
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "LYNUSDT",
+      "bars": 2160,
+      "start": "2026-08-05 18:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": -40.7913464275548
+    },
+    {
+      "strategy": "research_low_turnover_high_vol",
+      "interval": "1h",
+      "mode": "split_1_2_3",
+      "symbol": "POWRUSDT",
+      "bars": 2161,
+      "start": "2026-08-05 17:00:00+00:00",
+      "end": "2026-11-03 17:00:00+00:00",
+      "buy_hold_pct": 38.04755944931164
+    }
+  ]
+}

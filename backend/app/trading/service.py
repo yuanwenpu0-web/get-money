@@ -15,7 +15,9 @@ from ..market.data_service import MarketDataService
 from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
 from ..strategy.specs.pool_volatility_research import BLOCKED_CODES as RESEARCH_CODES
-from ..strategy.bindings import active_bindings, expand
+from ..strategy.bindings import (
+    active_bindings, decode_order_params, encode_order_params, expand, resolve_order_params,
+)
 from ..strategy.engine import StrategyEngine
 from ..strategy.registry import get_spec
 from ..utils import interval_ms, iso_utc, now_ms
@@ -111,6 +113,8 @@ class TradingService:
                         pool=binding.pool,
                     )
                     strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
+                    if signal is not None:
+                        signal.binding_id = binding.id
                     if signal is None:
                         signal_errors.append(f"{symbol}/{binding.strategy}×{binding.pool}: 数据不足或K线无效，无法生成信号")
                         continue
@@ -122,6 +126,7 @@ class TradingService:
                         if not pending:
                             pending = signal.to_dict()
                             pending["params"] = signal.params
+                            pending["binding_id"] = binding.id
                             set_state(self.db, pending_key, pending)
                     if signal.direction == "FLAT":
                         continue
@@ -138,18 +143,35 @@ class TradingService:
             closed_symbols = set()
             for order in open_orders(self.db):
                 if order.source == "live":
+                    live_order_id = order.id
                     try:
                         if sync_live(self.db, order) is not None:
                             closed_symbols.add(order.symbol)
                             managed.append({"order_id": order.id, "actions": ["exchange_closed_sync"]})
                             continue
                     except Exception as exc:
-                        sync_errors.append(f"live #{order.id}: {exc}")
-                        self._log("error", f"live 订单同步失败 #{order.id}: {exc}")
+                        self.db.rollback()
+                        sync_errors.append(f"live #{live_order_id}: {exc}")
+                        self._log("error", f"live 订单同步失败 #{live_order_id}: {exc}")
                         continue
                 key = (order.symbol, order.interval, order.strategy, order.pool or "")
-                signal = strategy_signals.get(key)
-                if signal is None:
+                signal = None
+                if order.params_snapshot is not None:
+                    order_id = order.id
+                    try:
+                        params = decode_order_params(order.strategy, order.interval, order.params_snapshot)
+                        signal = engine.evaluate(
+                            order.symbol, order.interval, order.strategy,
+                            params=params, pool=order.pool or "", respect_enabled=False,
+                        )
+                    except Exception as exc:
+                        self.db.rollback()
+                        message = f"订单 #{order_id} 信号计算失败: {type(exc).__name__}: {exc}"
+                        signal_errors.append(message)
+                        self._log("error", message)
+                else:
+                    signal = strategy_signals.get(key)
+                if signal is None and order.params_snapshot is None:
                     # 老订单没有记录 pool：退回该 (币种, 周期, 策略) 上的任意一条信号
                     signal = next(
                         (
@@ -160,7 +182,15 @@ class TradingService:
                         ),
                         None,
                     )
-                result = manage_order(self.db, order, signal)
+                order_id = order.id
+                try:
+                    result = manage_order(self.db, order, signal)
+                except Exception as exc:
+                    self.db.rollback()
+                    message = f"订单 #{order_id} 管理失败: {type(exc).__name__}: {exc}"
+                    signal_errors.append(message)
+                    self._log("error", message)
+                    continue
                 if result["actions"]:
                     managed.append(result)
                 if order.status != 'OPEN':
@@ -228,6 +258,8 @@ class TradingService:
                         "pool": binding.pool,
                         "interval": binding.interval,
                         "symbol_count": len(binding.symbols),
+                        # 出场口径随绑定走，巡检回执里带上可读标签便于排障
+                        "exit": binding.exit_label,
                     }
                     for binding in bindings
                 ],
@@ -293,6 +325,15 @@ class TradingService:
         order = self.db.get(Order, order_id)
         if order is None or order.status != "OPEN":
             return None
+        if order.strategy in RESEARCH_CODES:
+            raise ValueError("研究订单不支持手动反向开仓")
+        if order.params_snapshot is not None:
+            params = decode_order_params(order.strategy, order.interval, order.params_snapshot)
+        else:
+            params = resolve_order_params(
+                self.db, order.strategy, order.interval, order.pool or "", symbol=order.symbol
+            )
+            encode_order_params(order.strategy, order.interval, params)
         mark = order.mark_price or order.entry_price
         close_position(self.db, order, mark, "reverse")
         if order.side == "LONG":
@@ -312,6 +353,9 @@ class TradingService:
                 "leverage": order.leverage,
                 "position_pct": order.margin / max(portfolio_snapshot(self.db)["equity"], 1),
                 "strategy": order.strategy,
+                "pool": order.pool or "",
+                "binding_id": order.binding_id,
+                "params": params,
                 "score": 0.6,
                 "prob_up": 0.5,
             },

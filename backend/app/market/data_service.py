@@ -7,7 +7,7 @@ from contextlib import nullcontext
 from typing import Callable, Iterable, Iterator
 
 import pandas as pd
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, aliased
@@ -474,6 +474,7 @@ class MarketDataService:
             return select(
                 Kline.open_time, Kline.close_time, Kline.open, Kline.high, Kline.low,
                 Kline.close, Kline.volume, Kline.quote_volume, Kline.trades,
+                Kline.taker_buy_volume, Kline.taker_buy_quote_volume,
             ).where(*predicates)
 
         # 用「减余数」对齐桶，而不是 open_time / step * step：
@@ -491,6 +492,12 @@ class MarketDataService:
             func.sum(Kline.volume).label("volume"),
             func.sum(Kline.quote_volume).label("quote_volume"),
             func.sum(Kline.trades).label("trades"),
+            # 主动买入量按分钟求和；任一分钟缺失则该桶为 NULL——
+            # 缺字段的旧行不能用 0 冒充「主动买入为 0」，否则不平衡会被系统性拉负。
+            case((func.count(Kline.taker_buy_volume) == func.count(), func.sum(Kline.taker_buy_volume)),
+                 else_=None).label("taker_buy_volume"),
+            case((func.count(Kline.taker_buy_quote_volume) == func.count(), func.sum(Kline.taker_buy_quote_volume)),
+                 else_=None).label("taker_buy_quote_volume"),
         ).where(*predicates, Kline.open_time % MINUTE_MS == 0).group_by(bucket).subquery()
         first, last = aliased(Kline), aliased(Kline)
         count = grouped.c.minutes
@@ -503,6 +510,7 @@ class MarketDataService:
             grouped.c.open_time, (grouped.c.open_time + step - 1).label("close_time"),
             first.open, grouped.c.high, grouped.c.low,
             last.close, grouped.c.volume, grouped.c.quote_volume, grouped.c.trades,
+            grouped.c.taker_buy_volume, grouped.c.taker_buy_quote_volume,
         ).join(first, and_(first.symbol == symbol, first.interval == "1m",
                            first.open_time == grouped.c.first_time)
         ).join(last, and_(last.symbol == symbol, last.interval == "1m",
@@ -571,6 +579,7 @@ class MarketDataService:
         return select(
             Kline.open_time, Kline.close_time, Kline.open, Kline.high, Kline.low,
             Kline.close, Kline.volume, Kline.quote_volume, Kline.trades,
+            Kline.taker_buy_volume, Kline.taker_buy_quote_volume,
         ).where(*predicates, Kline.open_time < latest)
 
     def _merged_candle_rows(
@@ -634,7 +643,10 @@ class MarketDataService:
             else:
                 rows = self.db.execute(statement).mappings().all()
         if not rows:
-            frame = pd.DataFrame(columns=["open", "high", "low", "close", "volume", "quote_volume", "close_time", "trades"])
+            frame = pd.DataFrame(columns=[
+                "open", "high", "low", "close", "volume", "quote_volume", "close_time",
+                "trades", "taker_buy_volume", "taker_buy_quote_volume",
+            ])
             frame.attrs["candle_sources"] = sources
             return frame
         frame = pd.DataFrame([dict(row) for row in rows])
