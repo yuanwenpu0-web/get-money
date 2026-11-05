@@ -47,10 +47,10 @@ def test_order_summary_covers_entire_filtered_set_and_mark_fallback(db):
     result = trading.list_orders(symbol="btcusdt", page=2, page_size=2, db=db)
     assert len(result["orders"]) == 2
     assert (result["total"], result["page"], result["page_size"], result["pages"]) == (6, 2, 2, 3)
-    assert result["summary"] == {"open": 3, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 20}
+    assert result["summary"] == {"open": 3, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 20, "open_total": 3}
     closed = trading.list_orders(status="closed", symbol="BTCUSDT", page_size=1, db=db)
     assert closed["total"] == 2
-    assert closed["summary"] == {"open": 0, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 0}
+    assert closed["summary"] == {"open": 0, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 0, "open_total": 3}
     assert [row["id"] for row in closed["orders"]] == [2]
     assert [row["id"] for row in trading.list_orders(status="closed", symbol="BTCUSDT", page=2, page_size=1, db=db)["orders"]] == [1]
 
@@ -65,7 +65,7 @@ def test_order_strategy_filter_applies_to_rows_totals_and_summary(db):
 
     result = trading.list_orders(strategy="ABSORPTION_REVERSAL", page_size=1, db=db)
     assert result["total"] == 2
-    assert result["summary"] == {"open": 1, "closed": 1, "realized_pnl": 5, "unrealized_pnl": 10}
+    assert result["summary"] == {"open": 1, "closed": 1, "realized_pnl": 5, "unrealized_pnl": 10, "open_total": 1}
     assert [row["strategy"] for row in result["orders"]] == ["absorption_reversal"]
     assert [row["strategy"] for row in trading.list_orders(strategy="retired_strategy", db=db)["orders"]] == ["retired_strategy"]
 
@@ -104,7 +104,7 @@ def test_empty_lists_have_zero_pages_and_summary(db):
         assert result["page"] == 1
         assert result["page_size"] == 20
     assert trading.list_orders(db=db)["summary"] == {
-        "open": 0, "closed": 0, "realized_pnl": 0, "unrealized_pnl": 0,
+        "open": 0, "closed": 0, "realized_pnl": 0, "unrealized_pnl": 0, "open_total": 0,
     }
 
 

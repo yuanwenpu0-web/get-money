@@ -19,7 +19,7 @@ def _bars():
 def test_klines_with_local_data_does_not_scan_for_latest_or_sync(db, monkeypatch):
     calls = []
 
-    def load(self, symbol, interval, limit):
+    def load(self, symbol, interval, limit, end_ms=None):
         calls.append((symbol, interval, limit))
         return _bars()
 

@@ -159,17 +159,22 @@ def klines(
     interval: str = Query("1m"),
     limit: int = Query(500, ge=10, le=1500),
     db: Session = Depends(get_db),
+    # 用 Annotated 而不是 Query(...) 作默认值：直接调用（测试/内部）时才是真正的 None。
+    end: Annotated[int | None, Query(ge=0, description="只返回 open_time <= end 的K线（毫秒时间戳），用于向左翻页加载更早历史")] = None,
 ):
     service = MarketDataService(db)
-    frame = service.load_frame(symbol, interval, limit=limit)
+    frame = service.load_frame(symbol, interval, limit=limit, end_ms=end)
     if frame.empty:
+        if end is not None:
+            # 翻页请求不再触发拉取：本地没有更早的数据就代表到头了
+            return {"symbol": symbol, "interval": interval, "end": end, "bars": []}
         try:
             service.sync_recent(symbol, interval, tail_limit=1000)
         except Exception as exc:
             raise HTTPException(502, f"无本地数据且拉取失败: {exc}") from exc
         frame = service.load_frame(symbol, interval, limit=limit)
     if frame.empty:
-        return {"symbol": symbol, "interval": interval, "bars": []}
+        return {"symbol": symbol, "interval": interval, "end": end, "bars": []}
     bars = []
     for index, row in frame.iterrows():
         bars.append(
@@ -182,7 +187,7 @@ def klines(
                 "volume": row["volume"],
             }
         )
-    return {"symbol": symbol, "interval": interval, "bars": bars}
+    return {"symbol": symbol, "interval": interval, "end": end, "bars": bars}
 
 
 @router.post("/preview")

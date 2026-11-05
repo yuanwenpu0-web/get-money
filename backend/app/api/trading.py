@@ -90,11 +90,14 @@ def list_orders(
     ).one()
     rows = (query.order_by(Order.created_at.desc(), Order.id.desc())
             .offset((page - 1) * page_size).limit(page_size).all())
+    # 一键平仓按钮要显示"全市场还有多少持仓"，这个计数不受当前筛选影响。
+    open_total = db.query(func.count(Order.id)).filter(Order.status == "OPEN").scalar() or 0
     return {
         "orders": [order_dict(row) for row in rows],
         **page_metadata(total, page, page_size),
         "summary": {"open": open_count, "closed": closed_count,
-                    "realized_pnl": round(realized, 4), "unrealized_pnl": round(unrealized, 4)},
+                    "realized_pnl": round(realized, 4), "unrealized_pnl": round(unrealized, 4),
+                    "open_total": int(open_total)},
     }
 
 
@@ -114,6 +117,50 @@ def list_order_strategies(db: Session = Depends(get_db)):
             {"code": code, "name": name or code, "count": int(count)}
             for code, name, count in rows
         ]
+    }
+
+
+@router.post("/orders/close-all")
+def close_all_orders(db: Session = Depends(get_db)):
+    """一键平掉所有未平仓订单（不受列表筛选影响），按最新标记价市价成交。
+
+    先刷新一遍标记价再逐笔平仓；单笔失败只记录不中断，结果里返回失败明细。
+    """
+    portfolio_snapshot(db, update_marks=True)
+    service = TradingService(db)
+    targets = [
+        (int(row[0]), str(row[1]))
+        for row in db.query(Order.id, Order.symbol).filter(Order.status == "OPEN").order_by(Order.id.asc()).all()
+    ]
+    closed: list[dict] = []
+    failed: list[dict] = []
+    for order_id, symbol in targets:
+        try:
+            order = service.manual_close(order_id)
+        except Exception as exc:  # noqa: BLE001 - 单笔异常（含实盘下单失败）不应中断整批
+            db.rollback()
+            failed.append({"id": order_id, "symbol": symbol, "error": f"{exc.__class__.__name__}: {exc}"})
+            continue
+        if order is None:
+            failed.append({"id": order_id, "symbol": symbol, "error": "订单不存在或已平仓"})
+            continue
+        closed.append(order_dict(order))
+
+    realized = round(sum(float(item.get("realized_pnl") or 0) for item in closed), 4)
+    db.add(
+        JobLog(
+            job="order",
+            level="warning" if failed else "info",
+            message=f"一键平仓：成功 {len(closed)} 笔，失败 {len(failed)} 笔，已实现 {realized:.2f}"[:4000],
+        )
+    )
+    db.commit()
+    return {
+        "closed": closed,
+        "failed": failed,
+        "closed_count": len(closed),
+        "failed_count": len(failed),
+        "realized_pnl": realized,
     }
 
 

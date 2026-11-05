@@ -36,13 +36,16 @@ export default {
   getOrderStrategies: () => http.get('/trading/orders/strategies'),
   getOrder: (id) => http.get(`/trading/orders/${id}`),
   closeOrder: (id) => http.post(`/trading/orders/${id}/close`),
+  closeAllOrders: () => http.post('/trading/orders/close-all'),
   patchOrder: (id, payload) => http.patch(`/trading/orders/${id}`, payload),
   reverseOrder: (id) => http.post(`/trading/orders/${id}/reverse`),
   getEquity: (limit = 1200) => http.get('/trading/equity', { params: { limit } }),
   getLogs: (limit = 80) => http.get('/trading/logs', { params: { limit } }),
   runCycle: () => http.post('/trading/run-once'),
 
-  getKlines: (symbol, interval, limit = 500) => http.get('/market/klines', { params: { symbol, interval, limit } }),
+  // end 传毫秒时间戳时只取该时间之前的K线，用于向左翻页加载更早历史
+  getKlines: (symbol, interval, limit = 500, end = null) =>
+    http.get('/market/klines', { params: { symbol, interval, limit, ...(end ? { end } : {}) } }),
   getMarketSources: (params) => http.get('/market/sources', { params }),
   getMarketSymbols,
   syncMarket: (payload) => http.post('/market/sync', payload),

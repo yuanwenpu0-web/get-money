@@ -6,6 +6,9 @@ const props = defineProps({
   height: { type: String, default: '320px' },
 })
 
+// 把缩放/平移事件透给页面，页面据此在拖到左边缘时加载更早的K线。
+const emit = defineEmits(['datazoom'])
+
 const el = ref(null)
 const loading = ref(true)
 const error = ref('')
@@ -27,6 +30,14 @@ async function loadChart() {
     if (disposed || !el.value) return
     chart = echarts.init(el.value, 'dark', { renderer: 'canvas' })
     chart.getDom().style.backgroundColor = 'transparent'
+    // 只用事件里的 start/end，避免 getOption() 在每次拖动时复制整份配置
+    chart.on('datazoom', (params) => {
+      const item = Array.isArray(params?.batch) && params.batch.length ? params.batch[0] : params
+      const start = Number(item?.start)
+      const end = Number(item?.end)
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return
+      emit('datazoom', { start, end })
+    })
     render()
     observer = new ResizeObserver(() => chart && chart.resize())
     observer.observe(el.value)
