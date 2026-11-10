@@ -3,7 +3,9 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
+import TablePager from '../components/TablePager.vue'
 import { number, price, tsLabel } from '../utils/format'
+import { PAGE_SIZE } from '../utils/pagination'
 import { barsToCover, locateBar, tradeMarker, zoomForIndexes } from '../utils/kline'
 
 const settings = ref({})
@@ -28,7 +30,7 @@ const showTrades = ref(true)
 const locating = ref(false)
 const quickIntervals = ['1m', '5m', '15m', '1h', '4h']
 const statsPage = ref(1)
-const statsPageSize = ref(20)
+const statsPageSize = PAGE_SIZE
 const statsTotal = ref(0)
 let statsRequest = 0
 let tradesRequest = 0
@@ -296,7 +298,7 @@ async function loadSources() {
   if (disposed) return
   const request = ++statsRequest
   const page = statsPage.value
-  const pageSize = statsPageSize.value
+  const pageSize = statsPageSize
   sourcesLoading.value = true
   sourcesError.value = ''
   try {
@@ -321,13 +323,6 @@ async function loadSources() {
 function changeStatsPage(page) {
   if (page === statsPage.value) return Promise.resolve()
   statsPage.value = page
-  return loadSources()
-}
-
-function changeStatsPageSize(size) {
-  if (size === statsPageSize.value) return Promise.resolve()
-  statsPageSize.value = size
-  statsPage.value = 1
   return loadSources()
 }
 
@@ -365,9 +360,10 @@ async function loadTrades() {
   tradesLoading.value = true
   tradesError.value = ''
   try {
-    const data = await api.getOrders({ symbol, page: 1, page_size: 100 })
+    // 只取画标记要用的字段：整条订单（含参数快照）在图上只用到 5 个值
+    const data = await api.getOrderMarkers({ symbol, limit: 200 })
     if (disposed || request !== tradesRequest) return []
-    const rows = Array.isArray(data?.orders) ? data.orders : []
+    const rows = Array.isArray(data?.markers) ? data.markers : []
     const upper = String(symbol).toUpperCase()
     trades.value = rows.filter((order) => !order?.symbol || String(order.symbol).toUpperCase() === upper)
     tradesSymbol = symbol
@@ -675,13 +671,7 @@ onBeforeUnmount(() => {
             </template>
           </el-table-column>
         </el-table>
-        <div class="table-pagination">
-          <el-pagination
-            :current-page="statsPage" :page-size="statsPageSize" :total="statsTotal"
-            :page-sizes="[10, 20, 50, 100]" layout="total, sizes, prev, pager, next, jumper" size="small"
-            @update:current-page="changeStatsPage" @update:page-size="changeStatsPageSize"
-          />
-        </div>
+        <TablePager :page="statsPage" :page-size="statsPageSize" :total="statsTotal" :disabled="sourcesLoading" @change="changeStatsPage" />
       </div>
     </div>
 

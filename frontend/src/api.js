@@ -31,17 +31,25 @@ export default {
   saveCredentials: (payload) => updateSettings(http.put('/settings/credentials', payload)),
   testCredentials: () => http.post('/settings/credentials/test'),
 
-  getDashboard: () => http.get('/trading/dashboard', { params: { include_market: false } }),
+  getDashboard: (params) => http.get('/trading/dashboard', { params: { include_market: false, ...params } }),
   getOrders: (params) => http.get('/trading/orders', { params }),
+  getOrderMarkers: (params) => http.get('/trading/orders/markers', { params }),
   getOrderStrategies: () => http.get('/trading/orders/strategies'),
   getOrder: (id) => http.get(`/trading/orders/${id}`),
+  // 按当前搜索条件展开所有可平仓订单 ID（跨分页），用于「按筛选全选」
+  getOpenOrderIds: (params) => http.get('/trading/orders/open-ids', { params }),
+  batchCloseOrders: (orderIds) => http.post('/trading/orders/batch-close', { order_ids: orderIds }),
   closeOrder: (id) => http.post(`/trading/orders/${id}/close`),
-  closeAllOrders: () => http.post('/trading/orders/close-all'),
   patchOrder: (id, payload) => http.patch(`/trading/orders/${id}`, payload),
   reverseOrder: (id) => http.post(`/trading/orders/${id}/reverse`),
   getEquity: (limit = 1200) => http.get('/trading/equity', { params: { limit } }),
-  getLogs: (limit = 80) => http.get('/trading/logs', { params: { limit } }),
+  getLogs: (params) => http.get('/trading/logs', { params }),
   runCycle: () => http.post('/trading/run-once'),
+  // 交易所为真相源：环境、账户快照、下单成败回执与收益基准
+  getExchangeState: () => http.get('/trading/exchange'),
+  getExchangeEvents: (params) => http.get('/trading/exchange-events', { params }),
+  getExchangeStatus: () => http.get('/settings/exchange'),
+  rebaseExchange: () => http.post('/settings/exchange/rebase'),
 
   // end 传毫秒时间戳时只取该时间之前的K线，用于向左翻页加载更早历史
   getKlines: (symbol, interval, limit = 500, end = null) =>
@@ -51,12 +59,14 @@ export default {
   syncMarket: (payload) => http.post('/market/sync', payload),
   previewSignal: (payload) => http.post('/market/preview', payload),
 
-  getIndicators: () => http.get('/indicators'),
+  getIndicators: (params) => http.get('/indicators', { params }),
   getIndicatorResearch: () => http.get('/indicators/research/latest'),
   getIndicator: (id) => http.get('/indicators/' + encodeURIComponent(id)),
 
   getStrategies: () => http.get('/strategies'),
   updateStrategy: (code, payload) => http.put(`/strategies/${code}`, payload),
+  // 某个策略下的全部绑定：信号预演的参数层下拉用它，不依赖绑定表格的当前页
+  getStrategyBindings: (code, params) => http.get(`/strategies/${code}/bindings`, { params }),
 
   // 币种池与「策略 × 池」绑定：参数的真正归属地
   getPools: () => http.get('/pools'),
@@ -94,6 +104,8 @@ export default {
   getSymbolParams: (params) => http.get('/symbol-params', { params }),
   saveSymbolParams: (payload) => http.put('/symbol-params', payload),
   deleteSymbolParams: (payload) => http.delete('/symbol-params', { data: payload }),
+  // 清空覆盖：服务端一次删完（分页后前端只看到当前页，不能逐页拼 symbols 删）
+  clearSymbolParams: (params) => http.delete('/symbol-params/all', { params }),
 }
 
 

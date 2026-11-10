@@ -23,6 +23,7 @@ function view(overrides = {}) {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1]
     .replace(/^import .*$/gm, '')
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api: {
       getOptimizationOptions: async () => OPTIONS,
       listOptimizations: async () => ({ optimizations: [], total: 0 }),

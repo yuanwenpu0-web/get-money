@@ -181,8 +181,13 @@ def open_research_position(db: Session, signal) -> Order | None:
     return order
 
 
-def close_position(db: Session, order: Order, price: float, reason: str = "manual", slippage_rate: float | None = None) -> Order:
-    """本地记账结算。slippage_rate 默认取全局滑点；live 模式传入 0 用真实成交均价结算。"""
+def close_position(db: Session, order: Order, price: float, reason: str = "manual",
+                   slippage_rate: float | None = None, update_cash: bool = True) -> Order:
+    """本地记账结算。slippage_rate 默认取全局滑点；live 传 0 用真实成交均价。
+
+    update_cash=False 用于交易所订单：live 模式现金/权益以币安账户为准，
+    本地 cash 不再被模拟账本改动（否则会与交易所可用余额对不上）。
+    """
     if order.status != "OPEN":
         return order
     state = all_state(db)
@@ -195,12 +200,13 @@ def close_position(db: Session, order: Order, price: float, reason: str = "manua
     exit_fee = exit_notional * fee_rate
     net = gross - order.entry_fee - exit_fee
 
-    cash = float(state.get("cash", 0.0))
-    cash_row = db.get(AppState, "cash")
-    if cash_row is None:
-        cash_row = AppState(key="cash")
-        db.add(cash_row)
-    cash_row.value = json.dumps(round(cash + order.margin + gross - exit_fee, 4))
+    if update_cash:
+        cash = float(state.get("cash", 0.0))
+        cash_row = db.get(AppState, "cash")
+        if cash_row is None:
+            cash_row = AppState(key="cash")
+            db.add(cash_row)
+        cash_row.value = json.dumps(round(cash + order.margin + gross - exit_fee, 4))
 
     order.status = "CLOSED"
     order.close_price = round_price(exit_price)

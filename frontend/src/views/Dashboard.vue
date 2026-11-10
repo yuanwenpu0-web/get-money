@@ -1,12 +1,14 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
 import StatCard from '../components/StatCard.vue'
+import TablePager from '../components/TablePager.vue'
 import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, strategyLabel, symbolsLabel, tsLabel } from '../utils/format'
 
 const dashboard = ref(null)
+const exchangeState = ref({})
 const equity = ref([])
 const symbolCount = ref(0)
 const dashboardLoading = ref(false)
@@ -23,6 +25,19 @@ const portfolio = computed(() => dashboard.value?.portfolio || {})
 const positions = computed(() => dashboard.value?.positions || [])
 const settings = computed(() => dashboard.value?.settings || {})
 const logs = computed(() => dashboard.value?.logs || [])
+
+// 四张卡片各自分页：持仓、最近订单、最近信号、系统日志，每页都不超过 15 条
+const pages = reactive({ positions: 1, orders: 1, signals: 1, logs: 1 })
+
+function meta(section) {
+  return dashboard.value?.[`${section}_pagination`] || { total: 0, page: 1, page_size: 15, pages: 0 }
+}
+
+function changePage(section, page) {
+  if (!page || page === pages[section]) return
+  pages[section] = page
+  return loadDashboard()
+}
 
 const executionModeLabel = computed(() => {
   if (settings.value.execution_mode === 'live') {
@@ -137,7 +152,21 @@ function createLoader(request, apply, busy, errorState) {
 }
 
 const loadDashboard = createLoader(
-  () => api.getDashboard(), (data) => { dashboard.value = data }, dashboardLoading, dashboardError,
+  () => api.getDashboard({
+    positions_page: pages.positions,
+    orders_page: pages.orders,
+    signals_page: pages.signals,
+    logs_page: pages.logs,
+  }),
+  (data) => {
+    dashboard.value = data
+    // 数据变少后当前页可能越界（例如持仓被平掉），退回最后一页而不是停在空表格上
+    for (const section of ['positions', 'orders', 'signals', 'logs']) {
+      const info = data?.[`${section}_pagination`]
+      if (info && info.pages && pages[section] > info.pages) pages[section] = info.pages
+    }
+  },
+  dashboardLoading, dashboardError,
 )
 const loadEquity = createLoader(
   () => api.getEquity(1500), (data) => { equity.value = data.points || [] }, equityLoading, equityError,
@@ -146,8 +175,12 @@ const loadSymbolCount = createLoader(
   () => api.getMarketSymbols(), (data) => { symbolCount.value = data.symbols?.length || 0 }, symbolLoading, symbolError,
 )
 
+async function loadExchangeState() {
+  try { exchangeState.value = await api.getExchangeState() } catch { exchangeState.value = {} }
+}
+
 function load() {
-  return Promise.all([loadDashboard(), loadEquity(), loadSymbolCount()])
+  return Promise.all([loadDashboard(), loadEquity(), loadSymbolCount(), loadExchangeState()])
 }
 
 async function runNow() {
@@ -196,6 +229,29 @@ onBeforeUnmount(() => {
       <el-button size="small" @click="load">刷新</el-button>
     </div>
 
+    <div v-if="exchangeState.env" class="panel" style="margin-bottom: 14px">
+      <div class="row" style="flex-wrap: wrap; gap: 10px">
+        <el-tag size="small" :type="exchangeState.env === 'demo' ? 'warning' : 'danger'" effect="dark">
+          {{ exchangeState.env === 'demo' ? 'DEMO · 币安合约 Testnet' : '正式环境 · 币安合约主网' }}
+        </el-tag>
+        <span class="muted">收益口径：{{ exchangeState.pnl_source === 'binance' ? '币安账户（权益 / 盈亏 / 成交价 / 手续费）' : '本地账本' }} · 行情：主网公开 K 线</span>
+        <span class="muted">近期提交成功率 {{ exchangeState.recent_success_rate ?? '—' }}%（{{ exchangeState.recent_submits ?? 0 }} 笔）</span>
+        <span v-if="exchangeState.recent_blocked" class="muted">资金闸门跳过 {{ exchangeState.recent_blocked }} 次</span>
+        <span v-if="exchangeState.pnl_source === 'binance'" class="muted">逐笔盈亏口径差 {{ money(exchangeState.reconcile_diff) }}</span>
+        <div class="spacer"></div>
+        <el-button size="small" text type="primary" @click="loadExchangeState">刷新</el-button>
+      </div>
+      <div v-if="exchangeState.recent_blocked_reason" class="form-hint" style="margin-top: 8px">
+        <span class="muted">最近跳过原因：{{ exchangeState.recent_blocked_reason }}</span>
+      </div>
+      <div v-if="exchangeState.recent_failures?.length" class="form-hint" style="margin-top: 8px">
+        <span class="down">最近下单异常：</span>
+        <span v-for="item in exchangeState.recent_failures.slice(0, 3)" :key="item.id" class="mono" style="margin-right: 10px">
+          {{ item.symbol }} {{ item.action }} {{ item.status }} {{ item.code ? `(${item.code})` : '' }}
+        </span>
+      </div>
+    </div>
+
     <div v-if="dashboardError" class="panel" role="alert" style="margin-bottom: 14px">
       <span class="down">账户与持仓加载失败：{{ dashboardError }}</span>
       <el-button size="small" text type="primary" @click="loadDashboard">重试</el-button>
@@ -208,8 +264,8 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div v-else class="grid stats-grid">
-      <StatCard label="总权益" :value="money(portfolio.equity)" :sub="`收益基准 ${money(portfolio.initial_capital)}`" />
-      <StatCard label="可用现金" :value="money(portfolio.cash)" :sub="`占用保证金 ${money(portfolio.margin_used)}`" />
+      <StatCard label="总权益" :value="money(portfolio.equity)" :sub="`${portfolio.pnl_source === 'binance' ? '币安账户口径' : '本地账本'} · 基准 ${money(portfolio.initial_capital)}`" />
+      <StatCard label="可用现金" :value="money(portfolio.cash)" :sub="`${portfolio.pnl_source === 'binance' ? '币安可用余额' : '本地现金'} · 占用保证金 ${money(portfolio.margin_used)}`" />
       <StatCard
         label="未实现盈亏"
         :value="money(portfolio.unrealized_pnl)"
@@ -278,6 +334,7 @@ onBeforeUnmount(() => {
           </div>
           <div v-if="!logs.length" class="empty-hint">{{ !dashboard ? (dashboardError ? '日志加载失败' : '日志加载中…') : '暂无日志' }}</div>
         </div>
+        <TablePager :page="pages.logs" :total="meta('logs').total" :disabled="dashboardLoading" @change="changePage('logs', $event)" />
       </div>
     </div>
 
@@ -315,6 +372,7 @@ onBeforeUnmount(() => {
           <template #default="{ row }">{{ strategyLabel(row.strategy) }}</template>
         </el-table-column>
       </el-table>
+      <TablePager :page="pages.positions" :total="meta('positions').total" :disabled="dashboardLoading" @change="changePage('positions', $event)" />
     </div>
 
     <div class="two-col section-gap">
@@ -344,6 +402,7 @@ onBeforeUnmount(() => {
           </el-table-column>
           <el-table-column label="信号指标" min-width="120"><template #default="{ row }">{{ strategyLabel(row.strategy) }}</template></el-table-column>
         </el-table>
+        <TablePager :page="pages.signals" :total="meta('signals').total" :disabled="dashboardLoading" @change="changePage('signals', $event)" />
       </div>
 
       <div class="panel">
@@ -371,6 +430,7 @@ onBeforeUnmount(() => {
             <template #default="{ row }">{{ closeReasonLabel(row.close_reason) }}</template>
           </el-table-column>
         </el-table>
+        <TablePager :page="pages.orders" :total="meta('orders').total" :disabled="dashboardLoading" @change="changePage('orders', $event)" />
       </div>
     </div>
   </div>

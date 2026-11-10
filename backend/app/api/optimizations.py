@@ -37,7 +37,13 @@ from ..backtest.significance import bootstrap_expectancy_ci
 from ..config import SUPPORTED_INTERVALS
 from ..db import SessionLocal, get_db
 from ..models import OptimizationResult, OptimizationRun, StrategyBinding, SymbolPool, utcnow
-from ..pagination import page_metadata
+from ..pagination import (
+    DEFAULT_PAGE_SIZE,
+    PageQuery,
+    PageSizeQuery,
+    offset_of,
+    page_metadata,
+)
 from ..schemas import OptimizationApply, OptimizationPayload
 from ..serializers import dt_iso
 from ..strategy.pools import pool_symbols
@@ -493,15 +499,15 @@ def _execute(run_id: int, cancel: threading.Event | None = None) -> None:
 @router.get("")
 def list_optimizations(
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=50)] = 20,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     query = db.query(OptimizationRun)
     total = query.count()
     rows = (
         query.options(defer(OptimizationRun.config), defer(OptimizationRun.summary))
         .order_by(OptimizationRun.created_at.desc(), OptimizationRun.id.desc())
-        .offset((page - 1) * page_size)
+        .offset(offset_of(page, page_size))
         .limit(page_size)
         .all()
     )
@@ -549,8 +555,8 @@ def delete_optimization(run_id: int, db: Session = Depends(get_db)):
 def list_results(
     run_id: int,
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=200)] = 50,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
     verdict: str = "",
     q: str = "",
     sort: str = "score",
@@ -588,7 +594,7 @@ def list_results(
         else:
             items.sort(key=lambda item: -float(item["score"] or 0.0))
         total = len(items)
-        start = (page - 1) * page_size
+        start = offset_of(page, page_size)
         return {
             "results": items[start : start + page_size],
             "best_only": True,
@@ -609,7 +615,7 @@ def list_results(
         order = (OptimizationResult.score.desc(),)
     rows = (
         query.order_by(*order)
-        .offset((page - 1) * page_size)
+        .offset(offset_of(page, page_size))
         .limit(page_size)
         .all()
     )

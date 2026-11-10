@@ -1,0 +1,662 @@
+{
+  "strategy": "supertrend_current",
+  "generated_at": "2026-11-10T01:27:58.855755+00:00",
+  "interval": "1h",
+  "days": 183,
+  "window": {
+    "start_ms": 1778457600000,
+    "end_ms": 1794268800000,
+    "start": "2026-05-11 00:00 UTC",
+    "end": "2026-11-10 00:00 UTC"
+  },
+  "universe": {
+    "pool": "native-1h-full-window",
+    "symbols": 460,
+    "skipped": [
+      {
+        "symbol": "0GUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "1000PEPEUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "AIGENSYNUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "APTUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "ARCUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "ARUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "ARXUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.735
+      },
+      {
+        "symbol": "ASTERUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "AXSUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "BASEDUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BATUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "BEAMXUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "BILLUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BIRBUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BMTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BNBUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BOMEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "BRUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "BSBUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "BTWUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.8365
+      },
+      {
+        "symbol": "CAKEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "CAPUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.7115
+      },
+      {
+        "symbol": "CFGUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "CHIPUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "COTIUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "CTRUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.8759
+      },
+      {
+        "symbol": "CTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.1878
+      },
+      {
+        "symbol": "DATAIPUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.6799
+      },
+      {
+        "symbol": "DOODUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "DOSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.2832
+      },
+      {
+        "symbol": "DYMUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.283
+      },
+      {
+        "symbol": "EDGEUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "EIGENUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "FETUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "GALAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "GENIUSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "GRAMUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.6849
+      },
+      {
+        "symbol": "GRVTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.5255
+      },
+      {
+        "symbol": "HBARUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "HYPEUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "LITUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "LYNUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "MAGICUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "MANAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "MARSCOINUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.3513
+      },
+      {
+        "symbol": "METUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "MORPHOUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "MOVRUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "OGNUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "OPGUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "OPUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "OUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.7279
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "PENGUUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "PHAROSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9533
+      },
+      {
+        "symbol": "POLUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "PONSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.2835
+      },
+      {
+        "symbol": "PREDICTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.0565
+      },
+      {
+        "symbol": "PRLUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "PROMUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "RAREUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "REUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.76
+      },
+      {
+        "symbol": "RIVERUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "RLCUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "RUNEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "SAGAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "SANDUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "SKYUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.7129
+      },
+      {
+        "symbol": "SLXUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.8545
+      },
+      {
+        "symbol": "STARUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.8982
+      },
+      {
+        "symbol": "XAUTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "ZECUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9709
+      },
+      {
+        "symbol": "ZESTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.8365
+      },
+      {
+        "symbol": "哈基米USDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.3245
+      },
+      {
+        "symbol": "牛来USDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.3618
+      },
+      {
+        "symbol": "FXSUSDT",
+        "reason": "no_long_entries"
+      },
+      {
+        "symbol": "QUICKUSDT",
+        "reason": "no_long_entries"
+      },
+      {
+        "symbol": "SLERFUSDT",
+        "reason": "no_long_entries"
+      },
+      {
+        "symbol": "USDCUSDT",
+        "reason": "no_long_entries"
+      }
+    ],
+    "symbols_with_trades": 456
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional"
+  },
+  "split": {
+    "train_end_ms": 1785782160000,
+    "valid_end_ms": 1788895800000,
+    "purge_ms": 86400000,
+    "purged_records": 463,
+    "sizes": {
+      "train": 15863,
+      "valid": 3705,
+      "test": 6854
+    }
+  },
+  "trades": 15863,
+  "min_pooled_trades": 30,
+  "probe": {
+    "rows": [
+      {
+        "signal": "mom_fade",
+        "pairs": 15863,
+        "coverage": 1.0,
+        "ic": 0.077601,
+        "symbols_with_ic": 452,
+        "same_sign_symbols": 309,
+        "sign_share": 0.6836,
+        "p_binom": 0.0,
+        "segment_ics": [
+          0.08628,
+          0.107752,
+          0.042037,
+          0.071208
+        ],
+        "segments_same_sign": 4,
+        "gate": "pass",
+        "fdr_q": 0.0,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": true,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "ma_break",
+        "pairs": 15863,
+        "coverage": 1.0,
+        "ic": 0.075848,
+        "symbols_with_ic": 452,
+        "same_sign_symbols": 305,
+        "sign_share": 0.6748,
+        "p_binom": 0.0,
+        "segment_ics": [
+          0.112733,
+          0.116656,
+          0.001832,
+          0.072198
+        ],
+        "segments_same_sign": 4,
+        "gate": "pass",
+        "fdr_q": 0.0,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": true,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "vol_spike",
+        "pairs": 15544,
+        "coverage": 0.9799,
+        "ic": -0.070289,
+        "symbols_with_ic": 451,
+        "same_sign_symbols": 305,
+        "sign_share": 0.6763,
+        "p_binom": 0.0,
+        "segment_ics": [
+          -0.034052,
+          0.028391,
+          -0.169246,
+          -0.099984
+        ],
+        "segments_same_sign": 3,
+        "gate": "pass",
+        "fdr_q": 0.0,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": true,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": true,
+        "usable_as_sell": true
+      },
+      {
+        "signal": "pullback_from_high",
+        "pairs": 15863,
+        "coverage": 1.0,
+        "ic": 0.032212,
+        "symbols_with_ic": 452,
+        "same_sign_symbols": 268,
+        "sign_share": 0.5929,
+        "p_binom": 9.064e-05,
+        "segment_ics": [
+          0.084083,
+          0.076835,
+          -0.042226,
+          0.01073
+        ],
+        "segments_same_sign": 3,
+        "gate": "fail",
+        "fdr_q": 0.000159,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": false,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "st_flip",
+        "pairs": 15863,
+        "coverage": 1.0,
+        "ic": 0.035452,
+        "symbols_with_ic": 452,
+        "same_sign_symbols": 267,
+        "sign_share": 0.5907,
+        "p_binom": 0.00013371,
+        "segment_ics": [
+          0.053642,
+          0.085122,
+          -0.004015,
+          0.012524
+        ],
+        "segments_same_sign": 3,
+        "gate": "fail",
+        "fdr_q": 0.000187,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": false,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "funding_crowd",
+        "pairs": 15256,
+        "coverage": 0.9617,
+        "ic": 0.02988,
+        "symbols_with_ic": 433,
+        "same_sign_symbols": 244,
+        "sign_share": 0.5635,
+        "p_binom": 0.00937811,
+        "segment_ics": [
+          0.050994,
+          -0.000651,
+          0.019644,
+          0.046447
+        ],
+        "segments_same_sign": 3,
+        "gate": "fail",
+        "fdr_q": 0.010941,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": false,
+          "fdr_q_below_0.10": true,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "funding_neg",
+        "pairs": 15256,
+        "coverage": 0.9617,
+        "ic": -0.022053,
+        "symbols_with_ic": 433,
+        "same_sign_symbols": 224,
+        "sign_share": 0.5173,
+        "p_binom": 0.50112178,
+        "segment_ics": [
+          -0.064924,
+          -0.019472,
+          0.025968,
+          -0.016562
+        ],
+        "segments_same_sign": 3,
+        "gate": "fail",
+        "fdr_q": 0.501122,
+        "gates": {
+          "abs_ic_ge_0.02": true,
+          "sign_share_ge_0.60": false,
+          "fdr_q_below_0.10": false,
+          "segments_same_sign_ge_3of4": true
+        },
+        "sell_direction_ok": true,
+        "usable_as_sell": false
+      },
+      {
+        "signal": "oi_crowd",
+        "pairs": 0,
+        "unique_values": 0,
+        "ic": null,
+        "coverage": 0.0,
+        "gate": "insufficient",
+        "gates": {},
+        "sell_direction_ok": false,
+        "usable_as_sell": false
+      }
+    ],
+    "self_calibration": {
+      "positive_control_ic_LOOKAHEAD": 1.0,
+      "negative_control_mean_abs_ic": 0.006402,
+      "negative_control_p95_abs_ic": 0.013241,
+      "half_decay_mean_ic": 0.529115,
+      "n_seeds": 20,
+      "n_pairs": 15863
+    },
+    "probe_pass_count": 3,
+    "sell_direction_pass_count": 1,
+    "verdict": "pass"
+  },
+  "verdict": "pass",
+  "default_enabled": false,
+  "ci": {
+    "decision_ic": [
+      0.077601,
+      0.075848,
+      -0.070289,
+      0.032212,
+      0.035452,
+      0.02988,
+      -0.022053
+    ]
+  },
+  "limitations": [
+    "只用训练段；决策点固定第 8 根",
+    "sentiment 覆盖率低",
+    "名义本金口径，不得与 margin 口径混比"
+  ]
+}

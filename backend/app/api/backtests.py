@@ -11,7 +11,13 @@ from sqlalchemy.orm import Session, defer
 from ..backtest.runner import run_backtest
 from ..db import SessionLocal, get_db
 from ..models import BacktestRun
-from ..pagination import page_metadata
+from ..pagination import (
+    DEFAULT_PAGE_SIZE,
+    PageQuery,
+    PageSizeQuery,
+    offset_of,
+    page_metadata,
+)
 from ..schemas import BacktestRequest
 from ..serializers import backtest_dict
 
@@ -74,8 +80,8 @@ def create_backtest(payload: BacktestRequest, db: Session = Depends(get_db)):
 @router.get("")
 def list_backtests(
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     query = db.query(BacktestRun)
     total = query.count()
@@ -100,8 +106,8 @@ def get_backtest(run_id: int, db: Session = Depends(get_db), include_trades: boo
 def get_backtest_trades(
     run_id: int,
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     row = db.query(BacktestRun.trades).filter(BacktestRun.id == run_id).first()
     if row is None:
@@ -114,5 +120,5 @@ def get_backtest_trades(
         trades = []
     if not isinstance(trades, list):
         trades = []
-    start = (page - 1) * page_size
+    start = offset_of(page, page_size)
     return {"trades": trades[start:start + page_size], **page_metadata(len(trades), page, page_size)}

@@ -9,6 +9,7 @@ from app.api import market, settings
 from app.db import get_db
 from app.market.data_service import MarketDataService
 from app.models import Kline
+from app.pagination import MAX_PAGE_SIZE
 
 
 def seed_series(db, count=25):
@@ -39,21 +40,23 @@ def test_market_series_pages_are_bounded_stable_and_exclude_legacy_intervals(db)
 
     event.listen(db.get_bind(), "before_cursor_execute", record_query)
     try:
-        first = service.stats_page(1, 20)
-        second = service.stats_page(2, 20)
-        empty = service.stats_page(3, 20)
+        first = service.stats_page(1, MAX_PAGE_SIZE)
+        second = service.stats_page(2, MAX_PAGE_SIZE)
+        empty = service.stats_page(3, MAX_PAGE_SIZE)
     finally:
         event.remove(db.get_bind(), "before_cursor_execute", record_query)
-    assert (first["total"], first["pages"], first["page_size"]) == (25, 2, 20)
-    assert len(first["stats"]) == 20
-    assert len(second["stats"]) == 5
+    assert (first["total"], first["pages"], first["page_size"]) == (25, 2, MAX_PAGE_SIZE)
+    assert len(first["stats"]) == MAX_PAGE_SIZE
+    assert len(second["stats"]) == 25 - MAX_PAGE_SIZE
     assert empty["stats"] == [] and empty["total"] == 25
     symbols = [row["symbol"] for row in first["stats"] + second["stats"]]
     assert symbols == [f"S{index:03d}USDT" for index in range(25)]
     assert all(row["count"] == 2 and row["interval"] == "1m" for row in first["stats"])
     group_queries = [query for query in queries if "GROUP BY" in query]
-    assert len(group_queries) == 3
-    assert all("LIMIT" in query and "OFFSET" in query for query in group_queries)
+    # 3 次分页 + 1 次 total 计数（`count(*) from (group by symbol)`）；只有分页那 3 条带 LIMIT/OFFSET
+    page_queries = [query for query in group_queries if "LIMIT" in query]
+    assert len(group_queries) == 4 and len(page_queries) == 3
+    assert all("LIMIT" in query and "OFFSET" in query for query in page_queries)
 
 
 def test_market_sources_and_stats_share_page_contract(db):
@@ -67,7 +70,7 @@ def test_market_sources_and_stats_share_page_contract(db):
 
 def test_empty_market_groups_have_zero_pages(db):
     assert MarketDataService(db).stats_page() == {
-        "stats": [], "total": 0, "page": 1, "page_size": 20, "pages": 0,
+        "stats": [], "total": 0, "page": 1, "page_size": MAX_PAGE_SIZE, "pages": 0,
     }
 
 
@@ -90,7 +93,7 @@ def test_settings_default_keeps_legacy_stats_payload(db):
 
 
 @pytest.mark.parametrize("path", ["/market/stats", "/market/sources"])
-@pytest.mark.parametrize("params", [{"page": 0}, {"page_size": 0}, {"page_size": 101}, {"page": "bad"}])
+@pytest.mark.parametrize("params", [{"page": 0}, {"page_size": 0}, {"page_size": MAX_PAGE_SIZE + 1}, {"page": "bad"}])
 def test_market_page_query_validation(db, path, params):
     app = FastAPI()
     app.include_router(market.router)

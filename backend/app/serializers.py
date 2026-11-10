@@ -17,6 +17,12 @@ def dt_iso(value: datetime | None) -> str:
 
 def order_dict(order: Order, *, include_snapshot: bool = False) -> dict:
     unrealized = position_unrealized(order) if order.status == "OPEN" else 0.0
+    try:
+        note = json.loads(order.note or "{}")
+    except ValueError:
+        note = {}
+    if not isinstance(note, dict):
+        note = {}
     result = {
         "id": order.id,
         "symbol": order.symbol,
@@ -41,6 +47,14 @@ def order_dict(order: Order, *, include_snapshot: bool = False) -> dict:
         "close_price": order.close_price,
         "close_reason": order.close_reason,
         "note": order.note,
+        # 交易所侧止盈止损状态与盈亏来源：前端据此区分「交易所真实成交」与「本地估算」
+        # 新订单写独立列；历史订单列为空时回落 note，保证老数据展示/对账不断档
+        "exchange_order_id": order.exchange_order_id or note.get("exchange_order_id"),
+        "sl_order_id": note.get("sl_order_id"),
+        "tp_order_id": note.get("tp_order_id"),
+        "sl_status": note.get("sl_status", ""),
+        "tp_status": note.get("tp_status", ""),
+        "pnl_source": note.get("pnl_source", "estimated" if order.source == "live" else "ledger"),
         "created_at": dt_iso(order.created_at),
         "closed_at": dt_iso(order.closed_at),
     }

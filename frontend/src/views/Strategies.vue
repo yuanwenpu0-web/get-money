@@ -49,6 +49,7 @@ const previewBindingOptions = computed(() => bindings.value.filter((row) => row.
 function onPreviewStrategyChange() {
   previewBinding.value = ''
   form.pool = ''
+  loadBindings()
 }
 
 function onPreviewBindingChange(bindingId) {
@@ -72,13 +73,20 @@ function onPreviewIntervalChange() {
   previewBinding.value = ''
 }
 
+// 预演下拉只需要「当前选中策略」的绑定：走 /strategies/{code}/bindings，
+// 不受绑定表格分页影响（分页后 /bindings 一页最多 15 条，可能漏掉其他策略的绑定）。
 function loadBindings() {
   if (disposed) return Promise.resolve()
   if (bindingsPromise) return bindingsPromise
-  bindingsPromise = api.getBindings().then((data) => {
-    if (!disposed) bindings.value = data.bindings || []
+  const code = form.strategy
+  if (!code) {
+    bindings.value = []
+    return Promise.resolve()
+  }
+  bindingsPromise = api.getStrategyBindings(code).then((data) => {
+    if (!disposed && form.strategy === code) bindings.value = data.bindings || []
   }).catch(() => {
-    if (!disposed) bindings.value = []
+    if (!disposed && form.strategy === code) bindings.value = []
   }).finally(() => {
     bindingsPromise = null
   })

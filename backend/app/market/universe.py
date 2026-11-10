@@ -117,8 +117,9 @@ def resolve_universe(db: Session) -> dict:
     from ..state import all_state
 
     state = all_state(db)
-    # 与 K 线源严格同源：live+testnet → 测试网 fapi；live 主网与 paper（固定主网）→ 主网 fapi
-    testnet = state.get("execution_mode") == "live" and bool(state.get("testnet", True))
+    # 行情源与交易环境解耦：币种宇宙始终取主网永续（公开接口），
+    # 与 default_market_client 的 K 线源严格同源。demo 只影响下单/账户通道。
+    testnet = False
     proxy = state.get("proxy_url") or None
     try:
         min_volume = float(state.get("min_quote_volume_usd") or 0)
@@ -155,7 +156,7 @@ def universe_volumes(db: Session) -> dict[str, float]:
     from ..state import all_state
 
     state = all_state(db)
-    testnet = state.get("execution_mode") == "live" and bool(state.get("testnet", True))
+    testnet = False  # 与 K 线源同源；交易环境不切换行情网络
     proxy = state.get("proxy_url") or None
     client = BinanceFuturesClient(testnet=testnet, proxy=proxy)
     try:

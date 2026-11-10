@@ -50,6 +50,10 @@ class SettingsUpdate(BaseModel):
     order_type: str | None = None
     schedule_enabled: bool | None = None
     schedule_seconds: int | None = None
+    # live 模式下收益/权益以币安账户为准；关掉则退回本地账本（应急开关）
+    exchange_truth_enabled: bool | None = None
+    # 切到正式环境（真实资金）必须显式二次确认，防止误操作
+    confirm_mainnet: bool | None = None
 
 
 class StrategyUpdate(BaseModel):
@@ -164,6 +168,16 @@ class BacktestRequest(BaseModel):
 class OrderPatch(BaseModel):
     sl: float | None = None
     tp: float | None = None
+
+
+class BatchClosePayload(BaseModel):
+    """批量平仓：只接受前端明确勾选（或按筛选全选后展开）的订单 ID。
+
+    不接受筛选条件，避免服务端在用户确认后重新解析出用户没看见的持仓。
+    """
+
+    model_config = ConfigDict(extra='forbid')
+    order_ids: list[int] = Field(min_length=1, max_length=2000)
 
 
 class OptimizationPayload(BaseModel):

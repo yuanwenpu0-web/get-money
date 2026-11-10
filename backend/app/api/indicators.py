@@ -15,9 +15,12 @@ from fastapi import APIRouter, HTTPException
 from ..config import DATA_DIR
 from ..catalog_indicators import list_indicators as list_python_indicators
 from ..indicator_classifications import CRYPTO_CLASSIFICATIONS
+from ..pagination import DEFAULT_PAGE_SIZE, PageQuery, PageSizeQuery, offset_of, page_metadata
 
 router = APIRouter(prefix="/indicators", tags=["indicators"])
 _COLLECTIONS = ("pine-collection", "pine-crypto-collection")
+_CATALOG_CACHE: list[dict] | None = None
+_CATALOG_SIGNATURE: tuple | None = None
 _DECLARATION = re.compile(r"(?m)^\s*(indicator|study|strategy)\s*\(")
 _VERSION = re.compile(r"(?m)^\s*//\s*@version\s*=\s*(\d+)")
 
@@ -70,6 +73,48 @@ def _license_text(root: Path, relative: str) -> str | None:
 
 
 def _catalog(data_dir: Path) -> list[dict]:
+    """解析两个 Pine 集合的索引，并读出每个源码文件（版本号、哈希、python 绑定）。
+
+    这里是全站唯一「每次请求都读文件」的热点：156 个源码文件逐份读盘 + 算 sha256，
+    单次约 0.6s。目录是随仓库提交的只读数据，用索引文件的 mtime+size 做签名缓存，
+    命中时 0ms；目录被替换（重新拉取集合）后签名变化会自动重建。
+    """
+    global _CATALOG_CACHE, _CATALOG_SIGNATURE
+    signature = _catalog_signature(data_dir)
+    if _CATALOG_CACHE is not None and signature == _CATALOG_SIGNATURE:
+        return _CATALOG_CACHE
+    items = _build_catalog(data_dir)
+    _CATALOG_CACHE, _CATALOG_SIGNATURE = items, signature
+    return items
+
+
+def _catalog_signature(data_dir: Path) -> tuple:
+    """目录签名：索引内容 + 每个源码文件的 (mtime, size)。
+
+    只 stat 不读内容，156 个文件的 stat 约十几毫秒；比每次读源码 + 算 sha256（约 0.6s）
+    便宜两个数量级，同时能捕捉「索引换了」和「源码被改了」两种变化。
+    """
+    parts: list[tuple] = [("root", str(data_dir.resolve()))]
+    for collection in _COLLECTIONS:
+        root = data_dir / collection
+        index = root / "index.json"
+        try:
+            entries = json.loads(index.read_text(encoding="utf-8-sig"))
+        except (OSError, ValueError):
+            parts.append((collection, None))
+            continue
+        parts.append((collection, len(entries) if isinstance(entries, list) else 0))
+        for entry in entries if isinstance(entries, list) else ():
+            relative = entry.get("local_path") or entry.get("path") or ""
+            try:
+                stat = (root / relative).stat()
+                parts.append((relative, stat.st_mtime_ns, stat.st_size))
+            except OSError:
+                parts.append((relative, None, None))
+    return tuple(parts)
+
+
+def _build_catalog(data_dir: Path) -> list[dict]:
     results = []
     bindings = {(item.collection, item.path, item.source_sha256): item.name
                 for item in list_python_indicators()}
@@ -118,10 +163,45 @@ def _catalog(data_dir: Path) -> list[dict]:
 
 
 @router.get("")
-def list_indicators():
+def list_indicators(
+    q: str = "",
+    collection: str = "",
+    category: str = "",
+    indicator_type: str = "",
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
+):
+    """指标目录分页：筛选与切片都在服务端，响应体从 180KB 降到几 KB。
+
+    `facets` 回传全量去重后的来源/分类/类型，前端下拉不再依赖「已拉到全部行」。
+    """
     items = _catalog(DATA_DIR)
-    return {"items": [{k: v for k, v in item.items() if k not in ("source", "license_text")} for item in items],
-            "total": len(items)}
+    facets = {
+        "collections": sorted({item["collection"] for item in items if item["collection"]}),
+        "categories": sorted({item["category"] for item in items if item["category"]}),
+        "indicator_types": sorted({item["indicator_type"] for item in items if item["indicator_type"]}),
+    }
+    query = q.strip().casefold()
+    filtered = [
+        item for item in items
+        if (not collection or item["collection"] == collection)
+        and (not category or item["category"] == category)
+        and (not indicator_type or item["indicator_type"] == indicator_type)
+        and (
+            not query
+            or any(
+                query in str(item.get(key) or "").casefold()
+                for key in ("title", "original_title", "description", "category", "collection")
+            )
+        )
+    ]
+    page_rows = filtered[offset_of(page, page_size):offset_of(page, page_size) + page_size]
+    return {
+        "items": [{k: v for k, v in item.items() if k not in ("source", "license_text")} for item in page_rows],
+        "facets": facets,
+        "catalog_total": len(items),
+        **page_metadata(len(filtered), page, page_size),
+    }
 
 
 @router.get("/research/latest")

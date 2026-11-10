@@ -25,6 +25,7 @@ from .order_manager import manage_order
 from .dispatch import close_position, open_position
 from .live_sync import sync_live
 from .portfolio import open_orders, portfolio_snapshot, snapshot_equity
+from . import exchange_truth
 
 SYNC_WORKERS = MARKET_SYNC_WORKERS
 
@@ -62,6 +63,10 @@ class TradingService:
         try:
             started = time.monotonic()
             state = all_state(self.db)
+            # 以币安为准：每周期先拉一次账户快照，后续开仓仓位计算、权益曲线、
+            # 仪表盘读数都使用同一份交易所数据，避免本地账本与交易所漂移。
+            if state.get("execution_mode") == "live" and state.get("exchange_truth_enabled", True):
+                exchange_truth.sync_account(self.db)
             interval = state.get("interval", "1m")
             # symbol_scope=custom 是全局限制（同步与执行范围），币种池在其内部再筛选
             allowed = (

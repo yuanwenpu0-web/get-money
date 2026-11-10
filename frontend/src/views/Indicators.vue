@@ -1,8 +1,13 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import api from '../api'
+import TablePager from '../components/TablePager.vue'
+import { PAGE_SIZE } from '../utils/pagination'
 
 const items = ref([])
+const facets = ref({ collections: [], categories: [], indicator_types: [] })
+const total = ref(0)
+const catalogTotal = ref(0)
 const loading = ref(false)
 const error = ref('')
 const search = ref('')
@@ -12,53 +17,73 @@ const indicatorType = ref('')
 const research = ref(null)
 const researchError = ref('')
 const page = ref(1)
-const pageSize = 20
+const pageSize = PAGE_SIZE
 const detailVisible = ref(false)
 const detail = ref(null)
 const detailLoading = ref(false)
 const detailError = ref('')
-let listPromise = null
+let listRequest = 0
+let searchTimer = null
 let detailRequest = 0
 let disposed = false
 
-const collectionOptions = computed(() => [...new Set(items.value.map((item) => item.collection).filter(Boolean))].sort())
-const categoryOptions = computed(() => [...new Set(items.value
-  .filter((item) => !collection.value || item.collection === collection.value)
-  .map((item) => item.category).filter(Boolean))].sort())
-const typeOptions = computed(() => [...new Set(items.value.map((item) => item.indicator_type).filter(Boolean))].sort())
+const collectionOptions = computed(() => facets.value.collections || [])
+const categoryOptions = computed(() => facets.value.categories || [])
+const typeOptions = computed(() => facets.value.indicator_types || [])
 const rankedSingles = computed(() => [...(research.value?.singles_all || [])].sort((a, b) => b.train.total_pnl - a.train.total_pnl).slice(0, 10))
 const rankedCombos = computed(() => [...(research.value?.combos_all || [])].sort((a, b) => b.train.total_pnl - a.train.total_pnl).slice(0, 10))
-const filtered = computed(() => {
-  const query = search.value.trim().toLocaleLowerCase()
-  return items.value.filter((item) => {
-    if (collection.value && item.collection !== collection.value) return false
-    if (category.value && item.category !== category.value) return false
-    if (indicatorType.value && item.indicator_type !== indicatorType.value) return false
-    return !query || [item.title, item.original_title, item.description, item.category, item.collection]
-      .some((value) => String(value || '').toLocaleLowerCase().includes(query))
-  })
-})
-const displayed = computed(() => filtered.value.slice((page.value - 1) * pageSize, page.value * pageSize))
-watch([search, category, collection, indicatorType], () => { page.value = 1 })
-watch(collection, () => { category.value = '' })
+const filteredCount = computed(() => total.value)
 
-function load() {
-  if (listPromise) return listPromise
+// 目录在服务端筛选 + 分页：一次只回 15 行（原来 156 行 180KB + 0.6s）
+async function load() {
+  const request = ++listRequest
   loading.value = true
   error.value = ''
-  listPromise = api.getIndicators().then((data) => {
-    if (!disposed) {
-      items.value = data.items || []
-      page.value = Math.min(page.value, Math.max(1, Math.ceil(filtered.value.length / pageSize)))
+  try {
+    const data = await api.getIndicators({
+      q: search.value.trim(),
+      collection: collection.value,
+      category: category.value,
+      indicator_type: indicatorType.value,
+      page: page.value,
+      page_size: pageSize,
+    })
+    if (disposed || request !== listRequest) return
+    items.value = data.items || []
+    facets.value = data.facets || { collections: [], categories: [], indicator_types: [] }
+    total.value = Number(data.total || 0)
+    catalogTotal.value = Number(data.catalog_total ?? data.total ?? 0)
+    const last = Math.max(1, Math.ceil(total.value / pageSize))
+    if (page.value > last) {
+      page.value = last
+      return load()
     }
-  }).catch((err) => {
-    if (!disposed) error.value = err.message
-  }).finally(() => {
-    if (!disposed) loading.value = false
-    listPromise = null
-  })
-  return listPromise
+  } catch (err) {
+    if (!disposed && request === listRequest) error.value = err.message
+  } finally {
+    if (!disposed && request === listRequest) loading.value = false
+  }
 }
+
+function changePage(next) {
+  if (next === page.value) return
+  page.value = next
+  return load()
+}
+
+function onFilterChange() {
+  page.value = 1
+  return load()
+}
+
+// 搜索输入防抖：每敲一个字都打一次接口会让服务端反复解析目录
+function onSearchInput() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => { if (!disposed) onFilterChange() }, 300)
+}
+
+watch([collection, category, indicatorType], () => { page.value = 1 })
+watch(collection, () => { category.value = '' })
 
 async function showDetail(row) {
   const request = ++detailRequest
@@ -95,7 +120,11 @@ onMounted(() => {
   if (api.getIndicatorResearch) api.getIndicatorResearch().then((data) => { if (!disposed) research.value = data }).catch((err) => { if (!disposed) researchError.value = err.message })
   return pending
 })
-onBeforeUnmount(() => { disposed = true; detailRequest++ })
+onBeforeUnmount(() => {
+  disposed = true
+  detailRequest++
+  if (searchTimer) clearTimeout(searchTimer)
+})
 </script>
 
 <template>
@@ -110,25 +139,25 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
         <el-button size="small" :loading="loading" @click="load">刷新</el-button>
       </div>
       <div class="row indicator-filters">
-        <el-input v-model="search" clearable placeholder="搜索名称、描述或分类" aria-label="搜索指标" style="max-width: 280px" />
-        <el-select v-model="collection" clearable placeholder="全部来源" aria-label="指标来源" style="width: 220px">
+        <el-input v-model="search" clearable placeholder="搜索名称、描述或分类" aria-label="搜索指标" style="max-width: 280px" @input="onSearchInput" @clear="onFilterChange" @keyup.enter="onFilterChange" />
+        <el-select v-model="collection" clearable placeholder="全部来源" aria-label="指标来源" style="width: 220px" @change="onFilterChange">
           <el-option v-for="item in collectionOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select v-model="category" clearable filterable placeholder="全部分类" aria-label="指标分类" style="width: 200px">
+        <el-select v-model="category" clearable filterable placeholder="全部分类" aria-label="指标分类" style="width: 200px" @change="onFilterChange">
           <el-option v-for="item in categoryOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <el-select v-model="indicatorType" clearable placeholder="全部指标类型" aria-label="指标类型" style="width: 180px">
+        <el-select v-model="indicatorType" clearable placeholder="全部指标类型" aria-label="指标类型" style="width: 180px" @change="onFilterChange">
           <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
         </el-select>
-        <span class="muted">{{ filtered.length }} / {{ items.length }} 个指标</span>
+        <span class="muted">{{ filteredCount }} / {{ catalogTotal }} 个指标</span>
       </div>
       <div v-if="error" class="row section-gap" role="alert">
         <span class="down">指标加载失败：{{ error }}</span>
         <el-button size="small" :loading="loading" @click="load">重试</el-button>
       </div>
       <div v-if="loading && !items.length" class="empty-hint" role="status">正在加载指标…</div>
-      <div v-else-if="!displayed.length && !error" class="empty-hint">{{ items.length ? '没有符合条件的指标' : '暂无指标' }}</div>
-      <el-table v-else-if="displayed.length" :data="displayed" class="table-compact section-gap" @row-click="showDetail">
+      <div v-else-if="!items.length && !error" class="empty-hint">{{ catalogTotal ? '没有符合条件的指标' : '暂无指标' }}</div>
+      <el-table v-else-if="items.length" :data="items" class="table-compact section-gap" @row-click="showDetail">
         <el-table-column label="指标" min-width="220">
           <template #default="{ row }">
             <button type="button" class="indicator-title" @click.stop="showDetail(row)">{{ row.title }}</button>
@@ -147,9 +176,7 @@ onBeforeUnmount(() => { disposed = true; detailRequest++ })
           <template #default="{ row }"><el-button link type="primary" @click.stop="showDetail(row)">查看</el-button></template>
         </el-table-column>
       </el-table>
-      <div v-if="filtered.length > pageSize" class="table-pagination">
-        <el-pagination v-model:current-page="page" :page-size="pageSize" :total="filtered.length" layout="total, prev, pager, next" />
-      </div>
+      <TablePager :page="page" :page-size="pageSize" :total="filteredCount" :disabled="loading" @change="changePage" />
     </div>
 
     <div class="panel section-gap">

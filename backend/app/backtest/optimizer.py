@@ -76,7 +76,7 @@ from ..db import make_engine
 from ..ml.dataset import build_dataset
 from ..state import all_state
 from ..strategy.registry import get_spec
-from ..strategy.rules import apply_exit_overlay, evaluate_signals, prepare_frame, resolve_params
+from ..strategy.rules import apply_ema_trend_filter, apply_exit_overlay, evaluate_signals, prepare_frame, resolve_params
 from ..utils import interval_ms, now_ms
 from .execution import simulate
 from .metrics import metrics_from_equity
@@ -355,6 +355,9 @@ def evaluate_symbol_task(task: dict) -> dict:
             # 走 evaluate_signals 的同一层出场覆盖：绑定挂了 atr_r/support_r 时，
             # 训练段与验证段必须按同一套止损止盈评估，否则选参与判定口径分叉。
             signals = apply_exit_overlay(prepared, spec.signals(prepared, params), params)
+            # 通用 EMA 方向过滤：与 evaluate_signals 同一口径，保证寻优选出的参数
+            # 和实盘/回测行为一致。
+            signals = apply_ema_trend_filter(prepared, signals, params)
             equity, trades = simulate(
                 prepared, signals, params, initial, fee, slippage, interval
             )

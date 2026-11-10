@@ -122,6 +122,12 @@ DEFAULT_STATE = {
     "order_type": "market",              # 实盘开仓主单类型：market / limit_maker
     "schedule_enabled": True,
     "schedule_seconds": 60,
+    # live 模式下权益/余额/盈亏以币安账户为准（demo 与正式环境共用同一套口径）
+    "exchange_truth_enabled": True,
+    # 上次重置收益基准时的环境标识；切换到不同环境时自动按交易所余额重设基准
+    "exchange_baseline_env": "",
+    "exchange_account_latest": {},
+    "exchange_income_since": 0,
     # train_horizon 只用于回测切分时的标签跨度（purged_split 的 purge 长度）
     "train_horizon": 5,
 }

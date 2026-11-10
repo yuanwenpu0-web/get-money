@@ -16,6 +16,7 @@ test('币池表单添加波动率窗口与严格成交额条件', () => {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const errors = []
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     defineProps: () => ({ strategies: [] }), defineEmits: () => () => {},
     ref: value => ({ value }), reactive: value => value, computed: fn => ({ get value() { return fn() } }),
     onMounted: () => {}, ElMessage: { error: e => errors.push(e) }, api: {},

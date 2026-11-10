@@ -17,6 +17,7 @@ function component(path, api, exported) {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const hooks = { mount: [], unmount: [] }
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api, ref: (value) => ({ value }), reactive: (value) => value,
     computed: (fn) => ({ get value() { return fn() } }), watch: () => {},
     useRoute: () => ({ meta: {} }),

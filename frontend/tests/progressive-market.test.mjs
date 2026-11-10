@@ -18,6 +18,7 @@ function view(name, api, exports) {
   const unmounted = []
   let timers = 0
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }), reactive: (value) => value,
     computed: (getter) => ({ get value() { return getter() } }),

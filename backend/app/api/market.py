@@ -12,6 +12,7 @@ from ..market.data_service import MarketDataService
 from ..market import metrics as metrics_mod
 from ..market.universe import resolve_universe, universe_symbols
 from ..models import JobLog
+from ..pagination import DEFAULT_PAGE_SIZE, PageQuery, PageSizeQuery
 from ..schemas import MetricsSyncRequest, PreviewRequest, SyncRequest
 from ..strategy.bindings import resolve_order_params
 from ..strategy.engine import StrategyEngine
@@ -67,8 +68,8 @@ def _clean(value):
 @router.get("/stats")
 def market_stats(
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     return MarketDataService(db).stats_page(page, page_size)
 
@@ -76,8 +77,8 @@ def market_stats(
 @router.get("/sources")
 def market_sources(
     db: Session = Depends(get_db),
-    page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     return {
         "local": MarketDataService(db).stats_page(page, page_size),

@@ -27,6 +27,7 @@ function view(api) {
     .replace(/^import .*$/gm, '')
   const messages = []
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }),
     reactive: (value) => value,
@@ -64,9 +65,10 @@ function tradingApi(orders = ORDERS) {
   const calls = []
   return {
     calls,
-    getOrders: async (params) => {
-      calls.push({ kind: 'orders', ...params })
-      return { orders }
+    // 图上只需要画标记的 6 个字段，走极简 markers 接口而不是整条订单列表
+    getOrderMarkers: async (params) => {
+      calls.push({ kind: 'markers', ...params })
+      return { markers: orders }
     },
     getKlines: async (symbol, interval, limit, end) => {
       calls.push({ kind: 'klines', symbol, interval, limit, end })
@@ -83,7 +85,7 @@ test('按 symbol 拉取成交，并在 1m / 5m 都定位到正确的K线', async
   await subject.changeQuery()
 
   assert.deepEqual(api.calls[0], { kind: 'klines', symbol: 'ETHUSDT', interval: '1m', limit: 600, end: undefined })
-  assert.deepEqual(api.calls[1], { kind: 'orders', symbol: 'ETHUSDT', page: 1, page_size: 100 })
+  assert.deepEqual(api.calls[1], { kind: 'markers', symbol: 'ETHUSDT', limit: 200 })
 
   const minute = markerSeries(subject).data
   // 开仓、平仓各一个点，持仓中的空单只有开仓点
@@ -112,7 +114,7 @@ test('按 symbol 拉取成交，并在 1m / 5m 都定位到正确的K线', async
 
 test('订单接口失败只影响标记，K线照常显示', async () => {
   const subject = view({
-    getOrders: async () => { throw new Error('orders down') },
+    getOrderMarkers: async () => { throw new Error('orders down') },
     getKlines: async () => ({ bars: makeBars(BASE, MIN, 300) }),
   })
   await subject.loadBars()
@@ -139,9 +141,9 @@ test('定位最近成交会先补更早分页，再用 zoomForIndexes 缩放', a
   }
   const calls = []
   const subject = view({
-    getOrders: async (params) => {
-      calls.push({ kind: 'orders', ...params })
-      return { orders: [older] }
+    getOrderMarkers: async (params) => {
+      calls.push({ kind: 'markers', ...params })
+      return { markers: [older] }
     },
     getKlines: async (symbol, interval, limit, end) => {
       calls.push({ kind: 'klines', symbol, interval, limit, end })

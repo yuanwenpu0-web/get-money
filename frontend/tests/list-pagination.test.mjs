@@ -16,6 +16,7 @@ function view(name, api, exported) {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const unmounts = []
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api, ref: (value) => ({ value }), reactive: (value) => value,
     computed: (getter) => ({ get value() { return getter() } }),
     onMounted: () => {}, onBeforeUnmount: (fn) => unmounts.push(fn),
@@ -42,30 +43,29 @@ test('Orders requests only its page and uses filtered totals rather than page-on
   }, ['load', 'filters', 'pagination', 'summary'])
   subject.filters.status = ''
   await subject.load()
-  assert.deepEqual(calls, [{ page: 1, page_size: 20 }])
+  assert.deepEqual(calls, [{ page: 1, page_size: 15 }])
   assert.equal(subject.pagination.total, 241)
   assert.equal(subject.summary.value.closed, 121)
   assert.equal(subject.summary.value.realized, 850.5)
   assert.equal(subject.summary.value.unrealized, 42.5)
 })
 
-test('Orders page changes retain filters and filter/page-size changes return to page one', async () => {
+test('Orders page changes retain filters and filter changes return to page one', async () => {
   const calls = []
   const subject = view('Orders', {
     getOrders: async (params) => {
       calls.push({ ...params })
       return page({ orders: [{ id: params.page }] }, 200, params.page, params.page_size)
     },
-  }, ['load', 'filters', 'pagination', 'changePage', 'changePageSize', 'changeFilters'])
+  }, ['load', 'filters', 'pagination', 'changePage', 'changeFilters'])
   await subject.load()
   await subject.changePage(3)
-  assert.deepEqual(calls.at(-1), { page: 3, page_size: 20, status: 'OPEN' })
+  assert.deepEqual(calls.at(-1), { page: 3, page_size: 15, status: 'OPEN' })
   subject.filters.symbol = 'ETHUSDT'
   await subject.changeFilters()
-  assert.deepEqual(calls.at(-1), { page: 1, page_size: 20, status: 'OPEN', symbol: 'ETHUSDT' })
-  await subject.changePage(2)
-  await subject.changePageSize(50)
-  assert.deepEqual(calls.at(-1), { page: 1, page_size: 50, status: 'OPEN', symbol: 'ETHUSDT' })
+  assert.deepEqual(calls.at(-1), { page: 1, page_size: 15, status: 'OPEN', symbol: 'ETHUSDT' })
+  // 每页条数固定为 15，页面不再提供改每页条数的入口
+  assert.equal('changePageSize' in subject, false)
 })
 
 test('Orders strategy filter is sent with pagination, status and symbol', async () => {
@@ -75,15 +75,13 @@ test('Orders strategy filter is sent with pagination, status and symbol', async 
       calls.push({ ...params })
       return page({ orders: [{ id: params.page }] }, 100, params.page, params.page_size)
     },
-  }, ['filters', 'pagination', 'changeFilters', 'changePage', 'changePageSize'])
+  }, ['filters', 'pagination', 'changeFilters', 'changePage'])
   subject.filters.symbol = 'BTCUSDT'
   subject.filters.strategy = 'simple_zigzag_double'
   await subject.changeFilters()
-  assert.deepEqual(calls.at(-1), { page: 1, page_size: 20, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
+  assert.deepEqual(calls.at(-1), { page: 1, page_size: 15, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
   await subject.changePage(2)
-  assert.deepEqual(calls.at(-1), { page: 2, page_size: 20, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
-  await subject.changePageSize(50)
-  assert.deepEqual(calls.at(-1), { page: 1, page_size: 50, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
+  assert.deepEqual(calls.at(-1), { page: 2, page_size: 15, status: 'OPEN', symbol: 'BTCUSDT', strategy: 'simple_zigzag_double' })
   subject.filters.strategy = ''
   await subject.changeFilters()
   assert.equal('strategy' in calls.at(-1), false)
@@ -132,11 +130,11 @@ test('Orders does not apply a response from a page that is no longer selected', 
   const pending = subject.load()
   const next = subject.changePage(2)
   assert.equal(next, pending)
-  requests[0].resolve(page({ orders: [{ id: 1 }] }, 100, 1, 20))
+  requests[0].resolve(page({ orders: [{ id: 1 }] }, 100, 1, 15))
   await tick()
   assert.equal(subject.orders.value.length, 0)
   assert.equal(requests[1].params.page, 2)
-  requests[1].resolve(page({ orders: [{ id: 2 }] }, 100, 2, 20))
+  requests[1].resolve(page({ orders: [{ id: 2 }] }, 100, 2, 15))
   await pending
   assert.equal(subject.orders.value[0].id, 2)
   assert.equal(subject.pagination.page, 2)
@@ -147,7 +145,8 @@ test('Orders refreshes a valid previous page when the last page becomes empty', 
   const subject = view('Orders', {
     getOrders: async (params) => {
       requests.push({ ...params })
-      return page({ orders: params.page === 1 ? [{ id: 1 }] : [] }, 20, params.page, params.page_size)
+      // total 15 = 只有 1 页，所以第 2 页必然为空白，触发回退到有效页
+      return page({ orders: params.page === 1 ? [{ id: 1 }] : [] }, 15, params.page, params.page_size)
     },
   }, ['load', 'orders', 'pagination'])
   subject.pagination.page = 2
@@ -164,7 +163,7 @@ test('Unloading the order list stops a queued page request and ignores the in-fl
   const pending = subject.load()
   subject.changePage(2)
   subject.unmount()
-  response.resolve(page({ orders: [{ id: 1 }] }, 60, 1, 20))
+  response.resolve(page({ orders: [{ id: 1 }] }, 60, 1, 15))
   await pending
   assert.equal(requests, 1)
   assert.equal(subject.orders.value.length, 0)

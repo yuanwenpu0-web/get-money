@@ -20,6 +20,7 @@ function view(name, api, exports) {
   let timers = 0
   let clearedTimers = 0
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }),
     reactive: (value) => value,
@@ -44,6 +45,8 @@ test('Strategy preview follows the selected binding and clears it when the indic
   let payload
   const subject = view('Strategies', {
     previewSignal: async (request) => { payload = request; return {} },
+    // 预演下拉现在按策略维度取绑定（/strategies/{code}/bindings），不再依赖分页的 /bindings
+    getStrategyBindings: async () => ({ bindings: [] }),
   }, ['form', 'bindings', 'previewBinding', 'onPreviewBindingChange', 'onPreviewStrategyChange', 'runPreview'])
   subject.form.strategy = 'first'
   subject.bindings.value = [{ id: 12, strategy: 'first', pool: 'major', interval: '1h' }]

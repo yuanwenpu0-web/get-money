@@ -1,0 +1,32 @@
+# DirectML (AMD Radeon iGPU) inference stack for the isolated `.venv-dml`.
+# Verified 2026-11-10 on Windows 11 / Python 3.12.14 / Radeon 890M:
+#   .venv-dml\Scripts\python.exe scripts\verify_directml.py
+#
+# IMPORTANT: never install the plain `onnxruntime` wheel in this venv. It
+# shadows onnxruntime-directml and DmlExecutionProvider disappears silently.
+# Verify with ort.get_available_providers() after any change.
+#
+# IMPORTANT: onnx >= 1.23 emits ONNX IR 14, but ORT 1.24.4 accepts IR <= 13.
+# Keep onnx pinned, or clamp model.ir_version to 13 after every ONNX export.
+onnxruntime-directml==1.24.4
+onnx==1.22.0
+onnxscript==0.7.2
+numpy==2.5.4
+
+# Kronos runtime / weight loading (newer than upstream pins on purpose:
+# upstream pins pandas==2.2.2, which is incompatible with numpy 2.x).
+pandas==3.1.1
+huggingface_hub==2.4.0
+safetensors==0.8.0
+einops==0.8.2
+tqdm==4.70.1
+
+# torch CPU is needed ONLY to export a PyTorch model (Kronos decode_s1 / s2)
+# to ONNX. Inference itself runs entirely on ORT/DirectML. Install separately:
+#   .venv-dml\Scripts\python.exe -m pip install torch==2.15.0+cpu --index-url https://download.pytorch.org/whl/cpu
+
+# Offline research probes (backend/scripts/kronos_order_*.py) also need read-only
+# access to the project database:
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+python-dotenv>=1.0

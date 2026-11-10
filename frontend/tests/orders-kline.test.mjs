@@ -13,6 +13,7 @@ function ordersView(api) {
   const messages = []
   const noop = () => {}
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }),
     reactive: (value) => value,

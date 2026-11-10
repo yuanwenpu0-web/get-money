@@ -509,8 +509,9 @@ npm run build
 
 ## 11. 已知边界
 
-- **实盘仅限小资金/测试网验证**：本地账本与交易所是两套账，实盘盈亏以本地口径展示，可能与交易所对账有出入。
-- **行情源**：K线一律走 fapi 公共接口；paper 固定合约主网，live+测试网走测试网。历史 paper 期现货K线与合约价格存在口径差异，切换后建议清空 `klines` 重新同步。
+- **盈利以币安为准（2026-11-09 起）**：live 模式下权益 / 可用余额 / 未实现 / 已实现盈亏取自 `/fapi/v2/account`，逐笔订单按 `/fapi/v1/userTrades` 的真实成交价与手续费回填；本地账本只留作对账参考（`portfolio.reconcile_diff`）。取不到成交明细的订单显式标 `pnl_source=estimated`。详见 `docs/exchange-truth-demo.md`。
+- **行情源**：K 线与币种宇宙固定走主网 fapi 公开接口，**不随 demo / 正式环境切换**；只有下单与账户通道随 `testnet` 变化。测试网历史数据稀疏，若行情跟随测试网会导致策略几乎不出信号。
+- **满仓资金闸门（2026-11-09 补充）**：live 下新仓保证金按币安 `availableBalance × 0.90` 裁剪（`margin` 与 `qty` 同步缩放，不改 `position_size` 的策略风险预算口径），且不得低于 `max(10, initial_capital × 2%)`；可用余额不足时记 `exchange_events.status=blocked` 并跳过，不再发注定被 `-2019` 拒的 maker + 市价请求。`GET /api/trading/exchange` 的成功率只统计真正提交的请求，`blocked` 通过 `recent_blocked` / `recent_blocked_reason` 单独返回。
 - **数据深度（各周期差异很大，直接决定能跑哪些币）**：
 
   | 周期 | 原始行 | 365 天可用币 | 说明 |
@@ -522,7 +523,7 @@ npm run build
   | `4h` | **0 行（靠 1h 派生）** | 499 | `derive_candles.py` 补齐 |
 
   lower-tf intrabar delta 依赖 1m，1m 短于窗口时结果里 `delta` 标为 `mixed`（缺的段逐根用 estDelta 兜底）。
-- **实盘简化**：未模拟资金费率、盘口深度、强平与分批建仓；市价单以返回均价入账；`limit_maker` 挂 postOnly 最多轮询约 10 秒，超时撤单后剩余转市价；交易所侧止损止盈触发后本地按标记价结算，与真实成交价有偏差；保护单挂失败会市价回滚开仓并写日志。
+- **实盘简化**：未模拟盘口深度、强平与分批建仓（资金费由币安 income 明细展示，不计入本地撮合）；市价单以返回均价入账；`limit_maker` 挂 postOnly 最多轮询约 10 秒，超时撤单后剩余转市价。交易所保护单状态每周期同步（触发价回写、意外撤单自动重挂），触发后优先按保护单 `avgPrice` / `userTrades` 真实成交价结算，取不到才回落标记价；保护单挂失败会市价回滚开仓。所有下单 / 保护单 / 撤单 / 平仓的成败与币安错误码写入 `exchange_events`，可在前端「币安下单回执」或 `GET /api/trading/exchange-events` 核对。条件单自 2025-12-09 起必须走 `/fapi/v1/algoOrder`（`triggerPrice` / `algoId`，旧 `/fapi/v1/order` 会返回 `-4120`），demo 与正式主网一致。
 - **老库升级**：启动时自动建 `symbol_pools` / `strategy_bindings` / `symbol_params` / `optimization_runs` / `optimization_results`，给 `signals` / `orders` 补 `pool` 列，并把 `optimization_results` 的唯一键扩到 `(run_id, symbol, interval)`（PG 改约束；SQLite 不支持改约束，直接重建该表——本地回退库的寻优结果可重跑）。均为幂等操作。
 - **寻优的样本天花板**：判定不成立有两种，必须区分开——
   1. **信号太稀疏**：1h/4h 上吸收形态一年只有几次（BTC 1h 365 天命中 5 次、4h 0 次），

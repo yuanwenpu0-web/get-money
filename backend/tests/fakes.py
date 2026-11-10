@@ -172,7 +172,11 @@ class FakeFuturesClient:
         limit_reject=None,
         maker_status="NEW",
         maker_avg_price="100.4",
+        id_responses=None,
     ):
+        # {订单类型: 回报里的订单号}；None 表示回报完全没有订单号字段，
+        # 0/"abc"/"" 表示非法订单号，用于覆盖「币安 ID 未同步」分支。
+        self.id_responses = id_responses or {}
         self.calls = []
         self.cancel_calls = []
         self.step = step
@@ -228,12 +232,48 @@ class FakeFuturesClient:
             raise BinanceApiError("tp rejected", -2021)
         if self.reject_reduce_only and params.get("reduceOnly") == "true":
             raise BinanceApiError("ReduceOnly Order is rejected", -2022)
+        order_id = 100 + len(self.calls)
         if params.get("type") == "LIMIT":
             if self.limit_reject is not None:
                 raise self.limit_reject
-            self.limit_order_id = 100 + len(self.calls)
-            return {"orderId": self.limit_order_id, "status": "NEW", "avgPrice": "0"}
-        return {"orderId": 100 + len(self.calls), "avgPrice": self.avg_price, "status": "FILLED"}
+            self.limit_order_id = order_id
+            base = {"orderId": order_id, "status": "NEW", "avgPrice": "0"}
+        else:
+            base = {"orderId": order_id, "avgPrice": self.avg_price, "status": "FILLED"}
+        return self._inject_id(params, base)
+
+    def _inject_id(self, params, base):
+        """按订单类型注入缺失/非法的币安订单号，模拟下单回报「ID 未同步」。"""
+        if params.get("type") not in self.id_responses:
+            return base
+        value = self.id_responses[params["type"]]
+        id_keys = [key for key in ("orderId", "algoId") if key in base]
+        if value is None:
+            return {key: val for key, val in base.items() if key not in id_keys}
+        return {**base, **{key: value for key in id_keys}}
+
+    def new_algo_order(self, **params):
+        """Algo 条件单（2025-12-09 后保护单唯一入口），参数用 triggerPrice。"""
+        self.calls.append(("order", params))
+        if self.fail_protection and params.get("type") in ("STOP_MARKET", "TAKE_PROFIT_MARKET"):
+            raise BinanceApiError("protection rejected", -2021)
+        if self.fail_tp and params.get("type") == "TAKE_PROFIT_MARKET":
+            raise BinanceApiError("tp rejected", -2021)
+        order_id = 100 + len(self.calls)
+        return self._inject_id(params, {"algoId": order_id, "orderId": order_id,
+                                        "algoStatus": "NEW"})
+
+    def cancel_algo_order(self, symbol, algo_id):
+        self.cancel_calls.append((symbol, algo_id))
+        if self.cancel_error is not None:
+            raise self.cancel_error
+        return {}
+
+    def get_algo_order(self, symbol, algo_id):
+        status = {101: self.sl_status, 102: self.tp_status}.get(algo_id, "NEW")
+        return {"algoId": algo_id, "algoStatus": status,
+                "triggerPrice": "99.0" if status == "NEW" else "0",
+                "actualPrice": self.mark_price if status == "FILLED" else "0"}
 
     def cancel_order(self, symbol, order_id):
         self.cancel_calls.append((symbol, order_id))

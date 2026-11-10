@@ -4,8 +4,10 @@ import { ElMessage } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
 import StatCard from '../components/StatCard.vue'
+import TablePager from '../components/TablePager.vue'
 import { closeReasonLabel, money, number, pct, pnlClass, price, tsLabel } from '../utils/format'
 import { signalReason } from '../utils/strategy'
+import { PAGE_SIZE } from '../utils/pagination'
 
 const settings = ref({})
 const history = ref([])
@@ -19,9 +21,9 @@ const settingsError = ref('')
 const historyError = ref('')
 const loadingRun = ref(false)
 const resultError = ref('')
-const historyPagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const historyPagination = reactive({ page: 1, pageSize: PAGE_SIZE, total: 0 })
 const tradeRows = ref([])
-const tradePagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const tradePagination = reactive({ page: 1, pageSize: PAGE_SIZE, total: 0 })
 const loadingTrades = ref(false)
 const tradesError = ref('')
 let pollTimer = null
@@ -245,13 +247,6 @@ function changeHistoryPage(page) {
   return loadHistory()
 }
 
-function changeHistorySize(pageSize) {
-  if (pageSize === historyPagination.pageSize) return
-  historyPagination.pageSize = pageSize
-  historyPagination.page = 1
-  return loadHistory()
-}
-
 function resetTrades(runId = null) {
   tradeRequest += 1
   selectedTradeRunId = runId
@@ -291,13 +286,6 @@ async function loadTrades() {
 function changeTradePage(page) {
   if (page === tradePagination.page) return
   tradePagination.page = page
-  return loadTrades()
-}
-
-function changeTradeSize(pageSize) {
-  if (pageSize === tradePagination.pageSize) return
-  tradePagination.pageSize = pageSize
-  tradePagination.page = 1
   return loadTrades()
 }
 
@@ -570,15 +558,13 @@ onBeforeUnmount(() => {
           <el-table-column label="手续费" width="90"><template #default="{ row }"><span class="mono">{{ money(row.fees) }}</span></template></el-table-column>
           <el-table-column label="退出" min-width="100"><template #default="{ row }">{{ closeReasonLabel(row.status) }}</template></el-table-column>
         </el-table>
-        <el-pagination
-          class="table-pagination"
-          :current-page="tradePagination.page"
+        <TablePager
+          :page="tradePagination.page"
           :page-size="tradePagination.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
           :total="tradePagination.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @current-change="changeTradePage"
-          @size-change="changeTradeSize"
+          :disabled="loadingTrades"
+          jumper
+          @change="changeTradePage"
         />
       </div>
     </template>
@@ -616,15 +602,12 @@ onBeforeUnmount(() => {
         <el-table-column label="交易数" width="80"><template #default="{ row }">{{ row.metrics?.total_trades ?? '—' }}</template></el-table-column>
         <el-table-column label="创建时间" min-width="150"><template #default="{ row }">{{ tsLabel(row.created_at) }}</template></el-table-column>
       </el-table>
-      <el-pagination
-        class="table-pagination"
-        :current-page="historyPagination.page"
+      <TablePager
+        :page="historyPagination.page"
         :page-size="historyPagination.pageSize"
-        :page-sizes="[10, 20, 50, 100]"
         :total="historyPagination.total"
-        layout="total, sizes, prev, pager, next, jumper"
-        @current-change="changeHistoryPage"
-        @size-change="changeHistorySize"
+        :disabled="loadingHistory"
+        @change="changeHistoryPage"
       />
     </div>
   </div>

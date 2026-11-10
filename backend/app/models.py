@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import BigInteger, Column, DateTime, Float, Integer, String, Text, UniqueConstraint
+from sqlalchemy import BigInteger, Column, DateTime, Float, Index, Integer, String, Text, UniqueConstraint
 
 from .db import Base
 
@@ -28,7 +28,13 @@ class Credential(Base):
 
 class Kline(Base):
     __tablename__ = "klines"
-    __table_args__ = (UniqueConstraint("symbol", "interval", "open_time", name="uq_kline"),)
+    __table_args__ = (
+        UniqueConstraint("symbol", "interval", "open_time", name="uq_kline"),
+        # 覆盖率面板按 interval 过滤、按 symbol 分组、取 open_time 的 min/max：
+        # 只有列顺序为 (interval, symbol, open_time) 时才能走 Index Only Scan +
+        # 流式 GroupAggregate，配合 LIMIT 首页只碰 15 个分组就返回（0.07s → 原 2.9s）。
+        Index("ix_klines_interval_symbol_time", "interval", "symbol", "open_time"),
+    )
 
     id = Column(Integer, primary_key=True)
     symbol = Column(String(24), nullable=False, index=True)
@@ -236,6 +242,14 @@ class Signal(Base):
 
 class Order(Base):
     __tablename__ = "orders"
+    __table_args__ = (
+        # 订单列表 = 可选 status 过滤 + 按开仓时间倒序分页；两个组合索引分别覆盖
+        # 「按状态筛」与「全部」两条路径，避免百万行后 offset 分页退化成全表排序。
+        Index("ix_orders_status_created", "status", "created_at", "id"),
+        Index("ix_orders_created", "created_at", "id"),
+        # K 线图叠加成交标记：按币种取最近 N 笔
+        Index("ix_orders_symbol_created", "symbol", "created_at"),
+    )
 
     id = Column(Integer, primary_key=True)
     symbol = Column(String(24), nullable=False, index=True)
@@ -250,6 +264,9 @@ class Order(Base):
     tp = Column(Float, default=0.0)
     status = Column(String(16), default="OPEN", index=True)  # OPEN / CLOSED / CANCELED
     source = Column(String(16), default="paper")
+    # 币安开仓主单 orderId（live 专属的一等字段）：空值代表这笔订单无法与交易所对账。
+    # 只有下单回报里拿到有效 ID 才允许落库；保护单 algoId / 平仓单号仍存 note。
+    exchange_order_id = Column(String(32), default="", index=True)
     strategy = Column(String(48), default="")
     pool = Column(String(48), default="")  # 该仓位所用参数所属的币种池
     binding_id = Column(Integer, nullable=True)
@@ -278,8 +295,55 @@ class EquitySnapshot(Base):
     open_positions = Column(Integer, default=0)
 
 
+class ExchangeEvent(Base):
+    """每次交易所请求的成败留痕：下单是否成功、错误码、成交价都可追溯。"""
+
+    __tablename__ = "exchange_events"
+    __table_args__ = (
+        Index("ix_exchange_events_ts", "ts", "id"),
+        Index("ix_exchange_events_symbol", "symbol", "ts"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    ts = Column(BigInteger, nullable=False)  # 组合索引见 __table_args__，勿再加单列 index
+    env = Column(String(16), default="demo")  # demo(testnet) / real(mainnet)
+    action = Column(String(24), default="")  # open/protect_sl/protect_tp/close/cancel/modify/rollback
+    symbol = Column(String(24), default="")
+    side = Column(String(8), default="")
+    local_order_id = Column(Integer, nullable=True)
+    exchange_order_id = Column(String(32), default="")
+    status = Column(String(16), default="")  # filled/accepted/rejected/failed/canceled/unknown
+    exchange_status = Column(String(16), default="")
+    code = Column(Integer, default=0)
+    message = Column(Text, default="")
+    avg_price = Column(Float, default=0.0)
+    qty = Column(Float, default=0.0)
+    payload = Column(Text, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
+class ExchangeAccountSnapshot(Base):
+    """币安账户快照：live 模式下权益/余额/盈亏的真相源，替代本地推算账本。"""
+
+    __tablename__ = "exchange_account_snapshots"
+
+    id = Column(Integer, primary_key=True)
+    ts = Column(BigInteger, nullable=False, index=True)
+    env = Column(String(16), default="demo")
+    wallet_balance = Column(Float, default=0.0)
+    available_balance = Column(Float, default=0.0)
+    margin_balance = Column(Float, default=0.0)
+    unrealized_pnl = Column(Float, default=0.0)
+    position_margin = Column(Float, default=0.0)
+    realized_pnl = Column(Float, default=0.0)  # income REALIZED_PNL 累计
+    commission = Column(Float, default=0.0)    # income COMMISSION 累计
+    funding_fee = Column(Float, default=0.0)   # income FUNDING_FEE 累计
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+
 class BacktestRun(Base):
     __tablename__ = "backtest_runs"
+    __table_args__ = (Index("ix_backtest_runs_created", "created_at", "id"),)
 
     id = Column(Integer, primary_key=True)
     symbol = Column(String(24), nullable=False)
@@ -303,6 +367,7 @@ class OptimizationRun(Base):
     """
 
     __tablename__ = "optimization_runs"
+    __table_args__ = (Index("ix_optimization_runs_created", "created_at", "id"),)
 
     id = Column(Integer, primary_key=True)
     strategy = Column(String(48), nullable=False)
@@ -347,6 +412,7 @@ class OptimizationResult(Base):
 
 class JobLog(Base):
     __tablename__ = "job_logs"
+    __table_args__ = (Index("ix_job_logs_created", "created_at", "id"),)
 
     id = Column(Integer, primary_key=True)
     job = Column(String(48), nullable=False)

@@ -10,20 +10,25 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..db import get_db
+from ..pagination import DEFAULT_PAGE_SIZE, PageQuery, PageSizeQuery
 from ..schemas import SymbolParamDelete, SymbolParamPayload
 from ..strategy.registry import has_spec
-from ..strategy.symbol_params import delete_overrides, describe, set_overrides
+from ..strategy.symbol_params import delete_all_overrides, delete_overrides, describe, set_overrides
 
 router = APIRouter(prefix="/symbol-params", tags=["symbol-params"])
 
 
 @router.get("")
 def list_symbol_params(
-    strategy: str = "", interval: str = "", db: Session = Depends(get_db)
+    strategy: str = "",
+    interval: str = "",
+    db: Session = Depends(get_db),
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
 ):
     if strategy and not has_spec(strategy):
         raise HTTPException(400, f"未知策略: {strategy}")
-    return describe(db, strategy or None, interval or None)
+    return describe(db, strategy or None, interval or None, page=page, page_size=page_size)
 
 
 @router.put("")
@@ -40,6 +45,16 @@ def upsert_symbol_params(payload: SymbolParamPayload, db: Session = Depends(get_
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     return {"written": written}
+
+
+@router.delete("/all")
+def delete_all_symbol_params(
+    strategy: str = "", interval: str = "", db: Session = Depends(get_db)
+):
+    """清空币种级参数覆盖（可按策略/周期收窄），一次请求删完，不受分页影响。"""
+    if strategy and not has_spec(strategy):
+        raise HTTPException(400, f"未知策略: {strategy}")
+    return {"removed": delete_all_overrides(db, strategy or None, interval or None)}
 
 
 @router.delete("")

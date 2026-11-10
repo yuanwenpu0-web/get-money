@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..models import SymbolParam
@@ -238,20 +239,48 @@ def delete_overrides(
     return int(removed or 0)
 
 
+def delete_all_overrides(db: Session, strategy: str | None = None, interval: str | None = None) -> int:
+    """清空覆盖（可按策略/周期收窄）。
+
+    列表分页后前端只能看到当前页，逐页拼 symbols 再删会漏掉后面几页，
+    所以「清空」必须是服务端的一次性操作。
+    """
+    query = db.query(SymbolParam)
+    if strategy:
+        query = query.filter(SymbolParam.strategy_code == strategy)
+    if interval:
+        query = query.filter(SymbolParam.interval == interval)
+    removed = query.delete(synchronize_session=False)
+    db.commit()
+    return int(removed or 0)
+
+
 def describe(
     db: Session,
     strategy: str | None = None,
     interval: str | None = None,
     *,
     diff_only: bool = False,
+    page: int = 1,
+    page_size: int = 15,
 ) -> dict:
-    """覆盖表概览：总量、按来源分布、明细（默认只给「与绑定不同」的键）。"""
+    """覆盖表概览：总量、按来源分布、当前页明细（默认只给「与绑定不同」的键）。
+
+    `total` / `sources` 始终按全量算，`items` 只取当前页——覆盖表会随寻优落地不断增长，
+    列表页没必要把全库一次搬回来。
+    """
     query = db.query(SymbolParam)
     if strategy:
         query = query.filter(SymbolParam.strategy_code == strategy)
     if interval:
         query = query.filter(SymbolParam.interval == interval)
-    rows = query.order_by(SymbolParam.symbol.asc()).all()
+    total = query.count()
+    rows = (
+        query.order_by(SymbolParam.symbol.asc())
+        .offset(max(0, page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
     items = []
     for row in rows:
         try:
@@ -271,7 +300,22 @@ def describe(
                 "updated_at": row.updated_at.isoformat() if row.updated_at else "",
             }
         )
+    filters = []
+    if strategy:
+        filters.append(SymbolParam.strategy_code == strategy)
+    if interval:
+        filters.append(SymbolParam.interval == interval)
     sources: dict[str, int] = {}
-    for item in items:
-        sources[item["source"] or "manual"] = sources.get(item["source"] or "manual", 0) + 1
-    return {"total": len(items), "sources": sources, "items": items}
+    source_query = db.query(SymbolParam.source, func.count(SymbolParam.id))
+    if filters:
+        source_query = source_query.filter(*filters)
+    for source, count in source_query.group_by(SymbolParam.source).all():
+        sources[source or "manual"] = int(count)
+    return {
+        "total": total,
+        "sources": sources,
+        "items": items,
+        "page": page,
+        "page_size": page_size,
+        "pages": (total + page_size - 1) // page_size if page_size else 0,
+    }

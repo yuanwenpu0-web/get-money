@@ -13,6 +13,7 @@ function view(overrides = {}) {
   const source = readFileSync(new URL('../src/views/Backtest.vue', import.meta.url), 'utf8')
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api: {
       getSettings: async () => ({}),
       listBacktests: async () => ({ backtests: [], total: 0 }),

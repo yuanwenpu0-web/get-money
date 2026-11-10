@@ -277,6 +277,19 @@ class BinanceFuturesClient(PooledHttpClient):
     def new_order(self, **params) -> dict:
         return self._request("POST", "/fapi/v1/order", params, signed=True)
 
+    # 2025-12-09 起 U 本位合约条件单（STOP_MARKET / TAKE_PROFIT_MARKET 等）迁移到
+    # Algo 服务；继续发 /fapi/v1/order 会被拦截并返回 -4120 STOP_ORDER_SWITCH_ALGO。
+    # symbol 仅用于保持调用点签名一致，Algo 端点按 algoId 定位订单，不需要 symbol。
+    def new_algo_order(self, **params) -> dict:
+        params.setdefault("algoType", "CONDITIONAL")
+        return self._request("POST", "/fapi/v1/algoOrder", params, signed=True)
+
+    def cancel_algo_order(self, symbol: str, algo_id: int) -> dict:
+        return self._request("DELETE", "/fapi/v1/algoOrder", {"algoId": int(algo_id)}, signed=True)
+
+    def get_algo_order(self, symbol: str, algo_id: int) -> dict:
+        return self._request("GET", "/fapi/v1/algoOrder", {"algoId": int(algo_id)}, signed=True)
+
     def cancel_order(self, symbol: str, order_id: int) -> dict:
         return self._request("DELETE", "/fapi/v1/order", {"symbol": symbol, "orderId": order_id}, signed=True)
 
@@ -296,6 +309,26 @@ class BinanceFuturesClient(PooledHttpClient):
     def position_risk(self, symbol: str | None = None) -> list[dict]:
         params = {"symbol": symbol} if symbol else {}
         return self._request("GET", "/fapi/v2/positionRisk", params, signed=True)
+
+    def user_trades(self, symbol: str, start_ms: int | None = None, end_ms: int | None = None,
+                    limit: int = 1000) -> list[dict]:
+        """账户成交明细：真实成交价、手续费、已实现盈亏，用于逐笔订单结算。"""
+        params: dict = {"symbol": symbol, "limit": min(max(int(limit), 1), 1000)}
+        if start_ms is not None:
+            params["startTime"] = int(start_ms)
+        if end_ms is not None:
+            params["endTime"] = int(end_ms)
+        return self._request("GET", "/fapi/v1/userTrades", params, signed=True)
+
+    def income(self, start_ms: int | None = None, income_type: str | None = None,
+               limit: int = 1000) -> list[dict]:
+        """账户收益流水（REALIZED_PNL / COMMISSION / FUNDING_FEE），全账户口径。"""
+        params: dict = {"limit": min(max(int(limit), 1), 1000)}
+        if start_ms is not None:
+            params["startTime"] = int(start_ms)
+        if income_type:
+            params["incomeType"] = income_type
+        return self._request("GET", "/fapi/v1/income", params, signed=True)
 
     def set_position_side(self, dual: bool) -> dict:
         return self._request(

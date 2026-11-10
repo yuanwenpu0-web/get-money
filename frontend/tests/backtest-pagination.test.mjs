@@ -19,11 +19,12 @@ function view(overrides = {}) {
   const errors = []
   let timers = 0
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api: {
       getSettings: async () => ({}),
-      listBacktests: async () => ({ backtests: [], total: 0, page: 1, page_size: 20 }),
+      listBacktests: async () => ({ backtests: [], total: 0, page: 1, page_size: 15 }),
       getBacktest: async (id) => ({ id, status: 'done', metrics: { total_trades: 41 }, equity_curve: [{ time: 1, equity: 100 }] }),
-      getBacktestTrades: async () => ({ trades: [], total: 0, page: 1, page_size: 20 }),
+      getBacktestTrades: async () => ({ trades: [], total: 0, page: 1, page_size: 15 }),
       ...overrides,
     },
     ref: (value) => ({ value }), reactive: (value) => value,
@@ -34,14 +35,14 @@ function view(overrides = {}) {
     window: { scrollTo: () => {} },
   })
   vm.runInContext(`${source}\nglobalThis.subject = {
-    loadBase, loadHistory, changeHistoryPage, changeHistorySize, history, historyPagination,
-    loadRun, result, loadTrades, changeTradePage, changeTradeSize, trades, tradePagination,
+    loadBase, loadHistory, changeHistoryPage, history, historyPagination,
+    loadRun, result, loadTrades, changeTradePage, trades, tradePagination,
     loadingTrades, tradesError, loadingRun, poll,
   }`, context)
   return { ...context.subject, errors, unmount: () => unmounted.forEach((callback) => callback()), timerCount: () => timers }
 }
 
-test('Backtest history requests only its page and resets page when page size changes', async () => {
+test('Backtest history requests only its page, always with the fixed page size', async () => {
   const requests = []
   const subject = view({
     listBacktests: async (params) => {
@@ -52,12 +53,12 @@ test('Backtest history requests only its page and resets page when page size cha
   await subject.loadHistory()
   await subject.changeHistoryPage(3)
   assert.equal(subject.history.value[0].id, 3)
-  await subject.changeHistorySize(50)
+  // 每页条数全站固定 15：不再提供「改每页条数」的入口，请求里也不会出现更大的值
   assert.deepEqual(requests, [
-    { page: 1, page_size: 20 }, { page: 3, page_size: 20 }, { page: 1, page_size: 50 },
+    { page: 1, page_size: 15 }, { page: 3, page_size: 15 },
   ])
   assert.equal(subject.historyPagination.total, 125)
-  assert.equal(subject.historyPagination.page, 1)
+  assert.equal(subject.historyPagination.page, 3)
 })
 
 test('An older history response cannot overwrite a newer page', async () => {
@@ -108,7 +109,7 @@ test('Metrics and equity display before the separately paged trades arrive', asy
   assert.equal(subject.loadingRun.value, false)
   assert.equal(subject.loadingTrades.value, true)
   assert.deepEqual(requests, [
-    ['details', 12, { include_trades: false }], ['trades', 12, { page: 1, page_size: 20 }],
+    ['details', 12, { include_trades: false }], ['trades', 12, { page: 1, page_size: 15 }],
   ])
   response.resolve({ trades: [{ entry_time: 'first' }], total: 41 })
   await tick()
@@ -116,7 +117,7 @@ test('Metrics and equity display before the separately paged trades arrive', asy
   assert.equal(subject.tradePagination.total, 41)
 })
 
-test('Trade and history pages are independent, and changing trade size returns to page one', async () => {
+test('Trade and history pages stay independent', async () => {
   const requests = []
   const subject = view({
     getBacktestTrades: async (id, params) => {
@@ -128,11 +129,10 @@ test('Trade and history pages are independent, and changing trade size returns t
   await subject.loadRun({ id: 9 })
   await tick()
   await subject.changeTradePage(2)
-  await subject.changeTradeSize(50)
   assert.equal(subject.historyPagination.page, 3)
-  assert.equal(subject.tradePagination.page, 1)
+  assert.equal(subject.tradePagination.page, 2)
   assert.deepEqual(requests, [
-    [9, { page: 1, page_size: 20 }], [9, { page: 2, page_size: 20 }], [9, { page: 1, page_size: 50 }],
+    [9, { page: 1, page_size: 15 }], [9, { page: 2, page_size: 15 }],
   ])
 })
 
@@ -178,7 +178,7 @@ test('Polling running backtests excludes trades and loads the first trade page o
   await tick()
   assert.deepEqual(requests, [
     ['details', { include_trades: false }], ['details', { include_trades: false }],
-    ['trades', { page: 1, page_size: 20 }],
+    ['trades', { page: 1, page_size: 15 }],
   ])
 })
 

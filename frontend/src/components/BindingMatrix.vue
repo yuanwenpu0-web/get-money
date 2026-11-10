@@ -10,6 +10,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../api'
+import TablePager from './TablePager.vue'
+import { PAGE_SIZE } from '../utils/pagination'
 
 const props = defineProps({
   strategies: { type: Array, default: () => [] },
@@ -22,6 +24,10 @@ const bindings = ref([])
 const pools = ref([])
 const loading = ref(false)
 const error = ref('')
+// 绑定列表服务端分页：每页 15 条，total/enabled 用后端全量口径
+const listPage = ref(1)
+const listTotal = ref(0)
+const enabledTotal = ref(0)
 const saving = reactive({})
 const intervalOptions = ['1m', '5m', '15m', '1h', '4h', '1d']
 
@@ -146,7 +152,7 @@ const poolMembersTitle = ref('')
 const poolMembersCode = ref('')
 const poolMembersManual = ref(null)
 
-const enabledCount = computed(() => bindings.value.filter((row) => row.enabled).length)
+const enabledCount = computed(() => enabledTotal.value)
 
 function parseJson(text, label) {
   try {
@@ -162,13 +168,23 @@ function paramsSummary(row) {
   return keys.map((key) => `${key}=${row.params[key]}`).join(' · ')
 }
 
-function load() {
+function load(page = listPage.value) {
   if (loading.value) return Promise.resolve()
   loading.value = true
   error.value = ''
-  return Promise.all([api.getBindings(), api.getPools(), api.getBindingExitOptions()])
+  return Promise.all([
+    api.getBindings({ page, page_size: PAGE_SIZE }),
+    api.getPools(),
+    api.getBindingExitOptions(),
+  ])
     .then(([bindingData, poolData, exitData]) => {
       bindings.value = bindingData.bindings || []
+      listTotal.value = Number(bindingData.total || 0)
+      enabledTotal.value = Number(bindingData.enabled_total ?? 0)
+      listPage.value = Number(bindingData.page || page)
+      // 删到空页时退回最后一页，避免停在空白表格
+      const last = Math.max(1, Math.ceil(listTotal.value / PAGE_SIZE))
+      if (listPage.value > last) return load(last)
       pools.value = poolData.pools || []
       exitOptions.value = { methods: exitData.methods || [], support_sources: exitData.support_sources || [] }
     })
@@ -464,7 +480,7 @@ onMounted(load)
       暂无策略。请选择一个信号指标、币种池和周期创建策略。
     </div>
 
-    <el-table v-else :data="bindings" class="table-compact">
+    <el-table v-else :data="bindings" class="table-compact section-gap">
       <el-table-column label="信号指标" min-width="150">
         <template #default="{ row }">
           <div>{{ row.strategy_name || row.strategy }}</div>
@@ -506,6 +522,14 @@ onMounted(load)
         </template>
       </el-table-column>
     </el-table>
+
+    <TablePager
+      :page="listPage"
+      :page-size="PAGE_SIZE"
+      :total="listTotal"
+      :disabled="loading"
+      @change="load"
+    />
 
     <div class="row" style="margin-top: 14px">
       <span class="muted">币种池</span>

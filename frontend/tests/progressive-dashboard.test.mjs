@@ -18,6 +18,7 @@ function view(name, api, exported) {
   const mounted = [], unmounted = []
   let timers = 0, cleared = 0
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }),
     reactive: (value) => value,

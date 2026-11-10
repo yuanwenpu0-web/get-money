@@ -104,12 +104,16 @@ def test_paper_mode_client_is_futures_mainnet(db):
     assert client.hosts == FUTURES_MAIN_HOSTS
 
 
-def test_live_mode_client_still_follows_testnet_flag(db):
+def test_live_mode_market_client_stays_mainnet_while_orders_follow_env(db):
+    """行情源与交易环境解耦：demo 下单仍用主网 K 线，否则信号会因测试网数据稀疏而消失。"""
+    from app.trading.live import client_for
+
     set_state(db, "execution_mode", "live")
-    set_state(db, "testnet", True)
-    assert default_market_client(db).hosts == ["https://testnet.binancefuture.com"]
-    set_state(db, "testnet", False)
-    assert default_market_client(db).hosts == FUTURES_MAIN_HOSTS
+    for flag in (True, False):
+        set_state(db, "testnet", flag)
+        assert default_market_client(db).hosts == FUTURES_MAIN_HOSTS
+        expected = ["https://testnet.binancefuture.com"] if flag else FUTURES_MAIN_HOSTS
+        assert client_for(db).hosts == expected
 
 
 def test_db_none_client_is_futures_mainnet():

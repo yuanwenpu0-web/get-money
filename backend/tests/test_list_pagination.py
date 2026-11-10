@@ -12,6 +12,7 @@ from app.api import backtests, trading
 from app.db import get_db
 from app.market.data_service import MarketDataService
 from app.models import BacktestRun, JobLog, Order, StrategyConfig
+from app.pagination import MAX_PAGE_SIZE
 
 
 CREATED = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -47,10 +48,13 @@ def test_order_summary_covers_entire_filtered_set_and_mark_fallback(db):
     result = trading.list_orders(symbol="btcusdt", page=2, page_size=2, db=db)
     assert len(result["orders"]) == 2
     assert (result["total"], result["page"], result["page_size"], result["pages"]) == (6, 2, 2, 3)
-    assert result["summary"] == {"open": 3, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 20, "open_total": 3}
+    assert result["summary"] == {"open": 3, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 20,
+                                 "open_total": 3, "selectable_open": 3}
     closed = trading.list_orders(status="closed", symbol="BTCUSDT", page_size=1, db=db)
     assert closed["total"] == 2
-    assert closed["summary"] == {"open": 0, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 0, "open_total": 3}
+    # 状态筛到「已平仓」时，按筛选全选没有可平仓对象
+    assert closed["summary"] == {"open": 0, "closed": 2, "realized_pnl": 12, "unrealized_pnl": 0,
+                                 "open_total": 3, "selectable_open": 0}
     assert [row["id"] for row in closed["orders"]] == [2]
     assert [row["id"] for row in trading.list_orders(status="closed", symbol="BTCUSDT", page=2, page_size=1, db=db)["orders"]] == [1]
 
@@ -65,7 +69,8 @@ def test_order_strategy_filter_applies_to_rows_totals_and_summary(db):
 
     result = trading.list_orders(strategy="ABSORPTION_REVERSAL", page_size=1, db=db)
     assert result["total"] == 2
-    assert result["summary"] == {"open": 1, "closed": 1, "realized_pnl": 5, "unrealized_pnl": 10, "open_total": 1}
+    assert result["summary"] == {"open": 1, "closed": 1, "realized_pnl": 5, "unrealized_pnl": 10,
+                                 "open_total": 1, "selectable_open": 1}
     assert [row["strategy"] for row in result["orders"]] == ["absorption_reversal"]
     assert [row["strategy"] for row in trading.list_orders(strategy="retired_strategy", db=db)["orders"]] == ["retired_strategy"]
 
@@ -102,9 +107,10 @@ def test_empty_lists_have_zero_pages_and_summary(db):
         assert result[key] == []
         assert result["total"] == result["pages"] == 0
         assert result["page"] == 1
-        assert result["page_size"] == 20
+        assert result["page_size"] == MAX_PAGE_SIZE
     assert trading.list_orders(db=db)["summary"] == {
-        "open": 0, "closed": 0, "realized_pnl": 0, "unrealized_pnl": 0, "open_total": 0,
+        "open": 0, "closed": 0, "realized_pnl": 0, "unrealized_pnl": 0,
+        "open_total": 0, "selectable_open": 0,
     }
 
 
@@ -114,7 +120,7 @@ def test_backtest_history_pages_do_not_load_detail_json(db):
     event.listen(db.get_bind(), "before_cursor_execute", lambda conn, cursor, statement, *args: sql.append(statement))
     result = backtests.list_backtests(db, page=2)
     assert result["total"] == 45
-    assert [row["id"] for row in result["backtests"]] == list(range(25, 5, -1))
+    assert [row["id"] for row in result["backtests"]] == list(range(30, 15, -1))
     selects = [statement for statement in sql if not statement.lstrip().startswith("SELECT count(")]
     assert len(selects) == 1
     assert all(column not in selects[0] for column in ("backtest_runs.trades", "backtest_runs.equity_curve", "backtest_runs.params"))
@@ -132,7 +138,7 @@ def test_backtest_details_can_skip_trades_and_fetch_them_in_pages(db):
     assert detail["params"] == {"days": 30}
     assert all("backtest_runs.trades" not in statement for statement in sql)
     pages = [backtests.get_backtest_trades(1, db, page=page) for page in (1, 2, 3)]
-    assert [len(result["trades"]) for result in pages] == [20, 20, 5]
+    assert [len(result["trades"]) for result in pages] == [MAX_PAGE_SIZE] * 3
     assert [row["trade"] for result in pages for row in result["trades"]] == list(range(45))
     assert pages[0]["total"] == 45 and pages[0]["pages"] == 3
     assert backtests.get_backtest_trades(1, db, page=4)["trades"] == []
@@ -170,7 +176,7 @@ def test_dashboard_keeps_legacy_market_statistics_by_default(db, monkeypatch):
 
 
 @pytest.mark.parametrize("path", ["/trading/orders", "/trading/logs", "/backtests", "/backtests/1/trades"])
-@pytest.mark.parametrize("params", [{"page": 0}, {"page": -1}, {"page_size": 0}, {"page_size": 101}])
+@pytest.mark.parametrize("params", [{"page": 0}, {"page": -1}, {"page_size": 0}, {"page_size": MAX_PAGE_SIZE + 1}])
 def test_pagination_rejects_invalid_query_parameters_before_accessing_database(db, path, params):
     app = FastAPI()
     for router in (trading.router, backtests.router):

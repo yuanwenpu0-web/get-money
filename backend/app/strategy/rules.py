@@ -33,6 +33,12 @@ RULE_DEFAULTS = {
     "trailing_enabled": True,
     "trail_activation_atr": 1.5,
     "max_signal_age_bars": 2,
+    # EMA 快慢线方向过滤（通用，所有策略共享）：
+    # 0 = 关闭；>0 时按「快线 EMA(fast) 与慢线 EMA(slow) 的相对位置」做方向门控。
+    # 多头信号要求 fast > slow，空头信号要求 fast < slow；fast 或 slow 任一为 0 即关闭。
+    # 这只是入场门控，不改变策略本身的方向判断；默认关闭以保持既有口径不变。
+    "ema_trend_fast": 0,
+    "ema_trend_slow": 0,
     # 绑定层出场覆盖：{method, support, params}，见 strategy/exits.py
     EXIT_KEY: dict(DEFAULT_EXIT),
 }
@@ -77,6 +83,8 @@ SHARED_RANGES: dict[str, tuple[float, float]] = {
     "min_atr_cost_ratio": (0, 10),
     "min_net_reward_risk": (0, 10),
     "max_atr_pct": (0.0001, 0.2),
+    "ema_trend_fast": (0, 500),
+    "ema_trend_slow": (0, 1000),
 }
 
 SHARED_BOOL_KEYS = ("regime_filter", "cost_filter", "funding_filter", "trailing_enabled")
@@ -143,6 +151,10 @@ def resolve_params(
         raise ValueError("基础仓位不能超过单仓上限")
     if 0 < params["max_hold_bars"] < params["min_hold_bars"]:
         raise ValueError("最大持仓K线数不能小于最小持仓K线数")
+    ema_fast = int(params.get("ema_trend_fast", 0) or 0)
+    ema_slow = int(params.get("ema_trend_slow", 0) or 0)
+    if ema_fast and ema_slow and ema_fast >= ema_slow:
+        raise ValueError("EMA 方向过滤要求快线周期严格小于慢线周期")
     if spec.validate is not None:
         spec.validate(params)
     ensure_allowed(code, params[EXIT_KEY], params)
@@ -173,14 +185,60 @@ def evaluate_signals(
 
     `symbol` / `service` 只在策略需要更低周期数据时使用（如 intrabar delta）；
     回测与特征测试不传也能跑——策略内部会降级。
-    产出后再叠加绑定层的出场覆盖（见 `apply_exit_overlay`）。
+    产出后先叠加绑定层的出场覆盖（见 `apply_exit_overlay`），再过 EMA 方向门控。
+    覆盖层用 `finalize_signal_frame` 重建 direction / 仓位，门控必须是最后一道，
+    否则在 atr_r / support_r 绑定下可能被重建覆盖（与 optimizer worker 同口径，H10）。
     """
     frame = prepare_frame(data, code, params, symbol=symbol, service=service)
     result = get_spec(code).signals(frame, params)
     missing = set(SIGNAL_COLUMNS) - set(result.columns)
     if missing:
         raise ValueError(f"{code} 输出的信号帧缺少列: {', '.join(sorted(missing))}")
-    return apply_exit_overlay(frame, result, params)
+    result = apply_exit_overlay(frame, result, params)
+    return apply_ema_trend_filter(frame, result, params)
+
+
+def apply_ema_trend_filter(
+    frame: pd.DataFrame, signals: pd.DataFrame, params: dict
+) -> pd.DataFrame:
+    """通用 EMA 快慢线方向过滤：只做入场门控，不改策略方向判断。
+
+    当 `ema_trend_fast` 与 `ema_trend_slow` 都 > 0 且 fast < slow 时启用：
+    - 多头信号要求 EMA(fast) > EMA(slow)
+    - 空头信号要求 EMA(fast) < EMA(slow)
+    不满足时把方向清零并打 `ema_trend_filter` 标签，仓位/杠杆同步归零。
+
+    默认关闭（两个周期都为 0），行为与改造前完全一致。
+    """
+    fast = int(params.get("ema_trend_fast", 0) or 0)
+    slow = int(params.get("ema_trend_slow", 0) or 0)
+    if not fast or not slow:
+        return signals
+    series = frame.get("close")
+    if series is None:
+        return signals
+    close = pd.to_numeric(series, errors="coerce")
+    if close.empty:
+        return signals
+    ema_fast = close.ewm(span=fast, adjust=False).mean()
+    ema_slow = close.ewm(span=slow, adjust=False).mean()
+    bullish = ema_fast.gt(ema_slow)
+    bearish = ema_fast.lt(ema_slow)
+    direction = pd.to_numeric(signals["direction"], errors="coerce").fillna(0).astype(int)
+    long_blocked = direction.gt(0) & ~bullish
+    short_blocked = direction.lt(0) & ~bearish
+    blocked = long_blocked | short_blocked
+    if not blocked.any():
+        return signals
+    result = signals.copy()
+    reason = result["block_reason"].astype(object)
+    reason = reason.mask(blocked & reason.eq(""), "ema_trend_filter")
+    result["block_reason"] = reason
+    result["direction"] = direction.where(~blocked, 0)
+    result["position_pct"] = result["position_pct"].where(~blocked, 0.0)
+    result["leverage"] = result["leverage"].where(~blocked, 0)
+    result["risk_pct"] = result["risk_pct"].where(~blocked, 0.0)
+    return result
 
 
 def apply_exit_overlay(frame: pd.DataFrame, signals: pd.DataFrame, params: dict) -> pd.DataFrame:

@@ -1,0 +1,446 @@
+{
+  "topic": "kronos-order-exit",
+  "generated_at": "2026-11-10T06:54:38+08:00",
+  "strategy": "kronos_pre_entry_exit_probe",
+  "interval": "15m+1h",
+  "days": 13,
+  "window": {
+    "start": "2026-10-26",
+    "end": "2026-11-07"
+  },
+  "universe": {
+    "symbols": 84,
+    "orders": 123,
+    "skipped": [
+      {
+        "id": 192,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 193,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 194,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 195,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 196,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 197,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 198,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 199,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 200,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 201,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 202,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 203,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 204,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 205,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 206,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 207,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 208,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 209,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 210,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 211,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 212,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 213,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 214,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 215,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 217,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 218,
+        "reason": "incomplete_future"
+      },
+      {
+        "id": 219,
+        "reason": "incomplete_future"
+      }
+    ],
+    "unresolved_labels": 6,
+    "positive_path_labels": 30,
+    "positive_reason_labels": 27,
+    "close_reason_counts": {
+      "stop_loss": 69,
+      "take_profit": 27,
+      "signal_reverse": 17,
+      "env_switch_archived": 10
+    }
+  },
+  "subgroup_auc": {
+    "source": {
+      "paper": {
+        "n": 123,
+        "positive": 30,
+        "auc": 0.4287
+      }
+    },
+    "side": {
+      "LONG": {
+        "n": 55,
+        "positive": 12,
+        "auc": 0.4109
+      },
+      "SHORT": {
+        "n": 68,
+        "positive": 18,
+        "auc": 0.4389
+      }
+    },
+    "interval": {
+      "15m": {
+        "n": 99,
+        "positive": 29,
+        "auc": 0.4222
+      },
+      "1h": {
+        "n": 24,
+        "positive": 1,
+        "auc": 1.0
+      }
+    },
+    "strategy": {
+      "absorption_reversal": {
+        "n": 1,
+        "positive": 0,
+        "auc": null
+      },
+      "flow_imbalance_long": {
+        "n": 1,
+        "positive": 0,
+        "auc": null
+      },
+      "ml_ensemble": {
+        "n": 2,
+        "positive": 0,
+        "auc": null
+      },
+      "strong_pullback": {
+        "n": 1,
+        "positive": 0,
+        "auc": null
+      },
+      "supertrend_current": {
+        "n": 96,
+        "positive": 29,
+        "auc": 0.421
+      },
+      "trend_follow": {
+        "n": 22,
+        "positive": 1,
+        "auc": 1.0
+      }
+    }
+  },
+  "parameters": {
+    "source": "zero-shot pretrained Kronos-small, no fitting",
+    "grid": {},
+    "threshold": 0.5,
+    "lookback": 128,
+    "samples": 3,
+    "horizon_bars": {
+      "15m": 96,
+      "1h": 24
+    },
+    "kronos_commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a"
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional"
+  },
+  "split": {
+    "train": 0.0,
+    "valid": 0.0,
+    "test": 1.0,
+    "note": "zero-shot; whole window is out-of-sample, threshold fixed a priori"
+  },
+  "beta_btc_pct": -6.021,
+  "min_pooled_trades": 30,
+  "random_baseline_seeds": 20,
+  "scores": {
+    "kronos_mfe": {
+      "auc_vs_path_label": 0.4287,
+      "auc_ci95": [
+        0.3025,
+        0.5545
+      ],
+      "auc_vs_close_reason": 0.3719,
+      "brier": 0.3028,
+      "trigger_rate_at_0_5": 0.3008,
+      "degenerate": false,
+      "p_perm": 0.8801,
+      "fdr_q": 0.952
+    },
+    "kronos_hit": {
+      "auc_vs_path_label": 0.4896,
+      "auc_ci95": [
+        0.409,
+        0.5716
+      ],
+      "auc_vs_close_reason": 0.4823,
+      "brier": 0.2584,
+      "trigger_rate_at_0_5": 0.0894,
+      "degenerate": false,
+      "p_perm": 0.6167,
+      "fdr_q": 0.925
+    },
+    "kronos_end": {
+      "auc_vs_path_label": 0.5025,
+      "auc_ci95": [
+        0.3853,
+        0.6149
+      ],
+      "auc_vs_close_reason": 0.5384,
+      "brier": 0.2438,
+      "trigger_rate_at_0_5": 0.065,
+      "degenerate": false,
+      "p_perm": 0.4848,
+      "fdr_q": 0.8726
+    },
+    "rw_mfe": {
+      "auc_vs_path_label": 0.409,
+      "auc_ci95": [
+        0.3069,
+        0.5123
+      ],
+      "auc_vs_close_reason": 0.3256,
+      "brier": 0.3162,
+      "trigger_rate_at_0_5": 0.5203,
+      "degenerate": false,
+      "p_perm": 0.9285,
+      "fdr_q": 0.952
+    },
+    "rw_p_tp": {
+      "auc_vs_path_label": 0.3966,
+      "auc_ci95": [
+        0.2959,
+        0.5039
+      ],
+      "auc_vs_close_reason": 0.3083,
+      "brier": 0.2312,
+      "trigger_rate_at_0_5": 0.1057,
+      "degenerate": false,
+      "p_perm": 0.952,
+      "fdr_q": 0.952
+    },
+    "positive_control_label_mfe": {
+      "auc_vs_path_label": 0.8835,
+      "auc_ci95": [
+        0.8191,
+        0.936
+      ],
+      "auc_vs_close_reason": 0.8438,
+      "brier": 0.3881,
+      "trigger_rate_at_0_5": 0.7154,
+      "degenerate": true,
+      "p_perm": 0.0005,
+      "fdr_q": 0.0015
+    },
+    "random_control": {
+      "auc_vs_path_label": 0.5333,
+      "auc_ci95": [
+        0.4204,
+        0.6559
+      ],
+      "auc_vs_close_reason": 0.4853,
+      "brier": 0.3517,
+      "trigger_rate_at_0_5": 0.561,
+      "degenerate": false,
+      "p_perm": 0.2974,
+      "fdr_q": 0.669
+    },
+    "half_decay_control": {
+      "auc_vs_path_label": 0.8645,
+      "auc_ci95": [
+        0.7898,
+        0.9261
+      ],
+      "auc_vs_close_reason": 0.811,
+      "brier": 0.3396,
+      "trigger_rate_at_0_5": 0.7398,
+      "degenerate": true,
+      "p_perm": 0.0005,
+      "fdr_q": 0.0015
+    },
+    "weak_control_20pct": {
+      "auc_vs_path_label": 0.7075,
+      "auc_ci95": [
+        0.6047,
+        0.8013
+      ],
+      "auc_vs_close_reason": 0.6898,
+      "brier": 0.296,
+      "trigger_rate_at_0_5": 0.5203,
+      "degenerate": false,
+      "p_perm": 0.0005,
+      "fdr_q": 0.0015
+    }
+  },
+  "self_calibration": {
+    "positive_control_auc": 0.8835,
+    "negative_control_auc": 0.5333,
+    "half_decay_control_auc": 0.8645,
+    "weak_control_20pct_auc": 0.7075
+  },
+  "random_baseline": {
+    "auc_mean": 0.4985,
+    "auc_p95": 0.556,
+    "kronos_percentile": 0.0476
+  },
+  "time_segments": [
+    {
+      "n": 31,
+      "auc": 0.5667,
+      "sign_above_0_5": true
+    },
+    {
+      "n": 31,
+      "auc": 0.3384,
+      "sign_above_0_5": false
+    },
+    {
+      "n": 31,
+      "auc": 0.5045,
+      "sign_above_0_5": true
+    },
+    {
+      "n": 30,
+      "auc": 0.3077,
+      "sign_above_0_5": false
+    }
+  ],
+  "segments_same_sign": 2,
+  "groups": {
+    "all_orders": {
+      "trades": 123,
+      "mean_return_pct": -0.1263,
+      "ci_low_pct": -0.5678,
+      "ci_high_pct": 0.3086,
+      "verdict": "inconclusive"
+    },
+    "kronos_filter": {
+      "trades": 37,
+      "mean_return_pct": -0.0028,
+      "ci_low_pct": -0.7368,
+      "ci_high_pct": 0.766,
+      "verdict": "inconclusive"
+    },
+    "rw_filter": {
+      "trades": 64,
+      "mean_return_pct": -0.7337,
+      "ci_low_pct": -1.3822,
+      "ci_high_pct": -0.0423,
+      "verdict": "negative"
+    }
+  },
+  "random_filter_baseline": {
+    "trades_per_seed": 37,
+    "mean_p05": -0.5003,
+    "mean_p95": 0.3449,
+    "kronos_percentile": 0.619
+  },
+  "baseline": {
+    "random_percentile": 0.0476
+  },
+  "verdict": "inconclusive",
+  "verdict_by_ci": "inconclusive",
+  "default_enabled": false,
+  "limitations": [
+    "16-day window, 148 symbols, 36 take-profit outcomes -> low statistical power",
+    "Generated paths are zero-shot samples; no fine-tuning on this order population",
+    "Future window starts at the next complete bucket, dropping the remainder bar",
+    "No funding, order-book depth, liquidation or partial-fill simulation",
+    "Kronos pretraining cutoff cannot be independently verified",
+    "live cohort uses a shorter 24-bar (6h) horizon because its 24h future window is incomplete"
+  ],
+  "source_runtime_seconds": 916.0,
+  "live_subset_short_window": {
+    "orders": 27,
+    "symbols": 25,
+    "horizon_bars": {
+      "15m": 24,
+      "1h": 24
+    },
+    "positive_path_labels": 7,
+    "positive_reason_labels": 9,
+    "auc": 0.2357,
+    "auc_ci95": [
+      0.0108,
+      0.5162
+    ],
+    "p_perm": 0.981,
+    "trigger_rate_at_0_5": 0.1481,
+    "mean_return_pct": 0.7621,
+    "return_ci95": [
+      -0.2788,
+      1.9164
+    ],
+    "verdict": "insufficient"
+  }
+}

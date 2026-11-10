@@ -2,7 +2,9 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../api'
+import TablePager from '../components/TablePager.vue'
 import { number, pct, pnlClass, tsLabel } from '../utils/format'
+import { PAGE_SIZE } from '../utils/pagination'
 
 const VERDICTS = {
   pass: { label: '通过', type: 'success', hint: '验证段每笔期望 95% CI 下界 > 0' },
@@ -25,13 +27,13 @@ const cancelling = ref(false)
 const applying = ref(false)
 const loadError = ref('')
 const optionsLoaded = ref(false)
-const coverage = reactive({ total: 0, sources: {}, items: [] })
+const coverage = reactive({ total: 0, sources: {}, items: [], page: 1, pageSize: PAGE_SIZE })
 const coverageVisible = ref(false)
 const coverageLoading = ref(false)
 const universe = ref(null)
 const universeLoading = ref(false)
 
-const page = reactive({ page: 1, pageSize: 30 })
+const page = reactive({ page: 1, pageSize: PAGE_SIZE })
 const filters = reactive({ verdict: '', q: '', bestOnly: true })
 const applyMode = ref('symbol')
 const applyOnly = ref('positive')
@@ -164,7 +166,7 @@ async function loadOptions() {
 async function loadRuns() {
   if (disposed) return
   try {
-    const data = await api.listOptimizations({ page: 1, page_size: 20 })
+    const data = await api.listOptimizations({ page: 1, page_size: PAGE_SIZE })
     if (disposed) return
     runs.value = data.optimizations || []
   } catch (error) {
@@ -172,12 +174,13 @@ async function loadRuns() {
   }
 }
 
-async function loadCoverage() {
+async function loadCoverage(page = coverage.page) {
   if (disposed) return
   coverageLoading.value = true
   try {
-    const data = await api.getSymbolParams({})
+    const data = await api.getSymbolParams({ page, page_size: coverage.pageSize })
     if (disposed) return
+    coverage.page = Number(data.page || page)
     coverage.total = data.total || 0
     coverage.sources = data.sources || {}
     coverage.items = data.items || []
@@ -382,19 +385,10 @@ async function clearCoverage() {
     return
   }
   try {
-    const groups = new Map()
-    for (const item of coverage.items) {
-      const key = `${item.strategy}::${item.interval}`
-      if (!groups.has(key)) groups.set(key, { strategy: item.strategy, interval: item.interval, symbols: [] })
-      groups.get(key).symbols.push(item.symbol)
-    }
-    let removed = 0
-    for (const group of groups.values()) {
-      const data = await api.deleteSymbolParams(group)
-      removed += data.removed || 0
-    }
-    ElMessage.success(`已删除 ${removed} 条覆盖`)
-    await loadCoverage()
+    // 服务端一次删完：分页后前端只持有当前页，逐条拼 symbols 会漏删后面几页
+    const data = await api.clearSymbolParams({})
+    ElMessage.success(`已删除 ${data.removed || 0} 条覆盖`)
+    await loadCoverage(1)
   } catch (error) {
     ElMessage.error(`删除失败：${error.message}`)
   }
@@ -729,15 +723,14 @@ onBeforeUnmount(() => {
         </template>
       </el-table-column>
     </el-table>
-    <div class="opt-pager">
-      <el-pagination
-        layout="total, prev, pager, next"
-        :total="resultsTotal"
-        :page-size="page.pageSize"
-        :current-page="page.page"
-        @current-change="changePage"
-      />
-    </div>
+    <TablePager
+      :page="page.page"
+      :page-size="page.pageSize"
+      :total="resultsTotal"
+      :disabled="resultsLoading"
+      jumper
+      @change="changePage"
+    />
   </div>
 
   <div class="panel" style="margin-bottom: 14px">
@@ -810,6 +803,14 @@ onBeforeUnmount(() => {
         <template #default="{ row }">{{ tsLabel(row.updated_at) }}</template>
       </el-table-column>
     </el-table>
+    <TablePager
+      :page="coverage.page"
+      :page-size="coverage.pageSize"
+      :total="coverage.total"
+      :disabled="coverageLoading"
+      jumper
+      @change="loadCoverage"
+    />
   </el-dialog>
 </template>
 

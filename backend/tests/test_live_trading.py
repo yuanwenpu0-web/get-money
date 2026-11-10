@@ -6,7 +6,8 @@ import json
 import pytest
 
 from app.market.futures import BinanceApiError
-from app.models import Order
+from app.models import ExchangeEvent, Order
+from app.serializers import order_dict
 from app.state import set_state
 from app.trading import dispatch, live, live_sync
 
@@ -23,10 +24,15 @@ def test_open_live_floors_qty_to_step_and_builds_protection_orders(db, monkeypat
     entry = orders[0]
     assert entry["side"] == "BUY" and entry["quantity"] == "46.3"  # 46.3134 向下取整到 0.1 步长
     sl, tp = orders[1], orders[2]
-    assert sl["side"] == "SELL" and sl["closePosition"] == "true" and sl["stopPrice"] == "99"
-    assert tp["closePosition"] == "true" and tp["stopPrice"] == "103"
+    # 2025-12-09 起条件单走 /fapi/v1/algoOrder，触发价字段为 triggerPrice
+    assert sl["side"] == "SELL" and sl["closePosition"] == "true" and sl["triggerPrice"] == "99"
+    assert tp["closePosition"] == "true" and tp["triggerPrice"] == "103"
     note = json.loads(order.note)
     assert note["exchange_order_id"] and note["sl_order_id"] and note["tp_order_id"]
+    # 币安主单号必须同时落到独立列，且与 note 口径一致（列用于对账/反查）
+    assert order.exchange_order_id == str(note["exchange_order_id"])
+    assert int(order.exchange_order_id) > 0
+    assert order_dict(order)["exchange_order_id"] == order.exchange_order_id
     assert json.loads(order.params_snapshot)["params"]["exit"]["method"] == "strategy"
     assert order.entry_price == 100.5  # 用交易所成交均价入账
     assert order.sl == 99.0 and order.tp == 103.0
@@ -53,6 +59,58 @@ def test_open_live_rejects_without_credentials(db, monkeypatch):
     monkeypatch.setattr(live, "load_credentials", lambda session: ("", ""))
     assert live.open_live(db, signal()) is None
     assert db.query(Order).count() == 0
+
+
+@pytest.mark.parametrize(
+    "bad_type,bad_value",
+    [
+        ("MARKET", None),              # 开仓主单回报完全没有 orderId
+        ("STOP_MARKET", None),         # 止损保护单回报完全没有 algoId/orderId
+        ("TAKE_PROFIT_MARKET", None),  # 止盈保护单回报完全没有 algoId/orderId
+        ("MARKET", 0),                 # 订单号不能解析成正整数
+        ("STOP_MARKET", "abc"),
+        ("TAKE_PROFIT_MARKET", ""),
+    ],
+)
+def test_open_live_skips_order_when_binance_id_not_synced(db, monkeypatch, bad_type, bad_value):
+    """币安订单号未正常同步：先回滚交易所仓位，再放弃本地订单记录。"""
+    fake = FakeFuturesClient(id_responses={bad_type: bad_value})
+    patch_live(db, monkeypatch, fake)
+    assert live.open_live(db, signal()) is None
+    assert db.query(Order).count() == 0, "ID 缺失时绝不能落库"
+    orders = market_orders(fake)
+    assert orders[0]["type"] == "MARKET", "主单已发到交易所，必须回滚"
+    assert any(item.get("reduceOnly") == "true" for item in orders), "必须市价平仓，避免无记录裸仓"
+    # 只有拿到有效 ID 的保护单才撤得掉：主单缺 ID 时两张都在，保护单缺 ID 时只剩一张
+    assert len(fake.cancel_calls) == (2 if bad_type == "MARKET" else 1)
+    events = db.query(ExchangeEvent).filter(ExchangeEvent.status == "failed").all()
+    assert any("订单号同步失败" in (event.message or "") for event in events), "失败原因必须留痕"
+
+
+def test_order_dict_falls_back_to_note_when_column_empty(db):
+    """历史订单列为空时仍从 note 读币安订单号；新列有值时优先用新列。"""
+    legacy = live_order(exchange_order_id="")
+    db.add(legacy)
+    db.commit()
+    assert order_dict(legacy)["exchange_order_id"] == 100
+    modern = live_order(symbol="ETHUSDT", exchange_order_id="987654321")
+    db.add(modern)
+    db.commit()
+    assert order_dict(modern)["exchange_order_id"] == "987654321"
+
+
+def test_backfill_order_exchange_ids_from_note(db, monkeypatch):
+    """启动迁移把历史 note 里的主单号幂等回填到独立列。"""
+    from app import db as db_module
+
+    monkeypatch.setattr(db_module, "engine", db.get_bind())
+    legacy = live_order(exchange_order_id="")
+    db.add(legacy)
+    db.commit()
+    db_module._backfill_order_exchange_ids()
+    db_module._backfill_order_exchange_ids()  # 重复执行不应报错或改坏数据
+    db.expire_all()
+    assert db.query(Order).filter(Order.id == legacy.id).one().exchange_order_id == "100"
 
 
 def test_open_live_aborts_when_leverage_rejected(db, monkeypatch):
@@ -160,7 +218,7 @@ def test_modify_live_replaces_protection_orders(db, monkeypatch):
     assert note["sl_order_id"] == 100 + len(fake.calls)  # 新保护单号已回写
     assert ("BTCUSDT", 101) in fake.cancel_calls  # 旧止损保护单已撤销
     replaced = market_orders(fake)[-1]
-    assert replaced["type"] == "STOP_MARKET" and replaced["stopPrice"] == "100.2"
+    assert replaced["type"] == "STOP_MARKET" and replaced["triggerPrice"] == "100.2"
 
 
 def test_sync_live_closes_when_exchange_position_gone(db, monkeypatch):

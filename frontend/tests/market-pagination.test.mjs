@@ -15,11 +15,12 @@ function view(api) {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const unmounted = []
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api, ref: (value) => ({ value }), reactive: (value) => value,
     computed: (getter) => ({ get value() { return getter() } }),
     onMounted: () => {}, onBeforeUnmount: (fn) => unmounted.push(fn),
   })
-  vm.runInContext(`${source}\nglobalThis.subject = { loadSources, changeStatsPage, changeStatsPageSize, statsPage, statsPageSize, statsTotal, localStats, sourcesLoading }`, context)
+  vm.runInContext(`${source}\nglobalThis.subject = { loadSources, changeStatsPage, statsPage, statsPageSize, statsTotal, localStats, sourcesLoading }`, context)
   return { ...context.subject, unmount: () => unmounted.forEach((fn) => fn()) }
 }
 
@@ -30,15 +31,13 @@ test('Market requests only its selected page and uses the full group total', asy
     return { local: { stats: [{ symbol: 'S020USDT' }], total: 41 } }
   } })
   await subject.changeStatsPage(2)
-  assert.deepEqual(requests, [{ page: 2, page_size: 20 }])
+  assert.deepEqual(requests, [{ page: 2, page_size: 15 }])
   assert.equal(subject.statsTotal.value, 41)
   assert.equal(subject.localStats.value.length, 1)
+  // 每页条数固定 15，不提供修改入口；重复点同一页不会重复请求
+  assert.equal(subject.statsPageSize, 15)
   await subject.changeStatsPage(2)
-  await subject.changeStatsPageSize(20)
   assert.equal(requests.length, 1)
-  await subject.changeStatsPageSize(10)
-  assert.deepEqual(requests[1], { page: 1, page_size: 10 })
-  assert.equal(subject.statsPage.value, 1)
 })
 
 test('Market ignores an obsolete page response and does not clear the new loading state', async () => {
@@ -64,6 +63,7 @@ test('Market returns to the last valid page after the group count shrinks', asyn
   const requests = []
   const subject = view({ getMarketSources: async (params) => {
     requests.push({ ...params })
+    // total 21 → 2 页（15/页），第 3 页必然空白，触发回退到第 2 页
     return { local: { stats: params.page > 2 ? [] : [{ symbol: 'LAST' }], total: 21 } }
   } })
   await subject.changeStatsPage(3)

@@ -3,13 +3,18 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import api from '../api'
 import EChart from '../components/EChart.vue'
+import TablePager from '../components/TablePager.vue'
 import { closeReasonLabel, money, pct, pnlClass, price, sideLabel, statusLabel, strategyLabel, tsLabel } from '../utils/format'
+import { PAGE_SIZE } from '../utils/pagination'
 import { barsToCover, intervalMs, KLINE_MAX_LIMIT, locateBar, tradeMarker, zoomForIndexes } from '../utils/kline'
 
 const orders = ref([])
 const settings = ref({})
 const loading = ref(false)
-const closingAll = ref(false)
+// 批量平仓用「勾选 ID」而不是 el-table 的 selection：才能跨分页保留、按搜索条件全选
+const selectedIds = ref([])
+const selectingAll = ref(false)
+const batchClosing = ref(false)
 const ordersLoaded = ref(false)
 const ordersError = ref('')
 const settingsLoading = ref(false)
@@ -19,8 +24,10 @@ const strategiesLoading = ref(false)
 const strategiesError = ref('')
 const strategiesUnavailable = ref(false)
 const filters = reactive({ status: 'OPEN', symbol: '', strategy: '' })
-const pagination = reactive({ page: 1, pageSize: 20, total: 0 })
+const pagination = reactive({ page: 1, pageSize: PAGE_SIZE, total: 0 })
 const orderSummary = ref(null)
+const exchangeEvents = ref([])
+const exchangeEventsOpen = ref(false)
 let timer = null
 let loadPromise = null
 let settingsPromise = null
@@ -411,8 +418,10 @@ const summary = computed(() => {
       closed: Number(orderSummary.value.closed || 0),
       realized: Number(orderSummary.value.realized_pnl || 0),
       unrealized: Number(orderSummary.value.unrealized_pnl || 0),
-      // 不受筛选影响的持仓总数，供"全部平仓"按钮显示和置灰判断
+      // 不受筛选影响的持仓总数，仅用于兼容旧版后台
       openTotal: Number(orderSummary.value.open_total ?? orderSummary.value.open ?? 0),
+      // 当前搜索条件下可勾选的持仓数（跨分页），与按筛选全选接口同口径
+      selectableOpen: Number(orderSummary.value.selectable_open ?? orderSummary.value.open ?? 0),
     }
   }
   const closed = orders.value.filter((row) => row.status === 'CLOSED')
@@ -423,8 +432,81 @@ const summary = computed(() => {
     realized: closed.reduce((total, row) => total + Number(row.realized_pnl || 0), 0),
     unrealized: open.reduce((total, row) => total + Number(row.unrealized_pnl || 0), 0),
     openTotal: open.length,
+    selectableOpen: open.length,
   }
 })
+
+// ── 批量勾选 ──────────────────────────────────────────────────────────────
+// 自己维护 ID 列表：翻页不清空，切换筛选条件才清空；按筛选全选时把服务端展开的
+// 跨页 ID 合并进来。提交时只发 ID 列表，服务端不会重新扩大范围。
+const selectedSet = computed(() => new Set(selectedIds.value))
+const selectedCount = computed(() => selectedIds.value.length)
+const selectableOpen = computed(() => summary.value.selectableOpen)
+const pageSelectableIds = computed(() =>
+  orders.value.filter((row) => row.status === 'OPEN').map((row) => Number(row.id)),
+)
+const allPageSelected = computed(() =>
+  pageSelectableIds.value.length > 0 && pageSelectableIds.value.every((id) => selectedSet.value.has(id)),
+)
+const somePageSelected = computed(() =>
+  pageSelectableIds.value.some((id) => selectedSet.value.has(id)),
+)
+
+function setSelectedIds(ids) {
+  selectedIds.value = [...new Set(ids.map(Number).filter((id) => Number.isInteger(id) && id > 0))]
+}
+
+function clearSelection() {
+  selectedIds.value = []
+}
+
+function toggleRowSelection(row, checked) {
+  const next = new Set(selectedIds.value)
+  if (checked) next.add(Number(row.id))
+  else next.delete(Number(row.id))
+  selectedIds.value = [...next]
+}
+
+function togglePageSelection(checked) {
+  const next = new Set(selectedIds.value)
+  pageSelectableIds.value.forEach((id) => {
+    if (checked) next.add(id)
+    else next.delete(id)
+  })
+  selectedIds.value = [...next]
+}
+
+// 列表刷新后，当前页里已不再持仓（被止损/止盈平掉）的勾选项自动失效
+function pruneVisibleSelection() {
+  const stale = new Set(orders.value.filter((row) => row.status !== 'OPEN').map((row) => Number(row.id)))
+  if (!stale.size) return
+  const next = selectedIds.value.filter((id) => !stale.has(Number(id)))
+  if (next.length !== selectedIds.value.length) selectedIds.value = next
+}
+
+async function selectAllMatching() {
+  if (selectingAll.value) return
+  selectingAll.value = true
+  try {
+    // 只带筛选条件，不带分页参数：服务端展开全部匹配持仓
+    const params = {}
+    if (filters.status) params.status = filters.status
+    if (filters.symbol) params.symbol = filters.symbol
+    if (filters.strategy) params.strategy = filters.strategy
+    const data = await api.getOpenOrderIds(params)
+    const ids = (data && data.order_ids) || []
+    if (!ids.length) {
+      ElMessage.info('当前筛选下没有可平仓持仓')
+      return
+    }
+    setSelectedIds([...selectedIds.value, ...ids])
+    ElMessage.success(`已按当前筛选选中 ${ids.length} 笔持仓（含其他分页），当前共勾选 ${selectedIds.value.length} 笔`)
+  } catch (error) {
+    ElMessage.error(error.message || '按筛选全选失败')
+  } finally {
+    selectingAll.value = false
+  }
+}
 
 function orderParams() {
   const params = { page: pagination.page, page_size: pagination.pageSize }
@@ -453,6 +535,20 @@ const strategyOptions = computed(() => {
   return [...options.values()]
 })
 
+async function loadExchangeEvents() {
+  if (disposed) return
+  try {
+    const data = await api.getExchangeEvents({ limit: 20 })
+    if (!disposed) exchangeEvents.value = data.events || []
+  } catch { /* 回执列表加载失败不影响订单主表 */ }
+}
+
+function eventTagType(status) {
+  if (status === 'filled' || status === 'accepted' || status === 'canceled') return 'success'
+  if (status === 'blocked') return 'warning'
+  return 'danger'
+}
+
 function load() {
   if (disposed) return Promise.resolve()
   reloadRequested = true
@@ -475,6 +571,7 @@ function load() {
           }
           orders.value = rows
           orderSummary.value = data.summary || null
+          pruneVisibleSelection()
           ordersLoaded.value = true
           ordersError.value = ''
         }
@@ -495,16 +592,11 @@ function changePage(page) {
   return load()
 }
 
-function changePageSize(size) {
-  if (size === pagination.pageSize) return Promise.resolve()
-  pagination.pageSize = size
-  pagination.page = 1
-  return load()
-}
-
 function changeFilters() {
   pagination.page = 1
   ordersLoaded.value = false
+  // 勾选绑定在一次搜索上：筛选一变就清空，避免平掉不在当前筛选里的持仓
+  clearSelection()
   return load()
 }
 
@@ -581,39 +673,47 @@ async function closeOrder(row) {
   }
 }
 
-// 一键平仓：服务端按最新标记价逐笔市价平掉所有持仓（不受当前筛选影响）
-async function closeAllOrders() {
-  const count = summary.value.openTotal
-  if (!count) {
-    ElMessage.info('当前没有持仓')
+// 批量平仓：只提交用户勾选的订单 ID（可来自逐行勾选或按筛选全选），服务端按最新标记价逐笔市价成交
+async function closeSelected() {
+  const ids = [...selectedIds.value]
+  if (!ids.length) {
+    ElMessage.info('请先勾选要平掉的持仓')
     return
   }
+  const visible = pageSelectableIds.value.filter((id) => selectedSet.value.has(id)).length
+  const offPage = ids.length - visible
+  const scope = offPage > 0 ? `，其中 ${offPage} 笔不在当前页（按筛选全选的跨页持仓）` : ''
   try {
     await ElMessageBox.confirm(
-      `将按最新标记价市价平掉全部 ${count} 笔持仓，不受当前筛选影响，且无法撤销。`,
-      '确认全部平仓',
-      { type: 'warning', confirmButtonText: `平掉 ${count} 笔`, cancelButtonText: '取消' },
+      `将按最新标记价市价平掉勾选的 ${ids.length} 笔持仓${scope}，且无法撤销。期间已被止损/止盈平掉的订单会自动跳过。`,
+      '确认批量平仓',
+      { type: 'warning', confirmButtonText: `平掉 ${ids.length} 笔`, cancelButtonText: '取消' },
     )
   } catch (error) {
     return
   }
-  closingAll.value = true
+  batchClosing.value = true
   try {
-    const result = await api.closeAllOrders()
+    const result = await api.batchCloseOrders(ids)
     const closedCount = Number(result?.closed_count || 0)
     const failed = result?.failed || []
+    const skippedCount = Number(result?.skipped_count || 0)
+    // 失败的留在勾选项里方便重试；成功与自动跳过的清掉
+    setSelectedIds(failed.map((item) => item.id))
     if (failed.length) {
       ElMessage.warning(
-        `已平 ${closedCount} 笔，${failed.length} 笔失败（${failed.map((item) => item.symbol || item.id).join('、')}）`,
+        `已平 ${closedCount} 笔，跳过 ${skippedCount} 笔，${failed.length} 笔失败（${failed.map((item) => item.symbol || item.id).join('、')}）`,
       )
+    } else if (skippedCount) {
+      ElMessage.warning(`已平 ${closedCount} 笔，${skippedCount} 笔已不在持仓中，自动跳过`)
     } else {
       ElMessage.success(`已平掉 ${closedCount} 笔持仓，已实现 ${money(result?.realized_pnl)}`)
     }
     await load()
   } catch (error) {
-    ElMessage.error(error.message || '全部平仓失败')
+    ElMessage.error(error.message || '批量平仓失败')
   } finally {
-    closingAll.value = false
+    batchClosing.value = false
   }
 }
 
@@ -659,7 +759,8 @@ onMounted(() => {
   loadSettings()
   loadOrderStrategies()
   load()
-  timer = setInterval(load, 30000)
+  loadExchangeEvents()
+  timer = setInterval(() => { load(); loadExchangeEvents() }, 30000)
 })
 onBeforeUnmount(() => {
   disposed = true
@@ -674,6 +775,37 @@ onBeforeUnmount(() => {
       <div class="stat-card"><div class="stat-label">当前筛选已平仓</div><div class="stat-value">{{ ordersLoaded ? summary.closed : '—' }}</div><div class="stat-sub">含止损 / 止盈 / 信号反转</div></div>
       <div class="stat-card"><div class="stat-label">已实现盈亏</div><div class="stat-value" :class="pnlClass(summary.realized)">{{ ordersLoaded ? money(summary.realized) : '—' }}</div><div class="stat-sub">全部匹配订单，已扣手续费</div></div>
       <div class="stat-card"><div class="stat-label">未实现盈亏</div><div class="stat-value" :class="pnlClass(summary.unrealized)">{{ ordersLoaded ? money(summary.unrealized) : '—' }}</div><div class="stat-sub">全部匹配持仓，按标记价</div></div>
+    </div>
+
+    <div class="panel" style="margin-bottom: 14px">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">币安下单回执</div>
+          <div class="panel-sub">开仓主单、保护单、平仓、撤单的交易所返回结果；失败带错误码，便于核对「下单是否成功」</div>
+        </div>
+        <div class="row">
+          <el-button size="small" text type="primary" @click="loadExchangeEvents">刷新</el-button>
+          <el-button size="small" text @click="exchangeEventsOpen = !exchangeEventsOpen">
+            {{ exchangeEventsOpen ? '收起' : `展开最近 ${exchangeEvents.length} 条` }}
+          </el-button>
+        </div>
+      </div>
+      <div v-if="exchangeEventsOpen">
+        <div v-if="!exchangeEvents.length" class="muted">暂无交易所下单记录（仅实盘 / DEMO 模式产生）</div>
+        <div v-for="item in exchangeEvents" :key="item.id" class="row mono" style="gap: 10px; padding: 4px 0; border-bottom: 1px solid rgba(148,163,184,0.1); flex-wrap: wrap">
+          <span class="muted">{{ tsLabel(item.created_at) }}</span>
+          <el-tag size="small" :type="eventTagType(item.status)" effect="plain">{{ item.status }}</el-tag>
+          <span>{{ item.symbol }}</span>
+          <span>{{ item.action }}</span>
+          <span v-if="item.exchange_order_id" class="muted">#{{ item.exchange_order_id }}</span>
+          <span v-if="item.avg_price" class="muted">@{{ price(item.avg_price) }}</span>
+          <span v-if="item.code" class="down">{{ item.code }}</span>
+          <span v-if="item.message" class="muted" style="flex: 1 1 240px">{{ item.message }}</span>
+        </div>
+      </div>
+      <div v-else class="form-hint">
+        最近一笔：{{ exchangeEvents[0] ? `${exchangeEvents[0].symbol} ${exchangeEvents[0].action} ${exchangeEvents[0].status}` : '暂无' }}
+      </div>
     </div>
 
     <div class="panel">
@@ -697,16 +829,33 @@ onBeforeUnmount(() => {
           <el-button size="small" @click="load">刷新</el-button>
           <el-button
             size="small"
+            :loading="selectingAll"
+            :disabled="loading || batchClosing || !selectableOpen"
+            :title="selectableOpen ? '按当前筛选条件勾选全部持仓（含其他分页）' : '当前筛选下没有可平仓持仓'"
+            @click="selectAllMatching"
+          >
+            按筛选全选{{ selectableOpen ? ` (${selectableOpen})` : '' }}
+          </el-button>
+          <el-button
+            size="small"
             type="danger"
             plain
-            :loading="closingAll"
-            :disabled="loading || !summary.openTotal"
-            :title="summary.openTotal ? '按最新标记价平掉全部持仓' : '当前没有持仓'"
-            @click="closeAllOrders"
+            :loading="batchClosing"
+            :disabled="loading || selectingAll || !selectedCount"
+            :title="selectedCount ? '按最新标记价平掉勾选的持仓' : '请先勾选持仓'"
+            @click="closeSelected"
           >
-            全部平仓{{ summary.openTotal ? ` (${summary.openTotal})` : '' }}
+            批量平仓{{ selectedCount ? ` (${selectedCount})` : '' }}
           </el-button>
         </div>
+      </div>
+
+      <div v-if="selectedCount" class="row muted" style="gap: 6px; margin-bottom: 10px">
+        <span>
+          已勾选 <b style="color: #f87171">{{ selectedCount }}</b> 笔持仓<span v-if="selectableOpen && selectedCount >= selectableOpen"> · 已覆盖当前筛选下全部持仓</span>
+          · 勾选跨分页保留，切换筛选条件时自动清空
+        </span>
+        <el-button size="small" text type="primary" @click="clearSelection">清空选择</el-button>
       </div>
 
       <div v-if="ordersError" class="muted" role="alert" style="margin-bottom: 10px">
@@ -723,6 +872,27 @@ onBeforeUnmount(() => {
         <el-button size="small" text type="primary" @click="retryStrategies">重试</el-button>
       </div>
       <el-table v-loading="loading" :data="orders" class="table-compact" :empty-text="loading ? '订单加载中…' : ordersError ? '订单加载失败' : '暂无订单'">
+        <el-table-column width="46" align="center">
+          <template #header>
+            <el-checkbox
+              :model-value="allPageSelected"
+              :indeterminate="somePageSelected && !allPageSelected"
+              :disabled="!pageSelectableIds.length || batchClosing"
+              aria-label="全选本页持仓"
+              @change="togglePageSelection"
+            />
+          </template>
+          <template #default="{ row }">
+            <el-checkbox
+              v-if="row.status === 'OPEN'"
+              :model-value="selectedSet.has(Number(row.id))"
+              :disabled="loading || batchClosing"
+              :aria-label="`勾选订单 ${row.id}`"
+              @change="(checked) => toggleRowSelection(row, checked)"
+            />
+            <span v-else class="muted">—</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="id" label="#" width="56" />
         <el-table-column prop="symbol" label="币种" width="110">
           <template #default="{ row }"><el-button link type="primary" @click="openChart(row)">{{ row.symbol }}</el-button></template>
@@ -744,8 +914,15 @@ onBeforeUnmount(() => {
         </el-table-column>
         <el-table-column label="杠杆" width="62"><template #default="{ row }">×{{ row.leverage }}</template></el-table-column>
         <el-table-column label="保证金" width="96"><template #default="{ row }"><span class="mono">{{ money(row.margin) }}</span></template></el-table-column>
-        <el-table-column label="止损 / 止盈" min-width="145">
-          <template #default="{ row }"><span class="mono">{{ price(row.sl) }} / {{ price(row.tp) }}</span></template>
+        <el-table-column label="止损 / 止盈" min-width="175">
+          <template #default="{ row }">
+            <span class="mono">{{ price(row.sl) }} / {{ price(row.tp) }}</span>
+            <div v-if="row.source === 'live'" class="muted" style="font-size: 11px">
+              交易所 SL {{ row.sl_status || '—' }} / TP {{ row.tp_status || '—' }}
+              <span v-if="row.pnl_source === 'binance'" class="up"> · 成交已核对</span>
+              <span v-else-if="row.status === 'CLOSED'"> · 估算盈亏</span>
+            </div>
+          </template>
         </el-table-column>
         <el-table-column label="盈亏" width="130">
           <template #default="{ row }">
@@ -772,24 +949,21 @@ onBeforeUnmount(() => {
           <template #default="{ row }">
             <template v-if="row.status === 'OPEN'">
               <el-button size="small" link type="primary" :disabled="loading" @click="openEdit(row)">改止损止盈</el-button>
-              <el-button size="small" link type="warning" :disabled="loading || closingAll" @click="reverseOrder(row)">反手</el-button>
-              <el-button size="small" link type="danger" :disabled="loading || closingAll" @click="closeOrder(row)">平仓</el-button>
+              <el-button size="small" link type="warning" :disabled="loading || batchClosing" @click="reverseOrder(row)">反手</el-button>
+              <el-button size="small" link type="danger" :disabled="loading || batchClosing" @click="closeOrder(row)">平仓</el-button>
             </template>
             <span v-else class="muted">—</span>
           </template>
         </el-table-column>
       </el-table>
-      <div class="table-pagination">
-        <el-pagination
-          :current-page="pagination.page"
-          :page-size="pagination.pageSize"
-          :total="pagination.total"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          @current-change="changePage"
-          @size-change="changePageSize"
-        />
-      </div>
+      <TablePager
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        :total="pagination.total"
+        :disabled="loading"
+        jumper
+        @change="changePage"
+      />
     </div>
 
     <el-dialog v-model="chartVisible" :title="`${chartSymbol} · ${chartInterval} K线`" width="min(960px, 95vw)" destroy-on-close @close="closeChart">

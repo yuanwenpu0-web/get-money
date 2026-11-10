@@ -7,6 +7,7 @@ from ..market.data_service import MarketDataService
 from ..models import EquitySnapshot, Order
 from ..state import all_state, set_state
 from ..utils import now_ms
+from . import exchange_truth
 
 
 def open_orders(db: Session) -> list[Order]:
@@ -28,7 +29,9 @@ def portfolio_snapshot(db: Session, update_marks: bool = True) -> dict:
     positions = []
 
     for order in orders:
-        if update_marks:
+        # live 订单的 mark_price 由 live_sync 写入交易所 premiumIndex；
+        # 用本地 K 线覆盖会让「以币安为准」的未实现盈亏退回估算口径。
+        if update_marks and order.source != "live":
             frame = service.load_frame(order.symbol, order.interval, limit=1)
             if not frame.empty:
                 order.mark_price = float(frame["close"].iloc[-1])
@@ -58,13 +61,17 @@ def portfolio_snapshot(db: Session, update_marks: bool = True) -> dict:
 
     cash = float(state.get("cash", 0.0))
     equity = cash + margin_total + unrealized
-    closed_count, realized, wins = db.query(
+    closed_query = db.query(
         func.count(Order.id),
         func.coalesce(func.sum(Order.realized_pnl), 0.0),
         func.coalesce(func.sum(case((Order.realized_pnl > 0, 1), else_=0)), 0),
-    ).filter(Order.status == "CLOSED").one()
+    ).filter(Order.status == "CLOSED")
+    # 以币安为准时，胜率样本只取当前环境的交易所订单；归档的本地模拟持仓不计入。
+    if state.get("execution_mode") == "live":
+        closed_query = closed_query.filter(Order.source == "live")
+    closed_count, realized, wins = closed_query.one()
     initial = float(state.get("initial_capital", 0) or 0)
-    return {
+    result = {
         "cash": round(cash, 4),
         "margin_used": round(margin_total, 4),
         "unrealized_pnl": round(unrealized, 4),
@@ -78,6 +85,7 @@ def portfolio_snapshot(db: Session, update_marks: bool = True) -> dict:
         "initial_capital": round(initial, 4),
         "positions": positions,
     }
+    return exchange_truth.overlay(result, state)
 
 
 def snapshot_equity(db: Session) -> EquitySnapshot:
@@ -94,8 +102,9 @@ def snapshot_equity(db: Session) -> EquitySnapshot:
     db.add(row)
     db.commit()
 
-    # 盈利自动累加：以当前权益作为新的总资金基准
-    if snapshot["equity"] > 0:
+    # 盈利自动累加：以当前权益作为新的总资金基准。
+    # live 模式下权益来自币安，不再用本地账本反向改写基准。
+    if snapshot["equity"] > 0 and snapshot.get("pnl_source") != "binance":
         set_state(db, "total_capital", round(snapshot["equity"], 4))
     return row
 

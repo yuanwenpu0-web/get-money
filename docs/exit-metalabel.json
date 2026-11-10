@@ -1,0 +1,1209 @@
+{
+ "topic": "exit-metalabel",
+ "generated_at": "2026-11-09T23:42:54+00:00",
+ "strategy": "real order cohort (supertrend_current dominant)",
+ "interval": "15m+1h",
+ "days": 13,
+ "window": {
+  "start": "2026-10-26",
+  "end": "2026-11-07",
+  "days": 13
+ },
+ "trades": 105,
+ "t1_trades": 54,
+ "ci": {
+  "ci_low_pct": 0.17302124809571323,
+  "ci_high_pct": 1.0075208921724443,
+  "of": "metalabel_T0 vs unconditional baseline, purged test segment"
+ },
+ "costs": {
+  "fee_rate": 0.0004,
+  "slippage": 0.0002,
+  "round_trip": 0.0012,
+  "basis": "notional"
+ },
+ "hypothesis": {
+  "question": "can an indicator, observable at the decision moment, tell whether to take profit now or push it later?",
+  "falsifiable": "at least one column must clear |IC|>=0.02, symbol-block sign share>=0.60, FDR q<0.10 and 3/4 time segments with the same sign",
+  "difference_from_previous_round": "previous round tested unconditional static exit rules; this round tests CONDITIONAL discrimination",
+  "h2_treatment": "OHLCV-derived columns are negative controls only, never implementation or parameter-search candidates",
+  "information_sources": [
+   "OHLCV-derived (negative control)",
+   "order metadata (score/prob_up/side/interval)",
+   "derivatives sentiment + funding (sparse, H8)",
+   "in-hold path state (mfe/giveback/bars held)"
+  ]
+ },
+ "universe": {
+  "symbols": 78,
+  "orders_in": 123,
+  "market_exit": 105,
+  "t1_decision_points": 54,
+  "skipped": [
+   {
+    "id": 10,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 12,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 15,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 17,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 18,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 19,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 29,
+    "reason": "sl_not_adverse"
+   },
+   {
+    "id": 30,
+    "reason": "sl_not_adverse"
+   }
+  ],
+  "admin_exits_excluded": 10,
+  "fresh_sentiment_orders": 17,
+  "fresh_funding_orders": 17,
+  "y0_ties": 61
+ },
+ "parameters": {
+  "source": "real orders + finite pre-registered indicator families",
+  "ab_window_hours": 24.0,
+  "descriptive_window_hours": 72.0,
+  "probe_gates": {
+   "abs_ic": 0.02,
+   "sign_share": 0.6,
+   "fdr_q": 0.1,
+   "segments": "3/4",
+   "min_pairs": 30
+  },
+  "decision_mfe_R": 0.7,
+  "champion_selection": "train segment only; purged test segment read-only",
+  "note": "no parameter grid, no production rule implementation (H1/H2)"
+ },
+ "split": {
+  "train": 0.6,
+  "test": 0.4,
+  "purge_hours": 24.0,
+  "train_trades": 33,
+  "test_trades": 36
+ },
+ "min_pooled_trades": 30,
+ "random_baseline_seeds": 20,
+ "probe": {
+  "T0_columns_tested": 16,
+  "T1_columns_tested": 10,
+  "n_columns_pass_all_gates": 0,
+  "gate_result": "FAIL",
+  "T0": [
+   {
+    "column": "atr14_over_R",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.152897,
+    "auc": 0.47823,
+    "p_perm": 0.106447,
+    "ic_ci95": [
+     -0.356823,
+     0.048255
+    ],
+    "sign_share": 0.912,
+    "segments": {
+     "ics": [
+      -0.217763,
+      -0.118245,
+      -0.033111,
+      -0.143399
+     ],
+     "n_positive": 0,
+     "n_negative": 4
+    },
+    "fdr_q": 0.567716,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "hour_of_day",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.136905,
+    "auc": 0.514396,
+    "p_perm": 0.170915,
+    "ic_ci95": [
+     -0.084852,
+     0.330652
+    ],
+    "sign_share": 0.902,
+    "segments": {
+     "ics": [
+      0.021829,
+      0.329289,
+      0.014388,
+      0.278459
+     ],
+     "n_positive": 4,
+     "n_negative": 0
+    },
+    "fdr_q": 0.683658,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "is_15m",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.067545,
+    "auc": 0.558638,
+    "p_perm": 0.489255,
+    "ic_ci95": [
+     -0.10593,
+     0.229584
+    ],
+    "sign_share": 0.794,
+    "segments": {
+     "ics": [
+      -0.005306,
+      NaN,
+      NaN,
+      NaN
+     ],
+     "n_positive": 0,
+     "n_negative": 1
+    },
+    "fdr_q": 0.869787,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "is_short",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.01684,
+    "auc": 0.596559,
+    "p_perm": 0.871064,
+    "ic_ci95": [
+     -0.202443,
+     0.17087
+    ],
+    "sign_share": 0.566,
+    "segments": {
+     "ics": [
+      0.230053,
+      -0.331764,
+      0.302247,
+      -0.219132
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.929135,
+    "gates": {
+     "abs_ic_ge_0.02": false,
+     "sign_share_ge_0.60": false,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "last_body_ratio",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.040884,
+    "auc": 0.550562,
+    "p_perm": 0.692154,
+    "ic_ci95": [
+     -0.147092,
+     0.225593
+    ],
+    "sign_share": 0.667,
+    "segments": {
+     "ics": [
+      -0.095066,
+      -0.103107,
+      0.202389,
+      -0.066056
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.897266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "mom20",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.197827,
+    "auc": 0.405899,
+    "p_perm": 0.042479,
+    "ic_ci95": [
+     -0.36383,
+     -0.013929
+    ],
+    "sign_share": 0.983,
+    "segments": {
+     "ics": [
+      -0.288816,
+      -0.359297,
+      -0.212434,
+      0.076089
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.33983,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "mom5",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.031391,
+    "auc": 0.441713,
+    "p_perm": 0.76062,
+    "ic_ci95": [
+     -0.21956,
+     0.174414
+    ],
+    "sign_share": 0.63,
+    "segments": {
+     "ics": [
+      0.020395,
+      -0.209495,
+      0.157001,
+      -0.08236
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.897266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "prob_up",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.02582,
+    "auc": 0.500351,
+    "p_perm": 0.77911,
+    "ic_ci95": [
+     -0.149685,
+     0.184664
+    ],
+    "sign_share": 0.664,
+    "segments": {
+     "ics": [
+      0.005489,
+      0.074141,
+      NaN,
+      NaN
+     ],
+     "n_positive": 2,
+     "n_negative": 0
+    },
+    "fdr_q": 0.897266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "quote_ratio_20_40",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.105423,
+    "auc": 0.481039,
+    "p_perm": 0.278861,
+    "ic_ci95": [
+     -0.287476,
+     0.100469
+    ],
+    "sign_share": 0.85,
+    "segments": {
+     "ics": [
+      -0.057566,
+      -0.318995,
+      0.331487,
+      -0.153433
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.688656,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "range_pos_128",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.220616,
+    "auc": 0.584972,
+    "p_perm": 0.01999,
+    "ic_ci95": [
+     0.02258,
+     0.387432
+    ],
+    "sign_share": 0.976,
+    "segments": {
+     "ics": [
+      -0.17204,
+      0.362338,
+      0.236989,
+      0.530117
+     ],
+     "n_positive": 3,
+     "n_negative": 1
+    },
+    "fdr_q": 0.31984,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "score",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.039612,
+    "auc": 0.530548,
+    "p_perm": 0.695652,
+    "ic_ci95": [
+     -0.182148,
+     0.111541
+    ],
+    "sign_share": 0.695,
+    "segments": {
+     "ics": [
+      -0.185699,
+      -0.074141,
+      0.058038,
+      NaN
+     ],
+     "n_positive": 1,
+     "n_negative": 2
+    },
+    "fdr_q": 0.897266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "tp_dist_R",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": 0.007157,
+    "auc": 0.542837,
+    "p_perm": 0.938031,
+    "ic_ci95": [
+     -0.18616,
+     0.189583
+    ],
+    "sign_share": 0.52,
+    "segments": {
+     "ics": [
+      0.029934,
+      0.03688,
+      0.238849,
+      -0.261714
+     ],
+     "n_positive": 3,
+     "n_negative": 1
+    },
+    "fdr_q": 0.938031,
+    "gates": {
+     "abs_ic_ge_0.02": false,
+     "sign_share_ge_0.60": false,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "trend_slope20",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.027552,
+    "auc": 0.566011,
+    "p_perm": 0.785107,
+    "ic_ci95": [
+     -0.215361,
+     0.160308
+    ],
+    "sign_share": 0.61,
+    "segments": {
+     "ics": [
+      -0.156908,
+      0.131932,
+      -0.124633,
+      0.181444
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.897266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "vol20",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.101677,
+    "auc": 0.429775,
+    "p_perm": 0.314843,
+    "ic_ci95": [
+     -0.288565,
+     0.078063
+    ],
+    "sign_share": 0.863,
+    "segments": {
+     "ics": [
+      -0.098355,
+      0.07338,
+      0.086313,
+      -0.163885
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.688656,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "vol_ratio_20_40",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.091872,
+    "auc": 0.423455,
+    "p_perm": 0.344328,
+    "ic_ci95": [
+     -0.273516,
+     0.113035
+    ],
+    "sign_share": 0.829,
+    "segments": {
+     "ics": [
+      -0.063487,
+      -0.051328,
+      -0.00372,
+      -0.038045
+     ],
+     "n_positive": 0,
+     "n_negative": 4
+    },
+    "fdr_q": 0.688656,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "volume_ratio_20_40",
+    "layer": "T0_pre_entry",
+    "n_pairs": 105,
+    "ic": -0.101896,
+    "auc": 0.483848,
+    "p_perm": 0.294353,
+    "ic_ci95": [
+     -0.300235,
+     0.081449
+    ],
+    "sign_share": 0.864,
+    "segments": {
+     "ics": [
+      -0.035855,
+      -0.303786,
+      0.316233,
+      -0.14967
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.688656,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   }
+  ],
+  "T1": [
+   {
+    "column": "bar_body_R",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.197179,
+    "auc": 0.663448,
+    "p_perm": 0.163918,
+    "ic_ci95": [
+     -0.06445,
+     0.484988
+    ],
+    "sign_share": 0.9,
+    "segments": {
+     "ics": [
+      0.661538,
+      -0.367033,
+      0.104396,
+      -0.384615
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.532234,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "bar_range_R",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.231637,
+    "auc": 0.57931,
+    "p_perm": 0.093453,
+    "ic_ci95": [
+     -0.07408,
+     0.512224
+    ],
+    "sign_share": 0.935,
+    "segments": {
+     "ics": [
+      0.525275,
+      0.041758,
+      -0.593407,
+      0.153846
+     ],
+     "n_positive": 3,
+     "n_negative": 1
+    },
+    "fdr_q": 0.467266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "bars_held",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.142725,
+    "auc": 0.56,
+    "p_perm": 0.288356,
+    "ic_ci95": [
+     -0.139734,
+     0.409737
+    ],
+    "sign_share": 0.828,
+    "segments": {
+     "ics": [
+      0.209524,
+      -0.370031,
+      0.384983,
+      -0.139697
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.532234,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "cur_pnl_R",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.02268,
+    "auc": 0.62069,
+    "p_perm": 0.861569,
+    "ic_ci95": [
+     -0.247421,
+     0.288184
+    ],
+    "sign_share": 0.585,
+    "segments": {
+     "ics": [
+      0.613187,
+      -0.235165,
+      0.241758,
+      -0.214286
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.861569,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": false,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "dist_to_tp_R",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.237888,
+    "auc": 0.544828,
+    "p_perm": 0.082959,
+    "ic_ci95": [
+     -0.024615,
+     0.462303
+    ],
+    "sign_share": 0.945,
+    "segments": {
+     "ics": [
+      0.797802,
+      0.389011,
+      0.230769,
+      0.197802
+     ],
+     "n_positive": 4,
+     "n_negative": 0
+    },
+    "fdr_q": 0.467266,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "giveback_R_sofar",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.031828,
+    "auc": 0.402759,
+    "p_perm": 0.815592,
+    "ic_ci95": [
+     -0.249296,
+     0.300049
+    ],
+    "sign_share": 0.565,
+    "segments": {
+     "ics": [
+      -0.404841,
+      0.432967,
+      -0.263736,
+      0.428571
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.861569,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": false,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "mae_R_sofar",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.121555,
+    "auc": 0.484138,
+    "p_perm": 0.387306,
+    "ic_ci95": [
+     -0.16205,
+     0.375466
+    ],
+    "sign_share": 0.83,
+    "segments": {
+     "ics": [
+      0.274725,
+      -0.134066,
+      -0.351648,
+      -0.21978
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.553295,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "mfe_R_sofar",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.163255,
+    "auc": 0.575172,
+    "p_perm": 0.232884,
+    "ic_ci95": [
+     -0.113128,
+     0.410926
+    ],
+    "sign_share": 0.876,
+    "segments": {
+     "ics": [
+      0.41978,
+      0.068132,
+      -0.252747,
+      -0.049451
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.532234,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "mom3_R",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.036458,
+    "auc": 0.53931,
+    "p_perm": 0.778111,
+    "ic_ci95": [
+     -0.222042,
+     0.29199
+    ],
+    "sign_share": 0.589,
+    "segments": {
+     "ics": [
+      0.510241,
+      -0.593825,
+      -0.016575,
+      -0.503026
+     ],
+     "n_positive": 1,
+     "n_negative": 3
+    },
+    "fdr_q": 0.861569,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": false,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": true
+    },
+    "probe_pass": false
+   },
+   {
+    "column": "vol_sofar",
+    "layer": "T1_in_hold",
+    "n_pairs": 54,
+    "ic": 0.13711,
+    "auc": 0.571034,
+    "p_perm": 0.31934,
+    "ic_ci95": [
+     -0.162177,
+     0.415378
+    ],
+    "sign_share": 0.801,
+    "segments": {
+     "ics": [
+      0.298065,
+      -0.129083,
+      0.536937,
+      -0.103368
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "fdr_q": 0.532234,
+    "gates": {
+     "abs_ic_ge_0.02": true,
+     "sign_share_ge_0.60": true,
+     "fdr_q_below_0.10": false,
+     "segments_same_sign_ge_3of4": false
+    },
+    "probe_pass": false
+   }
+  ],
+  "columns_excluded": {
+   "columns": [
+    "fund_rate",
+    "fund_z30",
+    "sent_ls_ratio",
+    "sent_oi_xsec_pct",
+    "sent_oi_z30",
+    "sent_taker_bs",
+    "sent_top_ls"
+   ],
+   "reason": "H8 coverage, not statistical degeneracy: fresh (<24h) derivative rows exist on only 17/105 orders, below the 30-pair gate, so these columns never enter the probe"
+  }
+ },
+ "self_calibration": {
+  "T0": {
+   "positive_control_ic_LOOKAHEAD": 0.694271,
+   "negative_control_mean_ic": -0.021111,
+   "negative_control_p95_abs_ic": 0.099718,
+   "half_decay_control_mean_ic": 0.420681,
+   "half_decay_ratio_vs_positive": 0.6059,
+   "n_seeds": 20,
+   "n_pairs": 105
+  },
+  "T1": {
+   "positive_control_ic_LOOKAHEAD": 0.863794,
+   "negative_control_mean_ic": 0.029095,
+   "negative_control_p95_abs_ic": 0.20292,
+   "half_decay_control_mean_ic": 0.643225,
+   "half_decay_ratio_vs_positive": 0.7447,
+   "n_seeds": 20,
+   "n_pairs": 54
+  },
+  "positive_control_definition": "binary oracle = perfect knowledge of which arm/action wins (late_better / hold_better); LOOKAHEAD",
+  "future_mfe_control_separate": {
+   "T0": {
+    "positive_control_ic_LOOKAHEAD": 0.09282,
+    "negative_control_mean_ic": -0.021111,
+    "negative_control_p95_abs_ic": 0.099718,
+    "half_decay_control_mean_ic": 0.124333,
+    "half_decay_ratio_vs_positive": 1.3395,
+    "n_seeds": 20,
+    "n_pairs": 105
+   },
+   "T1": {
+    "positive_control_ic_LOOKAHEAD": 0.422527,
+    "negative_control_mean_ic": 0.029095,
+    "negative_control_p95_abs_ic": 0.20292,
+    "half_decay_control_mean_ic": 0.249316,
+    "half_decay_ratio_vs_positive": 0.5901,
+    "n_seeds": 20,
+    "n_pairs": 54
+   }
+  }
+ },
+ "derivative_subset": {
+  "trades": 17,
+  "min_pooled_trades": 30,
+  "verdict": "insufficient",
+  "note": "fresh (<24h) sentiment/funding only; stale rows excluded by H8",
+  "max_abs_ic_among_columns": 0.61086,
+  "per_column_ic": {
+   "sent_oi_z30": 0.61086,
+   "sent_oi_xsec_pct": 0.008609,
+   "sent_ls_ratio": -0.206488,
+   "sent_top_ls": 0.481805,
+   "sent_taker_bs": -0.35275,
+   "fund_rate": -0.459056,
+   "fund_z30": -0.246638
+  }
+ },
+ "baseline": {
+  "real_mean_pct": -0.4840647083348282,
+  "real_ci": [
+   -0.8385651335490326,
+   -0.12020751618847289
+  ],
+  "real_verdict": "negative",
+  "replay_mean_pct": -0.35385491218240545,
+  "replay_ci": [
+   -0.7461874561780949,
+   0.0719868206346983
+  ],
+  "replay_verdict": "inconclusive",
+  "y0_mean_pct": -0.15303805652524727,
+  "y1_mean_pct": -0.21743218724098326
+ },
+ "conditional_rules": {
+  "metalabel_T0": {
+   "feature": "mom20",
+   "threshold": 0.011773271595902647,
+   "train_ic": -0.2956274574798487,
+   "mapping": "high -> tp_x0.5, low -> tp_x2.0 (negative train IC)",
+   "train": {
+    "trades": 33,
+    "paired_diff_pct": 0.3013043763483995,
+    "paired_ci_low_pct": -0.2510304100887663,
+    "paired_ci_high_pct": 0.9789872527762273,
+    "p_perm": 0.3832055981339553,
+    "segments": {
+     "means": [
+      1.408604316775448,
+      0.1938733935829688,
+      -0.20749860093675387,
+      -0.3281740965814463
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "random_baseline": {
+     "mean": 0.008501948304807716,
+     "std": 0.1844959514260932,
+     "p05": -0.2790870747070006,
+     "p95": 0.2703292691025027,
+     "percentile_of_observed": 0.9761904761904762
+    },
+    "ci_verdict": "inconclusive"
+   },
+   "test": {
+    "trades": 36,
+    "paired_diff_pct": 0.5308682040965996,
+    "paired_ci_low_pct": 0.17302124809571323,
+    "paired_ci_high_pct": 1.0075208921724443,
+    "p_perm": 0.013995334888370544,
+    "segments": {
+     "means": [
+      0.8980931350312454,
+      0.17388430810166178,
+      0.35934723996026763,
+      0.6921481332932237
+     ],
+     "n_positive": 4,
+     "n_negative": 0
+    },
+    "random_baseline": {
+     "mean": 0.39124718435284633,
+     "std": 0.126357471305039,
+     "p05": 0.18405364961511766,
+     "p95": 0.6019580543591834,
+     "percentile_of_observed": 0.8809523809523809
+    },
+    "ci_verdict": "pass"
+   },
+   "full": {
+    "trades": 105,
+    "paired_diff_pct": 0.21023351547591831,
+    "paired_ci_low_pct": -0.13626639671736557,
+    "paired_ci_high_pct": 0.5900016742719427,
+    "p_perm": 0.2599133622125958,
+    "segments": {
+     "means": [
+      0.45544221536691976,
+      -0.19446526289783883,
+      0.20654683792796055,
+      0.3639791676646701
+     ],
+     "n_positive": 3,
+     "n_negative": 1
+    },
+    "random_baseline": {
+     "mean": -0.07901807112940144,
+     "std": 0.11727710802822951,
+     "p05": -0.20869211502761437,
+     "p95": 0.10249898881561535,
+     "percentile_of_observed": 0.9761904761904762
+    },
+    "ci_verdict": "inconclusive"
+   },
+   "selected_feature_fdr_q_full": 0.33983
+  },
+  "metalabel_T1": {
+   "feature": "giveback_R_sofar",
+   "threshold": 0.24068300289349046,
+   "mapping": "high giveback -> exit now, else hold",
+   "full": {
+    "trades": 54,
+    "paired_diff_pct": 0.175178374220411,
+    "paired_ci_low_pct": -0.43633081164906506,
+    "paired_ci_high_pct": 0.8086945845510445,
+    "p_perm": 0.5724758413862046,
+    "segments": {
+     "means": [
+      0.9122757799328565,
+      -1.1030976660311744,
+      -0.12218323953216487,
+      1.0553477482459066
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "random_baseline": {
+     "mean": 0.08883685867816957,
+     "std": 0.21045333435479052,
+     "p05": -0.23254536345568622,
+     "p95": 0.38821802859561927,
+     "percentile_of_observed": 0.6428571428571429
+    },
+    "ci_verdict": "inconclusive"
+   },
+   "test": {
+    "trades": 20,
+    "paired_diff_pct": 0.6836939734404563,
+    "paired_ci_low_pct": -0.11890094112762169,
+    "paired_ci_high_pct": 1.4961979519088444,
+    "p_perm": 0.13428857047650783,
+    "segments": {
+     "means": [
+      -0.009128251677531595,
+      -0.2063222935201458,
+      1.276048030546153,
+      1.67417840841335
+     ],
+     "n_positive": 2,
+     "n_negative": 2
+    },
+    "random_baseline": {
+     "mean": 0.6986648396922307,
+     "std": 0.38788356124353773,
+     "p05": 0.07158372454389667,
+     "p95": 1.5154461553300682,
+     "percentile_of_observed": 0.40476190476190477
+    },
+    "ci_verdict": "insufficient"
+   }
+  },
+  "oracle_LOOKAHEAD_not_tradable": {
+   "T0_best_arm_every_order_pct": 0.1462277361597594,
+   "T1_best_action_every_order_pct": 1.7589030026255807,
+   "T0_real_baseline_pct": -0.4840647083348282,
+   "note": "uses the realized future label; upper bound only"
+  }
+ },
+ "random_baseline": {
+  "mean": -0.07901807112940144,
+  "std": 0.11727710802822951,
+  "p05": -0.20869211502761437,
+  "p95": 0.10249898881561535,
+  "percentile_of_observed": 0.9761904761904762
+ },
+ "test_segment_single_rule_observation": {
+  "reading": "metalabel_T0 purged test segment paired diff +0.5309pp, CI [+0.1730, +1.0075], p_perm 0.0140",
+  "why_not_an_edge": [
+   "champion selected among 16 T0 columns on the train segment; its full-sample FDR q = 0.340 (> 0.10)",
+   "full-sample paired CI [-0.1363, +0.5900] crosses zero",
+   "train paired CI [-0.2510, +0.9790] crosses zero",
+   "random-baseline percentile 0.881 < 0.95 (H6)",
+   "Gate-1 probe passed 0/26 columns (H1 forbids implementation)"
+  ],
+  "classification": "likely_noise: observation only, never an edge"
+ },
+ "three_gates": {
+  "test_ci_low_positive": true,
+  "fdr_q_below_0.10": false,
+  "segments_same_sign_ge_3of4": true
+ },
+ "verdict": "inconclusive",
+ "baseline_verdict": "negative",
+ "default_enabled": false,
+ "beta_attribution": {
+  "source": "local PG klines 1m BTCUSDT",
+  "window": {
+   "start": "2026-10-26",
+   "end": "2026-11-07",
+   "days": 13
+  },
+  "start": 80579.7,
+  "end": 75728.0,
+  "change_pct": -6.020995362355528
+ },
+ "live_subset_short_window": {
+  "trades": 27,
+  "t1_trades": 19,
+  "ab_window_hours": 6.0,
+  "y0_mean_pct": 0.9106960566567712,
+  "y1_mean_pct": 0.7331471326482202,
+  "n_columns_pass_all_gates": 0,
+  "verdict": "insufficient",
+  "note": "27 orders < 30-trade gate; numbers reported, no conclusion"
+ },
+ "limitations": [
+  "sentiment/funding data end 2026-10-28 / 10-27; fresh (<24h) coverage is 17/105 paper orders and 0/27 live orders, so derivative columns are H8-insufficient and never enter the main judgement",
+  "61/105 T0 labels are exact ties: both TP arms are stopped out by the same SL before TP, so the early-vs-late question has no answer there; excluding ties would use future information and is NOT done",
+  "T1 decision points exist only on 54 orders (barrier fired earlier on the rest); this is a structural censoring, not a signal filter",
+  "sl/tp are values stored at close time; protective orders may have been updated during the hold (see trend-reversal-order-exit.md)",
+  "OHLC replay vs exchange conditional orders differ (mark price vs traded OHLC); calibration match rate was 83.8% in the prior round",
+  "paper 24h and live 6h forward windows are different cohorts and are never merged",
+  "oracle numbers are look-ahead upper bounds and are not tradable",
+  "no funding-rate charging, order-book depth, liquidation, partial fills or slippage-path modelling; notional basis only, do not subtract from margin-basis reports",
+  "no production spec / binding / parameter was changed; Gate 1 probe only, default_enabled=False"
+ ]
+}

@@ -17,6 +17,8 @@ from ..schemas import CapitalAdjust, CredentialsPayload, SettingsUpdate
 from ..security import decrypt, encrypt, mask
 from ..state import all_state, set_state
 from ..strategy.rules import known_codes, resolve_params
+from ..trading import exchange_gateway as gw
+from ..trading import exchange_truth
 from ..trading.portfolio import adjust_capital
 from ..trading.scheduler import scheduler, update_schedule
 
@@ -30,7 +32,7 @@ EDITABLE_KEYS = {
     "backtest_trailing", "trailing_atr_mult", "max_hold_bars", "risk_per_trade_pct",
     "cooldown_bars", "trailing_enabled", "trail_activation_atr", "max_signal_age_bars",
     "min_quote_volume_usd", "symbol_blacklist", "order_type",
-    "schedule_enabled", "schedule_seconds", "train_horizon",
+    "schedule_enabled", "schedule_seconds", "train_horizon", "exchange_truth_enabled",
 }
 
 
@@ -181,6 +183,17 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
                 resolve_params(strategy.code, merged, json.loads(strategy.params or '{}'))
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
+
+    previous = all_state(db)
+    target_mode = str(data.get("execution_mode", previous.get("execution_mode") or "paper"))
+    target_testnet = bool(data.get("testnet", previous.get("testnet", True)))
+    # 正式环境（真实资金）防呆：显式确认 + 该环境的凭证必须通过连通性验证
+    if target_mode == "live" and not target_testnet:
+        if not payload.confirm_mainnet:
+            raise HTTPException(400, "切换到币安正式环境涉及真实资金，请显式确认 confirm_mainnet=true")
+        if previous.get("credential_verified_env") != "real":
+            raise HTTPException(400, "请先在「测试连接」中验证正式环境 API 凭证，再切换主网")
+
     for key, value in data.items():
         set_state(db, key, value)
     if "schedule_enabled" in data or "schedule_seconds" in data:
@@ -189,7 +202,26 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
             enabled=bool(data.get("schedule_enabled", all_state(db)["schedule_enabled"])),
             seconds=int(data.get("schedule_seconds", all_state(db)["schedule_seconds"])),
         )
-    db.add(JobLog(job="settings", level="info", message=f"更新配置: {', '.join(data.keys())}"))
+
+    entering_live = target_mode == "live" and previous.get("execution_mode") != "live"
+    env_changed = "testnet" in data and bool(data["testnet"]) != bool(previous.get("testnet", True))
+    switch_notes = []
+    if entering_live:
+        archived = exchange_truth.archive_paper_positions(db)
+        switch_notes.append(f"归档本地模拟持仓 {archived} 条")
+    if entering_live or env_changed:
+        # 环境/模式变化后按交易所当前钱包余额重设收益基准，避免 demo 与正式资金串账
+        try:
+            result = exchange_truth.rebase(db, force=True)
+            switch_notes.append(f"收益基准重置 {result}")
+        except Exception as exc:  # noqa: BLE001 - 网络失败不阻塞配置保存
+            switch_notes.append(f"收益基准重置失败（可稍后手动重试）: {exc}")
+        db.add(JobLog(job="exchange_sync", level="info",
+                      message=(f"交易环境切换 → {gw.env_label(db)}；" + "；".join(switch_notes))[:4000]))
+
+    db.add(JobLog(job="settings", level="info",
+                  message=(f"更新配置: {', '.join(data.keys())}"
+                           + (f"；{'；'.join(switch_notes)}" if switch_notes else ""))[:4000]))
     db.commit()
     return read_settings(db)
 
@@ -198,6 +230,8 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
 def capital_adjust(payload: CapitalAdjust, db: Session = Depends(get_db)):
     if payload.mode not in ("add", "withdraw", "set"):
         raise HTTPException(400, "mode 仅支持 add / withdraw / set")
+    if all_state(db).get("execution_mode") == "live":
+        raise HTTPException(400, "实盘模式下资金以币安账户为准，请在交易所出入金后用「重置收益基准」同步")
     try:
         snapshot = adjust_capital(db, payload.amount, payload.mode)
     except ValueError as exc:
@@ -235,10 +269,14 @@ def test_credentials(db: Session = Depends(get_db)):
     key = decrypt(row.api_key_enc) if row else ""
     secret = decrypt(row.api_secret_enc) if row else ""
     testnet = bool(state.get("testnet", True))
-    client = BinanceFuturesClient(key, secret, testnet=testnet)
+    env = gw.DEMO if testnet else gw.REAL
+    # 代理必须与实盘下单链路一致，否则「测试通过但实盘失败」或反之
+    client = BinanceFuturesClient(key, secret, testnet=testnet,
+                                  proxy=state.get("proxy_url") or None)
     try:
         server_time = client.server_time()
         balances: list[dict] = []
+        account_view: dict = {}
         signed_ok = False
         if key and secret:
             signed_ok = True
@@ -265,6 +303,41 @@ def test_credentials(db: Session = Depends(get_db)):
                     for item in account.get("assets", [])
                     if float(item.get("walletBalance", 0) or 0) > 0
                 ][:20]
-        return {"ok": True, "server_time": server_time, "signed_ok": signed_ok, "balances": balances}
+            account_view = gw.fetch_account(client)
+            set_state(db, "credential_verified_env", env)
+        return {"ok": True, "server_time": server_time, "signed_ok": signed_ok,
+                "env": env, "env_label": gw.env_label(db), "account": account_view,
+                "balances": balances}
     except Exception as exc:
         return {"ok": False, "error": str(exc)[:300]}
+
+
+@router.get("/exchange")
+def exchange_status(db: Session = Depends(get_db)):
+    """当前交易环境 + 币安账户快照 + 本地账本对账差异。"""
+    state = all_state(db)
+    acc = exchange_truth.cached(db, state)
+    return {
+        "env": gw.env_of(db),
+        "env_label": gw.env_label(db),
+        "execution_mode": state.get("execution_mode"),
+        "truth_enabled": bool(state.get("exchange_truth_enabled", True)),
+        "baseline_env": state.get("exchange_baseline_env", ""),
+        "initial_capital": state.get("initial_capital"),
+        "credential_verified_env": state.get("credential_verified_env", ""),
+        "account": acc,
+        "market_source": "futures-mainnet",
+    }
+
+
+@router.post("/exchange/rebase")
+def exchange_rebase(db: Session = Depends(get_db)):
+    """手动按币安当前钱包余额重置收益基准（出入金或切换环境后使用）。"""
+    try:
+        result = exchange_truth.rebase(db, force=True)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(400, f"读取币安账户失败: {exc}") from exc
+    exchange_truth.sync_account(db, force=True)
+    db.add(JobLog(job="exchange_sync", level="info", message=f"手动重置收益基准: {result}"[:4000]))
+    db.commit()
+    return result

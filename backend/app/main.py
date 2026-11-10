@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -19,7 +19,7 @@ from .api import (
     trading,
 )
 from .config import BASE_DIR
-from .db import SessionLocal, init_db, pool_status
+from .db import SessionLocal, get_db, init_db, pool_status
 from .state import all_state, ensure_default_state
 from .strategy.defaults import seed_defaults
 from .trading.scheduler import scheduler, sync_scheduler_with_state
@@ -64,8 +64,15 @@ app.include_router(trading.router, prefix="/api")
 
 
 @app.get("/api/health")
-def health():
-    return {"ok": True, "service": "quant-trading", "mode": "paper"}
+def health(db=Depends(get_db)):
+    # 探针仍保持轻量：读状态失败时降级，不因为 DB 抖动把存活检查变成 500
+    try:
+        state = all_state(db)
+        mode = str(state.get("execution_mode", "paper"))
+        env = "demo" if state.get("testnet", True) else "real"
+    except Exception:  # noqa: BLE001
+        mode, env = "paper", "unknown"
+    return {"ok": True, "service": "quant-trading", "mode": mode, "exchange_env": env}
 
 
 @app.get("/api/db/pool")

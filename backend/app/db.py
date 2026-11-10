@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, field
 from threading import Lock
 from time import perf_counter
@@ -411,10 +412,75 @@ def init_db():
 
     Base.metadata.create_all(bind=engine)
     _add_missing_columns()
+    _backfill_order_exchange_ids()
+    _ensure_indexes()
     _ensure_optimization_result_interval()
     from .strategy.strategy_migration import migrate_binding_enablement
 
     migrate_binding_enablement(engine)
+
+
+# 列表分页靠「按时间倒序 + 可选状态过滤」扫索引，这些组合索引必须存在于既有库上。
+# `create_all` 只给新建的表带索引，老库需要单独补——全部 IF NOT EXISTS，可重复执行。
+_INDEXES: tuple[tuple[str, str, str], ...] = (
+    ("ix_orders_status_created", "orders", "(status, created_at, id)"),
+    ("ix_orders_created", "orders", "(created_at, id)"),
+    ("ix_orders_symbol_created", "orders", "(symbol, created_at)"),
+    # 按币安订单号反查本地订单（对账用）；老库加列后由这里补建
+    ("ix_orders_exchange_order_id", "orders", "(exchange_order_id)"),
+    ("ix_job_logs_created", "job_logs", "(created_at, id)"),
+    ("ix_backtest_runs_created", "backtest_runs", "(created_at, id)"),
+    ("ix_optimization_runs_created", "optimization_runs", "(created_at, id)"),
+)
+
+# klines 的覆盖索引单独处理：5000 万行上直接 CREATE INDEX 会长时间锁表。
+# 小库（含全新空库）启动时顺手建；大库交给 scripts/build_indexes.py 用
+# CONCURRENTLY 建，启动只打印提示，绝不阻塞服务。
+_KLINES_INDEX = ("ix_klines_interval_symbol_time", "klines", '("interval", symbol, open_time)')
+_KLINES_AUTO_BUILD_MAX_ROWS = 2_000_000
+
+
+def _table_rows_estimate(conn, table: str) -> int:
+    """行数量级估计：PostgreSQL 读统计信息（不扫表），其他方言退回 count(*)。"""
+    if engine.dialect.name == "postgresql":
+        value = conn.execute(
+            text("SELECT reltuples::bigint FROM pg_class WHERE relname = :name"), {"name": table}
+        ).scalar()
+        return int(value or 0)
+    try:
+        return int(conn.execute(text(f"SELECT count(*) FROM {table}")).scalar() or 0)
+    except Exception:  # noqa: BLE001 - 估计失败不应影响启动
+        return 0
+
+
+def _index_exists(conn, name: str) -> bool:
+    if engine.dialect.name == "postgresql":
+        return bool(conn.execute(text("SELECT 1 FROM pg_indexes WHERE indexname = :name"), {"name": name}).scalar())
+    return bool(
+        conn.execute(text("SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = :name"), {"name": name}).scalar()
+    )
+
+
+def _ensure_indexes() -> None:
+    """给既有库补建列表页需要的组合索引（幂等）。"""
+    inspector = inspect(engine)
+    tables = set(inspector.get_table_names())
+    with engine.begin() as conn:
+        for name, table, columns in _INDEXES:
+            if table not in tables or _index_exists(conn, name):
+                continue
+            conn.execute(text(f"CREATE INDEX IF NOT EXISTS {name} ON {table} {columns}"))
+
+        name, table, columns = _KLINES_INDEX
+        if table in tables and not _index_exists(conn, name):
+            if _table_rows_estimate(conn, table) <= _KLINES_AUTO_BUILD_MAX_ROWS:
+                conn.execute(text(f"CREATE INDEX IF NOT EXISTS {name} ON {table} {columns}"))
+            else:
+                print(
+                    f"[db] klines 体积较大，跳过启动建索引；请执行 "
+                    f"python scripts/build_indexes.py 以 CONCURRENTLY 方式创建 {name}",
+                    flush=True,
+                )
 
 
 # 轻量补列表：create_all 只建缺失的表，不会给既有表加列。
@@ -423,7 +489,13 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
     "klines": {"taker_buy_volume": "FLOAT", "taker_buy_quote_volume": "FLOAT"},
     # 引入币种池后，信号与订单需要记录自己用的是哪套池参数
     "signals": {"pool": "VARCHAR(48) DEFAULT ''"},
-    "orders": {"pool": "VARCHAR(48) DEFAULT ''", "binding_id": "INTEGER", "params_snapshot": "TEXT"},
+    "orders": {
+        "pool": "VARCHAR(48) DEFAULT ''",
+        "binding_id": "INTEGER",
+        "params_snapshot": "TEXT",
+        # 币安开仓主单号：新订单由 live._place_live 写入，历史订单从 note 回填
+        "exchange_order_id": "VARCHAR(32) DEFAULT ''",
+    },
     # 币种池的人工增删层：独立于 symbols，自动维护不会覆盖它
     "symbol_pools": {"manual_override": "TEXT DEFAULT '{}'"},
     # 绑定层的出场覆盖：止损止盈方法与支撑线指标（见 strategy/exits.py）
@@ -446,6 +518,38 @@ def _add_missing_columns() -> None:
             for name, ddl in columns.items():
                 if name not in existing:
                     conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))
+
+
+def _backfill_order_exchange_ids() -> None:
+    """历史 live 订单的币安主单号原本只存在 note JSON 里，新增独立列后回填到列上。
+
+    幂等：只处理 source='live' 且列为空的行；回填完成后每次启动命中 0 行。
+    非法/缺失的 ID 不回填，留给人工核对，绝不用猜测值污染列。
+    """
+    inspector = inspect(engine)
+    if "orders" not in set(inspector.get_table_names()):
+        return
+    if "exchange_order_id" not in {column["name"] for column in inspector.get_columns("orders")}:
+        return
+    with engine.begin() as conn:
+        rows = conn.execute(text(
+            "SELECT id, note FROM orders WHERE source = 'live' "
+            "AND (exchange_order_id IS NULL OR exchange_order_id = '')"
+        )).mappings().all()
+        for row in rows:
+            try:
+                note = json.loads(row["note"] or "{}")
+            except (ValueError, TypeError):
+                continue
+            if not isinstance(note, dict):
+                continue
+            value = str(note.get("exchange_order_id") or "").strip()
+            if not value.isdigit() or int(value) <= 0:
+                continue
+            conn.execute(
+                text("UPDATE orders SET exchange_order_id = :v WHERE id = :i"),
+                {"v": value, "i": row["id"]},
+            )
 
 
 def _ensure_optimization_result_interval() -> None:

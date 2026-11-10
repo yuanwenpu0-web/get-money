@@ -10,6 +10,7 @@ function marketView(api) {
     .match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const messages = []
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api,
     ref: (value) => ({ value }),
     reactive: (value) => value,

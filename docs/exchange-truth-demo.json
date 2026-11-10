@@ -1,0 +1,266 @@
+{
+  "name": "exchange-truth-demo",
+  "title": "币安 DEMO 直连与「以币安为准」改造",
+  "date": "2026-11-09",
+  "report_type": "engineering_change",
+  "verdict": "not_applicable",
+  "verdict_reason": "工程改造，非 edge 判定；按 strategy-backtest-playbook 第 0 节例外跳过 Gate 1 与 Gate 4",
+  "hypothesis_card": {
+    "information_source": "币安 U 本位合约 REST（账户余额、income、userTrades、保护单状态、订单回执）",
+    "hypothesis": "把交易所作为唯一真相源后，demo 与正式环境可共用同一套下单/记账逻辑，且下单成败可逐笔核对",
+    "holding_period": null,
+    "interval": "15m",
+    "symbol_pool": "all（绑定 #7 supertrend_current）",
+    "cost_basis": "paper: fee_rate=0.0004 + slippage=0.0002；live: 币安 userTrades 真实成交价与手续费，两种口径不混比",
+    "duplicate_check": "非新特征/新策略，不涉及已证伪路线的换皮"
+  },
+  "environment": {
+    "demo_host": "https://testnet.binancefuture.com",
+    "real_hosts": ["https://fapi.binance.com", "https://fapi1.binance.com", "https://fapi2.binance.com"],
+    "market_data_host": "主网公开 fapi（与 testnet 开关解耦）",
+    "execution_mode": "live",
+    "testnet": true,
+    "env": "demo",
+    "credential_verified_env": "demo",
+    "exchange_truth_enabled": true,
+    "order_type": "limit_maker",
+    "schedule_seconds": 60
+  },
+  "data_boundary": {
+    "market_source": "futures-mainnet",
+    "reason": "测试网 K 线深度与交易对远少于主网；行情跟随 testnet 会让策略因数据不足几乎不出信号",
+    "account_source": "fapi/v2/account（回落 fapi/v2/balance）",
+    "income_source": "fapi/v1/income，最多 10 页 x 1000 条",
+    "fills_source": "fapi/v1/userTrades，单 symbol 单页 1000 条",
+    "sample_window": null,
+    "sample_period": null,
+    "skip_list": []
+  },
+  "changes": {
+    "new_tables": ["exchange_events", "exchange_account_snapshots"],
+    "new_modules": ["backend/app/trading/exchange_gateway.py", "backend/app/trading/exchange_truth.py"],
+    "modified_backend": [
+      "backend/app/market/futures.py",
+      "backend/app/market/data_service.py",
+      "backend/app/market/universe.py",
+      "backend/app/config.py",
+      "backend/app/models.py",
+      "backend/app/schemas.py",
+      "backend/app/serializers.py",
+      "backend/app/api/settings.py",
+      "backend/app/api/trading.py",
+      "backend/app/main.py",
+      "backend/app/trading/live.py",
+      "backend/app/trading/live_sync.py",
+      "backend/app/trading/paper.py",
+      "backend/app/trading/portfolio.py",
+      "backend/app/trading/service.py",
+      "backend/app/trading/maker.py (间接：经 _LoggedClient 留痕)"
+    ],
+    "modified_frontend": [
+      "frontend/src/api.js",
+      "frontend/src/views/Settings.vue",
+      "frontend/src/views/Dashboard.vue",
+      "frontend/src/views/Orders.vue"
+    ],
+    "new_apis": [
+      "GET /api/trading/exchange",
+      "GET /api/trading/exchange-events",
+      "GET /api/settings/exchange",
+      "POST /api/settings/exchange/rebase"
+    ],
+    "algo_order_migration": {
+      "effective_date": "2025-12-09",
+      "reason": "币安把 U 本位合约条件单从 /fapi/v1/order 迁到 Algo 服务，旧端点返回 -4120 STOP_ORDER_SWITCH_ALGO",
+      "place": "POST /fapi/v1/algoOrder (algoType=CONDITIONAL, triggerPrice, closePosition)",
+      "cancel": "DELETE /fapi/v1/algoOrder (algoId)",
+      "query": "GET /fapi/v1/algoOrder (algoStatus, triggerPrice, actualPrice, actualOrderId)",
+      "applies_to": ["demo(testnet)", "real(mainnet)"],
+      "legacy_fallback": "note.protection_kind=legacy 时回落普通订单端点"
+    },
+    "strategy_params_changed": false,
+    "bindings_changed": false,
+    "default_enabled_changed": false
+  },
+  "verification": {
+    "new_unit_tests": {"file": "backend/tests/test_exchange_truth.py", "passed": 13, "failed": 0},
+    "live_chain_regression": {"files": ["test_live_trading.py", "test_maker_orders.py", "test_cycle_sync.py", "test_exchange_truth.py"], "passed": 56, "failed": 0},
+    "backend_full_pytest": {
+      "change_related": "all green",
+      "pre_existing_failures": [
+        "test_pool_volatility_research.py::test_live_entrypoints_reject[research_high_turnover_high_vol]",
+        "test_pool_volatility_research.py::test_live_entrypoints_reject[research_low_turnover_high_vol]",
+        "test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range"
+      ],
+      "baseline_confirmed_by": "git show HEAD:backend/app/trading/dispatch.py 无 halt_status；data_service 查询函数本次未改"
+    },
+    "frontend_tests": {"passed": 102, "failed": 0},
+    "frontend_build": "success",
+    "service_restart": "QuantDesk-GetMoney Stop + Start, init_db created new tables",
+    "credential_test": {
+      "ok": true,
+      "signed_ok": true,
+      "env": "demo",
+      "wallet_balance_usdt": 4772.72698522,
+      "other_assets": {"BTC": 0.01, "USDC": 5000.0}
+    },
+    "state_after_switch": {
+      "execution_mode": "live",
+      "testnet": true,
+      "initial_capital": 4772.727,
+      "cash": 4772.727,
+      "exchange_baseline_env": "demo",
+      "archived_paper_orders": 10,
+      "open_orders": 0
+    },
+    "account_snapshot": {
+      "pnl_source": "binance",
+      "equity": 4772.727,
+      "available_balance": 4772.727,
+      "unrealized_pnl": 0.0,
+      "realized_pnl": 0.0,
+      "reconcile_diff": 0.0,
+      "rows_written": 1
+    },
+    "first_live_cycle_before_algo_fix": {
+      "orders_reached_exchange": true,
+      "events": 11,
+      "rolled_back_opens": 2,
+      "open_positions": 0,
+      "error_code": -4120,
+      "error": "STOP_ORDER_SWITCH_ALGO: 条件单需改用 Algo Order 端点",
+      "exchange_equity_before": 4772.727,
+      "exchange_equity_after": 4754.1506,
+      "realized_pnl": -18.5764,
+      "reconcile_diff": 18.5764,
+      "note": "亏损来自回滚手续费/滑点，不是策略收益读数；同时反证收益以币安为准已生效"
+    },
+    "algo_fix_regression": {"passed": 51, "failed": 0, "suites": ["test_live_trading.py", "test_maker_orders.py", "test_cycle_sync.py", "test_exchange_truth.py"]},
+    "second_live_cycle_after_algo_fix": {
+      "protection_orders": "protect_sl / protect_tp accepted (no -4120)",
+      "open_positions": 4,
+      "events_total": 71,
+      "recent_success_rate_pct": 59.2,
+      "visible_failure_codes": {"-1121": "测试网无此交易对", "-2019": "保证金不足", "-5022": "postOnly 被拒后转市价"},
+      "exchange_wallet_balance": 4713.1302,
+      "available_balance": 550.9011,
+      "unrealized_pnl": -10.5569,
+      "realized_pnl": -59.5968,
+      "commission": -17.4857,
+      "funding_fee": -2.3799,
+      "note": "readings from Binance account, not strategy edge"
+    },
+    "availability_fixes": {
+      "refresh_available": "每笔开仓成功后刷新可用余额缓存，避免同周期连开多仓重复用旧余额导致 -2019",
+      "unsupported_symbols": "exchange_unsupported_symbols 跳过表（上限 300），rebase 换环境时清空",
+      "reconcile_basis": "改为逐笔订单盈亏 vs 币安账户盈亏，本地权益不再作为对账基准",
+      "regression_passed": 53
+    },
+    "algo_e2e_probe": {
+      "symbol": "BTCUSDT",
+      "qty": 0.0014,
+      "mark_price": 74972.53224638,
+      "open_market_order": "OK",
+      "stop_market_algo": {"placed": true, "algoId": 1000000279963165, "algoStatus": "NEW", "triggerPrice": "37486.30"},
+      "take_profit_algo": {"placed": true, "algoId": 1000000279963196, "algoStatus": "NEW", "triggerPrice": "112458.80"},
+      "query": "OK",
+      "cancel": "OK (both)",
+      "close_reduce_only": "OK",
+      "residual_positions_or_orders": 0,
+      "side_errors_observed": {"-1111": "触发价未按 tick 取整（生产代码用 round_to_tick）", "-4509": "无持仓时不能挂 closePosition 条件单（生产在开仓后才挂）"},
+      "note": "探针产生 2 笔小额成交手续费，已计入币安账户；非策略收益读数"
+    },
+    "run_once_probe": {"ok": false, "message": "已有交易周期在运行", "note": "调度器自动巡检中；上一轮 509 币同步 elapsed_ms≈223311，live 周期由调度器自动触发"},
+    "health_probe_dynamic": {
+      "before": "/api/health hardcodes mode=paper",
+      "after": {"ok": true, "service": "quant-trading", "mode": "live", "exchange_env": "demo"},
+      "scheduled_task": "QuantDesk-GetMoney State=Running, port 8010 LISTEN"
+    },
+    "margin_gate_fix": {
+      "symptom": "consecutive -2019 Margin is insufficient after account fully margined",
+      "exchange_readback": {
+        "totalWalletBalance": 4713.13023843,
+        "totalPositionInitialMargin_at_first_read": 4172.77568270,
+        "availableBalance": 550.90111674,
+        "totalOpenOrderInitialMargin": 0.0,
+        "leverage": 1,
+        "open_orders_on_exchange": 0,
+        "local_live_open_positions": 4,
+        "orphan_position": false
+      },
+      "root_cause": "portfolio_snapshot overlay sets equity=totalMarginBalance (incl. occupied margin); position_size cash/(1+leverage*fee) leaves only ~0.04% for fees, so the computed margin consumes nearly 100% of availableBalance and Binance rejects the isolated initial margin",
+      "fixes": [
+        "live.py::_exchange_margin_constraint caps margin/qty at availableBalance * 0.90 without changing position_size equity input",
+        "EXCHANGE_MIN_MARGIN_PCT=0.02 -> min margin = max(10, initial_capital * 2%)",
+        "exhausted balance records blocked and skips instead of sending guaranteed-rejected maker+market requests",
+        "api/trading.py::exchange_state excludes blocked from success-rate denominator; returns recent_blocked / recent_blocked_reason; recent_failures only rejected/failed"
+      ],
+      "regression_passed": 56,
+      "frontend": {"tests_passed": 102, "build_seconds": 9.07}
+    },
+    "margin_gate_readonly_check": {
+      "read_only": true,
+      "orders_placed": 0,
+      "pnl_source": "binance",
+      "available": 359.6136,
+      "position_margin": 4337.8736,
+      "cap_90pct": 323.6522,
+      "min_margin": 95.4545,
+      "would_open": true,
+      "equity": 4695.1238
+    }
+  },
+  "window": {
+    "start": null,
+    "end": null,
+    "wall_clock_alignment": "not_applicable",
+    "verification_date": "2026-11-09",
+    "exchange_server_time_ms": 1794195742903,
+    "reason": "工程链路改造，无回测窗口与样本期"
+  },
+  "universe": {
+    "market_source": "futures-mainnet",
+    "symbol_count": 509,
+    "note": "行情/币种宇宙来源，非回测币池；策略绑定与币池未改动"
+  },
+  "costs": {
+    "paper_fee_rate": 0.0004,
+    "paper_slippage": 0.0002,
+    "paper_round_trip": 0.0012,
+    "live": "币安 userTrades 的真实成交价 + commission；income 提供 FUNDING_FEE 明细",
+    "note": "名义本金口径，未与 margin 口径混比；paper 与 live 两种口径不混比"
+  },
+  "trades": {
+    "sample_count": 0,
+    "note": "工程改造不产生回测成交样本；live 订单成交明细以币安 userTrades 为准"
+  },
+  "ci": {
+    "bootstrap_expectancy_ci": null,
+    "reason": "not_applicable：非 edge 判定"
+  },
+  "statistics": {
+    "sample_count": null,
+    "bootstrap_expectancy_ci": null,
+    "random_baseline": null,
+    "fdr_q": null,
+    "reason": "工程链路改造，不产生策略收益样本；不做任何 edge 判定"
+  },
+  "limitations": [
+    "全市场 509 币同步一轮约 223 秒，调度 60s 且 coalesce，实际下单机会约每 3-4 分钟一次",
+    "测试网交易对少于主网宇宙，主网有信号的币可能在测试网被拒单（会记录 rejected 与错误码）",
+    "income 最多 1 万条、userTrades 单页 1000 条，极高频成交需分批",
+    "保护单成交后若 userTrades 暂不可查会标 estimated，已闭单不自动重算",
+    "无 WebSocket，状态靠 60s 轮询",
+    "正式环境需补充资金费率/强平模型与更短巡检间隔",
+    "3 项基线既存测试失败与本次改动无关",
+    "recent_success_rate 是事件级成功率（排除 blocked），历史失败不抹除、随新事件滚动，不是策略胜率",
+    "满仓时闸门只按可用余额裁剪仓位，不限制最大持仓数；最大持仓数属策略层风控，需另行评估"
+  ],
+  "rollback": [
+    "PUT /api/settings {\"execution_mode\":\"paper\"}",
+    "PUT /api/settings {\"exchange_truth_enabled\":false}",
+    "新增表为纯追加，删除不影响主业务表"
+  ],
+  "conclusion": "demo 直连已开启：下单、保护单、平仓全部提交币安合约 Testnet；收益与逐笔盈亏以币安账户及真实成交为准；止盈止损按交易所保护单状态同步；下单成败与错误码逐条可查。收尾复核修复了健康探针硬编码 mode=paper 与满仓后按总权益算仓位导致的连续 -2019（可用余额裁剪 + 相对最低保证金 + 主动跳过与拒单分离）。正式环境只需换主网 Key 并通过显式确认，无需改代码。本结论仅为工程链路结论，不代表任何策略具备正 edge。",
+  "files": ["docs/exchange-truth-demo.md", "docs/exchange-truth-demo.json"]
+}

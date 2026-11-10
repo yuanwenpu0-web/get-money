@@ -19,6 +19,8 @@ const credentialSaving = ref(false)
 const testing = ref(false)
 const testResult = ref(null)
 const capitalLoading = ref(false)
+const exchangeStatus = ref({})
+const rebasing = ref(false)
 
 const form = reactive({
   execution_mode: 'paper',
@@ -50,6 +52,7 @@ const form = reactive({
   train_horizon: 5,
   schedule_enabled: true,
   schedule_seconds: 60,
+  exchange_truth_enabled: true,
 })
 
 const credentialForm = reactive({ api_key: '', api_secret: '', testnet: true })
@@ -87,6 +90,7 @@ function applySettings(data) {
   form.schedule_enabled = Boolean(data.schedule_enabled)
   form.schedule_seconds = Number(data.schedule_seconds || 60)
   form.min_quote_volume_usd = Number(data.min_quote_volume_usd ?? 0)
+  form.exchange_truth_enabled = data.exchange_truth_enabled !== false
   credentialForm.testnet = Boolean(data.testnet)
 }
 
@@ -115,6 +119,7 @@ function load() {
       applySettings(data)
       settingsReady.value = true
       loadError.value = ''
+      loadExchangeStatus()
     } catch (error) {
       if (!disposed) loadError.value = error.message || '设置加载失败'
     }
@@ -125,11 +130,42 @@ function load() {
   return loadPromise
 }
 
+async function loadExchangeStatus() {
+  try {
+    exchangeStatus.value = await api.getExchangeStatus()
+  } catch {
+    exchangeStatus.value = {}
+  }
+}
+
+async function rebaseExchange() {
+  if (rebasing.value) return
+  rebasing.value = true
+  try {
+    const result = await api.rebaseExchange()
+    ElMessage.success(`收益基准已按币安余额重置为 ${result.initial_capital} USDT`)
+    await load()
+  } catch (error) {
+    ElMessage.error(error.message)
+  } finally {
+    rebasing.value = false
+  }
+}
+
 async function saveSettings() {
   if (!settingsReady.value || loading.value) return
   if (form.symbol_scope === 'custom' && !form.symbols.length) {
     ElMessage.error('自定义列表至少保留一个交易对')
     return
+  }
+  if (form.execution_mode === 'live' && !form.testnet) {
+    try {
+      await ElMessageBox.confirm(
+        '即将把订单提交到币安合约主网（真实资金）。请确认 API Key 属于主网账户，且已通过下方「测试连接」验证。',
+        '切换到正式环境（真实资金）',
+        { confirmButtonText: '确认切换主网', cancelButtonText: '取消', type: 'error' },
+      )
+    } catch { return }
   }
   saving.value = true
   try {
@@ -163,9 +199,12 @@ async function saveSettings() {
       train_horizon: Number(form.train_horizon),
       schedule_enabled: form.schedule_enabled,
       schedule_seconds: Number(form.schedule_seconds),
+      exchange_truth_enabled: form.exchange_truth_enabled,
+      confirm_mainnet: form.execution_mode === 'live' && !form.testnet ? true : undefined,
     }
     applySettings(await api.saveSettings(payload))
     loadUniverseInfo()
+    loadExchangeStatus()
     ElMessage.success('设置已保存')
   } catch (error) {
     ElMessage.error(error.message)
@@ -204,6 +243,7 @@ async function testCredentials() {
   testResult.value = null
   try {
     testResult.value = await api.testCredentials()
+    if (testResult.value?.ok) loadExchangeStatus()
   } catch (error) {
     ElMessage.error(error.message)
   } finally {
@@ -248,8 +288,8 @@ const credentialPanelSub = computed(() =>
 const executionModeAlertType = computed(() => (form.testnet ? 'warning' : 'error'))
 const executionModeAlertText = computed(() =>
   form.testnet
-    ? '测试网实盘：订单将提交到币安测试网撮合，不涉及真实资金。建议先在测试网验证策略表现后再切主网。'
-    : '真实资金风险：订单将用真实资金在币安主网成交，止损止盈可能因跳空或流动性不足失效。请先在测试网充分验证策略表现。',
+    ? 'DEMO：订单提交到币安合约 Testnet，不涉及真实资金；盈利、止盈止损与下单结果均以币安测试网账户为准。'
+    : '正式环境：订单用真实资金在币安主网成交，盈利以主网账户为准；止损止盈可能因跳空或流动性不足失效。请先在 DEMO 充分验证。',
 )
 
 watch(
@@ -316,6 +356,27 @@ onBeforeUnmount(() => { disposed = true })
             title="尚未配置币安 API Key，实盘下单将无法执行。请在下方“币安 API”面板完成配置。"
           />
           <div class="form-hint">切换后需点击右上角“保存风控与系统设置”才会生效；巡检产生的新订单按此模式执行，已有持仓不受影响。</div>
+
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(148,163,184,0.18)">
+            <div class="row">
+              <el-switch v-model="form.exchange_truth_enabled" active-text="收益以币安为准" inactive-text="本地账本" />
+              <el-tag size="small" effect="plain" :type="form.testnet ? 'warning' : 'danger'">
+                {{ exchangeStatus.env_label || (form.testnet ? '币安合约 Testnet（DEMO）' : '币安合约主网（正式环境）') }}
+              </el-tag>
+            </div>
+            <div class="form-hint" style="margin-top: 6px">
+              开启后：权益、可用余额、未实现/已实现盈亏取自币安账户；逐笔订单按真实成交价与手续费回填；止盈止损按交易所保护单状态同步。行情 K 线固定主网公开接口，切换 demo / 正式环境不会让数据变稀。
+            </div>
+            <div v-if="exchangeStatus.account?.wallet_balance" class="mono" style="margin-top: 8px">
+              钱包 {{ money(exchangeStatus.account.wallet_balance) }} · 可用 {{ money(exchangeStatus.account.available_balance) }} · 未实现 {{ money(exchangeStatus.account.unrealized_pnl) }}
+            </div>
+            <div class="row" style="margin-top: 8px">
+              <el-button size="small" :loading="rebasing" @click="rebaseExchange">按币安余额重置收益基准</el-button>
+              <span class="muted">当前基准 {{ money(exchangeStatus.initial_capital) }}</span>
+            </div>
+            <div class="form-hint">在交易所出入金后点此同步基准；切换 demo ↔ 正式环境时系统会自动重置，避免两套资金串账。</div>
+          </div>
+
           <div style="margin-top: 14px">
             <div class="muted" style="margin-bottom: 4px">网络代理（proxy_url）</div>
             <el-input
@@ -362,6 +423,7 @@ onBeforeUnmount(() => { disposed = true })
               {{ testResult.ok ? '连接正常' : `连接失败：${testResult.error}` }}
             </span>
             <span v-if="testResult.ok"> · 签名校验 {{ testResult.signed_ok ? '通过' : '未执行（无密钥）' }}</span>
+            <span v-if="testResult.ok && testResult.account?.wallet_balance"> · 账户权益 {{ money(testResult.account.margin_balance || testResult.account.wallet_balance) }}</span>
             <div v-if="testResult.balances?.length" class="mono" style="margin-top: 4px">
               {{ testResult.balances.map((item) => `${item.asset}:${item.free}`).join('  ') }}
             </div>

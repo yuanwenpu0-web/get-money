@@ -1,4 +1,4 @@
-"""实盘开仓回滚：保护单挂失败时先市价平仓保资金安全，再撤销已挂保护单防残留脏单。
+"""实盘开仓回滚：保护单挂失败或币安订单号未同步时，先市价平仓保资金安全，再撤保护单防残留脏单。
 
 从 live.py 拆出（单文件职责与行数约束）；log 由调用方注入，避免与 live 循环依赖。
 撤单失败不阻塞平仓，全部留痕 JobLog。
@@ -13,9 +13,13 @@ REDUCE_ONLY_REJECT_CODE = -2022
 
 
 def rollback_open(client, symbol: str, close_side: str, qty: float,
-                  placed_protections: list[int], exc: BinanceError, log) -> None:
-    """保护单挂失败回滚：先市价平仓保资金安全，再撤销已挂出的保护单防止残留脏单。"""
-    log("error", f"保护单挂单失败 {symbol}: {exc}，开始回滚刚开的仓")
+                  placed_protections: list[int], reason: Exception | str, log) -> None:
+    """开仓后异常回滚（保护单挂失败 / 币安订单号未同步）。
+
+    先市价平仓保资金安全，再撤销已挂出的保护单防止残留脏单。
+    reason 既可以是交易所异常，也可以是一句同步失败说明，只用于日志留痕。
+    """
+    log("error", f"开仓回滚 {symbol}: {reason}，开始回滚刚开的仓")
     try:
         client.new_order(symbol=symbol, side=close_side, type="MARKET",
                          quantity=format_amount(qty), reduceOnly="true")
@@ -27,7 +31,8 @@ def rollback_open(client, symbol: str, close_side: str, qty: float,
         log("error", f"回滚平仓失败 {symbol}: {close_exc}，请立即人工检查交易所仓位")
     for order_id in placed_protections:
         try:
-            client.cancel_order(symbol, order_id)
+            # 保护单是 Algo 条件单，撤单必须走 /fapi/v1/algoOrder
+            client.cancel_algo_order(symbol, order_id)
         except BinanceApiError as cancel_exc:
             if cancel_exc.code not in CANCEL_IGNORE_CODES:
                 log("error", f"回滚撤销保护单失败 {symbol} orderId={order_id}: code={cancel_exc.code}")

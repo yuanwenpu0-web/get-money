@@ -90,14 +90,12 @@ def test_resolve_universe_reports_source_and_cached(db, monkeypatch):
     # paper 模式（默认）宇宙与K线同源走主网 fapi，不受 testnet 开关影响
     paper = universe.resolve_universe(db)
     assert paper == {"symbols": ["BTCUSDT"], "cached": False, "source": "futures-mainnet"}
-    # live+testnet 才走测试网宇宙，与测试网K线同源
+    # 行情源与交易环境解耦：demo 只切下单/账户通道，宇宙与 K 线仍取主网公开 fapi，
+    # 否则测试网稀疏的历史数据和交易对会让策略因「数据不足」几乎不出信号。
     set_state(db, "execution_mode", "live")
-    set_state(db, "testnet", True)
-    live_testnet = universe.resolve_universe(db)
-    assert live_testnet["source"] == "futures-testnet"
-    set_state(db, "testnet", False)
-    live_mainnet = universe.resolve_universe(db)
-    assert live_mainnet["source"] == "futures-mainnet"
+    for flag in (True, False):
+        set_state(db, "testnet", flag)
+        assert universe.resolve_universe(db)["source"] == "futures-mainnet"
 
 
 def test_run_cycle_follows_bindings_and_scope(db, monkeypatch):

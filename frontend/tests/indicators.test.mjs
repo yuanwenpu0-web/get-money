@@ -4,6 +4,8 @@ import test from 'node:test'
 import vm from 'node:vm'
 import { computed, nextTick, ref, watch } from 'vue'
 
+const plain = (value) => JSON.parse(JSON.stringify(value))
+
 function deferred() {
   let resolve, reject
   const promise = new Promise((yes, no) => { resolve = yes; reject = no })
@@ -14,53 +16,104 @@ function indicators(api) {
   const source = readFileSync(new URL('../src/views/Indicators.vue', import.meta.url), 'utf8')
   const script = source.match(/<script setup>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm, '')
   const mounts = [], unmounts = []
+  const pending = new Map()
+  let timer = 0
   const context = vm.createContext({
+    PAGE_SIZE: 15,
     api, ref, computed, watch, URL,
+    setTimeout: (fn) => { timer += 1; pending.set(timer, fn); return timer },
+    clearTimeout: (id) => pending.delete(id),
     onMounted: (fn) => mounts.push(fn), onBeforeUnmount: (fn) => unmounts.push(fn),
   })
-  vm.runInContext(`${script}\nglobalThis.subject = { items, loading, error, search, collection, category, page, filtered, displayed, detail, detailLoading, detailError, detailVisible, load, showDetail, closeDetail, safeSourceUrl }`, context)
-  return { ...context.subject, source, mount: () => Promise.all(mounts.map((fn) => fn())), unmount: () => unmounts.forEach((fn) => fn()) }
+  vm.runInContext(`${script}\nglobalThis.subject = {
+    items, loading, error, search, collection, category, indicatorType, page, pageSize,
+    facets, total, catalogTotal, filteredCount, detail, detailLoading, detailError, detailVisible,
+    load, changePage, onFilterChange, onSearchInput, showDetail, closeDetail, safeSourceUrl,
+  }`, context)
+  return {
+    ...context.subject,
+    source,
+    flushTimers: () => { const fns = [...pending.values()]; pending.clear(); fns.forEach((fn) => fn()) },
+    mount: () => Promise.all(mounts.map((fn) => fn())),
+    unmount: () => unmounts.forEach((fn) => fn()),
+  }
 }
 
 const rows = [
-  { id: 'a', title: '趋势线', original_title: 'Trendline', description: '识别趋势', category: 'trend', collection: 'first' },
-  { id: 'b', title: 'RSI', description: '动量', category: 'momentum', collection: 'second' },
+  { id: 'a', title: '趋势线', original_title: 'Trendline', description: '识别趋势', category: 'trend', collection: 'first', indicator_type: '趋势方向' },
+  { id: 'b', title: 'RSI', description: '动量', category: 'momentum', collection: 'second', indicator_type: '动量' },
 ]
+const facets = {
+  collections: ['first', 'second'],
+  categories: ['momentum', 'trend'],
+  indicator_types: ['动量', '趋势方向'],
+}
 
-test('指标目录加载后支持名称、说明、来源及分类过滤', async () => {
-  const response = deferred()
-  const view = indicators({ getIndicators: () => response.promise })
+test('指标目录的筛选与分页都交给服务端：请求带参数，表格只渲染当前页', async () => {
+  const requests = []
+  const view = indicators({
+    getIndicators: async (params) => {
+      requests.push(params)
+      return { items: rows, facets, total: 2, catalog_total: 156, page: params.page, page_size: 15 }
+    },
+  })
   const pending = view.mount()
   assert.equal(view.loading.value, true)
-  response.resolve({ items: rows })
   await pending
   assert.equal(view.loading.value, false)
+  assert.deepEqual(plain(requests), [{ q: '', collection: '', category: '', indicator_type: '', page: 1, page_size: 15 }])
   assert.equal(view.items.value.length, 2)
-  view.search.value = 'TRENDLINE'
+  assert.equal(view.total.value, 2)
+  assert.equal(view.catalogTotal.value, 156)
+  // 下拉选项来自服务端 facets，不再依赖「已拉到全部行」
+  assert.deepEqual(view.facets.value.categories, ['momentum', 'trend'])
+
+  view.search.value = '  Trendline '
+  view.onFilterChange()
   await nextTick()
-  assert.equal(view.filtered.value[0].id, 'a')
-  view.search.value = '动量'
+  assert.equal(requests[1].q, 'Trendline')
+  assert.equal(requests[1].page, 1)
+
+  view.page.value = 1
+  view.changePage(3)
   await nextTick()
-  assert.equal(view.filtered.value[0].id, 'b')
-  view.search.value = ''
-  view.collection.value = 'first'
+  assert.equal(requests[2].page, 3)
+
+  view.unmount()
+})
+
+test('搜索输入做防抖，不逐字符打接口', async () => {
+  const requests = []
+  const view = indicators({
+    getIndicators: async (params) => {
+      requests.push(params.q)
+      return { items: [], facets, total: 0, catalog_total: 0, page: 1, page_size: 15 }
+    },
+  })
+  await view.mount()
+  const before = requests.length
+  view.search.value = 'RS'
+  view.onSearchInput()
+  view.search.value = 'RSI'
+  view.onSearchInput()
+  assert.equal(requests.length, before) // 还没到 300ms，一次都没发
+  view.flushTimers()
   await nextTick()
-  view.category.value = 'trend'
-  await nextTick()
-  assert.equal(view.filtered.value.length, 1)
-  assert.equal(view.filtered.value[0].id, 'a')
-  view.collection.value = 'second'
-  await nextTick()
-  assert.equal(view.category.value, '')
-  assert.equal(view.filtered.value[0].id, 'b')
+  assert.deepEqual(requests.slice(before), ['RSI'])
   view.unmount()
 })
 
 test('目录和详情加载失败后可重试，详情返回源码', async () => {
   let listAttempts = 0, detailAttempts = 0
   const view = indicators({
-    getIndicators: async () => { if (++listAttempts === 1) throw new Error('目录离线'); return { items: rows } },
-    getIndicator: async () => { if (++detailAttempts === 1) throw new Error('源码离线'); return { ...rows[0], source: 'indicator("Trend")', license_text: 'MIT' } },
+    getIndicators: async () => {
+      if (++listAttempts === 1) throw new Error('目录离线')
+      return { items: rows, facets, total: 2, catalog_total: 2, page: 1, page_size: 15 }
+    },
+    getIndicator: async () => {
+      if (++detailAttempts === 1) throw new Error('源码离线')
+      return { ...rows[0], source: 'indicator("Trend")', license_text: 'MIT' }
+    },
   })
   await view.mount()
   assert.equal(view.error.value, '目录离线')

@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 
 from ..db import get_db
 from ..models import StrategyBinding
+from ..pagination import DEFAULT_PAGE_SIZE, PageQuery, PageSizeQuery, offset_of, page_metadata
 from ..schemas import BindingPayload, BindingUpdate
 from ..state import all_state
 from ..strategy.bindings import binding_params, describe_binding, exit_config_of, validate_binding, validate_execution
@@ -66,16 +67,25 @@ def exit_options():
 
 
 @router.get("")
-def list_bindings(db: Session = Depends(get_db), with_members: bool = False):
+def list_bindings(
+    db: Session = Depends(get_db),
+    with_members: bool = False,
+    page: PageQuery = 1,
+    page_size: PageSizeQuery = DEFAULT_PAGE_SIZE,
+):
     state = all_state(db)
+    query = db.query(StrategyBinding)
+    total = query.count()
+    enabled_total = query.filter(StrategyBinding.enabled == 1).count()
     rows = (
-        db.query(StrategyBinding)
-        .order_by(StrategyBinding.priority.asc(), StrategyBinding.id.asc())
-        .all()
+        query.order_by(StrategyBinding.priority.asc(), StrategyBinding.id.asc())
+        .offset(offset_of(page, page_size)).limit(page_size).all()
     )
     return {
         "bindings": [describe_binding(db, row, state, with_members=with_members) for row in rows],
-        "total": len(rows),
+        # 启用条数是全量口径：分页后前端只看到一页，不能自己数
+        "enabled_total": int(enabled_total),
+        **page_metadata(total, page, page_size),
     }
 
 
