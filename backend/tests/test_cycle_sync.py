@@ -303,7 +303,7 @@ def test_cycle_updates_existing_positions_after_interval_and_scope_changes(db, m
     db.commit()
     calls = []
 
-    def sync_many(symbols, interval):
+    def sync_many(symbols, interval, workers=None):
         calls.append((symbols, interval))
         timestamp = now_ms() // 3600000 * 3600000
         for symbol in symbols:
@@ -344,7 +344,7 @@ def test_old_interval_sync_restores_stops_and_isolates_fetch_failures(db, monkey
     db.add(order)
     db.commit()
 
-    def sync_many(symbols, interval):
+    def sync_many(symbols, interval, workers=None):
         if interval == "1m":
             if sync_fails:
                 return ["HELDUSDT: unavailable"]

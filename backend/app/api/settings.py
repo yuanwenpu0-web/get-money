@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..backtest.runner import HAS_VBT
-from ..config import SUPPORTED_INTERVALS
+from ..config import DEFAULT_PUBLIC_INTERVAL_MS, MARKET_SYNC_WORKERS, SUPPORTED_INTERVALS
 from ..db import get_db
 from ..features.indicators import HAS_PTA, HAS_TALIB
 from ..market.data_service import MarketDataService
@@ -33,6 +33,8 @@ EDITABLE_KEYS = {
     "cooldown_bars", "trailing_enabled", "trail_activation_atr", "max_signal_age_bars",
     "min_quote_volume_usd", "symbol_blacklist", "order_type",
     "schedule_enabled", "schedule_seconds", "train_horizon", "exchange_truth_enabled",
+    # 巡检并发：改完下一轮巡检即生效，无需重启服务
+    "market_sync_workers", "market_public_interval_ms", "signal_workers", "execution_workers",
 }
 
 
@@ -130,7 +132,16 @@ def _validate(payload: dict, db: Session | None = None) -> None:
         "max_hold_bars": (0, 100000),
         "schedule_seconds": (10, 3600),
         "train_horizon": (1, 60),
+        "market_sync_workers": (1, 32),
+        "market_public_interval_ms": (20, 2000),
+        "signal_workers": (1, 16),
+        "execution_workers": (1, 16),
     }
+    # 线程数/间隔必须是整数：ranges 用 float() 校验会放过 2.5 这类值
+    for key in ("market_sync_workers", "market_public_interval_ms",
+                "signal_workers", "execution_workers"):
+        if key in payload and (isinstance(payload[key], bool) or not isinstance(payload[key], int)):
+            raise HTTPException(400, f"{key} 必须为整数")
     for key, (low, high) in ranges.items():
         if key in payload:
             try:
@@ -150,6 +161,11 @@ def _validate(payload: dict, db: Session | None = None) -> None:
 @router.get("")
 def read_settings(db: Session = Depends(get_db), include_stats: bool = True):
     state = all_state(db)
+    # 并发配置的默认值只在这里补齐（不写库），前端首次打开也能拿到完整表单值
+    state.setdefault("market_sync_workers", MARKET_SYNC_WORKERS)
+    state.setdefault("market_public_interval_ms", DEFAULT_PUBLIC_INTERVAL_MS)
+    state.setdefault("signal_workers", 1)
+    state.setdefault("execution_workers", 1)
     for key in ("risk_halt", "risk_halt_reason", "max_drawdown_halt_pct", "consecutive_loss_halt"):
         state.pop(key, None)
     service = MarketDataService(db)

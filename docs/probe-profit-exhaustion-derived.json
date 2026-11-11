@@ -1,0 +1,2709 @@
+{
+  "window": {
+    "train_validation_cuts_utc": {
+      "paper": "2026-11-05T21:17:55.149000+00:00",
+      "live": "2026-11-10T06:09:36.786000+00:00"
+    }
+  },
+  "config": {
+    "source": "local PostgreSQL orders and complete 1m-derived 15m klines",
+    "holding_bars": 8,
+    "decision": "first fully post-entry completed bar with mark profit > 0.12%; next open",
+    "label": "directional open-to-open return from next open to 8 bars later; counterfactual after actual exit allowed",
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "ic_is_gross": true,
+    "min_pairs_per_symbol": 30
+  },
+  "orders": 155,
+  "orders_per_source": {
+    "paper": 96,
+    "live": 59
+  },
+  "records": [
+    {
+      "id": 35,
+      "source": "paper",
+      "symbol": "BASEDUSDT",
+      "side": "LONG",
+      "decision_ms": 1793554200000,
+      "split": "train",
+      "rsi_pullback": -6.573436428611373,
+      "exhaustion": 53.52785807072823,
+      "future_hold_return": -0.024205469327420515
+    },
+    {
+      "id": 38,
+      "source": "paper",
+      "symbol": "FHEUSDT",
+      "side": "LONG",
+      "decision_ms": 1793554200000,
+      "split": "train",
+      "rsi_pullback": -0.6383715261482195,
+      "exhaustion": 60.48458116082981,
+      "future_hold_return": -0.03978494623655904
+    },
+    {
+      "id": 36,
+      "source": "paper",
+      "symbol": "COMPUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793555100000,
+      "split": "train",
+      "rsi_pullback": -3.2973691725244976,
+      "exhaustion": 24.57903728133135,
+      "future_hold_return": 0.00828460038986345
+    },
+    {
+      "id": 37,
+      "source": "paper",
+      "symbol": "ENSOUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793556000000,
+      "split": "train",
+      "rsi_pullback": -1.6251718347999429,
+      "exhaustion": 8.607990353581691,
+      "future_hold_return": -0.0016339869281045694
+    },
+    {
+      "id": 42,
+      "source": "paper",
+      "symbol": "ENSUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793556000000,
+      "split": "train",
+      "rsi_pullback": -4.707848597142913,
+      "exhaustion": 17.402224032062648,
+      "future_hold_return": 0.006506710044733688
+    },
+    {
+      "id": 39,
+      "source": "paper",
+      "symbol": "AZTECUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793556900000,
+      "split": "train",
+      "rsi_pullback": -3.6538167644847945,
+      "exhaustion": 8.134627342596808,
+      "future_hold_return": 0.026666666666666616
+    },
+    {
+      "id": 41,
+      "source": "paper",
+      "symbol": "DODOXUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793557800000,
+      "split": "train",
+      "rsi_pullback": -13.970552882444714,
+      "exhaustion": 40.519332607366486,
+      "future_hold_return": 0.001870990734141098
+    },
+    {
+      "id": 44,
+      "source": "paper",
+      "symbol": "1000SHIBUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793559600000,
+      "split": "train",
+      "rsi_pullback": -6.617269784860298,
+      "exhaustion": 27.847662595942197,
+      "future_hold_return": -0.0023544520547944536
+    },
+    {
+      "id": 45,
+      "source": "paper",
+      "symbol": "APTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793559600000,
+      "split": "train",
+      "rsi_pullback": -4.702873403210958,
+      "exhaustion": 43.314408383674134,
+      "future_hold_return": 0.0031766200762388674
+    },
+    {
+      "id": 43,
+      "source": "paper",
+      "symbol": "ALLOUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793560500000,
+      "split": "train",
+      "rsi_pullback": -3.895262182046423,
+      "exhaustion": 20.5583518629897,
+      "future_hold_return": 0.004036203522504889
+    },
+    {
+      "id": 47,
+      "source": "paper",
+      "symbol": "ARPAUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793564100000,
+      "split": "train",
+      "rsi_pullback": -2.7507722802426784,
+      "exhaustion": 7.3665403842823345,
+      "future_hold_return": 0.0005980861244018199
+    },
+    {
+      "id": 51,
+      "source": "paper",
+      "symbol": "AIAUSDT",
+      "side": "LONG",
+      "decision_ms": 1793633400000,
+      "split": "train",
+      "rsi_pullback": -1.481038051029067,
+      "exhaustion": 7.504393092672575,
+      "future_hold_return": -0.014287818529975183
+    },
+    {
+      "id": 56,
+      "source": "paper",
+      "symbol": "APRUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793633400000,
+      "split": "train",
+      "rsi_pullback": -2.7004120181235223,
+      "exhaustion": 38.6843004503741,
+      "future_hold_return": 0.0015540015540015384
+    },
+    {
+      "id": 52,
+      "source": "paper",
+      "symbol": "AIOTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793636100000,
+      "split": "train",
+      "rsi_pullback": -7.571670858053274,
+      "exhaustion": 18.801672878245366,
+      "future_hold_return": 0.018583042973286723
+    },
+    {
+      "id": 61,
+      "source": "paper",
+      "symbol": "1000000MOGUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793637000000,
+      "split": "train",
+      "rsi_pullback": -6.0514027735072276,
+      "exhaustion": 44.83155158341526,
+      "future_hold_return": 0.013859275053304865
+    },
+    {
+      "id": 62,
+      "source": "paper",
+      "symbol": "1000BONKUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793638800000,
+      "split": "train",
+      "rsi_pullback": -2.3057388537917234,
+      "exhaustion": 30.530674729351876,
+      "future_hold_return": 0.01103595585617645
+    },
+    {
+      "id": 66,
+      "source": "paper",
+      "symbol": "CATIUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793646900000,
+      "split": "train",
+      "rsi_pullback": -2.412655286002412,
+      "exhaustion": 29.609773756541415,
+      "future_hold_return": 0.017296763034346463
+    },
+    {
+      "id": 65,
+      "source": "paper",
+      "symbol": "AWEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793647800000,
+      "split": "train",
+      "rsi_pullback": -0.6404990119070959,
+      "exhaustion": 17.32558272820161,
+      "future_hold_return": 0.0054833150556165
+    },
+    {
+      "id": 64,
+      "source": "paper",
+      "symbol": "BIGTIMEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793648700000,
+      "split": "train",
+      "rsi_pullback": -3.560255399697681,
+      "exhaustion": 30.651826652425324,
+      "future_hold_return": -0.019646070785842795
+    },
+    {
+      "id": 70,
+      "source": "paper",
+      "symbol": "BREVUSDT",
+      "side": "LONG",
+      "decision_ms": 1793655900000,
+      "split": "train",
+      "rsi_pullback": -8.174147341149443,
+      "exhaustion": 18.765141303113026,
+      "future_hold_return": -0.009520230489790782
+    },
+    {
+      "id": 77,
+      "source": "paper",
+      "symbol": "BRUSDT",
+      "side": "LONG",
+      "decision_ms": 1793660400000,
+      "split": "train",
+      "rsi_pullback": -2.061745766095413,
+      "exhaustion": 19.44248897976522,
+      "future_hold_return": -0.004558924093913785
+    },
+    {
+      "id": 78,
+      "source": "paper",
+      "symbol": "CLOUSDT",
+      "side": "LONG",
+      "decision_ms": 1793664900000,
+      "split": "train",
+      "rsi_pullback": -3.5205668499827993,
+      "exhaustion": 15.717454393274966,
+      "future_hold_return": 0.03406131035864557
+    },
+    {
+      "id": 83,
+      "source": "paper",
+      "symbol": "1000FLOKIUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793674800000,
+      "split": "train",
+      "rsi_pullback": -6.03922571511719,
+      "exhaustion": 22.80104309674673,
+      "future_hold_return": -0.005412719891745743
+    },
+    {
+      "id": 82,
+      "source": "paper",
+      "symbol": "ANKRUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793674800000,
+      "split": "train",
+      "rsi_pullback": -6.643630939930297,
+      "exhaustion": 18.379421387163823,
+      "future_hold_return": -0.009401932619482967
+    },
+    {
+      "id": 87,
+      "source": "paper",
+      "symbol": "GWEIUSDT",
+      "side": "LONG",
+      "decision_ms": 1793680200000,
+      "split": "train",
+      "rsi_pullback": 1.7547880626698742,
+      "exhaustion": 30.094322751677694,
+      "future_hold_return": -0.005899705014749346
+    },
+    {
+      "id": 93,
+      "source": "paper",
+      "symbol": "CGPTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793688300000,
+      "split": "train",
+      "rsi_pullback": -4.011657791586217,
+      "exhaustion": 21.734511623727848,
+      "future_hold_return": -0.0028328611898018607
+    },
+    {
+      "id": 92,
+      "source": "paper",
+      "symbol": "ATOMUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793690100000,
+      "split": "train",
+      "rsi_pullback": -4.153221976875919,
+      "exhaustion": 8.745679794835603,
+      "future_hold_return": 0.0007077140835103357
+    },
+    {
+      "id": 95,
+      "source": "paper",
+      "symbol": "ALTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793694600000,
+      "split": "train",
+      "rsi_pullback": -3.6770961801298014,
+      "exhaustion": 7.207676014484406,
+      "future_hold_return": -0.034060191025409914
+    },
+    {
+      "id": 97,
+      "source": "paper",
+      "symbol": "1000LUNCUSDT",
+      "side": "LONG",
+      "decision_ms": 1793700900000,
+      "split": "train",
+      "rsi_pullback": -0.914828173287539,
+      "exhaustion": 15.289297350839652,
+      "future_hold_return": 0.011268985791278663
+    },
+    {
+      "id": 96,
+      "source": "paper",
+      "symbol": "1INCHUSDT",
+      "side": "LONG",
+      "decision_ms": 1793703600000,
+      "split": "train",
+      "rsi_pullback": -1.385138812247824,
+      "exhaustion": 11.70038252968805,
+      "future_hold_return": 0.00823867182623883
+    },
+    {
+      "id": 102,
+      "source": "paper",
+      "symbol": "ACEUSDT",
+      "side": "LONG",
+      "decision_ms": 1793703600000,
+      "split": "train",
+      "rsi_pullback": -2.7850931366722023,
+      "exhaustion": 27.5762512992451,
+      "future_hold_return": 0.010628536473466843
+    },
+    {
+      "id": 99,
+      "source": "paper",
+      "symbol": "ALCHUSDT",
+      "side": "LONG",
+      "decision_ms": 1793703600000,
+      "split": "train",
+      "rsi_pullback": -7.890489899265276,
+      "exhaustion": 38.05815524803475,
+      "future_hold_return": 0.010696653867251715
+    },
+    {
+      "id": 101,
+      "source": "paper",
+      "symbol": "1000SHIBUSDT",
+      "side": "LONG",
+      "decision_ms": 1793704500000,
+      "split": "train",
+      "rsi_pullback": -4.8584714331793535,
+      "exhaustion": 22.75265290313484,
+      "future_hold_return": 0.005443065534509017
+    },
+    {
+      "id": 129,
+      "source": "paper",
+      "symbol": "DOTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793814300000,
+      "split": "train",
+      "rsi_pullback": -4.3521509229172395,
+      "exhaustion": 2.7782595490728172,
+      "future_hold_return": 0.002397831526271932
+    },
+    {
+      "id": 128,
+      "source": "paper",
+      "symbol": "AVAXUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793821500000,
+      "split": "train",
+      "rsi_pullback": -5.398477855478575,
+      "exhaustion": 7.407129194500224,
+      "future_hold_return": 0.004899168280733668
+    },
+    {
+      "id": 131,
+      "source": "paper",
+      "symbol": "ADAUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793841300000,
+      "split": "train",
+      "rsi_pullback": -1.6873100802214296,
+      "exhaustion": 4.597308901114915,
+      "future_hold_return": -0.012722646310432628
+    },
+    {
+      "id": 135,
+      "source": "paper",
+      "symbol": "LTCUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793854800000,
+      "split": "train",
+      "rsi_pullback": -7.779190967446439,
+      "exhaustion": 19.049827254967248,
+      "future_hold_return": -0.0008950948800572345
+    },
+    {
+      "id": 137,
+      "source": "paper",
+      "symbol": "TIAUSDT",
+      "side": "LONG",
+      "decision_ms": 1793870100000,
+      "split": "train",
+      "rsi_pullback": -0.5778391841128965,
+      "exhaustion": 23.448963892898085,
+      "future_hold_return": -0.012742980561555095
+    },
+    {
+      "id": 138,
+      "source": "paper",
+      "symbol": "LTCUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793881800000,
+      "split": "train",
+      "rsi_pullback": -5.482716305405816,
+      "exhaustion": 34.326077855202406,
+      "future_hold_return": 0.0039668229354489215
+    },
+    {
+      "id": 139,
+      "source": "paper",
+      "symbol": "TIAUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793881800000,
+      "split": "train",
+      "rsi_pullback": -4.456899168189537,
+      "exhaustion": 21.903347185161586,
+      "future_hold_return": 0.0024325519681556163
+    },
+    {
+      "id": 140,
+      "source": "paper",
+      "symbol": "SOLUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793883600000,
+      "split": "train",
+      "rsi_pullback": 4.157712470843322,
+      "exhaustion": 27.761286951534526,
+      "future_hold_return": 0.024658971668415464
+    },
+    {
+      "id": 151,
+      "source": "paper",
+      "symbol": "CCUSDT",
+      "side": "LONG",
+      "decision_ms": 1793903400000,
+      "split": "train",
+      "rsi_pullback": -3.3602608961758946,
+      "exhaustion": 0.2013151443776103,
+      "future_hold_return": 0.009278565471225964
+    },
+    {
+      "id": 152,
+      "source": "paper",
+      "symbol": "STBLUSDT",
+      "side": "LONG",
+      "decision_ms": 1793903400000,
+      "split": "train",
+      "rsi_pullback": 0.33461091619017225,
+      "exhaustion": 0.0,
+      "future_hold_return": 0.002144082332761421
+    },
+    {
+      "id": 153,
+      "source": "paper",
+      "symbol": "我踏马来了USDT",
+      "side": "LONG",
+      "decision_ms": 1793903400000,
+      "split": "train",
+      "rsi_pullback": -0.6037629640809001,
+      "exhaustion": 0.0,
+      "future_hold_return": -0.009252313078269458
+    },
+    {
+      "id": 150,
+      "source": "paper",
+      "symbol": "HEIUSDT",
+      "side": "LONG",
+      "decision_ms": 1793906100000,
+      "split": "train",
+      "rsi_pullback": -6.994584524397588,
+      "exhaustion": 4.529560375841003,
+      "future_hold_return": -0.012134583563154888
+    },
+    {
+      "id": 157,
+      "source": "paper",
+      "symbol": "2ZUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793914200000,
+      "split": "validation",
+      "rsi_pullback": 1.4210854715202004e-14,
+      "exhaustion": 31.88833525866402,
+      "future_hold_return": 0.008530805687203769
+    },
+    {
+      "id": 158,
+      "source": "paper",
+      "symbol": "ASRUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793916000000,
+      "split": "validation",
+      "rsi_pullback": -3.4744987200351645,
+      "exhaustion": 21.393084154080135,
+      "future_hold_return": -0.0007456009543693742
+    },
+    {
+      "id": 159,
+      "source": "paper",
+      "symbol": "1MBABYDOGEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793919600000,
+      "split": "validation",
+      "rsi_pullback": -6.329783566810782,
+      "exhaustion": 24.01714254836484,
+      "future_hold_return": -0.017417022674991678
+    },
+    {
+      "id": 162,
+      "source": "paper",
+      "symbol": "ATUSDT",
+      "side": "LONG",
+      "decision_ms": 1793924100000,
+      "split": "validation",
+      "rsi_pullback": -3.179594510596104,
+      "exhaustion": 9.919091722197091,
+      "future_hold_return": -0.01905717151454367
+    },
+    {
+      "id": 163,
+      "source": "paper",
+      "symbol": "1000000MOGUSDT",
+      "side": "LONG",
+      "decision_ms": 1793926800000,
+      "split": "validation",
+      "rsi_pullback": 3.7405958269812984,
+      "exhaustion": 15.787987004460854,
+      "future_hold_return": 0.002089864158829835
+    },
+    {
+      "id": 165,
+      "source": "paper",
+      "symbol": "1000CATUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793943000000,
+      "split": "validation",
+      "rsi_pullback": -2.0142315551098875,
+      "exhaustion": 23.092965109352214,
+      "future_hold_return": 0.00810654313839032
+    },
+    {
+      "id": 167,
+      "source": "paper",
+      "symbol": "CGPTUSDT",
+      "side": "LONG",
+      "decision_ms": 1793946600000,
+      "split": "validation",
+      "rsi_pullback": -4.4274691881822505,
+      "exhaustion": 30.1957157044009,
+      "future_hold_return": 0.005444646098003547
+    },
+    {
+      "id": 168,
+      "source": "paper",
+      "symbol": "ACTUSDT",
+      "side": "LONG",
+      "decision_ms": 1793950200000,
+      "split": "validation",
+      "rsi_pullback": -8.381678059094398,
+      "exhaustion": 41.16403460019744,
+      "future_hold_return": -0.03438624550179936
+    },
+    {
+      "id": 171,
+      "source": "paper",
+      "symbol": "ALCHUSDT",
+      "side": "LONG",
+      "decision_ms": 1793953800000,
+      "split": "validation",
+      "rsi_pullback": 1.0350153134310531,
+      "exhaustion": 3.993818006020419,
+      "future_hold_return": -0.004668806536329173
+    },
+    {
+      "id": 172,
+      "source": "paper",
+      "symbol": "ESPORTSUSDT",
+      "side": "LONG",
+      "decision_ms": 1793957400000,
+      "split": "validation",
+      "rsi_pullback": 2.3406441224144885,
+      "exhaustion": 21.83001222777673,
+      "future_hold_return": 0.016711698188732083
+    },
+    {
+      "id": 177,
+      "source": "paper",
+      "symbol": "USUALUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793979000000,
+      "split": "validation",
+      "rsi_pullback": -5.899257813515099,
+      "exhaustion": 4.669230977671383,
+      "future_hold_return": -0.005119939319237599
+    },
+    {
+      "id": 178,
+      "source": "paper",
+      "symbol": "1000RATSUSDT",
+      "side": "LONG",
+      "decision_ms": 1793979900000,
+      "split": "validation",
+      "rsi_pullback": -5.64400964799578,
+      "exhaustion": 38.63675553356431,
+      "future_hold_return": -0.01708817498291182
+    },
+    {
+      "id": 183,
+      "source": "paper",
+      "symbol": "1MBABYDOGEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793986200000,
+      "split": "validation",
+      "rsi_pullback": -6.0560756655576355,
+      "exhaustion": 17.288698659812,
+      "future_hold_return": -0.0035347043701801084
+    },
+    {
+      "id": 184,
+      "source": "paper",
+      "symbol": "ALTUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793987100000,
+      "split": "validation",
+      "rsi_pullback": -5.3575524390254685,
+      "exhaustion": 20.293693763389783,
+      "future_hold_return": -0.0034646243617797445
+    },
+    {
+      "id": 185,
+      "source": "paper",
+      "symbol": "ESPORTSUSDT",
+      "side": "LONG",
+      "decision_ms": 1793990700000,
+      "split": "validation",
+      "rsi_pullback": -2.610826665540813,
+      "exhaustion": 11.694432896505646,
+      "future_hold_return": 0.0017538731365098759
+    },
+    {
+      "id": 186,
+      "source": "paper",
+      "symbol": "ACTUSDT",
+      "side": "LONG",
+      "decision_ms": 1793992500000,
+      "split": "validation",
+      "rsi_pullback": -2.648734530311671,
+      "exhaustion": 42.7323731758775,
+      "future_hold_return": -0.0009775171065493637
+    },
+    {
+      "id": 188,
+      "source": "paper",
+      "symbol": "ATOMUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793997000000,
+      "split": "validation",
+      "rsi_pullback": -2.272798961509274,
+      "exhaustion": 22.158609200117468,
+      "future_hold_return": 0.0007147962830593713
+    },
+    {
+      "id": 189,
+      "source": "paper",
+      "symbol": "ENJUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793997000000,
+      "split": "validation",
+      "rsi_pullback": -3.9519259729695335,
+      "exhaustion": 25.561927553989914,
+      "future_hold_return": 0.002981260647359485
+    },
+    {
+      "id": 190,
+      "source": "paper",
+      "symbol": "FFUSDT",
+      "side": "SHORT",
+      "decision_ms": 1793997000000,
+      "split": "validation",
+      "rsi_pullback": -3.410278854652155,
+      "exhaustion": 9.382714154880407,
+      "future_hold_return": 0.008687700045724722
+    },
+    {
+      "id": 191,
+      "source": "paper",
+      "symbol": "MASKUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794003300000,
+      "split": "validation",
+      "rsi_pullback": -5.90202626386305,
+      "exhaustion": 8.432285299708635,
+      "future_hold_return": -0.0029705644072373083
+    },
+    {
+      "id": 187,
+      "source": "paper",
+      "symbol": "ALPINEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794021300000,
+      "split": "validation",
+      "rsi_pullback": -4.027060293428356,
+      "exhaustion": 20.06845158972131,
+      "future_hold_return": -0.006642311524410527
+    },
+    {
+      "id": 194,
+      "source": "live",
+      "symbol": "HOTUSDT",
+      "side": "LONG",
+      "decision_ms": 1794197700000,
+      "split": "train",
+      "rsi_pullback": -8.877201188703644,
+      "exhaustion": 31.98110534495237,
+      "future_hold_return": -0.016759776536312776
+    },
+    {
+      "id": 197,
+      "source": "live",
+      "symbol": "STABLEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794201300000,
+      "split": "train",
+      "rsi_pullback": -6.495949657433364,
+      "exhaustion": 6.799475115370447,
+      "future_hold_return": 0.017984263769201814
+    },
+    {
+      "id": 193,
+      "source": "live",
+      "symbol": "ERAUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794202200000,
+      "split": "train",
+      "rsi_pullback": -2.800120424489016,
+      "exhaustion": 18.95834946940991,
+      "future_hold_return": 0.015388768898487948
+    },
+    {
+      "id": 199,
+      "source": "live",
+      "symbol": "1000000MOGUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794204000000,
+      "split": "train",
+      "rsi_pullback": -2.250071930787101,
+      "exhaustion": 11.981762941887368,
+      "future_hold_return": 0.009890109890109855
+    },
+    {
+      "id": 196,
+      "source": "live",
+      "symbol": "MUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794205800000,
+      "split": "train",
+      "rsi_pullback": -2.807266635006073,
+      "exhaustion": 11.762205242910051,
+      "future_hold_return": 0.0027100271002710175
+    },
+    {
+      "id": 201,
+      "source": "live",
+      "symbol": "AEROUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794206700000,
+      "split": "train",
+      "rsi_pullback": -4.921923299132466,
+      "exhaustion": 31.55624169219746,
+      "future_hold_return": 0.002473935324262211
+    },
+    {
+      "id": 200,
+      "source": "live",
+      "symbol": "ACEUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794208500000,
+      "split": "train",
+      "rsi_pullback": -9.254202287409946,
+      "exhaustion": 21.971962858504256,
+      "future_hold_return": -0.005498688774215443
+    },
+    {
+      "id": 202,
+      "source": "live",
+      "symbol": "0GUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794210300000,
+      "split": "train",
+      "rsi_pullback": 1.196721308146195,
+      "exhaustion": 30.80716464752912,
+      "future_hold_return": -0.023775216138328448
+    },
+    {
+      "id": 203,
+      "source": "live",
+      "symbol": "1000000MOGUSDT",
+      "side": "LONG",
+      "decision_ms": 1794217500000,
+      "split": "train",
+      "rsi_pullback": -1.9332551696246298,
+      "exhaustion": 6.682303502255948,
+      "future_hold_return": 0.004333694474539573
+    },
+    {
+      "id": 205,
+      "source": "live",
+      "symbol": "BROCCOLI714USDT",
+      "side": "LONG",
+      "decision_ms": 1794218400000,
+      "split": "train",
+      "rsi_pullback": -3.583998689217438,
+      "exhaustion": 7.775259573678366,
+      "future_hold_return": 0.009750152346130525
+    },
+    {
+      "id": 206,
+      "source": "live",
+      "symbol": "BULLAUSDT",
+      "side": "LONG",
+      "decision_ms": 1794219300000,
+      "split": "train",
+      "rsi_pullback": -4.786046216625579,
+      "exhaustion": 7.435563736902852,
+      "future_hold_return": 0.037539103232533844
+    },
+    {
+      "id": 204,
+      "source": "live",
+      "symbol": "1000FLOKIUSDT",
+      "side": "LONG",
+      "decision_ms": 1794226500000,
+      "split": "train",
+      "rsi_pullback": -6.70298765407685,
+      "exhaustion": 18.666390545377617,
+      "future_hold_return": 0.006250000000000089
+    },
+    {
+      "id": 209,
+      "source": "live",
+      "symbol": "ACUUSDT",
+      "side": "LONG",
+      "decision_ms": 1794226500000,
+      "split": "train",
+      "rsi_pullback": -4.2312308878876195,
+      "exhaustion": 36.64151116948152,
+      "future_hold_return": 0.0074880871341049815
+    },
+    {
+      "id": 210,
+      "source": "live",
+      "symbol": "ATHUSDT",
+      "side": "LONG",
+      "decision_ms": 1794226500000,
+      "split": "train",
+      "rsi_pullback": -6.206076556378349,
+      "exhaustion": 19.621520527372844,
+      "future_hold_return": 0.006358254768691118
+    },
+    {
+      "id": 211,
+      "source": "live",
+      "symbol": "MERLUSDT",
+      "side": "LONG",
+      "decision_ms": 1794227400000,
+      "split": "train",
+      "rsi_pullback": 5.085339935909019,
+      "exhaustion": 31.90878382492859,
+      "future_hold_return": 0.02317676143386893
+    },
+    {
+      "id": 212,
+      "source": "live",
+      "symbol": "STABLEUSDT",
+      "side": "LONG",
+      "decision_ms": 1794230100000,
+      "split": "train",
+      "rsi_pullback": 1.463182970940295,
+      "exhaustion": 27.837636988127674,
+      "future_hold_return": -0.011131725417439786
+    },
+    {
+      "id": 213,
+      "source": "live",
+      "symbol": "WLFIUSDT",
+      "side": "LONG",
+      "decision_ms": 1794230100000,
+      "split": "train",
+      "rsi_pullback": -2.8167606786303736,
+      "exhaustion": 44.166724475402965,
+      "future_hold_return": 0.008690122933446398
+    },
+    {
+      "id": 218,
+      "source": "live",
+      "symbol": "RIFUSDT",
+      "side": "LONG",
+      "decision_ms": 1794240000000,
+      "split": "train",
+      "rsi_pullback": -2.7743719317409017,
+      "exhaustion": 36.74782547296072,
+      "future_hold_return": -0.014766483516483464
+    },
+    {
+      "id": 217,
+      "source": "live",
+      "symbol": "INITUSDT",
+      "side": "LONG",
+      "decision_ms": 1794240900000,
+      "split": "train",
+      "rsi_pullback": -2.602989574326699,
+      "exhaustion": 7.839083245518527,
+      "future_hold_return": 0.07900952380952364
+    },
+    {
+      "id": 216,
+      "source": "live",
+      "symbol": "KOMAUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794241800000,
+      "split": "train",
+      "rsi_pullback": -4.0822890587774125,
+      "exhaustion": 19.001747740179436,
+      "future_hold_return": 0.001622418879056009
+    },
+    {
+      "id": 220,
+      "source": "live",
+      "symbol": "0GUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794244500000,
+      "split": "train",
+      "rsi_pullback": -0.7991938032988415,
+      "exhaustion": 6.88509499273206,
+      "future_hold_return": 0.011756569847856224
+    },
+    {
+      "id": 219,
+      "source": "live",
+      "symbol": "PARTIUSDT",
+      "side": "LONG",
+      "decision_ms": 1794244500000,
+      "split": "train",
+      "rsi_pullback": -7.447942932333952,
+      "exhaustion": 21.561011241309583,
+      "future_hold_return": -0.01390288132178119
+    },
+    {
+      "id": 221,
+      "source": "live",
+      "symbol": "1INCHUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794246300000,
+      "split": "train",
+      "rsi_pullback": -1.620422959017489,
+      "exhaustion": 18.200531623909978,
+      "future_hold_return": 0.0008913790907932873
+    },
+    {
+      "id": 223,
+      "source": "live",
+      "symbol": "AVAXUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794250800000,
+      "split": "train",
+      "rsi_pullback": -2.6317166511614047,
+      "exhaustion": 9.13244157235341,
+      "future_hold_return": -0.002807674309780017
+    },
+    {
+      "id": 224,
+      "source": "live",
+      "symbol": "1000RATSUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794253500000,
+      "split": "train",
+      "rsi_pullback": -2.3220684658698048,
+      "exhaustion": 8.52659069357625,
+      "future_hold_return": -0.0
+    },
+    {
+      "id": 225,
+      "source": "live",
+      "symbol": "BREVUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794254400000,
+      "split": "train",
+      "rsi_pullback": -6.736837378260091,
+      "exhaustion": 18.6036879995407,
+      "future_hold_return": 0.007014590347923733
+    },
+    {
+      "id": 222,
+      "source": "live",
+      "symbol": "1000XECUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794258900000,
+      "split": "train",
+      "rsi_pullback": -4.876058293518888,
+      "exhaustion": 20.435613094198793,
+      "future_hold_return": 0.004574243490499619
+    },
+    {
+      "id": 227,
+      "source": "live",
+      "symbol": "HUMAUSDT",
+      "side": "LONG",
+      "decision_ms": 1794276900000,
+      "split": "train",
+      "rsi_pullback": -6.337071775920215,
+      "exhaustion": 7.509576330854981,
+      "future_hold_return": -0.024762089726160452
+    },
+    {
+      "id": 226,
+      "source": "live",
+      "symbol": "TAKEUSDT",
+      "side": "LONG",
+      "decision_ms": 1794279600000,
+      "split": "train",
+      "rsi_pullback": -3.2100464229493753,
+      "exhaustion": 13.433395988335826,
+      "future_hold_return": -0.0060623983439300755
+    },
+    {
+      "id": 228,
+      "source": "live",
+      "symbol": "ATOMUSDT",
+      "side": "LONG",
+      "decision_ms": 1794283200000,
+      "split": "train",
+      "rsi_pullback": -3.5846238113202276,
+      "exhaustion": 40.10988076498946,
+      "future_hold_return": -0.005743000717875146
+    },
+    {
+      "id": 234,
+      "source": "live",
+      "symbol": "4USDT",
+      "side": "LONG",
+      "decision_ms": 1794296700000,
+      "split": "validation",
+      "rsi_pullback": -3.382617029113611,
+      "exhaustion": 21.668941382306063,
+      "future_hold_return": 0.007669042989846497
+    },
+    {
+      "id": 232,
+      "source": "live",
+      "symbol": "AGTUSDT",
+      "side": "LONG",
+      "decision_ms": 1794302100000,
+      "split": "validation",
+      "rsi_pullback": -6.175864457043112,
+      "exhaustion": 33.54239099240806,
+      "future_hold_return": 0.01104294478527601
+    },
+    {
+      "id": 236,
+      "source": "live",
+      "symbol": "1000FLOKIUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794307500000,
+      "split": "validation",
+      "rsi_pullback": -6.9553487542964945,
+      "exhaustion": 21.90687152880576,
+      "future_hold_return": -0.001909307875895161
+    },
+    {
+      "id": 235,
+      "source": "live",
+      "symbol": "AGLDUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794310200000,
+      "split": "validation",
+      "rsi_pullback": -5.548850139726667,
+      "exhaustion": 18.677302922468762,
+      "future_hold_return": -0.00766283524904221
+    },
+    {
+      "id": 238,
+      "source": "live",
+      "symbol": "4USDT",
+      "side": "SHORT",
+      "decision_ms": 1794314700000,
+      "split": "validation",
+      "rsi_pullback": -6.751416990286728,
+      "exhaustion": 22.25251249515027,
+      "future_hold_return": -0.014489571899012121
+    },
+    {
+      "id": 237,
+      "source": "live",
+      "symbol": "ASTERUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794316500000,
+      "split": "validation",
+      "rsi_pullback": -2.8383321135950865,
+      "exhaustion": 6.998619392632276,
+      "future_hold_return": 0.005412929167955327
+    },
+    {
+      "id": 239,
+      "source": "live",
+      "symbol": "CCUSDT",
+      "side": "SHORT",
+      "decision_ms": 1794318300000,
+      "split": "validation",
+      "rsi_pullback": -12.863683524107763,
+      "exhaustion": 55.48351896428013,
+      "future_hold_return": 0.01356158292574472
+    }
+  ],
+  "skipped_count": 52,
+  "skip_reasons_partial": {
+    "split_purge": 3
+  },
+  "summaries": [
+    {
+      "source": "paper",
+      "split": "train",
+      "feature": "rsi_pullback",
+      "pairs": 45,
+      "pooled_ic_descriptive": -0.0067193675889328066,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000BONKUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000LUNCUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000SHIBUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1INCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ADAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AIAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AIOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALLOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ANKRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "APRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "APTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ARPAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AWEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AZTECUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BASEDUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BIGTIMEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BREVUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CATIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CCUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CGPTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CLOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "COMPUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "DODOXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "DOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENSOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "FHEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "GWEIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HEIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "LTCUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "SOLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "STBLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "TIAUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "我踏马来了USDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "paper",
+      "split": "train",
+      "feature": "exhaustion",
+      "pairs": 45,
+      "pooled_ic_descriptive": 0.0538884680288389,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000BONKUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000LUNCUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000SHIBUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1INCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ADAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AIAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AIOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALLOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ANKRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "APRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "APTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ARPAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AWEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AZTECUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BASEDUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BIGTIMEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BREVUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CATIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CCUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CGPTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CLOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "COMPUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "DODOXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "DOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENSOUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "FHEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "GWEIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HEIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "LTCUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "SOLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "STBLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "TIAUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "我踏马来了USDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "paper",
+      "split": "validation",
+      "feature": "rsi_pullback",
+      "pairs": 21,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000CATUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000RATSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1MBABYDOGEUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "2ZUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACTUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "ALCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALPINEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ASRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CGPTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENJUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ESPORTSUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "FFUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MASKUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "USUALUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "paper",
+      "split": "validation",
+      "feature": "exhaustion",
+      "pairs": 21,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000CATUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000RATSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1MBABYDOGEUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "2ZUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACTUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "ALCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALPINEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ALTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ASRUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CGPTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ENJUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ESPORTSUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "FFUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MASKUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "USUALUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "live",
+      "split": "train",
+      "feature": "rsi_pullback",
+      "pairs": 30,
+      "pooled_ic_descriptive": 0.13014460511679646,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000RATSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000XECUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1INCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACUUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AEROUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BREVUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BROCCOLI714USDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ERAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "INITUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "KOMAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MERLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "PARTIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "RIFUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "STABLEUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "TAKEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "WLFIUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "live",
+      "split": "train",
+      "feature": "exhaustion",
+      "pairs": 30,
+      "pooled_ic_descriptive": -0.33704115684093433,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "0GUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1000000MOGUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000RATSUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1000XECUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "1INCHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ACUUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AEROUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATHUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ATOMUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AVAXUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BREVUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BROCCOLI714USDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "BULLAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ERAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HOTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "HUMAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "INITUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "KOMAUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MERLUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "MUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "PARTIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "RIFUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "STABLEUSDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "TAKEUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "WLFIUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "live",
+      "split": "validation",
+      "feature": "rsi_pullback",
+      "pairs": 7,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "4USDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "AGLDUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AGTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CCUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    },
+    {
+      "source": "live",
+      "split": "validation",
+      "feature": "exhaustion",
+      "pairs": 7,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": [
+        {
+          "symbol": "1000FLOKIUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "4USDT",
+          "pairs": 2,
+          "ic": null
+        },
+        {
+          "symbol": "AGLDUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "AGTUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "ASTERUSDT",
+          "pairs": 1,
+          "ic": null
+        },
+        {
+          "symbol": "CCUSDT",
+          "pairs": 1,
+          "ic": null
+        }
+      ]
+    }
+  ],
+  "causality": [
+    {
+      "symbol": "0GUSDT",
+      "finite": 549,
+      "passed": true
+    },
+    {
+      "symbol": "1000000MOGUSDT",
+      "finite": 543,
+      "passed": true
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "finite": 579,
+      "passed": true
+    },
+    {
+      "symbol": "1000CATUSDT",
+      "finite": 347,
+      "passed": true
+    },
+    {
+      "symbol": "1000FLOKIUSDT",
+      "finite": 564,
+      "passed": true
+    },
+    {
+      "symbol": "1000LUNCUSDT",
+      "finite": 364,
+      "passed": true
+    },
+    {
+      "symbol": "1000RATSUSDT",
+      "finite": 381,
+      "passed": true
+    },
+    {
+      "symbol": "1000SHIBUSDT",
+      "finite": 292,
+      "passed": true
+    },
+    {
+      "symbol": "1000XECUSDT",
+      "finite": 244,
+      "passed": true
+    },
+    {
+      "symbol": "1INCHUSDT",
+      "finite": 539,
+      "passed": true
+    },
+    {
+      "symbol": "1MBABYDOGEUSDT",
+      "finite": 360,
+      "passed": true
+    },
+    {
+      "symbol": "2ZUSDT",
+      "finite": 213,
+      "passed": true
+    },
+    {
+      "symbol": "4USDT",
+      "finite": 219,
+      "passed": true
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "finite": 354,
+      "passed": true
+    },
+    {
+      "symbol": "ACEUSDT",
+      "finite": 491,
+      "passed": true
+    },
+    {
+      "symbol": "ACTUSDT",
+      "finite": 344,
+      "passed": true
+    },
+    {
+      "symbol": "ACUUSDT",
+      "finite": 221,
+      "passed": true
+    },
+    {
+      "symbol": "ADAUSDT",
+      "finite": 360,
+      "passed": true
+    },
+    {
+      "symbol": "AEROUSDT",
+      "finite": 269,
+      "passed": true
+    },
+    {
+      "symbol": "AGLDUSDT",
+      "finite": 573,
+      "passed": true
+    },
+    {
+      "symbol": "AGTUSDT",
+      "finite": 221,
+      "passed": true
+    },
+    {
+      "symbol": "AIAUSDT",
+      "finite": 587,
+      "passed": true
+    },
+    {
+      "symbol": "AIOTUSDT",
+      "finite": 213,
+      "passed": true
+    },
+    {
+      "symbol": "AKTUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "ALCHUSDT",
+      "finite": 359,
+      "passed": true
+    },
+    {
+      "symbol": "ALLOUSDT",
+      "finite": 220,
+      "passed": true
+    },
+    {
+      "symbol": "ALPINEUSDT",
+      "finite": 631,
+      "passed": true
+    },
+    {
+      "symbol": "ALTUSDT",
+      "finite": 492,
+      "passed": true
+    },
+    {
+      "symbol": "ANKRUSDT",
+      "finite": 565,
+      "passed": true
+    },
+    {
+      "symbol": "APEUSDT",
+      "finite": 206,
+      "passed": true
+    },
+    {
+      "symbol": "APRUSDT",
+      "finite": 223,
+      "passed": true
+    },
+    {
+      "symbol": "APTUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "ARPAUSDT",
+      "finite": 217,
+      "passed": true
+    },
+    {
+      "symbol": "ASRUSDT",
+      "finite": 212,
+      "passed": true
+    },
+    {
+      "symbol": "ASTERUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "ATHUSDT",
+      "finite": 214,
+      "passed": true
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "finite": 557,
+      "passed": true
+    },
+    {
+      "symbol": "ATUSDT",
+      "finite": 238,
+      "passed": true
+    },
+    {
+      "symbol": "AUCTIONUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "AVAUSDT",
+      "finite": 208,
+      "passed": true
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "finite": 486,
+      "passed": true
+    },
+    {
+      "symbol": "AWEUSDT",
+      "finite": 219,
+      "passed": true
+    },
+    {
+      "symbol": "AZTECUSDT",
+      "finite": 210,
+      "passed": true
+    },
+    {
+      "symbol": "BABYUSDT",
+      "finite": 206,
+      "passed": true
+    },
+    {
+      "symbol": "BANANAUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "BANDUSDT",
+      "finite": 214,
+      "passed": true
+    },
+    {
+      "symbol": "BASEDUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "BBUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "BEATUSDT",
+      "finite": 202,
+      "passed": true
+    },
+    {
+      "symbol": "BIGTIMEUSDT",
+      "finite": 212,
+      "passed": true
+    },
+    {
+      "symbol": "BREVUSDT",
+      "finite": 550,
+      "passed": true
+    },
+    {
+      "symbol": "BROCCOLI714USDT",
+      "finite": 213,
+      "passed": true
+    },
+    {
+      "symbol": "BRUSDT",
+      "finite": 217,
+      "passed": true
+    },
+    {
+      "symbol": "BSVUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "BTCDOMUSDT",
+      "finite": 350,
+      "passed": true
+    },
+    {
+      "symbol": "BTWUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "BULLAUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "CATIUSDT",
+      "finite": 222,
+      "passed": true
+    },
+    {
+      "symbol": "CCUSDT",
+      "finite": 438,
+      "passed": true
+    },
+    {
+      "symbol": "CGPTUSDT",
+      "finite": 367,
+      "passed": true
+    },
+    {
+      "symbol": "CLOUSDT",
+      "finite": 219,
+      "passed": true
+    },
+    {
+      "symbol": "COAIUSDT",
+      "finite": 202,
+      "passed": true
+    },
+    {
+      "symbol": "COMPUSDT",
+      "finite": 222,
+      "passed": true
+    },
+    {
+      "symbol": "COWUSDT",
+      "finite": 209,
+      "passed": true
+    },
+    {
+      "symbol": "CUSDT",
+      "finite": 412,
+      "passed": true
+    },
+    {
+      "symbol": "CYSUSDT",
+      "finite": 209,
+      "passed": true
+    },
+    {
+      "symbol": "DODOXUSDT",
+      "finite": 208,
+      "passed": true
+    },
+    {
+      "symbol": "DOSUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "DOTUSDT",
+      "finite": 236,
+      "passed": true
+    },
+    {
+      "symbol": "ENJUSDT",
+      "finite": 317,
+      "passed": true
+    },
+    {
+      "symbol": "ENSOUSDT",
+      "finite": 233,
+      "passed": true
+    },
+    {
+      "symbol": "ENSUSDT",
+      "finite": 209,
+      "passed": true
+    },
+    {
+      "symbol": "ERAUSDT",
+      "finite": 217,
+      "passed": true
+    },
+    {
+      "symbol": "ESPORTSUSDT",
+      "finite": 339,
+      "passed": true
+    },
+    {
+      "symbol": "FFUSDT",
+      "finite": 317,
+      "passed": true
+    },
+    {
+      "symbol": "FHEUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "GWEIUSDT",
+      "finite": 224,
+      "passed": true
+    },
+    {
+      "symbol": "HBARUSDT",
+      "finite": 206,
+      "passed": true
+    },
+    {
+      "symbol": "HEIUSDT",
+      "finite": 218,
+      "passed": true
+    },
+    {
+      "symbol": "HOTUSDT",
+      "finite": 213,
+      "passed": true
+    },
+    {
+      "symbol": "HUMAUSDT",
+      "finite": 253,
+      "passed": true
+    },
+    {
+      "symbol": "INITUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "KOMAUSDT",
+      "finite": 235,
+      "passed": true
+    },
+    {
+      "symbol": "LTCUSDT",
+      "finite": 226,
+      "passed": true
+    },
+    {
+      "symbol": "MASKUSDT",
+      "finite": 317,
+      "passed": true
+    },
+    {
+      "symbol": "MERLUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "MOVRUSDT",
+      "finite": 208,
+      "passed": true
+    },
+    {
+      "symbol": "MUSDT",
+      "finite": 218,
+      "passed": true
+    },
+    {
+      "symbol": "PARTIUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "POPCATUSDT",
+      "finite": 201,
+      "passed": true
+    },
+    {
+      "symbol": "RIFUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "SIRENUSDT",
+      "finite": 201,
+      "passed": true
+    },
+    {
+      "symbol": "SOLUSDT",
+      "finite": 210,
+      "passed": true
+    },
+    {
+      "symbol": "STABLEUSDT",
+      "finite": 232,
+      "passed": true
+    },
+    {
+      "symbol": "STBLUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "TAKEUSDT",
+      "finite": 212,
+      "passed": true
+    },
+    {
+      "symbol": "THETAUSDT",
+      "finite": 207,
+      "passed": true
+    },
+    {
+      "symbol": "TIAUSDT",
+      "finite": 218,
+      "passed": true
+    },
+    {
+      "symbol": "USUALUSDT",
+      "finite": 213,
+      "passed": true
+    },
+    {
+      "symbol": "WLFIUSDT",
+      "finite": 211,
+      "passed": true
+    },
+    {
+      "symbol": "我踏马来了USDT",
+      "finite": 374,
+      "passed": true
+    }
+  ],
+  "controls": {
+    "oracle_ic": 1.0,
+    "shuffled_ic": 0.06542415323112068
+  },
+  "gate": "insufficient",
+  "limitations": [
+    "真实订单每币样本稀少；池化 IC 不能替代同号币门槛",
+    "真实订单触发与成交受既有配置和服务存续期影响，不代表完整历史策略信号",
+    "持仓盈利筛选为收盘估算且依赖实际订单平仓时间，未来标签允许越过实际平仓",
+    "正对照刻意使用未来收益，只用于校验；随机打乱未保留时序相关性",
+    "无交易回测、净收益置信区间、随机交易基线或多重检验"
+  ]
+}

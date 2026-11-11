@@ -50,6 +50,11 @@ class SettingsUpdate(BaseModel):
     order_type: str | None = None
     schedule_enabled: bool | None = None
     schedule_seconds: int | None = None
+    # 巡检并发：1 = 该阶段保持串行（上线默认零行为变化）
+    market_sync_workers: int | None = Field(default=None, ge=1, le=32)
+    market_public_interval_ms: int | None = Field(default=None, ge=20, le=2000)
+    signal_workers: int | None = Field(default=None, ge=1, le=16)
+    execution_workers: int | None = Field(default=None, ge=1, le=16)
     # live 模式下收益/权益以币安账户为准；关掉则退回本地账本（应急开关）
     exchange_truth_enabled: bool | None = None
     # 切到正式环境（真实资金）必须显式二次确认，防止误操作

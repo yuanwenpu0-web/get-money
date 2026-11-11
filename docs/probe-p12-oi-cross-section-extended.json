@@ -1,0 +1,557 @@
+{
+  "topic": "P12 OI crowding cross-sectional IC probe",
+  "generated_at": "2026-11-11T14:43:20.791869+00:00",
+  "script": "backend/scripts/probe_p12_oi_cross_section.py",
+  "stage": "Gate 1 IC probe",
+  "strategy": null,
+  "interval": "1h",
+  "primary": {
+    "factor": "oi_value_z7d",
+    "horizon": 24,
+    "label": "future_24h_return_minus_cross_sectional_median",
+    "periods": 775,
+    "mean_ic": -0.01329,
+    "median_ic": -0.01106,
+    "std_ic": 0.074,
+    "same_sign_share": 0.5639,
+    "first_half_mean_ic": -0.01571,
+    "second_half_mean_ic": -0.01089,
+    "ci": {
+      "ci_low": -0.03092,
+      "ci_high": 0.00418,
+      "n": 775,
+      "n_boot": 2000,
+      "method": "block24",
+      "mean": -0.01329
+    },
+    "permutation_null": {
+      "n_permutations": 200,
+      "seed": 20261111,
+      "null_mean": 8e-05,
+      "null_p05": -0.00247,
+      "null_p95": 0.00274,
+      "observed_mean": -0.01329,
+      "empirical_p_two_sided": 0.0,
+      "percentile_in_null": 0.0
+    },
+    "per_symbol_ic": {
+      "symbols": 515,
+      "mean_ic": -0.05799,
+      "median_ic": -0.06458,
+      "same_sign_share": 0.6388,
+      "direction": "negative",
+      "label": "future_H_return_minus_cross_sectional_median"
+    },
+    "raw_label_comparison": {
+      "periods": 775,
+      "mean_ic": -0.01329,
+      "median_ic": -0.01106,
+      "std_ic": 0.074,
+      "same_sign_share": 0.5639,
+      "first_half_mean_ic": -0.01571,
+      "second_half_mean_ic": -0.01089,
+      "label": "future_24h_return_raw"
+    },
+    "positive_control": {
+      "periods": 850,
+      "mean_ic": 1.0,
+      "median_ic": 1.0,
+      "std_ic": 0.0,
+      "same_sign_share": 1.0,
+      "first_half_mean_ic": 1.0,
+      "second_half_mean_ic": 1.0,
+      "label": "lookahead_factor_equals_label"
+    }
+  },
+  "gate": {
+    "abs_mean_ic_gt_0.02": false,
+    "ci_excludes_zero": false,
+    "same_sign_period_share_ge_0.60": false,
+    "per_symbol_same_sign_ge_0.60": true,
+    "permutation_p_lt_0.05": true,
+    "passed": false
+  },
+  "exploratory": [
+    {
+      "periods": 862,
+      "mean_ic": -0.00694,
+      "median_ic": -0.00131,
+      "std_ic": 0.13023,
+      "same_sign_share": 0.5046,
+      "first_half_mean_ic": -0.02559,
+      "second_half_mean_ic": 0.01171,
+      "label": "H8_excess",
+      "factor": "oi_value_usd",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.03161,
+        "ci_high": 0.01706,
+        "n": 862,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00694
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 846,
+      "mean_ic": -0.00266,
+      "median_ic": 0.00276,
+      "std_ic": 0.13479,
+      "same_sign_share": 0.4894,
+      "first_half_mean_ic": -0.02795,
+      "second_half_mean_ic": 0.02263,
+      "label": "H24_excess",
+      "factor": "oi_value_usd",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.03989,
+        "ci_high": 0.0333,
+        "n": 846,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00266
+      },
+      "empirical_p": 0.03,
+      "fdr_q": 0.0364
+    },
+    {
+      "periods": 822,
+      "mean_ic": -0.0024,
+      "median_ic": 0.00271,
+      "std_ic": 0.13456,
+      "same_sign_share": 0.4903,
+      "first_half_mean_ic": -0.03008,
+      "second_half_mean_ic": 0.02528,
+      "label": "H48_excess",
+      "factor": "oi_value_usd",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.04237,
+        "ci_high": 0.03644,
+        "n": 822,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.0024
+      },
+      "empirical_p": 0.13,
+      "fdr_q": 0.1381
+    },
+    {
+      "periods": 791,
+      "mean_ic": -0.02204,
+      "median_ic": -0.01936,
+      "std_ic": 0.0819,
+      "same_sign_share": 0.6081,
+      "first_half_mean_ic": -0.0238,
+      "second_half_mean_ic": -0.02029,
+      "label": "H8_excess",
+      "factor": "oi_value_z7d",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.03481,
+        "ci_high": -0.00837,
+        "n": 791,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.02204
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 751,
+      "mean_ic": 0.00606,
+      "median_ic": 0.00522,
+      "std_ic": 0.06736,
+      "same_sign_share": 0.526,
+      "first_half_mean_ic": 0.01409,
+      "second_half_mean_ic": -0.00195,
+      "label": "H48_excess",
+      "factor": "oi_value_z7d",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.01053,
+        "ci_high": 0.02287,
+        "n": 751,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.00606
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 837,
+      "mean_ic": -0.02172,
+      "median_ic": -0.01828,
+      "std_ic": 0.09266,
+      "same_sign_share": 0.5735,
+      "first_half_mean_ic": -0.02373,
+      "second_half_mean_ic": -0.01971,
+      "label": "H8_excess",
+      "factor": "oi_change_24h",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.03824,
+        "ci_high": -0.00519,
+        "n": 837,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.02172
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 821,
+      "mean_ic": -0.01344,
+      "median_ic": -0.01,
+      "std_ic": 0.08526,
+      "same_sign_share": 0.5518,
+      "first_half_mean_ic": -0.01842,
+      "second_half_mean_ic": -0.00847,
+      "label": "H24_excess",
+      "factor": "oi_change_24h",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.03302,
+        "ci_high": 0.00637,
+        "n": 821,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.01344
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 797,
+      "mean_ic": -0.0104,
+      "median_ic": -0.0167,
+      "std_ic": 0.08436,
+      "same_sign_share": 0.5872,
+      "first_half_mean_ic": -0.00082,
+      "second_half_mean_ic": -0.01996,
+      "label": "H48_excess",
+      "factor": "oi_change_24h",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.03005,
+        "ci_high": 0.01093,
+        "n": 797,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.0104
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 862,
+      "mean_ic": 0.0021,
+      "median_ic": 0.00308,
+      "std_ic": 0.12352,
+      "same_sign_share": 0.5058,
+      "first_half_mean_ic": 0.00773,
+      "second_half_mean_ic": -0.00354,
+      "label": "H8_excess",
+      "factor": "long_short_ratio",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.02071,
+        "ci_high": 0.02399,
+        "n": 862,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.0021
+      },
+      "empirical_p": 0.22,
+      "fdr_q": 0.22
+    },
+    {
+      "periods": 846,
+      "mean_ic": 0.00375,
+      "median_ic": -0.00103,
+      "std_ic": 0.1309,
+      "same_sign_share": 0.4941,
+      "first_half_mean_ic": 0.00524,
+      "second_half_mean_ic": 0.00227,
+      "label": "H24_excess",
+      "factor": "long_short_ratio",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.032,
+        "ci_high": 0.03807,
+        "n": 846,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.00375
+      },
+      "empirical_p": 0.01,
+      "fdr_q": 0.0131
+    },
+    {
+      "periods": 822,
+      "mean_ic": 0.00977,
+      "median_ic": 0.00994,
+      "std_ic": 0.13298,
+      "same_sign_share": 0.517,
+      "first_half_mean_ic": 0.00298,
+      "second_half_mean_ic": 0.01656,
+      "label": "H48_excess",
+      "factor": "long_short_ratio",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.03082,
+        "ci_high": 0.0492,
+        "n": 822,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.00977
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 862,
+      "mean_ic": 0.01676,
+      "median_ic": 0.0217,
+      "std_ic": 0.08412,
+      "same_sign_share": 0.5882,
+      "first_half_mean_ic": 0.01301,
+      "second_half_mean_ic": 0.02051,
+      "label": "H8_excess",
+      "factor": "top_long_short",
+      "horizon": 8,
+      "ci": {
+        "ci_low": 0.00271,
+        "ci_high": 0.0317,
+        "n": 862,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.01676
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 846,
+      "mean_ic": 0.00958,
+      "median_ic": 0.00346,
+      "std_ic": 0.08556,
+      "same_sign_share": 0.5154,
+      "first_half_mean_ic": 0.0085,
+      "second_half_mean_ic": 0.01065,
+      "label": "H24_excess",
+      "factor": "top_long_short",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.01303,
+        "ci_high": 0.03315,
+        "n": 846,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.00958
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 822,
+      "mean_ic": 0.00279,
+      "median_ic": -0.00341,
+      "std_ic": 0.09834,
+      "same_sign_share": 0.4891,
+      "first_half_mean_ic": 0.00254,
+      "second_half_mean_ic": 0.00305,
+      "label": "H48_excess",
+      "factor": "top_long_short",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.02618,
+        "ci_high": 0.03167,
+        "n": 822,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.00279
+      },
+      "empirical_p": 0.08,
+      "fdr_q": 0.0907
+    },
+    {
+      "periods": 865,
+      "mean_ic": -0.00787,
+      "median_ic": -0.00939,
+      "std_ic": 0.05743,
+      "same_sign_share": 0.5769,
+      "first_half_mean_ic": -0.00346,
+      "second_half_mean_ic": -0.01226,
+      "label": "H8_excess",
+      "factor": "taker_buy_sell",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.01247,
+        "ci_high": -0.00318,
+        "n": 865,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00787
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 849,
+      "mean_ic": -0.00678,
+      "median_ic": -0.00716,
+      "std_ic": 0.05411,
+      "same_sign_share": 0.5465,
+      "first_half_mean_ic": -0.00383,
+      "second_half_mean_ic": -0.00973,
+      "label": "H24_excess",
+      "factor": "taker_buy_sell",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.01109,
+        "ci_high": -0.00239,
+        "n": 849,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00678
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 825,
+      "mean_ic": -0.00582,
+      "median_ic": -0.00577,
+      "std_ic": 0.05366,
+      "same_sign_share": 0.5455,
+      "first_half_mean_ic": -0.00542,
+      "second_half_mean_ic": -0.00622,
+      "label": "H48_excess",
+      "factor": "taker_buy_sell",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.01054,
+        "ci_high": -0.00136,
+        "n": 825,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00582
+      },
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    }
+  ],
+  "exploratory_multiple_testing": {
+    "method": "Benjamini-Hochberg",
+    "n_tests": 17,
+    "q_threshold": 0.1,
+    "n_q_below_threshold": 15
+  },
+  "common_factor_diagnostic": {
+    "pairs": 779,
+    "spearman_market_oi_level_vs_market_fwd_24h": -0.34803,
+    "mean_cross_section_std_of_oi_z": 1.16136,
+    "mean_abs_cross_section_mean_of_oi_z": 0.64261,
+    "note": "rank IC 对逐期减常数是恒等变换，故 raw / demean 标签 IC 相同；横截面 IC 已天然剔除市场共同平移"
+  },
+  "rank_ic_invariant_note": "Spearman rank IC 对逐期标签减常数不变，故 raw 与 demean 标签 IC 完全相同；这不是缺陷，而是说明横截面 IC 本身已剔除市场共同平移，逐币时序 IC 与横截面 IC 的差异来自聚合维度（时间 vs 券）而非标签 demean",
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "applied_to_ic": false
+  },
+  "trades": 0,
+  "trades_note": "探针阶段无撮合、无成交；IC 不是净收益判定",
+  "window": {
+    "start": "2026-10-06T04:00:00+00:00",
+    "end": "2026-11-11T14:00:00+00:00",
+    "days": 36.42
+  },
+  "universe": {
+    "pool": "sentiment ∩ native 1h",
+    "symbols_in_sentiment": 515,
+    "symbols_in_native_1h": 535,
+    "skipped": [],
+    "coverage_note": "逐时点有效币数见 market；不足 30 币的时点跳过"
+  },
+  "data_freshness": {
+    "sentiment_end": "2026-11-11T14:00:00+00:00",
+    "native_1h_end": "2026-11-11T13:00:00+00:00",
+    "sentiment_lag_days_vs_1h": -0.04
+  },
+  "data_pipeline_status": {
+    "generated_at_utc": "2026-11-11T14:43:20.857881+00:00",
+    "kline_last_bar_utc": {
+      "15m": "2026-10-25T12:30:00+00:00",
+      "1h": "2026-11-11T13:00:00+00:00",
+      "1m": "2026-11-11T14:38:00+00:00",
+      "4h": "2026-10-26T08:00:00+00:00",
+      "5m": "2026-10-25T11:20:00+00:00"
+    },
+    "funding_last_bar_utc": "2026-10-27T12:00:00+00:00",
+    "sentiment_last_bar_utc": "2026-11-11T14:00:00+00:00",
+    "p9_ab_requirement_days": 60,
+    "p9_available_days": 36.42,
+    "note": "各周期尾部以本字段实时核表为准；调度是否覆盖需另查自动化／APScheduler，不在探针内推断"
+  },
+  "next_hypotheses": [
+    {
+      "id": "H-A",
+      "name": "市场级杠杆择时",
+      "falsifiable": "若全市场平均 OI z 对全市场未来收益有择时价值，则非重叠样本的样本外净收益 CI 下界 > 0 且跑赢多种子随机基线；否则终止",
+      "data_prerequisite": "恢复 sentiment 采集并补回 10-28 之后缺口，累积 >=60 天",
+      "status": "BLOCKED_BY_DATA",
+      "h2_compliant": true
+    },
+    {
+      "id": "H-B",
+      "name": "逐笔成交顺序（非 K 线汇总）",
+      "falsifiable": "若逐笔方向游程 / 大单簇携带信息，则 IC 探针 |IC|>0.02 且同号币 >=60%；否则终止",
+      "data_prerequisite": "新建 aggTrades 采集（data.binance.vision 日归档可回填）",
+      "status": "BLOCKED_BY_NEW_SOURCE",
+      "h2_compliant": true
+    },
+    {
+      "id": "H-C",
+      "name": "盘口挂撤单 / 多所现货腿",
+      "falsifiable": "若挂撤单失衡或跨所价差可预测，则先过 IC 探针；否则终止",
+      "data_prerequisite": "盘口需从现在开始录快照；多所需接 Gate/MEXC 数据",
+      "status": "BLOCKED_BY_NEW_SOURCE",
+      "h2_compliant": true
+    }
+  ],
+  "market": {
+    "median_symbols_per_period": 514,
+    "periods_below_min_cross_section": 100,
+    "btc_return_pct_window": -13.8
+  },
+  "ci": {
+    "ci_low": -0.03092,
+    "ci_high": 0.00418,
+    "n": 775,
+    "n_boot": 2000,
+    "method": "block24",
+    "mean": -0.01329
+  },
+  "verdict": "inconclusive",
+  "default_enabled": false,
+  "verdict_scope": "探针级：IC 的 95% CI 跨 0；本轮无撮合、无净收益 CI、无多种子随机基线，不构成 H4 的 edge 判定",
+  "limitations": [
+    "sentiment 仅 21.83 天且停在 2026-10-28，native 1h 停在 2026-11-04；单一样本期、BTC -5.691% 的下跌市，跨市场状态稳健性无法验证",
+    "oi_value_z7d 以 168 根 rolling、min_periods=72 近似 7 天 z-score，与 P9 的完整 7 天口径存在预热期偏离",
+    "标签为 close[t+H]/close[t]-1 的固定持有收益，不是 P9 的 triple-barrier 止盈标签，逐币 IC 数值不可与 P9 直接相减",
+    "IC 是毛价格关联，未扣 0.12% 双边成本、资金费率、盘口深度、滑点与强平",
+    "置换零分布按各期独立打乱，未保留跨期自相关；block bootstrap 保留了自相关，两者结论不一致时以更保守的 CI 为准",
+    "横截面 IC 只测券维度排序，不能排除 OI 在时间维度上存在择时价值",
+    "探索性组合未用于 gate，已做 BH-FDR，仍不得事后挑选取参"
+  ],
+  "seed": 20261111
+}

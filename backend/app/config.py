@@ -60,6 +60,9 @@ DB_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "20"))
 DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", "30"))
 # 网络请求并发上限；数据库写入仍由调用线程顺序提交。
 MARKET_SYNC_WORKERS = max(1, min(32, int(os.getenv("MARKET_SYNC_WORKERS", "8"))))
+# 币安公开 GET 的进程级限流间隔（毫秒）。巡检每轮从 state 读取并动态设置到
+# futures._PUBLIC_GATE；这里的环境变量只是 state 里没有配置时的兜底默认值。
+DEFAULT_PUBLIC_INTERVAL_MS = max(20, min(2000, int(os.getenv("MARKET_PUBLIC_INTERVAL_MS", "350"))))
 # 非 1m 周期在 1m 缺失时，是否用已单独存储的同周期行补齐。
 # 前提：docs/native-consistency.md 的重叠区间比对必须完全一致，否则关闭。
 MARKET_NATIVE_FALLBACK = os.getenv("MARKET_NATIVE_FALLBACK", "1").lower() not in ("0", "false", "no")

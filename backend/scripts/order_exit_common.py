@@ -75,13 +75,25 @@ def run_rule(bars, side, entry, sl, rule):
     return float(last_close), len(bars) - 1, "horizon"
 
 
-def build_rules(entry, tp, sl, atr_value, horizon, side):
-    """Finite NEGATIVE-CONTROL rule family. No champion selection (H2 / Gate 0)."""
+def build_rules(entry, tp, sl, atr_value, horizon, side, fixed_tp_pcts=()):
+    """Finite NEGATIVE-CONTROL rule family. No champion selection (H2 / Gate 0).
+
+    `fixed_tp_pcts` is an OPTIONAL pre-registered grid of ABSOLUTE take-profit
+    distances in percent of entry price. Unlike `tp_x*` (relative to each
+    order's own TP) and `atr_tp_x*` (scaled by each order's own ATR), these
+    targets are identical percentages for every order and every symbol, which
+    is what "fixed profit points" means. Default empty keeps all historical
+    reports bit-for-bit reproducible.
+    """
     sign = 1.0 if tp > entry else -1.0
     R = abs(entry - sl)
     tp_dist = abs(tp - entry)
     rules = [{"name": "baseline", "kind": "barrier", "tp": tp, "sl": sl,
               "R": R, "activate_R": 0, "trail_R": 0, "max_bars": 0}]
+    for pct in fixed_tp_pcts:
+        rules.append({"name": f"fix_{pct:g}pct", "kind": "barrier",
+                      "tp": entry * (1.0 + sign * pct / 100.0), "sl": sl,
+                      "R": R, "activate_R": 0, "trail_R": 0, "max_bars": 0})
     for scale in (0.5, 0.75, 1.5, 2.0, 3.0):
         rules.append({"name": f"tp_x{scale}", "kind": "barrier",
                       "tp": entry + sign * tp_dist * scale, "sl": sl, "R": R,

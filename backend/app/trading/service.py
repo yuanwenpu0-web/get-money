@@ -3,15 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import time
 import traceback
 from types import SimpleNamespace
 
 from sqlalchemy.orm import Session
 
-from ..config import MARKET_SYNC_WORKERS
+from ..config import DEFAULT_PUBLIC_INTERVAL_MS, MARKET_SYNC_WORKERS
 from ..db import SessionLocal
 from ..market.data_service import MarketDataService
+from ..market.futures import set_public_request_interval
 from ..models import JobLog, Order
 from ..state import all_state, get_state, set_state
 from ..strategy.specs.pool_volatility_research import BLOCKED_CODES as RESEARCH_CODES
@@ -23,11 +25,79 @@ from ..strategy.registry import get_spec
 from ..utils import interval_ms, iso_utc, now_ms
 from .order_manager import manage_order
 from .dispatch import close_position, open_position
-from .live_sync import sync_live
+from .live_sync import prefetch_live_snapshots, sync_live
 from .portfolio import open_orders, portfolio_snapshot, snapshot_equity
 from . import exchange_truth
 
 SYNC_WORKERS = MARKET_SYNC_WORKERS
+
+
+def _scan_parallelism(state: dict) -> dict:
+    """读巡检并发配置。缺省值 = 历史行为（8 线程 / 350ms / 其余串行），上线零变化。
+
+    每项都钳到合法区间，避免设置页写入脏值后整轮巡检崩掉。
+    """
+    def _int(key: str, default: int, low: int, high: int) -> int:
+        try:
+            value = int(state.get(key, default))
+        except (TypeError, ValueError):
+            return default
+        return max(low, min(high, value))
+
+    return {
+        "market_workers": _int("market_sync_workers", MARKET_SYNC_WORKERS, 1, 32),
+        "public_interval_ms": _int("market_public_interval_ms", DEFAULT_PUBLIC_INTERVAL_MS, 20, 2000),
+        "signal_workers": _int("signal_workers", 1, 1, 16),
+        "execution_workers": _int("execution_workers", 1, 1, 16),
+    }
+
+
+def _evaluate_pairs_parallel(pairs, workers: int) -> list[tuple[object, str | None]]:
+    """信号评估并行版：每线程独立 Session + StrategyEngine，结果按原下标返回。
+
+    SQLAlchemy Session 和 StrategyEngine.cycle_snapshot 缓存都不是线程安全的，
+    绝不能共享主线程的 engine；每个 worker 自建一套，单币异常在线程内 rollback
+    后转成 error 字符串，由主线程照常汇总 signal_errors。
+    """
+    # ORM binding 只在主线程拆成普通值，避免把 Session 绑定对象带进线程
+    tasks = [
+        (index, symbol, binding.interval, binding.strategy, binding.pool,
+         binding.params_for(symbol))
+        for index, (symbol, binding) in enumerate(pairs)
+    ]
+    count = min(workers, len(tasks))
+    size = (len(tasks) + count - 1) // count
+    chunks = [tasks[i:i + size] for i in range(0, len(tasks), size)]
+
+    def run_chunk(chunk):
+        session = None
+        out = []
+        try:
+            session = SessionLocal()
+            engine = StrategyEngine(session, cycle_snapshot=True)
+            for index, symbol, interval, strategy, pool, params in chunk:
+                try:
+                    signal = engine.evaluate(symbol, interval, strategy, save=True,
+                                             params=params, pool=pool)
+                    out.append((index, signal, None))
+                except Exception as exc:  # noqa: BLE001 - 单币失败不拖垮整轮
+                    session.rollback()
+                    out.append((index, None, f"{type(exc).__name__}: {exc}"))
+        except Exception as exc:  # noqa: BLE001 - 线程级失败降级成逐条错误
+            done = {row[0] for row in out}
+            out.extend((index, None, f"{type(exc).__name__}: {exc}")
+                       for index, *_ in chunk if index not in done)
+        finally:
+            if session is not None:
+                session.close()
+        return out
+
+    results: dict[int, tuple[object, str | None]] = {}
+    with ThreadPoolExecutor(max_workers=count, thread_name_prefix="signal-eval") as pool:
+        for chunk_result in pool.map(run_chunk, chunks):
+            for index, signal, error in chunk_result:
+                results[index] = (signal, error)
+    return [results.get(i, (None, "信号评估结果缺失")) for i in range(len(tasks))]
 
 
 def _research_pending_key(symbol: str, strategy: str, pool: str) -> str:
@@ -38,7 +108,11 @@ def _research_pending_key(symbol: str, strategy: str, pool: str) -> str:
 
 
 def _sync_recent_many(symbols: list[str], interval: str, workers: int = SYNC_WORKERS) -> list[str]:
-    """共享连接池并发拉行情，单一会话在调用线程顺序写入。"""
+    """共享连接池并发拉行情，单一会话在调用线程顺序写入。
+
+    workers 由 run_cycle 按设置页的 market_sync_workers 传入，下一轮即生效；
+    默认值保留给离线/脚本调用。
+    """
     db = SessionLocal()
     try:
         result = MarketDataService(db).sync_recent_many(symbols, interval, workers=workers)
@@ -63,6 +137,10 @@ class TradingService:
         try:
             started = time.monotonic()
             state = all_state(self.db)
+            scan = _scan_parallelism(state)
+            # 设置页改完下一轮即生效：放开进程级公开 GET 限流门，
+            # 否则行情同步的 N 个线程全堵在 acquire() 里排队。
+            set_public_request_interval(scan["public_interval_ms"] / 1000.0)
             # 以币安为准：每周期先拉一次账户快照，后续开仓仓位计算、权益曲线、
             # 仪表盘读数都使用同一份交易所数据，避免本地账本与交易所漂移。
             if state.get("execution_mode") == "live" and state.get("exchange_truth_enabled", True):
@@ -98,7 +176,8 @@ class TradingService:
                 sync_groups.setdefault(required_interval, set()).add(symbol)
             sync_errors = []
             for sync_interval, sync_symbols in sync_groups.items():
-                sync_errors.extend(_sync_recent_many(sorted(sync_symbols), sync_interval))
+                sync_errors.extend(_sync_recent_many(sorted(sync_symbols), sync_interval,
+                                                     workers=scan["market_workers"]))
             sync_target_count = sum(len(group) for group in sync_groups.values())
             synced_at = time.monotonic()
 
@@ -107,50 +186,71 @@ class TradingService:
             strategy_signals = {}
             initially_held = {order.symbol for order in open_orders(self.db)}
             signal_errors = list(binding_errors)
-            for symbol, binding in pairs:
-                try:
-                    signal = engine.evaluate(
-                        symbol,
-                        binding.interval,
-                        binding.strategy,
-                        save=True,
-                        params=binding.params_for(symbol),
-                        pool=binding.pool,
-                    )
-                    strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
-                    if signal is not None:
-                        signal.binding_id = binding.id
-                    if signal is None:
-                        signal_errors.append(f"{symbol}/{binding.strategy}×{binding.pool}: 数据不足或K线无效，无法生成信号")
-                        continue
-                    if (signal.strategy in RESEARCH_CODES and signal.interval == "1h"
-                            and symbol not in initially_held and signal.reason.get("research_entry")
-                            and signal.reason.get("block_reason") != "stale_data"):
-                        pending_key = _research_pending_key(symbol, binding.strategy, binding.pool)
-                        pending = get_state(self.db, pending_key, None)
-                        if not pending:
-                            pending = signal.to_dict()
-                            pending["params"] = signal.params
-                            pending["binding_id"] = binding.id
-                            set_state(self.db, pending_key, pending)
-                    if signal.direction == "FLAT":
-                        continue
-                    current = best_signals.get(symbol)
-                    if current is None or signal.score > current.score:
-                        best_signals[symbol] = signal
-                except Exception as exc:
-                    self.db.rollback()
-                    signal_errors.append(f"{symbol}/{binding.strategy}×{binding.pool}: {exc}")
+            # 并行只负责「算信号」；研究池 pending、评分择优、state 写入仍在主线程串行。
+            # 结果按 pairs 原下标合并，线程完成顺序不会影响任何开仓决策。
+            evaluated = (_evaluate_pairs_parallel(pairs, scan["signal_workers"])
+                         if scan["signal_workers"] > 1 else None)
+            for index, (symbol, binding) in enumerate(pairs):
+                label = f"{symbol}/{binding.strategy}×{binding.pool}"
+                if evaluated is None:
+                    try:
+                        signal = engine.evaluate(
+                            symbol, binding.interval, binding.strategy, save=True,
+                            params=binding.params_for(symbol), pool=binding.pool,
+                        )
+                        error = None
+                    except Exception as exc:
+                        self.db.rollback()
+                        signal, error = None, str(exc)
+                else:
+                    signal, error = evaluated[index]
+                if error is not None:
+                    signal_errors.append(f"{label}: {error}")
+                    continue
+                strategy_signals[(symbol, binding.interval, binding.strategy, binding.pool)] = signal
+                if signal is not None:
+                    signal.binding_id = binding.id
+                if signal is None:
+                    signal_errors.append(f"{label}: 数据不足或K线无效，无法生成信号")
+                    continue
+                if (signal.strategy in RESEARCH_CODES and signal.interval == "1h"
+                        and symbol not in initially_held and signal.reason.get("research_entry")
+                        and signal.reason.get("block_reason") != "stale_data"):
+                    pending_key = _research_pending_key(symbol, binding.strategy, binding.pool)
+                    pending = get_state(self.db, pending_key, None)
+                    if not pending:
+                        pending = signal.to_dict()
+                        pending["params"] = signal.params
+                        pending["binding_id"] = binding.id
+                        set_state(self.db, pending_key, pending)
+                if signal.direction == "FLAT":
+                    continue
+                current = best_signals.get(symbol)
+                if current is None or signal.score > current.score:
+                    best_signals[symbol] = signal
             signaled_at = time.monotonic()
 
             # 管理已有订单：live 订单先同步交易所状态（交易所侧止盈止损可能已触发）
             managed = []
             closed_symbols = set()
-            for order in open_orders(self.db):
+            open_rows = open_orders(self.db)
+            live_rows = [row for row in open_rows if row.source == "live"]
+            # 多笔 live 持仓时并发预取只读状态；结算/撤单/重挂/下单仍全部串行，
+            # 避免并发写 state 与资金竞争。预取失败自动回落到原串行网络路径。
+            live_snapshots = {}
+            if scan["execution_workers"] > 1 and len(live_rows) > 1:
+                try:
+                    live_snapshots = prefetch_live_snapshots(
+                        self.db, live_rows, scan["execution_workers"]
+                    )
+                except Exception as exc:
+                    self.db.rollback()
+                    sync_errors.append(f"live 状态预取失败，已回落串行: {exc}")
+            for order in open_rows:
                 if order.source == "live":
                     live_order_id = order.id
                     try:
-                        if sync_live(self.db, order) is not None:
+                        if sync_live(self.db, order, live_snapshots.get(order.id)) is not None:
                             closed_symbols.add(order.symbol)
                             managed.append({"order_id": order.id, "actions": ["exchange_closed_sync"]})
                             continue
@@ -274,6 +374,7 @@ class TradingService:
                 "signal_ms": int((signaled_at - synced_at) * 1000),
                 "execution_ms": int((time.monotonic() - signaled_at) * 1000),
                 "interval": interval,
+                "parallelism": scan,
                 "signals": [signal.to_dict() for signal in best_signals.values()],
                 "decisions": decisions,
                 "opened": opened,
@@ -312,6 +413,7 @@ class TradingService:
             "sync_ms": summary.get("sync_ms"),
             "signal_ms": summary.get("signal_ms"),
             "execution_ms": summary.get("execution_ms"),
+            "parallelism": summary.get("parallelism"),
             "opened": len(summary.get("opened", [])),
             "managed": len(summary.get("managed", [])),
             "sync_errors": [f"{len(sync_errors)} 条"] + sync_errors[:2],

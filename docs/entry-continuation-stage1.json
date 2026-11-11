@@ -1,0 +1,3621 @@
+{
+  "topic": "entry-continuation-stage1",
+  "generated_at": "2026-11-10T14:35:56+00:00",
+  "stage": 1,
+  "question": "Does a 1/5/10-minute post-entry continuation check improve profit over the baseline?",
+  "strategy": "supertrend_current",
+  "interval": "1h",
+  "days": 90,
+  "window": {
+    "start_ms": 1786492800000,
+    "end_ms": 1794268800000,
+    "start": "2026-08-12 00:00 UTC",
+    "end": "2026-11-10 00:00 UTC"
+  },
+  "trades": 1036,
+  "ci": {
+    "ci_low_pct": -0.1707097738221121,
+    "ci_high_pct": 0.14244283815057923,
+    "of": "1m vs baseline paired difference"
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional"
+  },
+  "universe": {
+    "symbols": 35,
+    "skipped": [
+      {
+        "symbol": "0GUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "APTUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "ARCUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "ARUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "ARXUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "ASTERUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "AXSUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "BATUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "BEAMXUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "BOMEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "BRUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "CAKEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "CAPUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "COTIUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "CTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.3819
+      },
+      {
+        "symbol": "DATAIPUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "DOODUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "DOSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "DYMUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "EIGENUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "FETUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "GALAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "GRAMUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "GRVTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "HBARUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "LITUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "LYNUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "MAGICUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "MANAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "MARSCOINUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.7144
+      },
+      {
+        "symbol": "METUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "MORPHOUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "MOVRUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "OGNUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "OPUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "OUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "PENDLEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "PENGUUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "POLUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "PONSUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.5764
+      },
+      {
+        "symbol": "PREDICTUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.1148
+      },
+      {
+        "symbol": "PROMUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "RAREUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "REUSDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.9407
+      },
+      {
+        "symbol": "RIVERUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "RLCUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "RUNEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "SAGAUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "SANDUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "SKYUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.5755
+      },
+      {
+        "symbol": "STABLEUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.8287
+      },
+      {
+        "symbol": "STARUSDT",
+        "reason": "window_coverage_below_threshold",
+        "coverage": 0.8287
+      },
+      {
+        "symbol": "哈基米USDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.6597
+      },
+      {
+        "symbol": "牛来USDT",
+        "reason": "no_warmup_history",
+        "coverage": 0.7356
+      },
+      {
+        "symbol": "1000000MOGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000BONKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000CATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "1000CHEEMSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "1000FLOKIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000LUNCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000PEPEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 75.6
+      },
+      {
+        "symbol": "1000RATSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000SATSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "1000SHIBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1000WHYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "1000XECUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "1INCHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "1MBABYDOGEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "2ZUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "4USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ACEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ACHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ACTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ACUUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AEROUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AEVOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AGLDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AIGENSYNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AIOTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AIOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.9
+      },
+      {
+        "symbol": "AIXBTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AKTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ALCHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ALGOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ALICEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ALLOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ALLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ALPINEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ALTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ANIMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ANKRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "APEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "API3USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "APRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "ARKMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ARKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ARPAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ASRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ASTRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ATHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ATOMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AUCTIONUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AVAAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "AVAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AVNTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AWEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AXLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AZTECUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "B2USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BABYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "BANANAS31USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BANANAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BANDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BANKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 4.0
+      },
+      {
+        "symbol": "BANUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BARDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BASEDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BASUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BEATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BELUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BERAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BICOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BIGTIMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BILLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BIOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BIRBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 75.6
+      },
+      {
+        "symbol": "BLESSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BLUAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BLURUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BMTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 0.7
+      },
+      {
+        "symbol": "BNTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BRETTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BREVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BROCCOLI714USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "BROCCOLIF3BUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BSBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BSVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BTCDOMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BTRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "BUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "C98USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CARVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CATIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CELOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CELRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CETUSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CFGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CFXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CGPTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CHILLGUYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CHIPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CHRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CHZUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CKBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CLANKERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CLOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "COAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "COLLECTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "COMPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "COOKIEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "COWUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CROSSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CRVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CTKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CTRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CTSIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CVCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CVXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "CYBERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "CYSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "DASHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "DEEPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "DEXEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "DIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "DODOXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "DOGSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "DOLOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "DRIFTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "DUSKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "DYDXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "EDENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "EDGEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "EDUUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "EGLDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ELSAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ENJUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ENSOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ENSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "EPICUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.9
+      },
+      {
+        "symbol": "ERAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "ESPORTSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ESPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ETCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ETHFIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ETHWUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "EULUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "EVAAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FARTCOINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FFUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FHEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FIDAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FIGHTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FLOCKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FLOWUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FLUIDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FLUXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FOGOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FOLKSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "FORMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FRAXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "FXSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "GASUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GENIUSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "GIGGLEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GLMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GMTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GMXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GOATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "GPSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GRASSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "GRIFFAINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "GRTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GUAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "GUNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "GWEIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "HAEDALUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HANAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "HEIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HEMIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HIVEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HMSTRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HOLOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HOMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HOTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HUMAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "HUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "HYPERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "HYPEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 75.6
+      },
+      {
+        "symbol": "ICNTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ICPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "IDOLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "IDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ILVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "IMXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "INITUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "INUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "INXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "IOTAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "IOTXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "IOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "IRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "IRYSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 77.7
+      },
+      {
+        "symbol": "JASMYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "JELLYJELLYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "JOEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "JSTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "JTOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KAIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KAITOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KASUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "KATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.7
+      },
+      {
+        "symbol": "KAVAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KERNELUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KGENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "KITEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KMNOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KNCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "KOMAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "KSMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LABUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "LAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LAYERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LDOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LIGHTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "LINEAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LISTAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LPTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LQTYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LSKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LUMIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "LUNA2USDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MANTAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MANTRAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MASKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MAVIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MAVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MEGAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MELANIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MEMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MERLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "METISUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MEWUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MINAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MIRAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MITOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.9
+      },
+      {
+        "symbol": "MMTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MOCAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MONUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MOODENGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MOVEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MTLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MUBARAKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "MUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "MYXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "NAORISUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "NEIROUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NEOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NEWTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NIGHTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NILUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "NMRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NOMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "NOTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "NTRNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "NXPCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "OGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ONEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ONGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ONTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ONUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "OPENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "OPGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "OPNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ORCAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ORDERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "ORDIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PARTIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PAXGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 9.2
+      },
+      {
+        "symbol": "PEOPLEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PHAROSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PHAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PIEVERSEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PIPPINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PIXELUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PLAYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PLUMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PNUTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "POLYXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "POPCATUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PORTALUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "POWERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "POWRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PRLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "PROMPTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "PROVEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PTBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "PUMPBTCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "PUNDIXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "PYTHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "QTUMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "QUICKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.9
+      },
+      {
+        "symbol": "QUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "RAVEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "RAYSOLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "RDNTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "RECALLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "REDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RENDERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RESOLVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "REZUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RIFUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ROBOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "RONINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ROSEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RPLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RSRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "RVNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SAFEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SAHARAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SANTOSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SAPIENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SCRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SEIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SENTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SFPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SHELLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SIGNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SIRENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SKLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SKRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SKYAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SLERFUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "SLPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SLXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SNXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SOLVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SOMIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SONICUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SOONUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "SOPHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SPACEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SPELLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SPKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SPORTFUNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SPXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SQDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SSVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "STBLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "STEEMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "STGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 41.7
+      },
+      {
+        "symbol": "STOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "STRKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "STXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SUNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SUPERUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SUSHIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SWARMSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "SXTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "SYNUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TACUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TAGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TAIKOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TAKEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TAOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "TAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "THETAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "THEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "TLMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TNSRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TOSHIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TOWNSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TRADOORUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TRBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TREEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TRIAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TRUMPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "TRUSTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TRUTHUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TSTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TURBOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TURTLEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "TUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "TUTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "TWTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "UAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "UBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "UMAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "UNIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "USDCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "USELESSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "USTCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "USUALUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "USUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "VANAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "VELODROMEUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 2.9
+      },
+      {
+        "symbol": "VELVETUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "VETUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "VIRTUALUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "VTHOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "VVVUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "WALUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WAXPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WCTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WETUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "WIFUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WLDUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "WLFIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WOOUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "WUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "XAIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "XANUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "XAUTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 4.0
+      },
+      {
+        "symbol": "XLMUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "XMRUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 21.5
+      },
+      {
+        "symbol": "XNYUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "XPINUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "XPLUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "XTZUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "XVGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "XVSUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "YBUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "YFIUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "YGGUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZAMAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZBTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZECUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 0.7
+      },
+      {
+        "symbol": "ZENUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZEREBROUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZESTUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZETAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZILUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZKCUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZKPUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZKUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZORAUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.2
+      },
+      {
+        "symbol": "ZROUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "ZRXUSDT",
+        "reason": "insufficient_1m_coverage",
+        "days": 16.3
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781661600000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781953200000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782298800000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782705600000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782993600000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783602000000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784030400000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784404800000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784606400000
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785049200000
+      },
+      {
+        "symbol": "AGTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782446400000
+      },
+      {
+        "symbol": "AGTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782777600000
+      },
+      {
+        "symbol": "AGTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783569600000
+      },
+      {
+        "symbol": "AGTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784181600000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781420400000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781924400000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782288000000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782615600000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782806400000
+      },
+      {
+        "symbol": "AKEUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783692000000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781661600000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782093600000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782367200000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782702000000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783188000000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783569600000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784044800000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784228400000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784455200000
+      },
+      {
+        "symbol": "ARBUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784696400000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781492400000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781834400000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782064800000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782252000000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782464400000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782655200000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782964800000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783353600000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783602000000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783936800000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784397600000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784700000000
+      },
+      {
+        "symbol": "ARIAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784959200000
+      },
+      {
+        "symbol": "BTWUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783843200000
+      },
+      {
+        "symbol": "BTWUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784307600000
+      },
+      {
+        "symbol": "BTWUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784880000000
+      },
+      {
+        "symbol": "BTWUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785117600000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781380800000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781884800000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782241200000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782622800000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782824400000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783414800000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783861200000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784185200000
+      },
+      {
+        "symbol": "BULLAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785110400000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782028800000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782345600000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782705600000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782957600000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783278000000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783576800000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783994400000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784210400000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784552400000
+      },
+      {
+        "symbol": "ENAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785106800000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781884800000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782093600000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782338400000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782756000000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783292400000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783573200000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783836000000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784034000000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784563200000
+      },
+      {
+        "symbol": "FILUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785006000000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781380800000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781974800000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782367200000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782914400000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783353600000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783731600000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784034000000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784430000000
+      },
+      {
+        "symbol": "GTCUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784988000000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781827200000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782093600000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782446400000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782745200000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783000800000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783292400000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783558800000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784005200000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784300400000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784494800000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784854800000
+      },
+      {
+        "symbol": "INJUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785106800000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781712000000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781971200000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782194400000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782496800000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782918000000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783353600000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783551600000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784034000000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784278800000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784548800000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784736000000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784995200000
+      },
+      {
+        "symbol": "IOSTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785186000000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782244800000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782982800000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783875600000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784440800000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784617200000
+      },
+      {
+        "symbol": "JCTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784851200000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781514000000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782306000000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782781200000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783846800000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784620800000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784995200000
+      },
+      {
+        "symbol": "MAGMAUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785196800000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781794800000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782133200000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782338400000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782529200000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782756000000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783292400000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783648800000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784034000000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784548800000
+      },
+      {
+        "symbol": "ONDOUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785042000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781474400000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781712000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781996400000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782252000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782482400000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782918000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783260000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783652400000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783868400000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784070000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784484000000
+      },
+      {
+        "symbol": "PUMPUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785038400000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781388000000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1781812800000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782223200000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782489600000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782705600000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1782885600000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783353600000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783555200000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1783933200000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784286000000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784566800000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1784793600000
+      },
+      {
+        "symbol": "QNTUSDT",
+        "reason": "no_1m_window",
+        "time_ms": 1785088800000
+      }
+    ],
+    "symbols_with_entries": 35,
+    "min_1m_coverage": 0.88,
+    "selection": "1h full-window coverage >= 90% AND 1m coverage >= 88% of window minutes (all qualifying symbols, no sampling)"
+  },
+  "parameters": {
+    "source": "global_state + StrategyConfig overrides (cost keys removed)",
+    "sl_atr_mult": 1.5,
+    "target_r": 3.0,
+    "supertrend_factor": 2.5,
+    "regime_filter": true,
+    "cost_filter": true
+  },
+  "config": {
+    "horizon_1h": 48,
+    "min_gap_1h": 48,
+    "obs_minutes": [
+      1,
+      5,
+      10
+    ],
+    "seeds": 20,
+    "seed": 20261110,
+    "min_coverage": 0.9
+  },
+  "btc_change_pct": 18.2208,
+  "baseline": {
+    "trades": 1036,
+    "total_return_pct": 47.565729826759096,
+    "expectancy_pct": 0.045912866628145844,
+    "win_rate": 0.2915057915057915,
+    "payoff_ratio": 2.5130977872197358,
+    "profit_factor": 1.0339993620440875,
+    "avg_win_pct": 4.790013357310835,
+    "avg_loss_pct": -1.906019487848928,
+    "max_drawdown_pct": -133.57894855034974
+  },
+  "cycles": [
+    {
+      "cycle_minutes": 1,
+      "trades": 1036,
+      "arm": {
+        "trades": 1036,
+        "total_return_pct": 35.975678047920695,
+        "expectancy_pct": 0.034725557961313415,
+        "win_rate": 0.14189189189189189,
+        "payoff_ratio": 6.374195608610171,
+        "profit_factor": 1.0540008486678236,
+        "avg_win_pct": 4.776744680661441,
+        "avg_loss_pct": -0.7493878402804399,
+        "max_drawdown_pct": -68.75061837069225
+      },
+      "baseline_same_subset": {
+        "trades": 1036,
+        "total_return_pct": 47.565729826759096,
+        "expectancy_pct": 0.045912866628145844,
+        "win_rate": 0.2915057915057915,
+        "payoff_ratio": 2.5130977872197358,
+        "profit_factor": 1.0339993620440875,
+        "avg_win_pct": 4.790013357310835,
+        "avg_loss_pct": -1.906019487848928,
+        "max_drawdown_pct": -133.57894855034974
+      },
+      "delta": {
+        "total_return_pct": -11.5900517788384,
+        "expectancy_pct": -0.01118730866683243,
+        "win_rate": -0.1496138996138996,
+        "payoff_ratio": 3.8610978213904357,
+        "profit_factor": 0.02000148662373613,
+        "max_drawdown_pct": 64.82833017965748
+      },
+      "absolute_ci": [
+        -0.10845022791853166,
+        0.18237994465351792
+      ],
+      "paired_diff_pct": -0.011187308666832443,
+      "paired_ci": [
+        -0.1707097738221121,
+        0.14244283815057923
+      ],
+      "p_perm": 0.8952761809547614,
+      "segments": [
+        -0.019965715090931608,
+        0.11339867882614518,
+        -0.25646463626710064,
+        0.11828243786455736
+      ],
+      "segments_positive": 2,
+      "segments_negative": 2,
+      "continuation_rate": 0.3948,
+      "no_continuation_rate": 0.6033,
+      "sl_in_window_rate": 0.0019,
+      "random_early": {
+        "seeds": 20,
+        "mean": 0.03441697146379674,
+        "p05": -0.015391121160017866,
+        "p95": 0.08783098126966565,
+        "arm_percentile": 0.55
+      },
+      "verdict": "inconclusive",
+      "absolute_verdict": "inconclusive",
+      "fdr_q": 0.8952761809547614,
+      "three_gates_pass": false,
+      "absolute_profit_pass": false
+    },
+    {
+      "cycle_minutes": 5,
+      "trades": 1036,
+      "arm": {
+        "trades": 1036,
+        "total_return_pct": -40.58094824745126,
+        "expectancy_pct": -0.03917079946665179,
+        "win_rate": 0.14189189189189189,
+        "payoff_ratio": 5.722081589867138,
+        "profit_factor": 0.9461709715528338,
+        "avg_win_pct": 4.85241497777989,
+        "avg_loss_pct": -0.8480156917672611,
+        "max_drawdown_pct": -99.9235122841259
+      },
+      "baseline_same_subset": {
+        "trades": 1036,
+        "total_return_pct": 47.565729826759096,
+        "expectancy_pct": 0.045912866628145844,
+        "win_rate": 0.2915057915057915,
+        "payoff_ratio": 2.5130977872197358,
+        "profit_factor": 1.0339993620440875,
+        "avg_win_pct": 4.790013357310835,
+        "avg_loss_pct": -1.906019487848928,
+        "max_drawdown_pct": -133.57894855034974
+      },
+      "delta": {
+        "total_return_pct": -88.14667807421036,
+        "expectancy_pct": -0.08508366609479764,
+        "win_rate": -0.1496138996138996,
+        "payoff_ratio": 3.2089838026474027,
+        "profit_factor": -0.08782839049125368,
+        "max_drawdown_pct": 33.65543626622383
+      },
+      "absolute_ci": [
+        -0.18049402984357796,
+        0.1065660965242189
+      ],
+      "paired_diff_pct": -0.08508366609479763,
+      "paired_ci": [
+        -0.24182923062446562,
+        0.06255063047002639
+      ],
+      "p_perm": 0.2794301424643839,
+      "segments": [
+        -0.125471344637459,
+        0.0027291628178396227,
+        -0.2803588053213647,
+        0.06276632276179347
+      ],
+      "segments_positive": 2,
+      "segments_negative": 2,
+      "continuation_rate": 0.3996,
+      "no_continuation_rate": 0.5946,
+      "sl_in_window_rate": 0.0058,
+      "random_early": {
+        "seeds": 20,
+        "mean": -0.013482001896615756,
+        "p05": -0.07388871789554396,
+        "p95": 0.052975785164872315,
+        "arm_percentile": 0.3
+      },
+      "verdict": "inconclusive",
+      "absolute_verdict": "inconclusive",
+      "fdr_q": 0.41914521369657587,
+      "three_gates_pass": false,
+      "absolute_profit_pass": false
+    },
+    {
+      "cycle_minutes": 10,
+      "trades": 1036,
+      "arm": {
+        "trades": 1036,
+        "total_return_pct": -62.078660860132345,
+        "expectancy_pct": -0.05992148731673006,
+        "win_rate": 0.14285714285714285,
+        "payoff_ratio": 5.549458238739772,
+        "profit_factor": 0.9249097064566287,
+        "avg_win_pct": 5.166496738860827,
+        "avg_loss_pct": -0.9309911916796563,
+        "max_drawdown_pct": -112.37535999460432
+      },
+      "baseline_same_subset": {
+        "trades": 1036,
+        "total_return_pct": 47.565729826759096,
+        "expectancy_pct": 0.045912866628145844,
+        "win_rate": 0.2915057915057915,
+        "payoff_ratio": 2.5130977872197358,
+        "profit_factor": 1.0339993620440875,
+        "avg_win_pct": 4.790013357310835,
+        "avg_loss_pct": -1.906019487848928,
+        "max_drawdown_pct": -133.57894855034974
+      },
+      "delta": {
+        "total_return_pct": -109.64439068689144,
+        "expectancy_pct": -0.1058343539448759,
+        "win_rate": -0.14864864864864863,
+        "payoff_ratio": 3.0363604515200366,
+        "profit_factor": -0.10908965558745876,
+        "max_drawdown_pct": 21.203588555745412
+      },
+      "absolute_ci": [
+        -0.21610426400700075,
+        0.10048501874787485
+      ],
+      "paired_diff_pct": -0.10583435394487588,
+      "paired_ci": [
+        -0.2509924455293887,
+        0.03845945300080345
+      ],
+      "p_perm": 0.15571107223194203,
+      "segments": [
+        -0.35901043987419873,
+        0.11822717589627145,
+        -0.2691111565199032,
+        0.08655700471832696
+      ],
+      "segments_positive": 2,
+      "segments_negative": 2,
+      "continuation_rate": 0.4151,
+      "no_continuation_rate": 0.5734,
+      "sl_in_window_rate": 0.0116,
+      "random_early": {
+        "seeds": 20,
+        "mean": -0.012237372265882434,
+        "p05": -0.034097423906047634,
+        "p95": 0.03078977782362236,
+        "arm_percentile": 0.0
+      },
+      "verdict": "inconclusive",
+      "absolute_verdict": "inconclusive",
+      "fdr_q": 0.41914521369657587,
+      "three_gates_pass": false,
+      "absolute_profit_pass": false
+    }
+  ],
+  "min_pooled_trades": 30,
+  "random_baseline": {
+    "type": "matched-rate random early exit",
+    "seeds": 20
+  },
+  "verdict": "inconclusive",
+  "default_enabled": false,
+  "stage2_decision": {
+    "proceed": false,
+    "reasons": [
+      "stage-2 expansion not triggered: the user's gate requires a clear improvement on key metrics, which was not observed",
+      "no cycle passes the three gates (paired CI low > 0, FDR q < 0.10, 3/4 segments same sign)",
+      "no cycle lifts the absolute per-trade CI lower bound above zero",
+      "no cycle improves total return, expectancy and win rate together vs the same-subset baseline",
+      "10m arm sits at the 0.00 percentile of matched-rate random early exits, i.e. no selection information"
+    ],
+    "trigger": "proceed only if a cycle passes all three gates AND absolute per-trade CI > 0"
+  },
+  "limitations": [
+    "1m coverage limits the pool to 35 symbols: of 481 symbols with full 90-day 1h bars, only 35 have >=88% 1m minutes in the window; the other 500+ have a median of 16.8 days of 1m history",
+    "the 90-day window starts 2026-08-12 and ends 2026-11-10; BTC rose over it, so short-horizon early exits carry a mechanical beta benefit",
+    "an early exit is booked at the observation bar close with the standard 0.12% round-trip cost; the baseline books barrier touches at the barrier price",
+    "the baseline uses a single full-position 3R target, whereas production supertrend_current scales out at 1R/2R/3R; absolute levels are therefore not production P&L",
+    "no funding rate, order-book depth, liquidation or partial-fill modelling; notional basis, do not subtract from margin-basis reports",
+    "observation windows of 1/5/10 minutes are far shorter than the 1.5xATR stop (mean 2.0%), so the stop is almost never touched inside the window (0.2-1.2%)"
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "window": {
+    "train_validation_cuts_utc": {
+      "paper": "2026-11-05T21:17:55.149000+00:00",
+      "live": "2026-11-10T06:09:36.786000+00:00"
+    }
+  },
+  "config": {
+    "source": "local PostgreSQL orders and native 15m klines",
+    "holding_bars": 8,
+    "decision": "first fully post-entry completed bar with mark profit > 0.12%; next open",
+    "label": "directional open-to-open return from next open to 8 bars later; counterfactual after actual exit allowed",
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "ic_is_gross": true,
+    "min_pairs_per_symbol": 30
+  },
+  "orders": 155,
+  "orders_per_source": {
+    "paper": 96,
+    "live": 59
+  },
+  "records": [],
+  "skipped_count": 155,
+  "skip_reasons_partial": {},
+  "summaries": [
+    {
+      "source": "paper",
+      "split": "train",
+      "feature": "rsi_pullback",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "paper",
+      "split": "train",
+      "feature": "exhaustion",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "paper",
+      "split": "validation",
+      "feature": "rsi_pullback",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "paper",
+      "split": "validation",
+      "feature": "exhaustion",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "live",
+      "split": "train",
+      "feature": "rsi_pullback",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "live",
+      "split": "train",
+      "feature": "exhaustion",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "live",
+      "split": "validation",
+      "feature": "rsi_pullback",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    },
+    {
+      "source": "live",
+      "split": "validation",
+      "feature": "exhaustion",
+      "pairs": 0,
+      "pooled_ic_descriptive": null,
+      "eligible_symbols": 0,
+      "mean_symbol_ic": null,
+      "same_sign_fraction": null,
+      "per_symbol": []
+    }
+  ],
+  "causality": [],
+  "controls": {
+    "oracle_ic": null,
+    "shuffled_ic": null
+  },
+  "gate": "insufficient",
+  "limitations": [
+    "真实订单每币样本稀少；池化 IC 不能替代同号币门槛",
+    "真实订单触发与成交受既有配置和服务存续期影响，不代表完整历史策略信号",
+    "持仓盈利筛选为收盘估算且依赖实际订单平仓时间，未来标签允许越过实际平仓",
+    "正对照刻意使用未来收益，只用于校验；随机打乱未保留时序相关性",
+    "无交易回测、净收益置信区间、随机交易基线或多重检验"
+  ]
+}

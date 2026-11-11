@@ -6,6 +6,9 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import nullcontext
+from types import SimpleNamespace
 
 from sqlalchemy.orm import Session
 
@@ -34,29 +37,39 @@ def _f(value) -> float:
         return 0.0
 
 
-def sync_live(db: Session, order: Order) -> Order | None:
-    """每周期同步。交易所仓位已消失时按保护单成交状态结算并返回该订单。"""
+def sync_live(db: Session, order: Order, snapshot: dict | None = None) -> Order | None:
+    """每周期同步。交易所仓位已消失时按保护单成交状态结算并返回该订单。
+
+    snapshot 为 prefetch_live_snapshots 预取的只读状态；缺省/字段缺失时自动回落
+    原网络路径，所以预取失败不会让某笔订单失去同步。
+    """
     if order.status != "OPEN" or order.source != "live":
         return None
     client = _LoggedClient(db, _client(db), local_order_id=order.id)
-    try:
-        mark = _f(client.premium_index(order.symbol)["markPrice"])
-        if mark > 0:
-            order.mark_price = round_price(mark)
-    except BinanceError as exc:
-        log(db, "error", f"标记价格同步失败 #{order.id}: {exc}")
-    try:
-        positions = client.position_risk(order.symbol)
-    except BinanceError as exc:
-        log(db, "error", f"仓位同步失败 #{order.id}: {exc}")
-        db.commit()
-        return None
+    live = snapshot or {}
+    mark = _f(live.get("mark"))
+    if mark <= 0:
+        try:
+            mark = _f(client.premium_index(order.symbol)["markPrice"])
+        except BinanceError as exc:
+            log(db, "error", f"标记价格同步失败 #{order.id}: {exc}")
+    if mark > 0:
+        order.mark_price = round_price(mark)
+    positions = live.get("positions")
+    if positions is None:
+        try:
+            positions = client.position_risk(order.symbol)
+        except BinanceError as exc:
+            log(db, "error", f"仓位同步失败 #{order.id}: {exc}")
+            db.commit()
+            return None
     still_open = any(
         row.get("symbol") == order.symbol and abs(_f(row.get("positionAmt"))) > 0
         for row in positions
     )
     note = load_note(order)
-    protections = _sync_protections(db, client, order, note, still_open)
+    protections = _sync_protections(db, client, order, note, still_open,
+                                    live.get("protections"))
     order.note = json.dumps(note, ensure_ascii=False)
     if still_open:
         db.commit()
@@ -70,18 +83,77 @@ def _client(db: Session) -> BinanceFuturesClient:
     return client_for(db)
 
 
-def _sync_protections(db: Session, client, order: Order, note: dict, still_open: bool) -> dict:
+def prefetch_live_snapshots(db: Session, orders: list[Order], workers: int) -> dict[int, dict]:
+    """并发只读预取 live 订单的交易所状态；结算/撤单/重挂仍由主线程串行执行。
+
+    只把纯网络读取放进线程池：不改 ORM 对象、不写库、不下单。某笔请求失败时
+    该字段留空，sync_live 会自动回落原网络路径，不会因预取失败丢掉同步。
+    """
+    if not orders:
+        return {}
+    # ORM 对象只留在主线程；线程里只用普通 dict，避免跨线程 lazy load
+    stubs = [{"id": order.id, "symbol": order.symbol, "note": load_note(order)}
+             for order in orders]
+    client = _client(db)
+
+    def read_one(stub: dict) -> dict:
+        symbol = stub["symbol"]
+        out: dict = {"mark": None, "positions": None, "protections": {}}
+        try:
+            out["mark"] = _f(client.premium_index(symbol)["markPrice"])
+        except Exception:  # noqa: BLE001 - 预取失败回落原路径
+            pass
+        try:
+            rows = client.position_risk(symbol)
+            out["positions"] = rows if isinstance(rows, list) else None
+        except Exception:  # noqa: BLE001
+            pass
+        note = stub["note"]
+        for field, *_ in PROTECTIONS:
+            order_id = note.get(field)
+            if not order_id:
+                continue
+            try:
+                info = _protection_status(client, SimpleNamespace(symbol=symbol), note, order_id)
+                if isinstance(info, dict):
+                    out["protections"][field] = info
+            except Exception:  # noqa: BLE001
+                pass
+        return out
+
+    count = min(max(1, int(workers)), len(stubs))
+    snapshots: dict[int, dict] = {}
+    # connection_pool 作用域内 httpx.Client 在线程间复用，避免每单重建连接；
+    # 测试桩/自定义客户端可能没有连接池，用 nullcontext 保持兼容。
+    pool_ctx = getattr(client, "connection_pool", None)
+    with (pool_ctx() if pool_ctx is not None else nullcontext()), ThreadPoolExecutor(
+        max_workers=count, thread_name_prefix="live-prefetch"
+    ) as pool:
+        futures = {pool.submit(read_one, stub): stub["id"] for stub in stubs}
+        for future in as_completed(futures):
+            try:
+                snapshots[futures[future]] = future.result()
+            except Exception:  # noqa: BLE001 - 无快照即走原串行网络路径
+                pass
+    return snapshots
+
+
+def _sync_protections(db: Session, client, order: Order, note: dict, still_open: bool,
+                      prefetched: dict | None = None) -> dict:
     """回写保护单真实状态与触发价；仓位仍在但保护单消失时自动重挂。"""
+    prefetched = prefetched or {}
     found: dict = {}
     for field, _action, order_type, status_key, _reason in PROTECTIONS:
         order_id = note.get(field)
         if not order_id:
             continue
-        try:
-            info = _protection_status(client, order, note, order_id)
-        except BinanceError as exc:
-            log(db, "warning", f"保护单状态查询失败 #{order.id} {field}={order_id}: {exc}")
-            continue
+        info = prefetched.get(field)
+        if info is None:
+            try:
+                info = _protection_status(client, order, note, order_id)
+            except BinanceError as exc:
+                log(db, "warning", f"保护单状态查询失败 #{order.id} {field}={order_id}: {exc}")
+                continue
         if not isinstance(info, dict):
             continue
         status = str(info.get("status") or "")

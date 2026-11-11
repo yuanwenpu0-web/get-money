@@ -1,0 +1,563 @@
+{
+  "topic": "H-B / P14 逐笔成交顺序 Gate 1 可行性探针",
+  "generated_at": "2026-11-11T16:05:53.314451+00:00",
+  "script": "backend/scripts/probe_p14_trade_sequence.py",
+  "stage": "Gate 1（IC 探针，非回测、非 edge 判定）",
+  "hypothesis_card": "research/hypotheses/H-B-trade-sequence.md",
+  "interval": "1h",
+  "primary": {
+    "periods": 312,
+    "mean_ic": -0.06608,
+    "median_ic": -0.07391,
+    "std_ic": 0.18474,
+    "same_sign_share": 0.6731,
+    "first_half_mean_ic": -0.04292,
+    "second_half_mean_ic": -0.08924,
+    "label": "future_24h_return_minus_cross_sectional_median",
+    "factor": "seq_flip_dev",
+    "horizon": 24,
+    "ci": {
+      "ci_low": -0.13233,
+      "ci_high": -0.00556,
+      "n": 312,
+      "n_boot": 2000,
+      "method": "block24",
+      "mean": -0.06608
+    },
+    "per_symbol_ic": {
+      "symbols": 24,
+      "mean_ic": 0.07463,
+      "median_ic": 0.06642,
+      "same_sign_share": 0.7917,
+      "direction": "positive",
+      "label": "future_H_return_minus_cross_sectional_median"
+    },
+    "permutation_null": {
+      "n_permutations": 200,
+      "seed": 20261111,
+      "null_mean": -0.00034,
+      "null_p05": -0.01922,
+      "null_p95": 0.02033,
+      "observed_mean": -0.06608,
+      "empirical_p_two_sided": 0.0,
+      "percentile_in_null": 0.0
+    },
+    "mean_valid_symbols_per_period": 22.29,
+    "positive_control": {
+      "mean_ic": 1.0,
+      "note": "以主因子本身作伪标签，rank IC 应≈1，量具自校准"
+    }
+  },
+  "gate": {
+    "abs_mean_ic_gt_0.02": true,
+    "ci_excludes_zero": true,
+    "same_sign_periods_ge_0.60": true,
+    "same_sign_symbols_ge_0.60": true,
+    "permutation_p_lt_0.05": true,
+    "calibration_ok": true
+  },
+  "gate_passed": true,
+  "exploratory": [
+    {
+      "periods": 328,
+      "mean_ic": -0.02817,
+      "median_ic": -0.0213,
+      "std_ic": 0.18402,
+      "same_sign_share": 0.5457,
+      "first_half_mean_ic": -0.01222,
+      "second_half_mean_ic": -0.04412,
+      "label": "H8_excess",
+      "factor": "seq_flip_dev",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.08231,
+        "ci_high": 0.02045,
+        "n": 328,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.02817
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.005,
+      "fdr_q": 0.0057
+    },
+    {
+      "periods": 288,
+      "mean_ic": -0.14471,
+      "median_ic": -0.14478,
+      "std_ic": 0.1517,
+      "same_sign_share": 0.8438,
+      "first_half_mean_ic": -0.12179,
+      "second_half_mean_ic": -0.16764,
+      "label": "H48_excess",
+      "factor": "seq_flip_dev",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.19757,
+        "ci_high": -0.09109,
+        "n": 288,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.14471
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 328,
+      "mean_ic": 0.05505,
+      "median_ic": 0.05609,
+      "std_ic": 0.23723,
+      "same_sign_share": 0.5823,
+      "first_half_mean_ic": 0.01865,
+      "second_half_mean_ic": 0.09145,
+      "label": "H8_excess",
+      "factor": "big_run_dev",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.00823,
+        "ci_high": 0.12305,
+        "n": 328,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.05505
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 312,
+      "mean_ic": 0.10065,
+      "median_ic": 0.10609,
+      "std_ic": 0.23695,
+      "same_sign_share": 0.6474,
+      "first_half_mean_ic": 0.07493,
+      "second_half_mean_ic": 0.12638,
+      "label": "H24_excess",
+      "factor": "big_run_dev",
+      "horizon": 24,
+      "ci": {
+        "ci_low": 0.01314,
+        "ci_high": 0.18639,
+        "n": 312,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.10065
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 288,
+      "mean_ic": 0.17993,
+      "median_ic": 0.17435,
+      "std_ic": 0.21104,
+      "same_sign_share": 0.8021,
+      "first_half_mean_ic": 0.13688,
+      "second_half_mean_ic": 0.22298,
+      "label": "H48_excess",
+      "factor": "big_run_dev",
+      "horizon": 48,
+      "ci": {
+        "ci_low": 0.1108,
+        "ci_high": 0.25269,
+        "n": 288,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.17993
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 328,
+      "mean_ic": -0.00812,
+      "median_ic": -0.0113,
+      "std_ic": 0.2403,
+      "same_sign_share": 0.5091,
+      "first_half_mean_ic": -0.01333,
+      "second_half_mean_ic": -0.00291,
+      "label": "H8_excess",
+      "factor": "impact_rev",
+      "horizon": 8,
+      "ci": {
+        "ci_low": -0.04628,
+        "ci_high": 0.0306,
+        "n": 328,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.00812
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.475,
+      "fdr_q": 0.475
+    },
+    {
+      "periods": 312,
+      "mean_ic": -0.04805,
+      "median_ic": -0.04783,
+      "std_ic": 0.24352,
+      "same_sign_share": 0.5897,
+      "first_half_mean_ic": -0.04084,
+      "second_half_mean_ic": -0.05526,
+      "label": "H24_excess",
+      "factor": "impact_rev",
+      "horizon": 24,
+      "ci": {
+        "ci_low": -0.106,
+        "ci_high": 0.00693,
+        "n": 312,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.04805
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    },
+    {
+      "periods": 288,
+      "mean_ic": -0.08893,
+      "median_ic": -0.08957,
+      "std_ic": 0.22808,
+      "same_sign_share": 0.6528,
+      "first_half_mean_ic": -0.07304,
+      "second_half_mean_ic": -0.10482,
+      "label": "H48_excess",
+      "factor": "impact_rev",
+      "horizon": 48,
+      "ci": {
+        "ci_low": -0.14155,
+        "ci_high": -0.03244,
+        "n": 288,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.08893
+      },
+      "not_evaluable": false,
+      "empirical_p": 0.0,
+      "fdr_q": 0.0
+    }
+  ],
+  "exploratory_multiple_testing": {
+    "method": "BH-FDR on 200-permutation empirical p",
+    "n_tests": 8,
+    "q_below_0.10": 7,
+    "note": "置换零分布假设各期独立，零分布偏窄；以 block24 CI 为准"
+  },
+  "control_feature_ic": [
+    {
+      "factor": "taker_imb",
+      "horizon": 8,
+      "mean_ic": 0.01607,
+      "note": "已证伪的 K 线级主动成交汇总，仅作换皮参照"
+    },
+    {
+      "factor": "taker_imb",
+      "horizon": 24,
+      "mean_ic": -0.00157,
+      "note": "已证伪的 K 线级主动成交汇总，仅作换皮参照"
+    },
+    {
+      "factor": "taker_imb",
+      "horizon": 48,
+      "mean_ic": 0.00888,
+      "note": "已证伪的 K 线级主动成交汇总，仅作换皮参照"
+    }
+  ],
+  "sequence_specificity_diagnostic": {
+    "seq_flip_dev": {
+      "pairs": 8064,
+      "mean_original": -0.2053,
+      "mean_shuffled": 0.00039,
+      "std_original": 0.16023,
+      "std_shuffled": 0.01703,
+      "mean_abs_diff": 0.21263587
+    },
+    "big_run_dev": {
+      "pairs": 8064,
+      "mean_original": 0.42816,
+      "mean_shuffled": -0.00265,
+      "std_original": 0.27848,
+      "std_shuffled": 0.05527,
+      "mean_abs_diff": 0.43565431
+    },
+    "taker_imb": {
+      "pairs": 8064,
+      "mean_original": -0.01444,
+      "mean_shuffled": -0.01444,
+      "std_original": 0.12667,
+      "std_shuffled": 0.12667,
+      "mean_abs_diff": 0.0
+    },
+    "collinearity_vs_taker_imb": {
+      "seq_flip_dev": {
+        "periods": 336,
+        "mean_rho": 0.02251,
+        "mean_abs_rho": 0.16026
+      },
+      "big_run_dev": {
+        "periods": 336,
+        "mean_rho": -0.013,
+        "mean_abs_rho": 0.18363
+      },
+      "impact_rev": {
+        "periods": 336,
+        "mean_rho": 0.03111,
+        "mean_abs_rho": 0.17662
+      }
+    },
+    "variance_decomposition": {
+      "seq_flip_dev": {
+        "total_variance": 0.025673,
+        "time_common_level_variance": 0.000728,
+        "cross_section_within_variance": 0.024945,
+        "time_common_share": 0.0284,
+        "cross_section_share": 0.9716,
+        "interpretation": "time_common_share 高 => 主要是全市场微观结构共同状态，横截面 rank IC 会将其对消（P12 同型风险）"
+      },
+      "big_run_dev": {
+        "total_variance": 0.077552,
+        "time_common_level_variance": 0.003222,
+        "cross_section_within_variance": 0.07433,
+        "time_common_share": 0.0415,
+        "cross_section_share": 0.9585,
+        "interpretation": "time_common_share 高 => 主要是全市场微观结构共同状态，横截面 rank IC 会将其对消（P12 同型风险）"
+      },
+      "impact_rev": {
+        "total_variance": 0.0,
+        "time_common_level_variance": 0.0,
+        "cross_section_within_variance": 0.0,
+        "time_common_share": 0.0989,
+        "cross_section_share": 0.9011,
+        "interpretation": "time_common_share 高 => 主要是全市场微观结构共同状态，横截面 rank IC 会将其对消（P12 同型风险）"
+      },
+      "taker_imb": {
+        "total_variance": 0.016044,
+        "time_common_level_variance": 0.003321,
+        "cross_section_within_variance": 0.012723,
+        "time_common_share": 0.207,
+        "cross_section_share": 0.793,
+        "interpretation": "time_common_share 高 => 主要是全市场微观结构共同状态，横截面 rank IC 会将其对消（P12 同型风险）"
+      }
+    },
+    "interpretation": "整行置换保持每笔 price/quote/direction 配对，故 taker_imb 应严格不变；seq_flip_dev / big_run_dev 应向 0 收敛。若不然则顺序特征不是纯顺序量。"
+  },
+  "robustness_diagnostics": {
+    "two_way_variance_decomposition": {
+      "seq_flip_dev": {
+        "time_effect_variance": 0.000728,
+        "symbol_fixed_effect_variance": 0.02041,
+        "residual_variance": 0.004535,
+        "time_effect_share": 0.0284,
+        "symbol_fixed_effect_share": 0.795,
+        "residual_share": 0.1766,
+        "interpretation": "symbol_fixed_effect_share 高 => 因子几乎是每币恒定属性，横截面 IC 可能只是静态风格在单一段行情里的表现"
+      },
+      "big_run_dev": {
+        "time_effect_variance": 0.003222,
+        "symbol_fixed_effect_variance": 0.045397,
+        "residual_variance": 0.028933,
+        "time_effect_share": 0.0415,
+        "symbol_fixed_effect_share": 0.5854,
+        "residual_share": 0.3731,
+        "interpretation": "symbol_fixed_effect_share 高 => 因子几乎是每币恒定属性，横截面 IC 可能只是静态风格在单一段行情里的表现"
+      },
+      "taker_imb": {
+        "time_effect_variance": 0.003321,
+        "symbol_fixed_effect_variance": 7.9e-05,
+        "residual_variance": 0.012644,
+        "time_effect_share": 0.207,
+        "symbol_fixed_effect_share": 0.0049,
+        "residual_share": 0.7881,
+        "interpretation": "symbol_fixed_effect_share 高 => 因子几乎是每币恒定属性，横截面 IC 可能只是静态风格在单一段行情里的表现"
+      }
+    },
+    "symbol_fixed_effect_removed": {
+      "definition": "每币减去全窗口均值后重新算横截面 rank IC",
+      "periods": 312,
+      "mean_ic": 0.11024,
+      "median_ic": 0.11783,
+      "std_ic": 0.19007,
+      "same_sign_share": 0.7532,
+      "first_half_mean_ic": 0.12679,
+      "second_half_mean_ic": 0.09368,
+      "label": "H24_excess_on_demeaned_by_symbol_factor",
+      "ci": {
+        "ci_low": 0.07303,
+        "ci_high": 0.14425,
+        "n": 312,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": 0.11024
+      },
+      "interpretation": "若 IC 大幅衰减，则原 IC 主要来自币的静态属性差异"
+    },
+    "liquidity_partial_ic": {
+      "degenerate_periods": 0,
+      "periods": 312,
+      "mean_partial_ic": -0.06147,
+      "control": "rank(log n_trades) per period",
+      "ci": {
+        "ci_low": -0.1306,
+        "ci_high": 0.00174,
+        "n": 312,
+        "n_boot": 2000,
+        "method": "block24",
+        "mean": -0.06147
+      }
+    },
+    "nonoverlapping_block_ic": {
+      "n_blocks": 13,
+      "mean_ic": -0.06923,
+      "median_ic": -0.06522,
+      "negative_share": 0.6154,
+      "values": [
+        -0.0357,
+        -0.0652,
+        0.1843,
+        0.1791,
+        0.06,
+        -0.6304,
+        -0.1426,
+        0.107,
+        0.0809,
+        -0.2591,
+        -0.1261,
+        -0.1748,
+        -0.0774
+      ],
+      "note": "块数远低于 20，点估计不稳定；用于看符号是否由个别时段驱动"
+    },
+    "up_down_regime_split": {
+      "down_days": 8,
+      "up_days": 5,
+      "down_mean_ic": -0.14576,
+      "up_mean_ic": 0.05322,
+      "note": "普跌样本里涨日极少；若两段符号不一致则不支持稳定方向性"
+    },
+    "h24_label_overlap": {
+      "mean_lag1_autocorr": 0.9368,
+      "symbols": 24,
+      "note": "H=24 重叠标签 lag1 相关很高时，block24 移动块仍可能低估方差；H=48 的 IC 单调放大尤其要按此折价"
+    },
+    "summary": {
+      "original_mean_ic": -0.06608,
+      "after_symbol_demean_mean_ic": 0.11024,
+      "abs_ic_retention_after_demean": 1.6682,
+      "partial_ic_after_liquidity_control": -0.06147,
+      "nonoverlapping_negative_share": 0.6154,
+      "caution": "以上均为证伪性诊断；任何一项显示 IC 由静态属性或重叠标签驱动，都不得据此授权 Gate 2 实现或全量采集"
+    }
+  },
+  "decision": {
+    "gate1_formal_pass": true,
+    "robustness_flags": {
+      "symbol_fixed_effect_share_gt_0.5": true,
+      "ic_sign_flips_after_symbol_demean": true,
+      "liquidity_partial_ci_crosses_zero": true,
+      "ic_sign_flips_between_down_and_up_days": true,
+      "h24_label_lag1_autocorr_gt_0.9": true,
+      "nonoverlapping_block_sign_consistency_lt_0.75": true
+    },
+    "n_flags_triggered": 6,
+    "action": "DO_NOT_SCALE_UP",
+    "interpretation": "Gate 1 的 H1 形式门槛通过，但稳健性诊断显示 IC 由每币静态属性、流动性代理与单一普跌市场状态驱动；去币均值后符号翻转；H=24 标签重叠使 block24 CI 偏窄。据此不授权 Gate 2 实现、不启动 500 币×60 天（数百 GB）全量归档采集、不启用任何绑定。",
+    "stop_loss_note": "逐笔 aggTrades 方向切换率／大单游程的『静态横截面水平』不是可交易选币 alpha；不得靠换 H、换分位数或扩窗补救。"
+  },
+  "download": {
+    "archive_base": "https://data.binance.vision/data/futures/um/daily/aggTrades",
+    "requested_files": 336,
+    "status_counts": {
+      "ok": 336
+    },
+    "total_bytes": 1030971753,
+    "total_megabytes": 983.21,
+    "source_trade_rows": 74241666,
+    "skipped_thin_hours": 0,
+    "kept_hour_rows": 8064,
+    "skip_list": [],
+    "checksum": "未请求 .CHECKSUM，依赖 zipfile 的 CRC 校验",
+    "from_cache": true
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "applied_to_ic": false
+  },
+  "trades": 0,
+  "trades_note": "本轮无交易；IC 为毛价格关联，未扣 0.12% 双边成本",
+  "window": {
+    "start_utc": "2026-10-27T00:00:00+00:00",
+    "end_utc": "2026-11-09T23:00:00+00:00",
+    "days": 14,
+    "hourly_periods": 336,
+    "effective_nonoverlapping_blocks_at_H24": 13,
+    "min_effective_blocks_required": 20
+  },
+  "universe": {
+    "size": 24,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "BNBUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "ADAUSDT",
+      "AVAXUSDT",
+      "LINKUSDT",
+      "UNIUSDT",
+      "APTUSDT",
+      "NEARUSDT",
+      "ARBUSDT",
+      "SUIUSDT",
+      "DOTUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "ETCUSDT",
+      "FILUSDT",
+      "ATOMUSDT",
+      "INJUSDT",
+      "OPUSDT",
+      "TIAUSDT",
+      "SEIUSDT"
+    ],
+    "selection": "事前 HEAD 验证归档存在的 USD-M 主流/中流动性币",
+    "min_cross_section": 18,
+    "p12_min_cross_section": 30,
+    "note": "横截面宽度低于 P12，仅支持可行性筛查"
+  },
+  "ci": {
+    "ci_low": -0.13233,
+    "ci_high": -0.00556,
+    "n": 312,
+    "n_boot": 2000,
+    "method": "block24",
+    "mean": -0.06608
+  },
+  "verdict": "insufficient",
+  "verdict_scope": "Gate 1 探针不是净收益判定；样本不足以支撑 edge 结论，数值照给但按 H4 判 insufficient",
+  "default_enabled": false,
+  "limitations": [
+    "14 天窗口且 H=24 标签高度重叠，有效独立时间块不足 20",
+    "横截面仅 24 币，低于 P12 的 30；已显式放宽 MIN_CROSS_SECTION",
+    "aggTrades 是毫秒级聚合逐笔，不含真实逐笔委托/撤单与盘口",
+    "未请求 .CHECKSUM，仅依赖 zip CRC；未入库、未落盘原始逐笔",
+    "IC 未扣 0.12% 双边成本，不得解读为净收益 edge",
+    "impact_rev 与桶内价格路径相关，未纳入顺序重排对照",
+    "固定币池与单一市场，未覆盖多所现货腿与盘口信息",
+    "样本期单一普跌状态（24 币中位 −9.86%、仅 8.3% 上涨），无样本外切分",
+    "H=48 标签重叠 48 期而 block bootstrap 块长仅 24，长 H 的 CI 可能过窄"
+  ],
+  "seed": 20261111,
+  "permutations": 200,
+  "workers": 4,
+  "request_pace_seconds": 0.25
+}

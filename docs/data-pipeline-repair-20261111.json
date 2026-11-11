@@ -1,0 +1,146 @@
+{
+  "report_id": "data-pipeline-repair-20261111",
+  "generated_at": "2026-11-11T15:22:33Z",
+  "code_commit": "7ebb5f5",
+  "report_type": "operational_acceptance",
+  "note": "运维验收记录，不是 Gate 1–6 策略研究报告；未验证任何新因子",
+  "stage": "data collection chain repair + Gate 0 hypothesis registration",
+  "verdict": "operational_pass",
+  "gate": {"applicable": false, "reason": "no IC probe, backtest or parameter search run this round"},
+  "default_enabled": false,
+  "costs": {"fee_rate": 0.0004, "slippage": 0.0002, "round_trip": 0.0012,
+            "basis": "notional", "applied": false,
+            "reason": "no trades and no PnL evaluation this round"},
+  "ci": {"confidence": 0.95, "method": null, "applicable": false,
+         "reason": "no return estimate; P12 CIs live in docs/probe-p12-oi-cross-section*.json"},
+  "window": {"start_utc": "2026-10-24T00:00Z", "end_utc": "2026-11-11T15:22Z",
+             "note": "collection-repair window, not a backtest sample period"},
+  "universe": {"source": "existing distinct symbol per interval", "point_in_time_membership": true,
+               "symbols": {"15m": 521, "4h": 521, "5m": 2, "funding_rates": 507}},
+  "random_baseline": {"applicable": false, "reason": "no strategy evaluation this round"},
+  "trades": 0,
+  "orders": 0,
+  "strategy_changes": [],
+  "binding_changes": [],
+  "parameter_changes": [],
+  "backend_service_restarted": false,
+  "frontend_build_required": false,
+  "code_roots": ["backend/scripts/sync_market_tail.py"],
+  "scripts": {
+    "new": "backend/scripts/sync_market_tail.py",
+    "lines": 297,
+    "existing_reused": [
+      "backend/scripts/sync_sentiment.py",
+      "backend/scripts/sync_recent_1h.py",
+      "backend/app/market/data_service.py::sync_funding_many"
+    ],
+    "policy": "target universe = existing distinct symbol per interval; no pool expansion; no data-schema change; idempotent upsert",
+    "fetch_rule": "start = per-symbol max(open_time) - 2 bars; end = last complete UTC bar; overlap 2 bars",
+    "request_interval_seconds": 0.25,
+    "inter_stage_cooldown_seconds": 3,
+    "funding_window": "min(per-symbol max(funding_time)) based, capped at 30 days"
+  },
+  "coverage_before": {
+    "klines_15m": {"start_utc": "2025-12-31T04:15Z", "end_utc": "2026-10-25T12:30Z", "rows": 1885554, "symbols": 521},
+    "klines_4h": {"start_utc": "2025-09-20T16:00Z", "end_utc": "2026-10-26T08:00Z", "rows": 1146043, "symbols": 521},
+    "klines_5m": {"start_utc": "2026-08-26T11:25Z", "end_utc": "2026-10-25T11:20Z", "rows": 34560, "symbols": 2},
+    "funding_rates": {"start_utc": "2025-09-22T01:00Z", "end_utc": "2026-10-27T12:00Z", "rows": 1041678, "symbols": 507},
+    "klines_1h": {"end_utc": "2026-11-11T13:00Z", "rows": 4930725, "symbols": 535},
+    "sentiment": {"start_utc": "2026-10-06T04:00Z", "end_utc": "2026-11-11T14:00Z", "rows": 449313, "symbols": 515, "span_days": 36.42}
+  },
+  "coverage_after": {
+    "klines_15m": {"end_utc": "2026-11-11T14:45Z", "rows": 2740515, "symbols": 521, "delta_rows": 854961},
+    "klines_4h": {"end_utc": "2026-11-11T08:00Z", "rows": 1198812, "symbols": 521, "delta_rows": 52769},
+    "klines_5m": {"end_utc": "2026-11-11T15:05Z", "rows": 44442, "symbols": 2, "delta_rows": 9882},
+    "funding_rates": {"end_utc": "2026-11-11T15:00Z", "rows": 1083786, "symbols": 507, "delta_rows": 42108},
+    "klines_1h": {"end_utc": "2026-11-11T13:00Z", "rows": 4930725, "symbols": 535, "delta_rows": 0},
+    "klines_1m": {"end_utc": "2026-11-11T15:17Z", "rows": 48214850, "symbols": 535, "note": "自然随交易巡检增长"},
+    "sentiment": {"end_utc": "2026-11-11T14:00Z", "rows": 449313, "symbols": 515, "span_days": 36.42, "delta_rows": 0}
+  },
+  "runs": [
+    {
+      "report": "output/sync_market_tail_full_20261111.json",
+      "duration_seconds": 312.76,
+      "error_count": 66,
+      "details": {
+        "15m": {"fresh": 5, "ok": 512, "error": 4, "reason": "proxy redirect 302"},
+        "4h": {"fresh": 5, "ok": 454, "error": 62, "reason": "Binance -1003 IP weight limit 2400/min and rate-limit cooldown"},
+        "5m": {"fresh": 2},
+        "funding": {"window_days": 3, "inserted": 8226, "error_count": 0, "issue": "global max(funding_time) mis-sized the window; intermediate hole risk"}
+      }
+    },
+    {
+      "report": "output/sync_market_tail_full_20261111_retry.json",
+      "duration_seconds": 162.78,
+      "error_count": 0,
+      "details": {
+        "15m": {"fresh": 517, "ok": 4, "rows": 6576},
+        "4h": {"fresh": 459, "ok": 62, "rows": 6473},
+        "5m": {"ok": 2, "rows": 8},
+        "funding": {"window_days": 18, "requested": 507, "inserted": 49315, "error_count": 0}
+      }
+    }
+  ],
+  "fixes_between_runs": [
+    "default public request interval 0.1s -> 0.25s",
+    "3s cooldown between interval stages",
+    "funding watermark from global max(funding_time) to min(per-symbol max(funding_time)), capped at 30 days"
+  ],
+  "acceptance": {
+    "tail_lagging_symbols": {"15m": 0, "4h": 0, "5m": 0},
+    "bar_gaps_since_2026_10_24": {"15m": 0, "4h": 0, "5m": 0, "1h": 0},
+    "max_observed_gap_hours": {"15m": 0.25, "4h": 4.0, "5m": 0.08, "1h": 1.0},
+    "funding_hole_interval": "2026-10-28..2026-11-07",
+    "funding_symbols_with_under_20_records_in_hole": 1,
+    "funding_sparse_symbol": "VELODROMEUSDT",
+    "funding_sparse_symbol_last_utc": "2026-10-28T08:00Z",
+    "funding_sparse_symbol_rows": 2410,
+    "funding_sparse_symbol_verdict": "exchange stopped publishing funding; data-source staleness, not a collection gap",
+    "old_values_untouched": true,
+    "old_values_reason": "fetch range starts at per-symbol max(open_time)-2 bars; pre-gap history never requested",
+    "p12_primary_evidence_unchanged": true
+  },
+  "automation": {
+    "id": "62854c1d-aec5-4551-93a8-27f9b5ec5fca",
+    "name": "每日行情增量采集（sentiment + native 1h + 15m/4h/5m + funding）",
+    "mode": "update",
+    "status": "ACTIVE",
+    "rrule": "FREQ=DAILY;BYHOUR=8;BYMINUTE=30",
+    "scripts": ["sync_sentiment.py", "sync_recent_1h.py", "sync_market_tail.py"]
+  },
+  "hypothesis_card": {
+    "experiment_id": "P13-000",
+    "path": "research/hypotheses/H-A-market-leverage-timing.md",
+    "status": "BLOCKED_BY_DATA",
+    "required_sentiment_days": 60,
+    "current_sentiment_days": 36.42,
+    "rewrite": "P9 per-symbol feature ON/OFF A/B -> market-level position on/off switch",
+    "probe_started": false,
+    "backtest_started": false
+  },
+  "tests": {
+    "py_compile": "pass",
+    "dry_run": "pass",
+    "smoke_5_symbols": "pass",
+    "pytest_backend_tests": {"passed": 1836, "failed": 3, "duration_seconds": 75.33,
+      "known_failures": ["test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range",
+        "test_pool_volatility_research.py::test_live_entrypoints_reject[research_high_turnover_high_vol]",
+        "test_pool_volatility_research.py::test_live_entrypoints_reject[research_low_turnover_high_vol]"],
+      "note": "identical to the previous two rounds; pre-existing, unrelated to this change"}
+  },
+  "artifacts": [
+    "docs/data-pipeline-repair-20261111.md",
+    "docs/data-pipeline-repair-20261111.json",
+    "output/sync_market_tail_smoke.json",
+    "output/sync_market_tail_full_20261111.json",
+    "output/sync_market_tail_full_20261111_retry.json",
+    "research/experiments.jsonl",
+    "research/hypotheses/H-A-market-leverage-timing.md"
+  ],
+  "limitations": [
+    "VELODROMEUSDT funding staleness keeps the automatic window large (<=30d); daily redundant upserts accepted",
+    "5m remains 2 symbols on purpose; any expansion is a data-schema change requiring its own registration",
+    "proxy 302 may recur; idempotent script + daily scheduler self-heal",
+    "no new probe/backtest was run; P12 inconclusive verdict stands"
+  ]
+}

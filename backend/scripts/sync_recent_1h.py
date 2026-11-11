@@ -99,6 +99,8 @@ def main() -> int:
     ap.add_argument("--days", type=int, default=400, help="无历史数据币的回填宽度")
     ap.add_argument("--proxy", default=None)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--out", default="docs/sync-recent-1h-report.json",
+                    help="采集报告路径；默认保留历史路径，指定新路径可避免覆盖旧报告")
     args = ap.parse_args()
 
     explicit = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
@@ -143,7 +145,8 @@ def main() -> int:
         "rows_inserted": sum(int(r.get("rows", 0)) for r in results if r["status"] == "ok"),
         "results": results,
     }
-    out = ROOT / "docs" / "sync-recent-1h-report.json"
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"完成: {counts} | 写入 {report['rows_inserted']} 行 | 报告 {out}", flush=True)
     return 0

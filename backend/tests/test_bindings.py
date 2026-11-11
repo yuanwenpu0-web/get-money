@@ -285,7 +285,7 @@ def test_run_cycle_picks_best_score_across_pools(db, monkeypatch):
         )
 
     monkeypatch.setattr(trading_service, "StrategyEngine", lambda db, **kwargs: type("S", (), {"evaluate": evaluate})())
-    monkeypatch.setattr(trading_service, "_sync_recent_many", lambda symbols, interval: [])
+    monkeypatch.setattr(trading_service, "_sync_recent_many", lambda symbols, interval, workers=None: [])
     monkeypatch.setattr(trading_service, "open_position", lambda db, signal, **kwargs: None)
 
     summary = TradingService(db).run_cycle()
@@ -347,7 +347,7 @@ def test_api_binding_to_paper_order_and_disabled_diagnostic(client, monkeypatch)
     created = client.post("/api/bindings", json={"strategy": STRATEGY, "pool": "p1", "interval": "1m", "enabled": True, "params": {"target_r": 3}})
     assert created.status_code == 200
     assert created.json()["effective_params"]["cooldown_bars"] == 3
-    monkeypatch.setattr(service, "_sync_recent_many", lambda *args: [])
+    monkeypatch.setattr(service, "_sync_recent_many", lambda *args, **kwargs: [])
     monkeypatch.setattr(live, "open_live", lambda *args: pytest.fail("unexpected live order"))
 
     def evaluate(self, symbol, interval, strategy, **kwargs):

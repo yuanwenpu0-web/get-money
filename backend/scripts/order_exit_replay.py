@@ -101,8 +101,13 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=20261110)
     ap.add_argument("--random-seeds", type=int, default=20)
     ap.add_argument("--limit", type=int, default=0, help="pilot: first N orders only")
+    ap.add_argument("--fixed-tp-grid", default="",
+                    help="comma-separated ABSOLUTE TP percentages of entry, e.g. 0.5,1,2,4")
     ap.add_argument("--out", default="output/order_exit_replay_paper.json")
     args = ap.parse_args()
+    fixed_grid = tuple(float(x) for x in args.fixed_tp_grid.split(",") if x.strip())
+    if any(p <= 0 or p > 100 for p in fixed_grid):
+        raise SystemExit("fixed TP grid must be in (0, 100] percent")
 
     t0 = time.perf_counter()
     engine = make_engine(read_only=True)
@@ -168,7 +173,8 @@ def main() -> int:
         # Calibration only: replay the baseline inside the REAL holding window
         # to measure how well our OHLC replay reproduces production exits.
         calib_bars = future[:max(1, min(len(future), hold_bars))]
-        rules = build_rules(entry, tp, sl, atr(hist), len(replay_bars), side)
+        rules = build_rules(entry, tp, sl, atr(hist), len(replay_bars), side,
+                            fixed_tp_pcts=fixed_grid)
         rule_out, net = {}, {}
         for r in rules:
             px, idx, why = run_rule(replay_bars, side, entry, r["sl"], r)
@@ -227,6 +233,7 @@ def main() -> int:
             "fee_rate": 0.0004, "slippage": 0.0002, "round_trip": 0.0012,
             "basis": "notional",
             "rule_family": "negative-control only; no parameter search (H2)",
+            "fixed_tp_pcts": list(fixed_grid),
             "class_thresholds": {"early_post_run_R": 1.0, "late_hold_mfe_R": 0.7},
         },
         "orders_in": len(orders), "skipped": skipped, "records": records,

@@ -53,6 +53,10 @@ const form = reactive({
   schedule_enabled: true,
   schedule_seconds: 60,
   exchange_truth_enabled: true,
+  market_sync_workers: 8,
+  market_public_interval_ms: 350,
+  signal_workers: 1,
+  execution_workers: 1,
 })
 
 const credentialForm = reactive({ api_key: '', api_secret: '', testnet: true })
@@ -91,6 +95,10 @@ function applySettings(data) {
   form.schedule_seconds = Number(data.schedule_seconds || 60)
   form.min_quote_volume_usd = Number(data.min_quote_volume_usd ?? 0)
   form.exchange_truth_enabled = data.exchange_truth_enabled !== false
+  form.market_sync_workers = Number(data.market_sync_workers ?? 8)
+  form.market_public_interval_ms = Number(data.market_public_interval_ms ?? 350)
+  form.signal_workers = Number(data.signal_workers ?? 1)
+  form.execution_workers = Number(data.execution_workers ?? 1)
   credentialForm.testnet = Boolean(data.testnet)
 }
 
@@ -200,6 +208,10 @@ async function saveSettings() {
       schedule_enabled: form.schedule_enabled,
       schedule_seconds: Number(form.schedule_seconds),
       exchange_truth_enabled: form.exchange_truth_enabled,
+      market_sync_workers: Math.round(Number(form.market_sync_workers)),
+      market_public_interval_ms: Math.round(Number(form.market_public_interval_ms)),
+      signal_workers: Math.round(Number(form.signal_workers)),
+      execution_workers: Math.round(Number(form.execution_workers)),
       confirm_mainnet: form.execution_mode === 'live' && !form.testnet ? true : undefined,
     }
     applySettings(await api.saveSettings(payload))
@@ -630,6 +642,35 @@ onBeforeUnmount(() => { disposed = true })
             <span class="muted">下次 {{ settings.scheduler?.next_run ? tsLabel(settings.scheduler.next_run) : '—' }}</span>
           </div>
           <div class="form-hint">保存后立即生效。周期过短会增加币安/数据库读取频率，1 分钟线建议 30-60 秒。</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">巡检并发</div>
+              <div class="panel-sub">行情同步 / 信号评估 / 持仓同步的线程数，保存后下一轮巡检生效</div>
+            </div>
+            <el-tag size="small" effect="plain" type="info">默认保持串行</el-tag>
+          </div>
+          <div class="row">
+            <span class="muted">行情线程</span>
+            <el-input-number v-model="form.market_sync_workers" :min="1" :max="32" style="width: 120px" />
+            <span class="muted">限流间隔</span>
+            <el-input-number v-model="form.market_public_interval_ms" :min="20" :max="2000" :step="10" style="width: 130px" />
+            <span class="muted">ms</span>
+          </div>
+          <div class="row">
+            <span class="muted">信号线程</span>
+            <el-input-number v-model="form.signal_workers" :min="1" :max="16" style="width: 120px" />
+            <span class="muted">持仓同步线程</span>
+            <el-input-number v-model="form.execution_workers" :min="1" :max="16" style="width: 120px" />
+          </div>
+          <div class="form-hint">
+            当前 509 币一轮约 267 秒，其中行情同步约 187 秒。行情同步本来就是多线程，但币安公开请求被全局限流门按固定间隔放行，
+            <strong>只加线程数不会变快，需同时调小限流间隔</strong>。默认 8 线程 / 350ms / 其余 1（串行）= 上线零行为变化。
+            建议先小幅调小间隔并观察日志里的 418 / 429 与 sync_errors；信号线程设为 2 以上时，每线程使用独立数据库会话，
+            结果按原顺序合并，不会改变评分择优结果。
+          </div>
         </div>
       </div>
     </div>

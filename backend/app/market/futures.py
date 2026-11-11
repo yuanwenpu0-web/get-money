@@ -47,6 +47,13 @@ class _PublicRequestGate:
                     return
             time.sleep(delay)
 
+    def set_interval(self, seconds: float) -> float:
+        """运行期调整放行间隔；巡检每轮按设置页配置调用，钳在安全区间内。"""
+        value = max(0.02, min(2.0, float(seconds)))
+        with self.lock:
+            self.interval = value
+        return value
+
     def cool_down(self, response: httpx.Response) -> None:
         value = response.headers.get("Retry-After", "60")
         try:
@@ -65,6 +72,15 @@ class _PublicRequestGate:
 
 
 _PUBLIC_GATE = _PublicRequestGate()
+
+
+def set_public_request_interval(seconds: float) -> float:
+    """设置公开 GET 的进程级放行间隔（秒），返回实际生效值。
+
+    巡检每轮开头按 state 里的 market_public_interval_ms 调用一次，因此设置页
+    改完下一轮即生效，不需要重启服务；418/429 仍由 cool_down 兜底退避。
+    """
+    return _PUBLIC_GATE.set_interval(seconds)
 
 
 class BinanceApiError(BinanceError):

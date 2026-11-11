@@ -1,0 +1,43 @@
+# Autonomous quant research · 本轮冻结配置（2026-11-11）
+# 说明：项目正式结论以 docs/*.md + 同名 .json 为准；本目录仅作实验台账。
+venue: Binance USD-M perpetuals
+mode: research_paper_only
+live_orders_allowed: false
+live_api_keys_enabled: false
+
+universe:
+  source: local PostgreSQL `sentiment` ∩ `klines` interval=1h
+  snapshot_symbols: 515
+  point_in_time_membership: true
+  survivor_bias_guard: "sentiment 表全量在库币，按逐时点有效覆盖过滤，不用未来存续名单"
+
+intervals: [1h]
+cost_model:
+  fee_rate: 0.0004
+  slippage: 0.0002
+  round_trip: 0.0012
+  basis: notional
+  note: "IC 探针为毛价格关联，未扣成本；净收益判定必须扣 0.12%"
+
+gates:
+  ic_abs_threshold: 0.02
+  same_sign_share_threshold: 0.60
+  ci_confidence: 0.95
+  ci_method: block_bootstrap_24_periods
+  fdr_q_threshold: 0.10
+  min_p90_random_baseline_percentile: 0.95
+  min_pooled_trades: 30
+
+round_budget:
+  max_hypotheses: 3
+  max_implementations: 2
+  max_parameter_trials_per_strategy: 20
+  max_code_repair_attempts: 3
+  stop_after_non_improving_rounds: 5
+
+hard_stoploss_H2: "现货 OHLCV 价格序列 + K 线级主动成交汇总已证伪；新特征只许逐笔顺序 / 盘口挂撤单 / 多所现货腿 / 衍生品持仓与情绪，且先过 IC 探针"
+
+execution:
+  adapter: none
+  status: BLOCKED
+  reason: "本轮为只读 IC 探针，Gate 1 未通过；未部署任何 paper/live 执行"
