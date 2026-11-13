@@ -265,6 +265,16 @@ def _protection_order(client: BinanceFuturesClient, symbol: str, close_side: str
                             stopPrice=format_amount(stop_price), closePosition="true", newOrderRespType="RESULT")
 
 
+def reanchor_exits(fill_price: float, signal_price: float, sl: float, tp: float) -> tuple[float, float]:
+    """把信号价锚定的止损/止盈平移到实际成交价，保持绝对价格距离不变。
+
+    距离不变 ⇒ sl_atr_mult×ATR 与 target_r 在成交后仍成立，且 qty×距离 恰等于
+    开仓前按信号价算出的风险预算；留在信号价上会让追价把实际风险放大数倍。
+    """
+    offset = fill_price - signal_price
+    return sl + offset, tp + offset
+
+
 def _line_logger(db: Session):
     """把 live.log(db, level, message) 适配成 maker / rollback 需要的 (level, message) 回调，
     避免下游模块反向依赖 live 造成循环导入。"""
@@ -318,6 +328,9 @@ def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, 
     order_resp = execute_entry(client, signal.symbol, exchange_side, adj_qty, entry,
                                order_type, tick, step, line_log)
     fill_price = _safe_float(order_resp.get("avgPrice")) or entry
+    side = 1 if signal.direction == "LONG" else -1
+    sl_raw, tp_raw = reanchor_exits(fill_price, entry, signal.sl, signal.tp)
+    sl_trigger, tp_trigger = round_to_tick(sl_raw, tick), round_to_tick(tp_raw, tick)
     # 币安 ID 同步守卫：三张单的订单号必须全部有效，否则这笔订单无法对账/撤单/结算。
     # 此刻交易所可能已真实成交，所以「不记录订单」之前必须先回滚交易所仓位。
     entry_id = _valid_exchange_id(order_resp.get("orderId"))
@@ -326,16 +339,20 @@ def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, 
     sl_order: dict = {}
     tp_order: dict = {}
     sl_id = tp_id = None
+    if (fill_price - sl_trigger) * side <= 0 or (tp_trigger - fill_price) * side <= 0:
+        reason = (f"成交价 {fill_price} 经 tick 取整后止损/止盈方向不合法"
+                  f"（sl={sl_trigger} tp={tp_trigger}），已回滚")
+        gw.record(db, "open", signal.symbol, status="failed", message=reason)
+        rollback_open(client, signal.symbol, close_side, adj_qty, placed_protections, reason, line_log)
+        return None
     try:
-        sl_order = _protection_order(client, signal.symbol, close_side, "STOP_MARKET",
-                                     round_to_tick(signal.sl, tick))
+        sl_order = _protection_order(client, signal.symbol, close_side, "STOP_MARKET", sl_trigger)
         sl_id = _valid_exchange_id(sl_order.get("orderId"))
         if sl_id is None:
             sync_error = sync_error or "止损保护单回报缺少有效 algoId/orderId"
         else:
             placed_protections.append(sl_id)
-        tp_order = _protection_order(client, signal.symbol, close_side, "TAKE_PROFIT_MARKET",
-                                     round_to_tick(signal.tp, tick))
+        tp_order = _protection_order(client, signal.symbol, close_side, "TAKE_PROFIT_MARKET", tp_trigger)
         tp_id = _valid_exchange_id(tp_order.get("orderId"))
         if tp_id is None:
             sync_error = sync_error or "止盈保护单回报缺少有效 algoId/orderId"
@@ -372,8 +389,8 @@ def _place_live(db: Session, client: BinanceFuturesClient, signal, margin, qty, 
         mark_price=round_price(fill_price),
         margin=round(margin, 4),
         leverage=leverage,
-        sl=round_price(round_to_tick(signal.sl, tick)),
-        tp=round_price(round_to_tick(signal.tp, tick)),
+        sl=round_price(sl_trigger),
+        tp=round_price(tp_trigger),
         status="OPEN",
         source="live",
         exchange_order_id=str(entry_id),

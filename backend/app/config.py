@@ -81,7 +81,7 @@ FUTURES_TESTNET_HOSTS = ["https://testnet.binancefuture.com"]
 
 DEFAULT_SYMBOLS = ["BTCUSDT", "ETHUSDT"]
 DEFAULT_INTERVAL = "15m"
-SUPPORTED_INTERVALS = ["1m", "5m", "15m", "1h", "4h", "1d"]
+SUPPORTED_INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"]
 
 # 模拟撮合默认参数
 DEFAULT_FEE_RATE = 0.0004

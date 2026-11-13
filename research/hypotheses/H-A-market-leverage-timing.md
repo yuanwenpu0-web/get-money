@@ -78,3 +78,34 @@ P9 roadmap 中「攒满 60 天做特征 ON/OFF 的 A/B」在本卡中正式改�
 - 当 sentiment 覆盖 ≥60 天且样本外段 ≥20 天时，**由人工重新登记假设卡并授权**，
   才允许启动 Gate 1 探针；自动化不得自行跑回测或启用策略。
 - 在此之前：不跑探针、不跑回测、不改 spec / 绑定 / 参数，`default_enabled=False`。
+
+## 10. 附录：量具预置完成（P13-001，2026-11-12T01:05+08:00）
+
+**本节不是第 9 节要求的人工重新登记与授权。** 假设、H、阈值、终止条件一字未改；
+状态仍为 `BLOCKED_BY_DATA`，仍不跑探针 / 回测、不启用、不进绑定。
+
+- **量具已预置并通过 51 项单测**（先写失败测试再实现）：
+  `backend/scripts/ha_common.py`(126 行) / `ha_portfolio.py`(196 行) / `ha_market_timing.py`(197 行)，
+  测试 `backend/tests/test_ha_common.py`(19) / `test_ha_portfolio.py`(25) / `test_ha_market_timing.py`(7)。
+  成对报告：`docs/ha-market-leverage-timing-harness.md` + `.json`（标题标注「工程预置，非 edge 判定」，
+  `verdict=insufficient`、`metrics=null`、`trades=0`）。
+- **到期日口径更正**：第 4 节的「≥60 个完整日」是**跨度**口径。按跨度算 mark 为 2026-12-05T04:00Z
+  （该日期出自 P15 审计与台账 P15-000/001，本卡原文未给日期）；但 `ROLL_MIN_PERIODS=72` 的
+  z-score 预热会吃掉开头 **3 个非重叠块**，故按**可用块**口径需 63 块，实际可判定日约
+  **2026-12-09T16:00Z**，晚 4 天。当前跨度 36.50 天、总块数 35、缺 25 块 + 3 预热块 = 28 天。
+  `block_readiness.interior_gap=false`，说明缺口纯粹是时间未到，不是采集链断裂。
+- **第 5 节成本括号写法澄清（总额不变）**：原文「fee 0.04% + slippage 0.08%」易被误读。
+  实现按 playbook H3 取**单边** `fee_rate=0.0004`(0.04%) + `slippage=0.0002`(0.02%) = 单边 0.06%，
+  双边合计 **0.12%**，与原文总额一致。成本按精确出场名义本金计：一段连续 ON 区间
+  总成本 = `c*(1 + exit/entry)`，不用固定 `2*fee` 近似。口径全程 notional，不切 margin。
+- **第 6 节随机基线的实现方式已锁定**：用**匹配游程长度置换**（ON 游程集合与 OFF 游程集合
+  各自内部置换后按原 pattern 铺回），逐序列精确保持曝光、游程条数与线性转移次数。
+  **不用拟合马尔可夫链**——单测抓出：信号持续时观测不到 OFF→ON 转移，`p_off` 估为 1.0，
+  链进入吸收态，基线换手系统性偏低，会把成本差伪造成 alpha。也不用 iid Bernoulli（不保持游程结构）
+  与循环平移（与块级开关口径不符）。`fit_markov` 仅作持续性诊断报告。
+- **阈值选择防泄漏**：`select_threshold(train_factor, train_ret, ...)` 签名收不到样本外数据，
+  有专门单测验证「扰动 OOS 后阈值不变」。7 档分位阈值只在训练段择优，评估时须报告全部 7 档。
+- **样本外块数不足已登记为局限**：训练＋样本外合计 60 块满足 `MIN_BLOCKS=30`，
+  但样本外单独只有 20 块 < 30，统计功效偏弱，不得靠改 H 或改门槛绕过。
+- **门禁行为**：CLI 默认只做就绪检查；数据到齐也只输出 `READY_AWAITING_HUMAN_AUTHORIZATION`，
+  必须显式 `--evaluate` 且经人工重新登记授权后才进 Gate 1。绝不静默丢块凑样本。

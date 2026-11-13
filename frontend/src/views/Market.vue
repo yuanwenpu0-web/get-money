@@ -28,7 +28,7 @@ const tradesError = ref('')
 const tradesLoading = ref(false)
 const showTrades = ref(true)
 const locating = ref(false)
-const quickIntervals = ['1m', '5m', '15m', '1h', '4h']
+const quickIntervals = ['1m', '5m', '15m', '30m', '1h', '4h']
 const statsPage = ref(1)
 const statsPageSize = PAGE_SIZE
 const statsTotal = ref(0)
@@ -609,7 +609,7 @@ onBeforeUnmount(() => {
         <div class="panel-head">
           <div>
             <div class="panel-title">同步币安K线</div>
-            <div class="panel-sub">只获取 1m 原始K线；5m / 15m / 1h / 4h / 1d 在本地聚合</div>
+            <div class="panel-sub">只获取 1m 原始K线；5m / 15m / 30m / 1h / 4h / 1d 在本地聚合</div>
           </div>
         </div>
         <div v-if="settingsLoading" class="muted" role="status">正在加载同步设置，行情与本地数据可独立查看…</div>
@@ -634,7 +634,7 @@ onBeforeUnmount(() => {
           <div>
             <div class="muted" style="margin-bottom: 4px">K线周期</div>
             <el-select v-model="syncForm.interval" style="width: 100%" @change="touchSyncForm">
-              <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
+              <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '30m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
             </el-select>
           </div>
           <div>
@@ -692,7 +692,7 @@ onBeforeUnmount(() => {
             <el-option v-for="symbol in symbolOptions" :key="symbol" :label="symbol" :value="symbol" />
           </el-select>
           <el-select v-model="query.interval" size="small" style="width: 100px" @change="changeQuery">
-            <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
+            <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '30m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
           </el-select>
           <el-select v-model="query.limit" size="small" style="width: 110px" @change="changeQuery">
             <el-option label="300 根" :value="300" />

@@ -1,0 +1,1151 @@
+{
+  "generated_at": "2026-11-13T02:48:53+00:00",
+  "experiment_id": "P18-007",
+  "parent_experiment_id": "P18-002",
+  "supersedes_interpretation_of": "P18-006",
+  "registration_note": "P18-006 登记的是同一份测量，但当时尚未分离「回看长度」与「未来信息」两种效应；本条携带完整口径与分离后的泄漏率。台账 append-only，不改写前条。",
+  "stage": "S1/S5 pool membership point-in-time audit",
+  "decision": "BLOCKED",
+  "db_access": "read_only",
+  "transaction_read_only": "on",
+  "scope_sha": "b323c0912533842e",
+  "source_hashes": {
+    "indicator-eval-scope.json": "4a7c09c49d298870b321d1a8639f7e9fcba0d2c93bd5056cc34520dcee6c7e24",
+    "fit-universe.json": "3a0aad283b31f267936d3bb38de4723a339775d2d5cc67eae7d3bfad239139c3",
+    "indicator-fit-stats-A.json": "dae06221ca92a0a5a8ac442296e4cb65ab1e8428792c6f2748817ecce620e9ac"
+  },
+  "window_anchor": {
+    "status": "OK",
+    "end_ms": 1794495600000,
+    "source": "min(liq_q*.rule.window_end_ms)",
+    "raw_min_ms": 1794495840242,
+    "iso": "2026-11-12T15:00:00+00:00",
+    "q_snapshot_trusted": true
+  },
+  "pool_window_days": 90,
+  "window_lo_ms": 1786719600000,
+  "history_lookback_months": 15,
+  "history_lookback_days": 458,
+  "reference_symbols": 80,
+  "pool_interval": "1h",
+  "overflow_bug": {
+    "id": "expected_bars_int32_overflow",
+    "root_cause": "pandas 3.x .dt.days_in_month 为 int32，乘 DAY_MS(86400000) 对 >=25 天的月份溢出为负",
+    "consequence": "partial 恒为 False，窗口首尾残月从未被剔除，直接进入 Q 档中位数与逐月档位",
+    "fixed_in": "backend/app/research/fit_data.py:month_expected_bars/mark_partial_months",
+    "frozen_artifacts_unchanged": true,
+    "a_round_reproduction": "MATCH",
+    "a_round_reproduction_detail": {
+      "frozen_count": 80,
+      "recomputed_count": 80,
+      "unchanged": 80,
+      "changed": [],
+      "dropped": [],
+      "added": []
+    }
+  },
+  "corrected_recompute": {
+    "note": "只用修好的 partial 判定重算同一窗口档位；不落库、不覆盖 fit-universe.json、不重算统计",
+    "tier_delta": {
+      "frozen_count": 80,
+      "recomputed_count": 80,
+      "unchanged": 52,
+      "changed": [
+        {
+          "symbol": "0GUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "AAVEUSDT",
+          "frozen": "Q1",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "ARBUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q1"
+        },
+        {
+          "symbol": "ARIAUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "BATUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "BIRBUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "BOMEUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "COTIUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "DOODUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "FETUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "GALAUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "GTCUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "IOSTUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "IRYSUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "JCTUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "LYNUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "MAGICUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "MAGMAUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "MORPHOUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "MOVRUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "OGNUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "OPUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "POLUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "RIVERUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q4"
+        },
+        {
+          "symbol": "RLCUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "SAGAUSDT",
+          "frozen": "Q4",
+          "recomputed": "Q3"
+        },
+        {
+          "symbol": "SANDUSDT",
+          "frozen": "Q3",
+          "recomputed": "Q2"
+        },
+        {
+          "symbol": "TRXUSDT",
+          "frozen": "Q2",
+          "recomputed": "Q3"
+        }
+      ],
+      "dropped": [],
+      "added": []
+    },
+    "frozen_pool_sizes": {
+      "liq_q1": 20,
+      "liq_q2": 20,
+      "liq_q3": 20,
+      "liq_q4": 20
+    },
+    "recomputed_pool_sizes": {
+      "liq_q1": 20,
+      "liq_q2": 20,
+      "liq_q3": 20,
+      "liq_q4": 20
+    },
+    "window_months": [
+      {
+        "ym": "2026-08",
+        "symbols": 78,
+        "partial_months": 78,
+        "expected_bars_min": 744
+      },
+      {
+        "ym": "2026-09",
+        "symbols": 80,
+        "partial_months": 0,
+        "expected_bars_min": 720
+      },
+      {
+        "ym": "2026-10",
+        "symbols": 80,
+        "partial_months": 0,
+        "expected_bars_min": 744
+      },
+      {
+        "ym": "2026-11",
+        "symbols": 80,
+        "partial_months": 80,
+        "expected_bars_min": 720
+      }
+    ]
+  },
+  "pit": {
+    "rule": "只用严格早于事件月且非 partial 的月份定档；不读事件月自身或之后的月",
+    "lookback_months_available": 15,
+    "confound_note": "长回看 PIT 档与 A 轮短回看固定档的差异同时含「回看长度」与「未来信息」两种效应，不是纯泄漏估计",
+    "per_month": {
+      "2026-08": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07"
+        ],
+        "comparable": 76,
+        "disagree": 32,
+        "disagree_rate": 0.4211,
+        "no_pit_tier": 2,
+        "disagree_symbols": [
+          "0GUSDT",
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "ASTERUSDT",
+          "AXSUSDT",
+          "BCHUSDT",
+          "BEAMXUSDT",
+          "BRUSDT",
+          "BTWUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DOTUSDT",
+          "EIGENUSDT",
+          "GALAUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "MAGMAUSDT",
+          "MANAUSDT",
+          "MOVRUSDT",
+          "PENDLEUSDT",
+          "PROMUSDT",
+          "PUMPUSDT",
+          "QNTUSDT",
+          "RIVERUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SKYUSDT",
+          "币安人生USDT",
+          "龙虾USDT"
+        ]
+      },
+      "2026-09": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08"
+        ],
+        "comparable": 76,
+        "disagree": 27,
+        "disagree_rate": 0.3553,
+        "no_pit_tier": 4,
+        "disagree_symbols": [
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "AXSUSDT",
+          "BCHUSDT",
+          "BEAMXUSDT",
+          "BRUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DOTUSDT",
+          "EIGENUSDT",
+          "GALAUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "MANAUSDT",
+          "MOVRUSDT",
+          "PENDLEUSDT",
+          "PROMUSDT",
+          "QNTUSDT",
+          "RIVERUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SKYUSDT",
+          "币安人生USDT",
+          "龙虾USDT"
+        ]
+      },
+      "2026-10": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08",
+          "2026-09"
+        ],
+        "comparable": 80,
+        "disagree": 28,
+        "disagree_rate": 0.35,
+        "no_pit_tier": 0,
+        "disagree_symbols": [
+          "0GUSDT",
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "AXSUSDT",
+          "BCHUSDT",
+          "BEAMXUSDT",
+          "BRUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "GALAUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "MOVRUSDT",
+          "POLUSDT",
+          "PONSUSDT",
+          "PROMUSDT",
+          "QNTUSDT",
+          "RIVERUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SKYUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      },
+      "2026-11": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07",
+          "2026-08",
+          "2026-09",
+          "2026-10"
+        ],
+        "comparable": 80,
+        "disagree": 26,
+        "disagree_rate": 0.325,
+        "no_pit_tier": 0,
+        "disagree_symbols": [
+          "0GUSDT",
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "AXSUSDT",
+          "BCHUSDT",
+          "BEAMXUSDT",
+          "BRUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DOSUSDT",
+          "GALAUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "MOVRUSDT",
+          "POLUSDT",
+          "PROMUSDT",
+          "QNTUSDT",
+          "RIVERUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      }
+    },
+    "comparable_total": 312,
+    "disagree_total": 113,
+    "disagree_rate": 0.3622,
+    "months_without_pit": [],
+    "window_days_by_month": {
+      "2026-08": 17.375,
+      "2026-09": 30.0,
+      "2026-10": 31.0,
+      "2026-11": 11.625
+    },
+    "window_days_total": 90.0,
+    "window_days_without_pit": 0,
+    "window_share_without_pit": 0.0
+  },
+  "lookahead_isolated": {
+    "rule": "保持 A 轮实际使用的月份集合（残月因溢出也在内），只去掉事件月之后的月",
+    "purpose": "把「未来信息」这一项单独量出来，与回看长度效应分开",
+    "per_month": {
+      "2026-08": {
+        "status": "NO_PRIOR_COMPLETE_MONTH",
+        "prior_months": [],
+        "comparable": 0,
+        "disagree": 0,
+        "disagree_rate": null,
+        "no_pit_tier": 78,
+        "disagree_symbols": []
+      },
+      "2026-09": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2026-08"
+        ],
+        "comparable": 78,
+        "disagree": 21,
+        "disagree_rate": 0.2692,
+        "no_pit_tier": 2,
+        "disagree_symbols": [
+          "AGTUSDT",
+          "AXSUSDT",
+          "BCHUSDT",
+          "BOMEUSDT",
+          "BRUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DOSUSDT",
+          "FILUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LYNUSDT",
+          "MOVRUSDT",
+          "OPUSDT",
+          "POLUSDT",
+          "PROMUSDT",
+          "QNTUSDT",
+          "RUNEUSDT",
+          "币安人生USDT",
+          "我踏马来了USDT"
+        ]
+      },
+      "2026-10": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2026-08",
+          "2026-09"
+        ],
+        "comparable": 80,
+        "disagree": 21,
+        "disagree_rate": 0.2625,
+        "no_pit_tier": 0,
+        "disagree_symbols": [
+          "AAVEUSDT",
+          "AGTUSDT",
+          "ARBUSDT",
+          "ARIAUSDT",
+          "BCHUSDT",
+          "BEAMXUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "DOSUSDT",
+          "FILUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LYNUSDT",
+          "MAGMAUSDT",
+          "ONDOUSDT",
+          "OPUSDT",
+          "PROMUSDT",
+          "RAREUSDT",
+          "SAGAUSDT",
+          "哈基米USDT"
+        ]
+      },
+      "2026-11": {
+        "status": "PIT_AVAILABLE",
+        "prior_months": [
+          "2026-08",
+          "2026-09",
+          "2026-10"
+        ],
+        "comparable": 80,
+        "disagree": 15,
+        "disagree_rate": 0.1875,
+        "no_pit_tier": 0,
+        "disagree_symbols": [
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARIAUSDT",
+          "BEAMXUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "DOODUSDT",
+          "DOSUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "MAGMAUSDT",
+          "ONDOUSDT",
+          "RAREUSDT",
+          "龙虾USDT"
+        ]
+      }
+    },
+    "comparable_total": 238,
+    "disagree_total": 57,
+    "disagree_rate": 0.2395,
+    "months_without_pit": [
+      "2026-08"
+    ]
+  },
+  "membership": {
+    "q_pools_static": true,
+    "q_drift_vs_frozen_snapshot": {
+      "liq_q1": {
+        "status": "MATCH",
+        "frozen_count": 20,
+        "live_count": 20,
+        "added": [],
+        "removed": []
+      },
+      "liq_q2": {
+        "status": "MATCH",
+        "frozen_count": 20,
+        "live_count": 20,
+        "added": [],
+        "removed": []
+      },
+      "liq_q3": {
+        "status": "MATCH",
+        "frozen_count": 20,
+        "live_count": 20,
+        "added": [],
+        "removed": []
+      },
+      "liq_q4": {
+        "status": "MATCH",
+        "frozen_count": 20,
+        "live_count": 20,
+        "added": [],
+        "removed": []
+      }
+    },
+    "rule_pools": {
+      "major": {
+        "kind": "rule",
+        "rule": {
+          "base": "major"
+        },
+        "updated_at": "2026-10-29T01:34:20.895059+08:00"
+      },
+      "alt": {
+        "kind": "rule",
+        "rule": {
+          "base": "all",
+          "exclude_major": true
+        },
+        "updated_at": "2026-10-29T01:34:20.895059+08:00"
+      }
+    },
+    "rule_pool_a_round_members_persisted": false,
+    "rule_pool_count_check": {
+      "5m": {
+        "major": {
+          "live_count": 16,
+          "a_round_count": 16,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        },
+        "alt": {
+          "live_count": 60,
+          "a_round_count": 60,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        }
+      },
+      "15m": {
+        "major": {
+          "live_count": 16,
+          "a_round_count": 16,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        },
+        "alt": {
+          "live_count": 79,
+          "a_round_count": 79,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        }
+      },
+      "30m": {
+        "major": {
+          "live_count": 16,
+          "a_round_count": 16,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        },
+        "alt": {
+          "live_count": 78,
+          "a_round_count": 78,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        }
+      },
+      "1h": {
+        "major": {
+          "live_count": 16,
+          "a_round_count": 16,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        },
+        "alt": {
+          "live_count": 96,
+          "a_round_count": 96,
+          "count_status": "MATCH",
+          "members_frozen_in_a_round": false
+        }
+      }
+    },
+    "frozen_now": {
+      "5m": {
+        "major": [
+          "ADAUSDT",
+          "APTUSDT",
+          "AVAXUSDT",
+          "BCHUSDT",
+          "BNBUSDT",
+          "BTCUSDT",
+          "DOGEUSDT",
+          "DOTUSDT",
+          "ETHUSDT",
+          "LINKUSDT",
+          "LTCUSDT",
+          "NEARUSDT",
+          "SOLUSDT",
+          "SUIUSDT",
+          "TRXUSDT",
+          "XRPUSDT"
+        ],
+        "alt": [
+          "0GUSDT",
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AKEUSDT",
+          "ARBUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "ARUSDT",
+          "ASTERUSDT",
+          "AXSUSDT",
+          "BATUSDT",
+          "BEAMXUSDT",
+          "BOMEUSDT",
+          "BRUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DOODUSDT",
+          "DOSUSDT",
+          "EIGENUSDT",
+          "ENAUSDT",
+          "FETUSDT",
+          "FILUSDT",
+          "GALAUSDT",
+          "GTCUSDT",
+          "HBARUSDT",
+          "INJUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LITUSDT",
+          "LYNUSDT",
+          "MAGICUSDT",
+          "MAGMAUSDT",
+          "MANAUSDT",
+          "METUSDT",
+          "MORPHOUSDT",
+          "MOVRUSDT",
+          "OGNUSDT",
+          "ONDOUSDT",
+          "OPUSDT",
+          "PENDLEUSDT",
+          "PENGUUSDT",
+          "POLUSDT",
+          "PONSUSDT",
+          "PROMUSDT",
+          "PUMPUSDT",
+          "QNTUSDT",
+          "RAREUSDT",
+          "RIVERUSDT",
+          "RLCUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SANDUSDT",
+          "SKYUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "我踏马来了USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      },
+      "15m": {
+        "major": [
+          "ADAUSDT",
+          "APTUSDT",
+          "AVAXUSDT",
+          "BCHUSDT",
+          "BNBUSDT",
+          "BTCUSDT",
+          "DOGEUSDT",
+          "DOTUSDT",
+          "ETHUSDT",
+          "LINKUSDT",
+          "LTCUSDT",
+          "NEARUSDT",
+          "SOLUSDT",
+          "SUIUSDT",
+          "TRXUSDT",
+          "XRPUSDT"
+        ],
+        "alt": [
+          "0GUSDT",
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AINUSDT",
+          "AKEUSDT",
+          "APRUSDT",
+          "ARBUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "ARUSDT",
+          "ASTERUSDT",
+          "AXSUSDT",
+          "BATUSDT",
+          "BEAMXUSDT",
+          "BEATUSDT",
+          "BOMEUSDT",
+          "BRUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "CAPUSDT",
+          "CHIPUSDT",
+          "COTIUSDT",
+          "DASHUSDT",
+          "DOODUSDT",
+          "DOSUSDT",
+          "EIGENUSDT",
+          "ENAUSDT",
+          "ERAUSDT",
+          "FETUSDT",
+          "FILUSDT",
+          "GALAUSDT",
+          "GTCUSDT",
+          "HBARUSDT",
+          "INJUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LITUSDT",
+          "LYNUSDT",
+          "MAGICUSDT",
+          "MAGMAUSDT",
+          "MANAUSDT",
+          "METUSDT",
+          "MORPHOUSDT",
+          "MOVRUSDT",
+          "NILUSDT",
+          "OGNUSDT",
+          "ONDOUSDT",
+          "OPUSDT",
+          "PENDLEUSDT",
+          "PENGUUSDT",
+          "POLUSDT",
+          "PONSUSDT",
+          "PROMUSDT",
+          "PUMPUSDT",
+          "QNTUSDT",
+          "QUSDT",
+          "RAREUSDT",
+          "RIVERUSDT",
+          "RLCUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SANDUSDT",
+          "SKYUSDT",
+          "SOONUSDT",
+          "STRKUSDT",
+          "TAOUSDT",
+          "TIAUSDT",
+          "TRUMPUSDT",
+          "UNIUSDT",
+          "WLDUSDT",
+          "XLMUSDT",
+          "XMRUSDT",
+          "ZROUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "我踏马来了USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      },
+      "30m": {
+        "major": [
+          "ADAUSDT",
+          "APTUSDT",
+          "AVAXUSDT",
+          "BCHUSDT",
+          "BNBUSDT",
+          "BTCUSDT",
+          "DOGEUSDT",
+          "DOTUSDT",
+          "ETHUSDT",
+          "LINKUSDT",
+          "LTCUSDT",
+          "NEARUSDT",
+          "SOLUSDT",
+          "SUIUSDT",
+          "TRXUSDT",
+          "XRPUSDT"
+        ],
+        "alt": [
+          "0GUSDT",
+          "AAVEUSDT",
+          "AGTUSDT",
+          "AINUSDT",
+          "AKEUSDT",
+          "APRUSDT",
+          "ARBUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "ARUSDT",
+          "ASTERUSDT",
+          "AXSUSDT",
+          "BATUSDT",
+          "BEAMXUSDT",
+          "BEATUSDT",
+          "BOMEUSDT",
+          "BRUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "COTIUSDT",
+          "DASHUSDT",
+          "DOODUSDT",
+          "DOSUSDT",
+          "EIGENUSDT",
+          "ENAUSDT",
+          "ERAUSDT",
+          "FETUSDT",
+          "FILUSDT",
+          "GALAUSDT",
+          "GTCUSDT",
+          "HBARUSDT",
+          "INJUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LITUSDT",
+          "LYNUSDT",
+          "MAGICUSDT",
+          "MAGMAUSDT",
+          "MANAUSDT",
+          "METUSDT",
+          "MORPHOUSDT",
+          "MOVRUSDT",
+          "NILUSDT",
+          "OGNUSDT",
+          "ONDOUSDT",
+          "OPUSDT",
+          "ORDERUSDT",
+          "PENDLEUSDT",
+          "PENGUUSDT",
+          "POLUSDT",
+          "PONSUSDT",
+          "PROMUSDT",
+          "PUMPUSDT",
+          "QNTUSDT",
+          "QUSDT",
+          "RAREUSDT",
+          "RIVERUSDT",
+          "RLCUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SANDUSDT",
+          "SKYUSDT",
+          "SOONUSDT",
+          "STRKUSDT",
+          "TAOUSDT",
+          "TIAUSDT",
+          "TRUMPUSDT",
+          "UNIUSDT",
+          "WLDUSDT",
+          "XLMUSDT",
+          "XMRUSDT",
+          "ZROUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "我踏马来了USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      },
+      "1h": {
+        "major": [
+          "ADAUSDT",
+          "APTUSDT",
+          "AVAXUSDT",
+          "BCHUSDT",
+          "BNBUSDT",
+          "BTCUSDT",
+          "DOGEUSDT",
+          "DOTUSDT",
+          "ETHUSDT",
+          "LINKUSDT",
+          "LTCUSDT",
+          "NEARUSDT",
+          "SOLUSDT",
+          "SUIUSDT",
+          "TRXUSDT",
+          "XRPUSDT"
+        ],
+        "alt": [
+          "0GUSDT",
+          "1000SHIBUSDT",
+          "AAVEUSDT",
+          "ACEUSDT",
+          "AGTUSDT",
+          "AINUSDT",
+          "AKEUSDT",
+          "APRUSDT",
+          "ARBUSDT",
+          "ARCUSDT",
+          "ARIAUSDT",
+          "ARUSDT",
+          "ASTERUSDT",
+          "AXSUSDT",
+          "BATUSDT",
+          "BEAMXUSDT",
+          "BOMEUSDT",
+          "BRUSDT",
+          "BTRUSDT",
+          "BTWUSDT",
+          "BULLAUSDT",
+          "CAKEUSDT",
+          "CAPUSDT",
+          "COTIUSDT",
+          "CRVUSDT",
+          "DASHUSDT",
+          "DOODUSDT",
+          "DOSUSDT",
+          "EIGENUSDT",
+          "ENAUSDT",
+          "ETCUSDT",
+          "FARTCOINUSDT",
+          "FETUSDT",
+          "FILUSDT",
+          "GALAUSDT",
+          "GTCUSDT",
+          "HBARUSDT",
+          "HEMIUSDT",
+          "IDOLUSDT",
+          "INITUSDT",
+          "INJUSDT",
+          "IOSTUSDT",
+          "JCTUSDT",
+          "LITUSDT",
+          "LSKUSDT",
+          "LYNUSDT",
+          "MAGICUSDT",
+          "MAGMAUSDT",
+          "MANAUSDT",
+          "MARSCOINUSDT",
+          "METUSDT",
+          "MORPHOUSDT",
+          "MOVRUSDT",
+          "MUBARAKUSDT",
+          "NILUSDT",
+          "OGNUSDT",
+          "ONDOUSDT",
+          "ONEUSDT",
+          "ONGUSDT",
+          "OPUSDT",
+          "PENDLEUSDT",
+          "PENGUUSDT",
+          "POLUSDT",
+          "PONSUSDT",
+          "PROMUSDT",
+          "PUMPUSDT",
+          "QNTUSDT",
+          "QUSDT",
+          "RAREUSDT",
+          "RAYSOLUSDT",
+          "RIVERUSDT",
+          "RLCUSDT",
+          "RUNEUSDT",
+          "SAGAUSDT",
+          "SANDUSDT",
+          "SKYUSDT",
+          "STRKUSDT",
+          "TAOUSDT",
+          "TIAUSDT",
+          "TRUMPUSDT",
+          "TUTUSDT",
+          "UAIUSDT",
+          "UNIUSDT",
+          "USELESSUSDT",
+          "USUSDT",
+          "VVVUSDT",
+          "WLDUSDT",
+          "XLMUSDT",
+          "XMRUSDT",
+          "XPLUSDT",
+          "ZROUSDT",
+          "哈基米USDT",
+          "币安人生USDT",
+          "我踏马来了USDT",
+          "牛来USDT",
+          "龙虾USDT"
+        ]
+      }
+    },
+    "freeze_caveat": "本次 major/alt 成员是审计时点的事后快照；A 轮成员名单从未落盘，无法逐币复现"
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "applied_in_this_audit": false,
+    "note": "沿用原统计名义本金往返0.12%，每边fee_rate=0.0004/slippage=0.0002；本审计不新增净收益"
+  },
+  "window": {
+    "start_ms": 1786719600000,
+    "end_ms": 1794495600000,
+    "days": 90,
+    "anchor_source": "min(liq_q*.rule.window_end_ms)",
+    "start_iso": "2026-08-14T15:00:00+00:00",
+    "end_iso": "2026-11-12T15:00:00+00:00"
+  },
+  "universe": {
+    "reference_symbols": 80,
+    "pool_interval": "1h",
+    "intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ],
+    "universe_size": {
+      "5m": 80,
+      "15m": 101,
+      "30m": 99,
+      "1h": 119
+    },
+    "common_universe": 80
+  },
+  "verdict": "insufficient",
+  "trades": {
+    "status": "NOT_RUN",
+    "count": 0
+  },
+  "ci": {
+    "status": "NOT_APPLICABLE",
+    "reason": "本审计不估计任何收益期望，未新增置信区间；档位不一致率是计数比例，不是收益估计"
+  },
+  "limitations": [
+    "只测量成员口径，不产生净收益数字，不改 A 轮统计与标签。",
+    "溢出修复改变此后 prep 的分档口径；A 轮冻结档位与池成员保持原样，未按修复重选。",
+    "长回看 PIT 不一致率混合回看长度与未来信息两种效应，不是纯泄漏估计。",
+    "PIT 不一致率是档位标签的不一致，不是收益偏差的估计，两者不能互相替代。",
+    "残月判定修复后 tier_stability 与逐月档位的历史产物同样受影响，本轮未重写它们。",
+    "major/alt 的 A 轮成员名单从未落盘，只能比计数；本次冻结是事后快照。",
+    "max-T、先整体交互的校正、整体显著性/稳定性、独立样本外历史仍未补齐。"
+  ],
+  "backtest_status": "NOT_RUN",
+  "parameter_trials": 0,
+  "stats_recomputed": false,
+  "a_round_labels_unchanged": true,
+  "live_orders": false,
+  "verification": {
+    "output/fit-membership-focused-pytest.log": "108 passed in 2.04s",
+    "output/fit-membership-full-pytest.log": "3 failed, 2198 passed, 5 warnings in 93.78s (0:01:33)",
+    "output/fit-membership-independent-verify.log": "INDEPENDENT VERIFY: 12/12 checks passed; all matched"
+  }
+}

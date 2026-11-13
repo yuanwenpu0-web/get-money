@@ -1,0 +1,33 @@
+{
+  "experiment_id": "P18-009",
+  "parent_experiment_id": "P18-008",
+  "generated_at": "2026-11-13T06:45:06+00:00",
+  "stage": "membership audit evidence clarification",
+  "decision": "BLOCKED",
+  "scope_sha": "b323c0912533842e",
+  "source_sha256": "b22f702517a88a4038d7f5ea21c195f3eeb22f5730f21ea0b533fb2c3b1d3daa",
+  "source_file": "docs\\indicator-fit-membership-correction.json",
+  "quality": {
+    "long_prior_minimum_bar_fraction": 0.7,
+    "long_prior_rule": "此前自然月每币柱数不少于该月应有柱数的70%，不保证月内无缺口或历史交易资格",
+    "short_prior_rule": "复刻 A 轮 partial 恒为 False，包含未达70%门槛的残月；仅用于口径对照"
+  },
+  "denominators": {
+    "short_comparable": 238,
+    "short_disagree": 57,
+    "long_comparable": 312,
+    "long_disagree": 113,
+    "definition": "固定档与各自此前分档的交集；并非实际事件数，也不强制事件月存在数据",
+    "not_directly_comparable": "两路使用不同历史月份、覆盖过滤和可比分母",
+    "missing_counts": "无档计数来自事件月出现且此前无档的币，与可比分母不构成统一总体；原因未逐币确证"
+  },
+  "evidence_limits": [
+    "实际 A 轮 max(open_time) 与原始行情输入版本尚无可靠冻结证据；池规则墙钟时间取整仅为估计锚点。",
+    "参考币集为事后 common universe；无历史上市/下架事件表及 ticker 快照，不能确认历史可交易资格。",
+    "原审计的池窗口天数不能代表实际事件占比或逐币覆盖率，亦不能证明等于各周期事件窗口。",
+    "比较不一致率并非独立未来信息效应或收益偏差；没有回测与参数试验。"
+  ],
+  "backtest_status": "NOT_RUN",
+  "parameter_trials": 0,
+  "stats_recomputed": false
+}

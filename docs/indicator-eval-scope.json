@@ -1,0 +1,104 @@
+{
+  "A": {
+    "scope": "A",
+    "label": "comparable-90d",
+    "purpose": "四周期同币种同窗口：周期 × 池矩阵的主结论",
+    "version": "indicator-fit-2026-11-12",
+    "intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ],
+    "window_days": {
+      "5m": 90,
+      "15m": 90,
+      "30m": 90,
+      "1h": 90
+    },
+    "max_symbols": 90,
+    "horizons_bars": [
+      6,
+      24,
+      96
+    ],
+    "cost": {
+      "fee_side": 0.0004,
+      "slip_side": 0.0002,
+      "round_trip": 0.0012,
+      "stress": [
+        1.0,
+        2.0,
+        3.0
+      ],
+      "override_allowed": false
+    },
+    "direction_mode": "aligned",
+    "direction_source": "docs/indicator-directions.json",
+    "benchmarks": [
+      "unconditional",
+      "cross_section"
+    ],
+    "gates": {
+      "bootstrap_ci_low_gt": 0.0,
+      "fdr_q_lt": 0.1,
+      "segments": 4,
+      "segment_sign_min": 0.75,
+      "symbol_sign_min": 0.6,
+      "cell_events_min": 100,
+      "cell_symbols_min": 5,
+      "interaction_p_lt": 0.1,
+      "shrink_k": 30.0,
+      "pooled_events_min": 30,
+      "sym_events_min": 10,
+      "hit_rate_range": [
+        0.002,
+        0.6
+      ]
+    },
+    "data_gates": {
+      "min_density": 0.85,
+      "min_history_bars": 500,
+      "max_gap_rate": 0.02,
+      "max_zero_volume_rate": 0.05
+    },
+    "pools": [
+      "all",
+      "major",
+      "alt",
+      "liq_q1",
+      "liq_q2",
+      "liq_q3",
+      "liq_q4"
+    ],
+    "entry": "signal 在 t 收盘确认，t+1 开盘成交，t+h 收盘出场",
+    "seed": 20261112,
+    "n_boot": 2000,
+    "provenance": {
+      "rule": "同一轮同一周期内某币只用一个来源：native 满密度就用 native，否则派生",
+      "derive": {
+        "5m": {
+          "source": "1m",
+          "lookback_days": 95,
+          "min_fill": 0.75
+        },
+        "15m": {
+          "source": "1m",
+          "lookback_days": 95,
+          "min_fill": 0.75
+        },
+        "30m": {
+          "source": "1m",
+          "lookback_days": 95,
+          "min_fill": 0.75
+        },
+        "1h": {
+          "source": "15m",
+          "lookback_days": 95,
+          "min_fill": 0.75
+        }
+      }
+    },
+    "sha": "b323c0912533842e"
+  }
+}

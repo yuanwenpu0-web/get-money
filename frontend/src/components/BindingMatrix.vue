@@ -29,7 +29,7 @@ const listPage = ref(1)
 const listTotal = ref(0)
 const enabledTotal = ref(0)
 const saving = reactive({})
-const intervalOptions = ['1m', '5m', '15m', '1h', '4h', '1d']
+const intervalOptions = ['1m', '5m', '15m', '30m', '1h', '4h', '1d']
 
 const bindingVisible = ref(false)
 const bindingSaving = ref(false)

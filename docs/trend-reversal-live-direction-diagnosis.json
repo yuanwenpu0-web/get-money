@@ -1,0 +1,563 @@
+{
+  "title": "趋势反转 live 订单方向与出场工程诊断（工程诊断，非 edge 判定）",
+  "generated_at": "2026-11-12T00:55:00Z",
+  "nature": "engineering_diagnosis_and_correctness_fix_not_edge_verdict",
+  "script": [
+    "backend/scripts/diagnose_trend_reversal_live.py",
+    "backend/scripts/reanchor_open_protections.py"
+  ],
+  "window": {
+    "start": "2026-11-09T11:57:47Z",
+    "end": "2026-11-11T22:37:02Z",
+    "days": 2.44,
+    "btc_benchmark_pct": -0.81,
+    "wall_clock": "orders.created_at / closed_at UTC"
+  },
+  "universe": {
+    "pool": "all",
+    "binding_id": 7,
+    "strategy": "supertrend_current",
+    "interval": "15m",
+    "source": "live (Binance DEMO)",
+    "n_orders": 91,
+    "n_symbols": 69,
+    "skipped": [],
+    "replay_fail": 0,
+    "note": "91/91 全部重放成功，0 剔除；报告生成时另有 7 笔 OPEN 未纳入。91 笔经核实全部 binding_id=7，无 NULL 遗留、无 env_switch_archived",
+    "execution_env": "DEMO (app_state.testnet=true, execution_mode=live) — 币安合约 Testnet，非主网真钱",
+    "snapshot_vs_current": "本报告为 91 笔冻结快照（窗口末 2026-11-11T22:37:02Z）；2026-11-12T01:0x 复核为 92 笔 / -225.23 USDT / OPEN 6 笔（新增 id 289）。91 笔逐笔比对 realized_pnl 0 笔变化",
+    "open_at_recheck": {
+      "n": 6,
+      "ids": [
+        280,
+        281,
+        284,
+        286,
+        287,
+        288
+      ],
+      "margin_usdt": 2913.98
+    }
+  },
+  "binding_ledger": {
+    "binding_id": 7,
+    "filter": "binding_id=7 AND status='CLOSED' AND close_reason<>'env_switch_archived'",
+    "live": {
+      "n": 92,
+      "pnl_usdt": -225.23,
+      "win_pct": 29.35
+    },
+    "paper": {
+      "n": 26,
+      "pnl_usdt": -273.85,
+      "win_pct": 15.38
+    },
+    "total": {
+      "n": 118,
+      "pnl_usdt": -499.07,
+      "notional_usdt": 160097.2,
+      "net_over_notional_pct": -0.3117,
+      "win_pct": 26.27
+    },
+    "backtest_15m_verdict": {
+      "per_trade_pct": -0.299,
+      "ci95": [
+        -0.382,
+        -0.209
+      ],
+      "verdict": "negative",
+      "n_trades": 7459
+    },
+    "agreement": "更正后 -0.3117% 落在回测 CI 之内；118 << 7459，不声称差异显著",
+    "correction_of_concurrent_reading": {
+      "reported_elsewhere": {
+        "n": 118,
+        "pnl_usdt": -631.26,
+        "per_trade_pct": -0.3943
+      },
+      "root_cause": "手续费重复扣减：orders.realized_pnl 已含双边费，再减一次 entry_fee+exit_fee",
+      "proof": {
+        "sum_fees": 132.19,
+        "sum_realized_pnl": -499.07,
+        "pnl_minus_fees": -631.26,
+        "over_notional_pct": -0.3943
+      },
+      "code_evidence": "backend/app/trading/paper.py:201 net = gross - order.entry_fee - exit_fee; :215 order.realized_pnl = round(net, 6)",
+      "independent_check": "91 笔 Σ价差-Σ费=-225.95 vs Σrealized_pnl=-223.10，残差+2.85（舍入/部分成交）；若 realized_pnl 为毛利残差应约+101",
+      "corrected": {
+        "pnl_usdt": -499.07,
+        "per_trade_pct": -0.3117
+      }
+    }
+  },
+  "costs": {
+    "fee_rate_actual_mean": 0.000838,
+    "fee_source": "orders.entry_fee+exit_fee (真实/估算)",
+    "slippage": "未额外叠加；交易所条件单成交价不可得",
+    "round_trip_pct": 0.0838,
+    "basis": "名义本金 (notional=qty*entry_price)",
+    "playbook_backtest_basis_pct": 0.12,
+    "note": "实测双边 0.0838% 低于手册回测口径 0.12%；本报告不与 margin 口径混比"
+  },
+  "trades": {
+    "n": 91,
+    "long": 49,
+    "short": 42,
+    "wins": 27,
+    "close_reasons": {
+      "exchange_sl": 44,
+      "exchange_tp": 16,
+      "signal_reverse": 21,
+      "manual": 10
+    }
+  },
+  "pnl_usdt": {
+    "gross_price_x_qty": -124.92,
+    "fees": 101.04,
+    "gross_minus_fees_reconstructed": -225.95,
+    "net_realized_authoritative": -223.1,
+    "reconciliation_residual": 2.85,
+    "residual_max_per_order": 0.747,
+    "residual_n_gt_001": 11,
+    "note": "权威口径为 orders.realized_pnl；残差来自部分成交与价格/数量舍入。gross_usd 字段在合并产物中为占位 0，勿用"
+  },
+  "per_trade_nominal_pct": {
+    "gross": 0.1369,
+    "fee": 0.0838,
+    "net": 0.0564
+  },
+  "ci": {
+    "n": 91,
+    "net": 0.0564,
+    "ci": [
+      -0.3766,
+      0.5397
+    ],
+    "verdict": "inconclusive",
+    "pnl": -223.1
+  },
+  "direction_check": {
+    "dir_match": 90,
+    "dir_mismatch_ids": [
+      275
+    ],
+    "pnl_reconciliation_max_resid_usdt": 0.747,
+    "conclusion": "方向未反号；记账与 side×价差×qty−手续费 自洽"
+  },
+  "latency": {
+    "median": 11.44,
+    "p75": 15.18,
+    "mean_excl_outlier": 12.08,
+    "max": 920.38,
+    "basis": "bar 收盘 → orders.created_at，91 笔重放快照；拆解见 latency_decomposition"
+  },
+  "latency_cost_usdt": -95.79,
+  "entry_dev_pct": {
+    "mean": 0.0437,
+    "median": 0.0,
+    "std": 0.4758,
+    "max": 2.717,
+    "n_adverse_gt_005": 23
+  },
+  "rr_fill": {
+    "nominal": 3.0,
+    "median": 3.0,
+    "min": 0.416,
+    "n_lt_2": 7,
+    "n_lt_15": 4,
+    "basis": "同 risk_inflation，91 笔重放快照"
+  },
+  "risk_inflation": {
+    "median": 1.0,
+    "max": 2.862,
+    "n_gt_15": 6,
+    "n_gt_2": 2,
+    "budget_equity_pct": 0.5,
+    "max_actual_equity_pct": 1.431,
+    "basis": "91 笔快照，锚点=按 created_at 重放 kline（见 authoritative_signal_audit 的方法学更正）"
+  },
+  "giveback": {
+    "n": 40,
+    "avg_mfe_pct": 1.298,
+    "avg_mfe_R": 1.091,
+    "avg_net_nom_pct": -1.0825,
+    "avg_giveback_pp": 2.3801,
+    "total_giveback_pp": 95.21,
+    "n_mfe_ge_05R": 29,
+    "n_mfe_ge_1R": 18,
+    "n_mfe_ge_15R": 8,
+    "mfe_time_frac_median": 0.338,
+    "basis": "MFE% 与净% 同为名义本金、扣双边费；此前一版误用未扣费 net_pct 得 2.299pp/91.96pp，已修正",
+    "all_orders_mfe_ge_05R_then_loss": {
+      "n": 30,
+      "pnl_usdt": -348.41
+    },
+    "by_close_reason": {
+      "exchange_sl": {
+        "n": 24,
+        "pnl": -398.45
+      },
+      "signal_reverse": {
+        "n": 15,
+        "pnl": -177.83
+      },
+      "manual": {
+        "n": 1,
+        "pnl": -12.45
+      }
+    }
+  },
+  "cohorts_descriptive": {
+    "never_profit": {
+      "n": 21,
+      "pnl_usdt": -321.32,
+      "net_nom_pct": -1.1839,
+      "ci95": [
+        -1.4032,
+        -0.9673
+      ],
+      "note": "ex-post defined, NOT a tradeable verdict"
+    },
+    "profit_then_loss": {
+      "n": 40,
+      "pnl_usdt": -588.74,
+      "net_nom_pct": -1.0825,
+      "ci95": [
+        -1.279,
+        -0.9245
+      ],
+      "note": "ex-post defined, NOT a tradeable verdict"
+    },
+    "profit_kept": {
+      "n": 30,
+      "pnl_usdt": 686.95,
+      "net_nom_pct": 2.4432,
+      "ci95": [
+        1.6896,
+        3.2899
+      ],
+      "note": "ex-post defined, NOT a tradeable verdict"
+    }
+  },
+  "subsets": {
+    "chase_gt_005": {
+      "n": 23,
+      "net": -0.4777,
+      "ci": [
+        -1.0019,
+        0.1913
+      ],
+      "verdict": "insufficient",
+      "pnl": -188.36
+    },
+    "risk_inflation_gt_15": {
+      "n": 6,
+      "net": -1.1049,
+      "ci": [
+        -2.1322,
+        -0.3175
+      ],
+      "verdict": "insufficient",
+      "pnl": -86.79
+    }
+  },
+  "data_fidelity": {
+    "pnl_source": {
+      "estimated": 62,
+      "binance": 29
+    },
+    "orphan_tp_ids": [
+      279
+    ],
+    "note": "62/91 笔 pnl_source=estimated；exchange_sl/tp 平仓按止损/止盈价假设成交，未含触发滑点，真实亏损可能更大"
+  },
+  "random_baseline": "NOT_RUN — 本轮为工程诊断，不做 edge 判定；方向反号对照见 docs/supertrend-inverse-check.md（原方向与反向均 negative）",
+  "verdict": "inconclusive",
+  "verdict_scope": "等权每笔净收益 +0.0564% CI[-0.3766,+0.5397] 跨 0 → inconclusive；USDT 加权 −223.10。方向本身无 alpha 的结论沿用既有 negative 判定，本轮不重新判定 edge。",
+  "limitations": [
+    "事后分群（A/B/C）按已实现结果定义，存在选择偏差，其 CI 仅为描述性，不得当作可交易 verdict",
+    "62/91 笔 PnL 为 estimated，交易所条件单真实成交价与手续费不可得",
+    "样本期仅 2.44 天、单一市场状态（BTC −0.81%），91 笔低于跨市场稳健性要求",
+    "未模拟资金费率、盘口深度、强平、部分成交；id 275 重放 bars_since_signal=61 属重构异常，方向一致性按 90/91 计",
+    "追价偏离与亏损的关联为观察性（corr 0.32 量级），未做因果识别、未做 FDR，不得读作「修好追价就能转正」",
+    "名义本金口径，不得与 margin 口径报告直接相减"
+  ],
+  "prior_verdicts_consulted": [
+    "references/verdicts-history.md §1 H2 止损线",
+    "§4 不换 15m/不加分批/不再调止损倍数",
+    "docs/supertrend-inverse-check.md",
+    "docs/trend-reversal-order-exit.md",
+    "docs/interval-exit-verdict.md"
+  ],
+  "enabled_decision": {
+    "default_enabled": false,
+    "binding_7_enabled": 1,
+    "binding_10_enabled": 0,
+    "user_standing_decision": "2026-11-12 经 AskUserQuestion：负 edge 绑定「先不动，只登记风险」，绑定 7 保持 enabled=1",
+    "h11_flag": "未经统计支持，且与既有 15m negative 判定相反",
+    "note": "本轮未改 enabled/参数/出场口径，未下单，未启用 live key，未切换执行环境（仍 DEMO/testnet）"
+  },
+  "self_check": {
+    "preflight": "FAIL 0 / WARN 0 / PASS 21",
+    "pytest_full": "3 failed / 1936 passed / 117.26s（env -u NO_PROXY，修复后）",
+    "pytest_baseline_failures": [
+      "test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range",
+      "test_pool_volatility_research.py::test_live_entrypoints_reject[research_high_turnover_high_vol]",
+      "test_pool_volatility_research.py::test_live_entrypoints_reject[research_low_turnover_high_vol]"
+    ],
+    "env_gotcha": "本机 NO_PROXY 值畸形 → httpx InvalidURL: Invalid port: ':1]' → test_backfill_rate_limit ×3 假失败；env -u NO_PROXY 后该文件 9 passed。非代码问题，未修",
+    "production_code_changed": true,
+    "restart_required": true,
+    "frontend_build_required": false,
+    "pytest_targeted": "test_live_fill_anchor(7) + test_reanchor_open_protections(20) + test_live_trading + test_maker_orders 全绿",
+    "pytest_no_regression": "1936 = 修复前 1916 + 本轮新增 20；失败集合与既有基线完全一致",
+    "restart_done": true,
+    "new_scripts_under_300_lines": true,
+    "exchange_orders_submitted": 0,
+    "read_only_engine_for_all_diagnostics": true,
+    "post_restart_orders_verified": 2
+  },
+  "corrections_this_round": [
+    "cohort 均净% 一度误用未扣费的 net_pct（-1.104/-1.001/+2.523），已统一为 net_nom_pct（-1.1839/-1.0825/+2.4432）",
+    "B 群回吐 2.299pp/91.96pp（未扣费）→ 2.3801pp/95.21pp（扣费，与 MFE 同基准）",
+    "B 群 MFE>=0.5R 28 → 29 笔；全部订单 MFE>=0.5R 后净亏 30 笔 / -348.41 USDT",
+    "毛利-手续费=-225.95 与权威 realized_pnl=-223.10 的 +2.85 残差已显式列出，不再暗示二者相等",
+    "并发会话绑定 7 台账 -631.26/-0.3943% 系手续费重复扣减，更正为 -499.07/-0.3117%",
+    "OPEN live 仓位数 7（报告生成时）→ 6（2026-11-12 01:0x 复核）",
+    "锚点方法学更正：按 created_at 重放 kline 会多取一根引擎当时还没同步的 bar（实证 id 287）；改用 signals 表权威信号行后 101/101 匹配",
+    "风险膨胀最大 2.862 → 2.8143（101 笔权威复核）；63/101 maker 原价成交本就正确，缺陷只在 38 笔追价单",
+    "延迟归属更正：11.44 分钟并非全在下单链路——bar 收盘→信号落库中位 9.671 分（85%），信号→下单仅 1.867 分",
+    "报告性质由「未改任何生产代码」更正为「已实施正确性修复并重启服务」；存量重挂为已验证空操作，未发任何交易所改单"
+  ],
+  "reproduce": [
+    "PYTHONPATH=backend .venv/Scripts/python.exe backend/scripts/diagnose_trend_reversal_live.py --out output/trend_reversal_live_diag.json",
+    ".venv/Scripts/python.exe backend/scripts/reanchor_open_protections.py  # 只读 dry-run；确认 plans 后才加 --apply",
+    "env -u NO_PROXY -u no_proxy .venv/Scripts/python.exe -m pytest backend/tests -q",
+    "PYTHONPATH=backend .venv/Scripts/python.exe .workbuddy/skills/strategy-backtest-playbook/scripts/preflight.py --prefix docs/trend-reversal-live-direction-diagnosis"
+  ],
+  "fix_implemented_at": "2026-11-12T08:05:00+08:00",
+  "authoritative_signal_audit": {
+    "n_orders": 101,
+    "anchor_source": "signals 表：下单前最后一条同向信号行（symbol+interval+strategy+direction, created_at<=order.created_at）",
+    "matched": 101,
+    "unmatched": 0,
+    "why_not_kline_replay": "引擎按本地已同步 bar 发信号；按 created_at 重放会多取到下单时还没入库的那一根。实证 id 287 APRUSDT：重放取 0.03587（22:30 bar），权威信号行 id 3851732 为 0.03572（22:15 bar，sl 0.036962/tp 0.031994），与落库 sl/tp 逐位吻合",
+    "order_type_counts": {
+      "limit_maker": 101
+    },
+    "n_entry_equals_signal_price": 63,
+    "n_chased": 38,
+    "risk_inflation": {
+      "median": 1.0,
+      "p90": 1.2462,
+      "max": 2.8143,
+      "n_gt_15": 6,
+      "n_gt_2": 2,
+      "n_exactly_1": 63
+    },
+    "rr_fill": {
+      "nominal": 3.0,
+      "median": 3.0,
+      "min": 0.4162
+    },
+    "worst": {
+      "id": 248,
+      "symbol": "1INCHUSDT",
+      "dev_pct": 1.680116,
+      "risk_inflation": 2.814286,
+      "rr_fill": 0.416244
+    },
+    "correction_vs_snapshot": "最大膨胀 2.862 → 2.8143；>1.5×/ >2× 笔数 6/2 不变；R:R 最小 0.416 → 0.4162",
+    "conclusion": "缺陷结论不变、量级微调；风险突破只发生在 38 笔追价单内，63 笔 maker 原价成交时旧代码本就正确",
+    "artifact": "output/reanchor_closed_audit.json"
+  },
+  "latency_decomposition": {
+    "n": 101,
+    "unit": "minute",
+    "anchor_source": "signals.ts(bar open) / signals.created_at / orders.created_at",
+    "bar_close_to_signal": {
+      "median": 9.671,
+      "p75": 13.107,
+      "p90": 16.185,
+      "max": 20.787,
+      "meaning": "kline 同步 + 轮次调度"
+    },
+    "signal_to_order": {
+      "median": 1.867,
+      "p75": 2.229,
+      "p90": 2.722,
+      "max": 4.737,
+      "meaning": "下单链路"
+    },
+    "bar_close_to_order": {
+      "median": 11.402,
+      "p75": 15.176,
+      "p90": 18.526,
+      "max": 22.186
+    },
+    "correction": "此前把 11.44 分钟整体归给下单链路；实际 85% 在数据同步/调度段，优化优先级应据此调整"
+  },
+  "fix_implemented": {
+    "authorization": "用户 2026-11-12「一起改」＝同时改开仓路径与存量仓位",
+    "production_change": {
+      "file": "backend/app/trading/live.py",
+      "new_function": "reanchor_exits(fill_price, signal_price, sl, tp) -> (sl+offset, tp+offset)",
+      "property": "纯平移、与方向无关（side²=1）⇒ 绝对价格距离不变 ⇒ sl_atr_mult×ATR 与 target_r 成交后仍成立，qty×距离 恰等于开仓前风险预算",
+      "place_live_changes": [
+        "保护单触发价改用 reanchor_exits(fill_price, entry, signal.sl, signal.tp) 后按 tick 取整",
+        "落库 order.sl/tp 同步改为取整后的新水平",
+        "取整后方向守卫：(fill-sl)*side<=0 或 (tp-fill)*side<=0 → 记录原因并 rollback_open，不留脏单"
+      ],
+      "unchanged_on_purpose": "position_size(...) 仍用信号价：sizing 必须在下单前，无法预知成交价；绝对距离锚定后实际风险 USDT 自动等于预算",
+      "not_changed": [
+        "strategy",
+        "binding enabled",
+        "params",
+        "exit rules",
+        "sl_atr_mult",
+        "target_r",
+        "interval"
+      ]
+    },
+    "tdd": {
+      "new_tests": [
+        "backend/tests/test_live_fill_anchor.py (7)",
+        "backend/tests/test_reanchor_open_protections.py (20 = 15 纯规划 + 5 apply 路径)"
+      ],
+      "red_observed": "fill-anchor：7 例失败，含风险 USDT 极差 105.793；migration 纯函数：ModuleNotFoundError / ImportError；migration apply 路径：ImportError: cannot import name 'apply_plans'",
+      "updated_existing_test": "backend/tests/test_live_trading.py 中 2 处断言旧错误行为（triggerPrice 99/103 → 99.5/103.5；order.sl/tp 同步）",
+      "order_violation_corrected": "apply_plans 一度先写实现后补测试，违反 TDD 铁律；已删除该实现，先看 5 例 RED 再重新实现至 GREEN",
+      "apply_path_coverage": [
+        "正常换单并回写 order.sl/tp、撤旧 101/102、挂新 triggerPrice 99.5/103.5",
+        "订单已 CLOSED → 零交易所调用",
+        "现价穿过新水平 → 零交易所调用、本地水平不变",
+        "挂新止盈失败 → 挂回旧水平，restored_old_levels=True",
+        "兜底也失败 → 显式报告 restored_old_levels=False"
+      ]
+    },
+    "existing_positions_migration": {
+      "script": "backend/scripts/reanchor_open_protections.py",
+      "default_mode": "read_only_dry_run",
+      "apply_flag": "--apply（本轮未执行）",
+      "signal_price_source": "signals 表下单前最后一条同向信号行；并校验落库 sl/tp == round_to_tick(signal.sl/tp)",
+      "n_open_at_migration": 6,
+      "n_plans": 0,
+      "exchange_write_requests": 0,
+      "result": "verified_no_op",
+      "orders": [
+        {
+          "id": 284,
+          "symbol": "KERNELUSDT",
+          "side": "SHORT",
+          "entry": 0.04492,
+          "signal_price": 0.04492,
+          "why": "already_anchored"
+        },
+        {
+          "id": 286,
+          "symbol": "AIOUSDT",
+          "side": "LONG",
+          "entry": 0.04289,
+          "signal_price": 0.04289,
+          "why": "already_anchored"
+        },
+        {
+          "id": 287,
+          "symbol": "APRUSDT",
+          "side": "SHORT",
+          "entry": 0.03572,
+          "signal_price": 0.03572,
+          "why": "already_anchored"
+        },
+        {
+          "id": 296,
+          "symbol": "STBLUSDT",
+          "side": "LONG",
+          "entry": 0.02137,
+          "signal_price": 0.02137,
+          "why": "already_anchored"
+        },
+        {
+          "id": 297,
+          "symbol": "AIAUSDT",
+          "side": "LONG",
+          "entry": 0.06307,
+          "signal_price": 0.06307,
+          "why": "already_anchored",
+          "opened_after_restart": true
+        },
+        {
+          "id": 298,
+          "symbol": "ATUSDT",
+          "side": "LONG",
+          "entry": 0.0889,
+          "signal_price": 0.0889,
+          "why": "already_anchored",
+          "opened_after_restart": true
+        }
+      ],
+      "reason": "6 笔全部 limit_maker 且成交价恰等于信号价，保护单已在预算距离上",
+      "moving_target_note": "授权时 6 笔(280/281/284/286/287/288)，复核时已变为 4 笔；脚本按当前库状态查询，不沿用旧 id 列表",
+      "safety_guards": [
+        "would_stop_out / would_take_profit 一律跳过，不主动把浮亏变成已实现亏损",
+        "--apply 前再取一次现价复核",
+        "modify_live 先撤后挂失败时尽力挂回旧水平并报告 restored_old_levels",
+        "not_signal_anchored：落库水平被手工/保本移过则跳过"
+      ],
+      "artifact": "output/reanchor_open_protections.json",
+      "test_count": 20,
+      "script_lines": 191
+    },
+    "service_restart": {
+      "task": "QuantDesk-GetMoney",
+      "method": "schtasks /end → /run",
+      "restarted_at_local": "2026-11-12 07:55:29",
+      "health": {
+        "ok": true,
+        "mode": "live",
+        "exchange_env": "demo"
+      },
+      "note": "重启前 07:55:04 开的 id 296 STBLUSDT 走旧代码，已纳入复核（already_anchored）"
+    },
+    "effect_boundary": "只保证实际风险=预算风险、实际 R:R=3；不改变 15m 已判 negative 的事实，不保证扭亏。延迟平均直接成本为负（-95.79 USDT），故「修好追价就能转正」无证据",
+    "post_restart_verification": {
+      "n_new_orders": 2,
+      "orders": [
+        {
+          "id": 297,
+          "symbol": "AIAUSDT",
+          "tick": 1e-05,
+          "signal_price": 0.06307,
+          "entry": 0.06307,
+          "chased": false,
+          "signal_distance": 0.00077,
+          "fill_distance": 0.00077,
+          "risk_inflation": 1.0,
+          "rr_fill": 3.0,
+          "signal_to_order_min": 1.66
+        },
+        {
+          "id": 298,
+          "symbol": "ATUSDT",
+          "tick": 0.0001,
+          "signal_price": 0.0889,
+          "entry": 0.0889,
+          "chased": false,
+          "signal_distance": 0.001387,
+          "fill_distance": 0.0014,
+          "risk_inflation": 1.009373,
+          "rr_fill": 3.0,
+          "signal_to_order_min": 2.23,
+          "note": "1.0094 倍纯粹来自 tick 取整（止损 0.087513→0.0875），不是追价"
+        }
+      ],
+      "final_dry_run": {
+        "n_open": 6,
+        "n_plans": 0,
+        "all": "already_anchored",
+        "exchange_write_requests": 0
+      },
+      "honest_limitation": "两笔均为 maker 原价成交，追价成交路径重启后尚未在线上出现；线上只验证了不劣化，追价场景正确性目前仅由单测覆盖（4 个不同成交价断言风险 USDT 恒定、R:R 恒为 3）。不得声称追价缺陷已在线上实证消除"
+    }
+  }
+}

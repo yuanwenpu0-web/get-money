@@ -25,7 +25,8 @@ FUNDING_STEP_MS = 8 * 3_600_000
 MINUTE_MS = 60_000
 KLINE_PAGE_SIZE = 1000
 # 允许用已存储的同周期行补齐的周期。1m 本身就是源，无需回落。
-NATIVE_FALLBACK_INTERVALS = ("5m", "15m", "1h", "4h", "1d")
+# 30m 没有独立采集层，行由 scripts/derive_candles.py --source 15m --target 30m 派生落库。
+NATIVE_FALLBACK_INTERVALS = ("5m", "15m", "30m", "1h", "4h", "1d")
 
 
 def default_market_client(db: Session | None):

@@ -1,0 +1,1977 @@
+{
+  "topic": "H-D / P16 固定规模 PIT 币池可构造性与池规模敏感性",
+  "generated_at": "2026-11-11T16:35:46.133378+00:00",
+  "script": "backend/scripts/probe_p16_fixed_pool.py",
+  "hypothesis_card": "research/hypotheses/H-D-fixed-size-universe.md",
+  "stage": "Gate 0 + 数据口径可行性诊断（非回测、非 edge 判定）",
+  "window": {
+    "start_utc": "2025-09-20T15:00:00+00:00",
+    "end_utc": "2026-11-11T15:00:00+00:00",
+    "days": 417.0,
+    "rebuild_periods": 59,
+    "step_days": 7,
+    "first_period_utc": "2025-09-28T00:00:00+00:00",
+    "last_period_utc": "2026-11-08T00:00:00+00:00"
+  },
+  "universe": {
+    "source": "klines interval=1h, quote_volume + bar presence",
+    "symbols_after_filter": 527,
+    "pool_sizes": [
+      10,
+      20,
+      30,
+      50,
+      100
+    ],
+    "selection": "per-period pre-window 168h quote_volume TopN",
+    "note": "不读 close / 不算收益 / 不构造特征，纯样本选择口径"
+  },
+  "parameters": {
+    "lookback_hours": 168,
+    "min_bars_per_window": 160,
+    "stale_hours": 2,
+    "forward_hours": 24,
+    "min_cross_section": 30,
+    "gate_thresholds": {
+      "C1_constructible_share": 0.9,
+      "C2_jaccard_median": 0.6,
+      "C3_width_ge_30_share": 0.9
+    },
+    "sort": "quote_volume desc, symbol asc tie-break"
+  },
+  "data_quality": {
+    "source_rows": 4861821,
+    "symbols_after_filter": 527,
+    "hourly_grid_points": 10009,
+    "quote_volume_null_rows": 0,
+    "quote_volume_zero_rows": 56158,
+    "window_start_ms": 1758380400000,
+    "window_end_ms": 1794409200000
+  },
+  "eligible_count_series": [
+    {
+      "t": 1759017600000,
+      "eligible_count": 4
+    },
+    {
+      "t": 1759622400000,
+      "eligible_count": 403
+    },
+    {
+      "t": 1760227200000,
+      "eligible_count": 423
+    },
+    {
+      "t": 1760832000000,
+      "eligible_count": 430
+    },
+    {
+      "t": 1761436800000,
+      "eligible_count": 437
+    },
+    {
+      "t": 1762041600000,
+      "eligible_count": 441
+    },
+    {
+      "t": 1762646400000,
+      "eligible_count": 444
+    },
+    {
+      "t": 1763251200000,
+      "eligible_count": 449
+    },
+    {
+      "t": 1763856000000,
+      "eligible_count": 455
+    },
+    {
+      "t": 1764460800000,
+      "eligible_count": 455
+    },
+    {
+      "t": 1765065600000,
+      "eligible_count": 454
+    },
+    {
+      "t": 1765670400000,
+      "eligible_count": 455
+    },
+    {
+      "t": 1766275200000,
+      "eligible_count": 459
+    },
+    {
+      "t": 1766880000000,
+      "eligible_count": 460
+    },
+    {
+      "t": 1767484800000,
+      "eligible_count": 464
+    },
+    {
+      "t": 1768089600000,
+      "eligible_count": 467
+    },
+    {
+      "t": 1768694400000,
+      "eligible_count": 468
+    },
+    {
+      "t": 1769299200000,
+      "eligible_count": 470
+    },
+    {
+      "t": 1769904000000,
+      "eligible_count": 477
+    },
+    {
+      "t": 1770508800000,
+      "eligible_count": 480
+    },
+    {
+      "t": 1771113600000,
+      "eligible_count": 481
+    },
+    {
+      "t": 1771718400000,
+      "eligible_count": 483
+    },
+    {
+      "t": 1772323200000,
+      "eligible_count": 484
+    },
+    {
+      "t": 1772928000000,
+      "eligible_count": 485
+    },
+    {
+      "t": 1773532800000,
+      "eligible_count": 486
+    },
+    {
+      "t": 1774137600000,
+      "eligible_count": 487
+    },
+    {
+      "t": 1774742400000,
+      "eligible_count": 488
+    },
+    {
+      "t": 1775347200000,
+      "eligible_count": 487
+    },
+    {
+      "t": 1775952000000,
+      "eligible_count": 489
+    },
+    {
+      "t": 1776556800000,
+      "eligible_count": 495
+    },
+    {
+      "t": 1777161600000,
+      "eligible_count": 497
+    },
+    {
+      "t": 1777766400000,
+      "eligible_count": 498
+    },
+    {
+      "t": 1778371200000,
+      "eligible_count": 497
+    },
+    {
+      "t": 1778976000000,
+      "eligible_count": 498
+    },
+    {
+      "t": 1779580800000,
+      "eligible_count": 500
+    },
+    {
+      "t": 1780185600000,
+      "eligible_count": 500
+    },
+    {
+      "t": 1780790400000,
+      "eligible_count": 501
+    },
+    {
+      "t": 1781395200000,
+      "eligible_count": 504
+    },
+    {
+      "t": 1782000000000,
+      "eligible_count": 504
+    },
+    {
+      "t": 1782604800000,
+      "eligible_count": 505
+    },
+    {
+      "t": 1783209600000,
+      "eligible_count": 508
+    },
+    {
+      "t": 1783814400000,
+      "eligible_count": 510
+    },
+    {
+      "t": 1784419200000,
+      "eligible_count": 510
+    },
+    {
+      "t": 1785024000000,
+      "eligible_count": 510
+    },
+    {
+      "t": 1785628800000,
+      "eligible_count": 473
+    },
+    {
+      "t": 1786233600000,
+      "eligible_count": 474
+    },
+    {
+      "t": 1786838400000,
+      "eligible_count": 474
+    },
+    {
+      "t": 1787443200000,
+      "eligible_count": 474
+    },
+    {
+      "t": 1788048000000,
+      "eligible_count": 474
+    },
+    {
+      "t": 1788652800000,
+      "eligible_count": 474
+    },
+    {
+      "t": 1789257600000,
+      "eligible_count": 477
+    },
+    {
+      "t": 1789862400000,
+      "eligible_count": 477
+    },
+    {
+      "t": 1790467200000,
+      "eligible_count": 517
+    },
+    {
+      "t": 1791072000000,
+      "eligible_count": 516
+    },
+    {
+      "t": 1791676800000,
+      "eligible_count": 517
+    },
+    {
+      "t": 1792281600000,
+      "eligible_count": 515
+    },
+    {
+      "t": 1792886400000,
+      "eligible_count": 515
+    },
+    {
+      "t": 1793491200000,
+      "eligible_count": 513
+    },
+    {
+      "t": 1794096000000,
+      "eligible_count": 512
+    }
+  ],
+  "results_by_pool_size": {
+    "10": {
+      "constructible_share": 0.9831,
+      "constructible_periods": 58,
+      "failed_periods": [
+        1759017600000
+      ],
+      "jaccard_median": 0.5385,
+      "jaccard_min": 0.25,
+      "jaccard_median_constructible_pairs": 0.5385,
+      "jaccard_min_constructible_pairs": 0.25,
+      "excluded_unconstructible_pairs": 1,
+      "mean_turnover": 0.331,
+      "width_median": 10.0,
+      "width_min": 4,
+      "width_ge_30_share": 0.0,
+      "supports_cross_section_30": false,
+      "gate": {
+        "C1": true,
+        "C2": false,
+        "C3": true,
+        "passed": false
+      }
+    },
+    "20": {
+      "constructible_share": 0.9831,
+      "constructible_periods": 58,
+      "failed_periods": [
+        1759017600000
+      ],
+      "jaccard_median": 0.51,
+      "jaccard_min": 0.1429,
+      "jaccard_median_constructible_pairs": 0.5385,
+      "jaccard_min_constructible_pairs": 0.3333,
+      "excluded_unconstructible_pairs": 1,
+      "mean_turnover": 0.344,
+      "width_median": 20.0,
+      "width_min": 4,
+      "width_ge_30_share": 0.0,
+      "supports_cross_section_30": false,
+      "gate": {
+        "C1": true,
+        "C2": false,
+        "C3": true,
+        "passed": false
+      }
+    },
+    "30": {
+      "constructible_share": 0.9831,
+      "constructible_periods": 58,
+      "failed_periods": [
+        1759017600000
+      ],
+      "jaccard_median": 0.5,
+      "jaccard_min": 0.0968,
+      "jaccard_median_constructible_pairs": 0.5,
+      "jaccard_min_constructible_pairs": 0.3953,
+      "excluded_unconstructible_pairs": 1,
+      "mean_turnover": 0.3293,
+      "width_median": 30.0,
+      "width_min": 4,
+      "width_ge_30_share": 0.9831,
+      "supports_cross_section_30": true,
+      "gate": {
+        "C1": true,
+        "C2": false,
+        "C3": true,
+        "passed": false
+      }
+    },
+    "50": {
+      "constructible_share": 0.9831,
+      "constructible_periods": 58,
+      "failed_periods": [
+        1759017600000
+      ],
+      "jaccard_median": 0.5625,
+      "jaccard_min": 0.08,
+      "jaccard_median_constructible_pairs": 0.5625,
+      "jaccard_min_constructible_pairs": 0.4286,
+      "excluded_unconstructible_pairs": 1,
+      "mean_turnover": 0.2983,
+      "width_median": 50.0,
+      "width_min": 4,
+      "width_ge_30_share": 0.9831,
+      "supports_cross_section_30": true,
+      "gate": {
+        "C1": true,
+        "C2": false,
+        "C3": true,
+        "passed": false
+      }
+    },
+    "100": {
+      "constructible_share": 0.9831,
+      "constructible_periods": 58,
+      "failed_periods": [
+        1759017600000
+      ],
+      "jaccard_median": 0.6129,
+      "jaccard_min": 0.04,
+      "jaccard_median_constructible_pairs": 0.6129,
+      "jaccard_min_constructible_pairs": 0.5038,
+      "excluded_unconstructible_pairs": 1,
+      "mean_turnover": 0.256,
+      "width_median": 100.0,
+      "width_min": 4,
+      "width_ge_30_share": 0.9831,
+      "supports_cross_section_30": true,
+      "gate": {
+        "C1": true,
+        "C2": true,
+        "C3": true,
+        "passed": true
+      }
+    }
+  },
+  "posthoc_selection_diagnostic": {
+    "10": {
+      "current_pool_size": 10,
+      "early_median_percentile": 0.9647,
+      "late_median_percentile": 0.9902,
+      "early_not_eligible_share": 0.4,
+      "late_not_eligible_share": 0.0,
+      "all_periods_not_eligible_share_max": 0.6,
+      "series": [
+        {
+          "t": 1759017600000,
+          "median_percentile": 0.5,
+          "not_eligible_share": 0.6
+        },
+        {
+          "t": 1759622400000,
+          "median_percentile": 0.9527,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1760227200000,
+          "median_percentile": 0.9751,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1760832000000,
+          "median_percentile": 0.9638,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1761436800000,
+          "median_percentile": 0.953,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1762041600000,
+          "median_percentile": 0.9546,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1762646400000,
+          "median_percentile": 0.9752,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1763251200000,
+          "median_percentile": 0.9944,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1763856000000,
+          "median_percentile": 0.9835,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1764460800000,
+          "median_percentile": 0.9658,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1765065600000,
+          "median_percentile": 0.9647,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1765670400000,
+          "median_percentile": 0.9592,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1766275200000,
+          "median_percentile": 0.9748,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1766880000000,
+          "median_percentile": 0.9717,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1767484800000,
+          "median_percentile": 0.9751,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1768089600000,
+          "median_percentile": 0.971,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1768694400000,
+          "median_percentile": 0.9625,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1769299200000,
+          "median_percentile": 0.9617,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1769904000000,
+          "median_percentile": 0.9611,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1770508800000,
+          "median_percentile": 0.9728,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1771113600000,
+          "median_percentile": 0.9833,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1771718400000,
+          "median_percentile": 0.9627,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1772323200000,
+          "median_percentile": 0.9742,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1772928000000,
+          "median_percentile": 0.9887,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1773532800000,
+          "median_percentile": 0.9814,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1774137600000,
+          "median_percentile": 0.9835,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1774742400000,
+          "median_percentile": 0.9733,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1775347200000,
+          "median_percentile": 0.9712,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1775952000000,
+          "median_percentile": 0.9754,
+          "not_eligible_share": 0.4
+        },
+        {
+          "t": 1776556800000,
+          "median_percentile": 0.9848,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777161600000,
+          "median_percentile": 0.9839,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777766400000,
+          "median_percentile": 0.9829,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778371200000,
+          "median_percentile": 0.9849,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778976000000,
+          "median_percentile": 0.9859,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1779580800000,
+          "median_percentile": 0.988,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780185600000,
+          "median_percentile": 0.989,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780790400000,
+          "median_percentile": 0.987,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1781395200000,
+          "median_percentile": 0.9841,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782000000000,
+          "median_percentile": 0.9871,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782604800000,
+          "median_percentile": 0.9831,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783209600000,
+          "median_percentile": 0.9881,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783814400000,
+          "median_percentile": 0.9872,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1784419200000,
+          "median_percentile": 0.9891,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785024000000,
+          "median_percentile": 0.9892,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785628800000,
+          "median_percentile": 0.9905,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1786233600000,
+          "median_percentile": 0.982,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1786838400000,
+          "median_percentile": 0.982,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1787443200000,
+          "median_percentile": 0.9905,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1788048000000,
+          "median_percentile": 0.9862,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1788652800000,
+          "median_percentile": 0.9905,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1789257600000,
+          "median_percentile": 0.9906,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1789862400000,
+          "median_percentile": 0.9885,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1790467200000,
+          "median_percentile": 0.9912,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791072000000,
+          "median_percentile": 0.9893,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791676800000,
+          "median_percentile": 0.9903,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792281600000,
+          "median_percentile": 0.9902,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792886400000,
+          "median_percentile": 0.9902,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1793491200000,
+          "median_percentile": 0.9912,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1794096000000,
+          "median_percentile": 0.9912,
+          "not_eligible_share": 0.0
+        }
+      ]
+    },
+    "20": {
+      "current_pool_size": 20,
+      "early_median_percentile": 0.9367,
+      "late_median_percentile": 0.9757,
+      "early_not_eligible_share": 0.2,
+      "late_not_eligible_share": 0.0,
+      "all_periods_not_eligible_share_max": 0.8,
+      "series": [
+        {
+          "t": 1759017600000,
+          "median_percentile": 0.5,
+          "not_eligible_share": 0.8
+        },
+        {
+          "t": 1759622400000,
+          "median_percentile": 0.9453,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1760227200000,
+          "median_percentile": 0.9645,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1760832000000,
+          "median_percentile": 0.9394,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1761436800000,
+          "median_percentile": 0.9266,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1762041600000,
+          "median_percentile": 0.9727,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1762646400000,
+          "median_percentile": 0.9458,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1763251200000,
+          "median_percentile": 0.971,
+          "not_eligible_share": 0.25
+        },
+        {
+          "t": 1763856000000,
+          "median_percentile": 0.9493,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1764460800000,
+          "median_percentile": 0.9328,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1765065600000,
+          "median_percentile": 0.9327,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1765670400000,
+          "median_percentile": 0.9262,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1766275200000,
+          "median_percentile": 0.9388,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1766880000000,
+          "median_percentile": 0.9346,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1767484800000,
+          "median_percentile": 0.9276,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1768089600000,
+          "median_percentile": 0.9367,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1768694400000,
+          "median_percentile": 0.9261,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1769299200000,
+          "median_percentile": 0.9254,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1769904000000,
+          "median_percentile": 0.9433,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1770508800000,
+          "median_percentile": 0.9488,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1771113600000,
+          "median_percentile": 0.9302,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1771718400000,
+          "median_percentile": 0.9305,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1772323200000,
+          "median_percentile": 0.9472,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1772928000000,
+          "median_percentile": 0.936,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1773532800000,
+          "median_percentile": 0.9506,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1774137600000,
+          "median_percentile": 0.9486,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1774742400000,
+          "median_percentile": 0.9517,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1775347200000,
+          "median_percentile": 0.9404,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1775952000000,
+          "median_percentile": 0.9395,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1776556800000,
+          "median_percentile": 0.9484,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777161600000,
+          "median_percentile": 0.9415,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777766400000,
+          "median_percentile": 0.9376,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778371200000,
+          "median_percentile": 0.9567,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778976000000,
+          "median_percentile": 0.9537,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1779580800000,
+          "median_percentile": 0.9609,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780185600000,
+          "median_percentile": 0.9719,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780790400000,
+          "median_percentile": 0.974,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1781395200000,
+          "median_percentile": 0.9672,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782000000000,
+          "median_percentile": 0.9622,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782604800000,
+          "median_percentile": 0.9614,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783209600000,
+          "median_percentile": 0.9596,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783814400000,
+          "median_percentile": 0.9637,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1784419200000,
+          "median_percentile": 0.9696,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785024000000,
+          "median_percentile": 0.9696,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785628800000,
+          "median_percentile": 0.9555,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1786233600000,
+          "median_percentile": 0.9525,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1786838400000,
+          "median_percentile": 0.9619,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1787443200000,
+          "median_percentile": 0.9757,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1788048000000,
+          "median_percentile": 0.9757,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1788652800000,
+          "median_percentile": 0.9715,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1789257600000,
+          "median_percentile": 0.9727,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1789862400000,
+          "median_percentile": 0.9758,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1790467200000,
+          "median_percentile": 0.9816,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791072000000,
+          "median_percentile": 0.9777,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791676800000,
+          "median_percentile": 0.9777,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792281600000,
+          "median_percentile": 0.9777,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792886400000,
+          "median_percentile": 0.9796,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1793491200000,
+          "median_percentile": 0.9795,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1794096000000,
+          "median_percentile": 0.9814,
+          "not_eligible_share": 0.0
+        }
+      ]
+    },
+    "30": {
+      "current_pool_size": 30,
+      "early_median_percentile": 0.9164,
+      "late_median_percentile": 0.9559,
+      "early_not_eligible_share": 0.1667,
+      "late_not_eligible_share": 0.0,
+      "all_periods_not_eligible_share_max": 0.8667,
+      "series": [
+        {
+          "t": 1759017600000,
+          "median_percentile": 0.5,
+          "not_eligible_share": 0.8667
+        },
+        {
+          "t": 1759622400000,
+          "median_percentile": 0.9117,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1760227200000,
+          "median_percentile": 0.9503,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1760832000000,
+          "median_percentile": 0.9359,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1761436800000,
+          "median_percentile": 0.9186,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1762041600000,
+          "median_percentile": 0.9295,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1762646400000,
+          "median_percentile": 0.9368,
+          "not_eligible_share": 0.2667
+        },
+        {
+          "t": 1763251200000,
+          "median_percentile": 0.9576,
+          "not_eligible_share": 0.2333
+        },
+        {
+          "t": 1763856000000,
+          "median_percentile": 0.9273,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1764460800000,
+          "median_percentile": 0.8943,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1765065600000,
+          "median_percentile": 0.9161,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1765670400000,
+          "median_percentile": 0.9229,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1766275200000,
+          "median_percentile": 0.9083,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1766880000000,
+          "median_percentile": 0.9063,
+          "not_eligible_share": 0.1667
+        },
+        {
+          "t": 1767484800000,
+          "median_percentile": 0.9244,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1768089600000,
+          "median_percentile": 0.9142,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1768694400000,
+          "median_percentile": 0.9164,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1769299200000,
+          "median_percentile": 0.8923,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1769904000000,
+          "median_percentile": 0.916,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1770508800000,
+          "median_percentile": 0.9446,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1771113600000,
+          "median_percentile": 0.8969,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1771718400000,
+          "median_percentile": 0.9254,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1772323200000,
+          "median_percentile": 0.9047,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1772928000000,
+          "median_percentile": 0.9122,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1773532800000,
+          "median_percentile": 0.9402,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1774137600000,
+          "median_percentile": 0.9301,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1774742400000,
+          "median_percentile": 0.9374,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1775347200000,
+          "median_percentile": 0.9249,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1775952000000,
+          "median_percentile": 0.9232,
+          "not_eligible_share": 0.1333
+        },
+        {
+          "t": 1776556800000,
+          "median_percentile": 0.9454,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777161600000,
+          "median_percentile": 0.9173,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1777766400000,
+          "median_percentile": 0.9114,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778371200000,
+          "median_percentile": 0.9123,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1778976000000,
+          "median_percentile": 0.9447,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1779580800000,
+          "median_percentile": 0.9399,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780185600000,
+          "median_percentile": 0.9379,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1780790400000,
+          "median_percentile": 0.944,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1781395200000,
+          "median_percentile": 0.9414,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782000000000,
+          "median_percentile": 0.9414,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782604800000,
+          "median_percentile": 0.9375,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783209600000,
+          "median_percentile": 0.9398,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783814400000,
+          "median_percentile": 0.9577,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1784419200000,
+          "median_percentile": 0.9528,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785024000000,
+          "median_percentile": 0.9558,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785628800000,
+          "median_percentile": 0.947,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1786233600000,
+          "median_percentile": 0.9387,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1786838400000,
+          "median_percentile": 0.9429,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1787443200000,
+          "median_percentile": 0.9556,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1788048000000,
+          "median_percentile": 0.9641,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1788652800000,
+          "median_percentile": 0.9598,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1789257600000,
+          "median_percentile": 0.9559,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1789862400000,
+          "median_percentile": 0.9601,
+          "not_eligible_share": 0.0333
+        },
+        {
+          "t": 1790467200000,
+          "median_percentile": 0.9651,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791072000000,
+          "median_percentile": 0.9622,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791676800000,
+          "median_percentile": 0.9516,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792281600000,
+          "median_percentile": 0.9563,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792886400000,
+          "median_percentile": 0.9533,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1793491200000,
+          "median_percentile": 0.9668,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1794096000000,
+          "median_percentile": 0.9716,
+          "not_eligible_share": 0.0
+        }
+      ]
+    },
+    "50": {
+      "current_pool_size": 50,
+      "early_median_percentile": 0.8929,
+      "late_median_percentile": 0.9264,
+      "early_not_eligible_share": 0.16,
+      "late_not_eligible_share": 0.0,
+      "all_periods_not_eligible_share_max": 0.92,
+      "series": [
+        {
+          "t": 1759017600000,
+          "median_percentile": 0.5,
+          "not_eligible_share": 0.92
+        },
+        {
+          "t": 1759622400000,
+          "median_percentile": 0.8781,
+          "not_eligible_share": 0.26
+        },
+        {
+          "t": 1760227200000,
+          "median_percentile": 0.9218,
+          "not_eligible_share": 0.24
+        },
+        {
+          "t": 1760832000000,
+          "median_percentile": 0.8974,
+          "not_eligible_share": 0.22
+        },
+        {
+          "t": 1761436800000,
+          "median_percentile": 0.8922,
+          "not_eligible_share": 0.22
+        },
+        {
+          "t": 1762041600000,
+          "median_percentile": 0.9045,
+          "not_eligible_share": 0.22
+        },
+        {
+          "t": 1762646400000,
+          "median_percentile": 0.8939,
+          "not_eligible_share": 0.22
+        },
+        {
+          "t": 1763251200000,
+          "median_percentile": 0.9219,
+          "not_eligible_share": 0.2
+        },
+        {
+          "t": 1763856000000,
+          "median_percentile": 0.9009,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1764460800000,
+          "median_percentile": 0.8579,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1765065600000,
+          "median_percentile": 0.8896,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1765670400000,
+          "median_percentile": 0.8965,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1766275200000,
+          "median_percentile": 0.8799,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1766880000000,
+          "median_percentile": 0.8812,
+          "not_eligible_share": 0.16
+        },
+        {
+          "t": 1767484800000,
+          "median_percentile": 0.8618,
+          "not_eligible_share": 0.14
+        },
+        {
+          "t": 1768089600000,
+          "median_percentile": 0.897,
+          "not_eligible_share": 0.14
+        },
+        {
+          "t": 1768694400000,
+          "median_percentile": 0.8929,
+          "not_eligible_share": 0.14
+        },
+        {
+          "t": 1769299200000,
+          "median_percentile": 0.887,
+          "not_eligible_share": 0.14
+        },
+        {
+          "t": 1769904000000,
+          "median_percentile": 0.8929,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1770508800000,
+          "median_percentile": 0.8862,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1771113600000,
+          "median_percentile": 0.8636,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1771718400000,
+          "median_percentile": 0.8744,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1772323200000,
+          "median_percentile": 0.8717,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1772928000000,
+          "median_percentile": 0.8905,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1773532800000,
+          "median_percentile": 0.9042,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1774137600000,
+          "median_percentile": 0.891,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1774742400000,
+          "median_percentile": 0.9004,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1775347200000,
+          "median_percentile": 0.8765,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1775952000000,
+          "median_percentile": 0.8893,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1776556800000,
+          "median_percentile": 0.8846,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1777161600000,
+          "median_percentile": 0.8669,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1777766400000,
+          "median_percentile": 0.8652,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1778371200000,
+          "median_percentile": 0.879,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1778976000000,
+          "median_percentile": 0.8873,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1779580800000,
+          "median_percentile": 0.9118,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1780185600000,
+          "median_percentile": 0.8998,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1780790400000,
+          "median_percentile": 0.916,
+          "not_eligible_share": 0.02
+        },
+        {
+          "t": 1781395200000,
+          "median_percentile": 0.9095,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782000000000,
+          "median_percentile": 0.9234,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1782604800000,
+          "median_percentile": 0.9137,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783209600000,
+          "median_percentile": 0.8915,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1783814400000,
+          "median_percentile": 0.8959,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1784419200000,
+          "median_percentile": 0.9264,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785024000000,
+          "median_percentile": 0.9077,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1785628800000,
+          "median_percentile": 0.9195,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1786233600000,
+          "median_percentile": 0.8964,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1786838400000,
+          "median_percentile": 0.8922,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1787443200000,
+          "median_percentile": 0.9345,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1788048000000,
+          "median_percentile": 0.9239,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1788652800000,
+          "median_percentile": 0.9239,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1789257600000,
+          "median_percentile": 0.9244,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1789862400000,
+          "median_percentile": 0.9454,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1790467200000,
+          "median_percentile": 0.9476,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791072000000,
+          "median_percentile": 0.9398,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1791676800000,
+          "median_percentile": 0.9264,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792281600000,
+          "median_percentile": 0.9309,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792886400000,
+          "median_percentile": 0.9387,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1793491200000,
+          "median_percentile": 0.9444,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1794096000000,
+          "median_percentile": 0.952,
+          "not_eligible_share": 0.0
+        }
+      ]
+    },
+    "100": {
+      "current_pool_size": 100,
+      "early_median_percentile": 0.8372,
+      "late_median_percentile": 0.8711,
+      "early_not_eligible_share": 0.15,
+      "late_not_eligible_share": 0.04,
+      "all_periods_not_eligible_share_max": 0.96,
+      "series": [
+        {
+          "t": 1759017600000,
+          "median_percentile": 0.5,
+          "not_eligible_share": 0.96
+        },
+        {
+          "t": 1759622400000,
+          "median_percentile": 0.8134,
+          "not_eligible_share": 0.23
+        },
+        {
+          "t": 1760227200000,
+          "median_percentile": 0.8448,
+          "not_eligible_share": 0.22
+        },
+        {
+          "t": 1760832000000,
+          "median_percentile": 0.8555,
+          "not_eligible_share": 0.21
+        },
+        {
+          "t": 1761436800000,
+          "median_percentile": 0.8372,
+          "not_eligible_share": 0.21
+        },
+        {
+          "t": 1762041600000,
+          "median_percentile": 0.8364,
+          "not_eligible_share": 0.19
+        },
+        {
+          "t": 1762646400000,
+          "median_percentile": 0.8646,
+          "not_eligible_share": 0.19
+        },
+        {
+          "t": 1763251200000,
+          "median_percentile": 0.8672,
+          "not_eligible_share": 0.18
+        },
+        {
+          "t": 1763856000000,
+          "median_percentile": 0.8546,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1764460800000,
+          "median_percentile": 0.8282,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1765065600000,
+          "median_percentile": 0.83,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1765670400000,
+          "median_percentile": 0.8436,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1766275200000,
+          "median_percentile": 0.8428,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1766880000000,
+          "median_percentile": 0.8257,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1767484800000,
+          "median_percentile": 0.8283,
+          "not_eligible_share": 0.14
+        },
+        {
+          "t": 1768089600000,
+          "median_percentile": 0.8498,
+          "not_eligible_share": 0.13
+        },
+        {
+          "t": 1768694400000,
+          "median_percentile": 0.8437,
+          "not_eligible_share": 0.13
+        },
+        {
+          "t": 1769299200000,
+          "median_percentile": 0.8252,
+          "not_eligible_share": 0.13
+        },
+        {
+          "t": 1769904000000,
+          "median_percentile": 0.8266,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1770508800000,
+          "median_percentile": 0.8434,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1771113600000,
+          "median_percentile": 0.8063,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1771718400000,
+          "median_percentile": 0.8371,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1772323200000,
+          "median_percentile": 0.8157,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1772928000000,
+          "median_percentile": 0.8398,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1773532800000,
+          "median_percentile": 0.834,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1774137600000,
+          "median_percentile": 0.8508,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1774742400000,
+          "median_percentile": 0.8439,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1775347200000,
+          "median_percentile": 0.8272,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1775952000000,
+          "median_percentile": 0.8309,
+          "not_eligible_share": 0.12
+        },
+        {
+          "t": 1776556800000,
+          "median_percentile": 0.8198,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1777161600000,
+          "median_percentile": 0.7994,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1777766400000,
+          "median_percentile": 0.7827,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1778371200000,
+          "median_percentile": 0.7994,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1778976000000,
+          "median_percentile": 0.84,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1779580800000,
+          "median_percentile": 0.8337,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1780185600000,
+          "median_percentile": 0.8266,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1780790400000,
+          "median_percentile": 0.839,
+          "not_eligible_share": 0.06
+        },
+        {
+          "t": 1781395200000,
+          "median_percentile": 0.8509,
+          "not_eligible_share": 0.05
+        },
+        {
+          "t": 1782000000000,
+          "median_percentile": 0.8469,
+          "not_eligible_share": 0.05
+        },
+        {
+          "t": 1782604800000,
+          "median_percentile": 0.8413,
+          "not_eligible_share": 0.05
+        },
+        {
+          "t": 1783209600000,
+          "median_percentile": 0.8274,
+          "not_eligible_share": 0.04
+        },
+        {
+          "t": 1783814400000,
+          "median_percentile": 0.834,
+          "not_eligible_share": 0.04
+        },
+        {
+          "t": 1784419200000,
+          "median_percentile": 0.8458,
+          "not_eligible_share": 0.04
+        },
+        {
+          "t": 1785024000000,
+          "median_percentile": 0.8369,
+          "not_eligible_share": 0.04
+        },
+        {
+          "t": 1785628800000,
+          "median_percentile": 0.8602,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1786233600000,
+          "median_percentile": 0.8351,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1786838400000,
+          "median_percentile": 0.8288,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1787443200000,
+          "median_percentile": 0.8774,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1788048000000,
+          "median_percentile": 0.8732,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1788652800000,
+          "median_percentile": 0.8605,
+          "not_eligible_share": 0.15
+        },
+        {
+          "t": 1789257600000,
+          "median_percentile": 0.8908,
+          "not_eligible_share": 0.13
+        },
+        {
+          "t": 1789862400000,
+          "median_percentile": 0.8824,
+          "not_eligible_share": 0.13
+        },
+        {
+          "t": 1790467200000,
+          "median_percentile": 0.8798,
+          "not_eligible_share": 0.01
+        },
+        {
+          "t": 1791072000000,
+          "median_percentile": 0.8835,
+          "not_eligible_share": 0.01
+        },
+        {
+          "t": 1791676800000,
+          "median_percentile": 0.8711,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792281600000,
+          "median_percentile": 0.856,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1792886400000,
+          "median_percentile": 0.8901,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1793491200000,
+          "median_percentile": 0.8916,
+          "not_eligible_share": 0.0
+        },
+        {
+          "t": 1794096000000,
+          "median_percentile": 0.9032,
+          "not_eligible_share": 0.0
+        }
+      ]
+    }
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "applied": false,
+    "reason": "trades=0, no PnL evaluation this round"
+  },
+  "ci": {
+    "confidence": 0.95,
+    "method": null,
+    "applicable": false,
+    "reason": "no return estimate; data-schema feasibility check"
+  },
+  "random_baseline": {
+    "applicable": false,
+    "reason": "no strategy evaluation this round"
+  },
+  "trades": 0,
+  "default_enabled": false,
+  "decision": {
+    "feasible_pool_sizes": [
+      100
+    ],
+    "pool_sizes_supporting_min_cs_30": [
+      100
+    ],
+    "recommended_pool_size": 100,
+    "c2_margin_at_largest_feasible_n": 0.0129,
+    "action": "FEASIBLE_WITH_BOUNDS",
+    "caveat": "C2 门槛 0.60 为事前设定，本轮不得调整；通过者的 margin 很小，不构成该 N 最优的证据。周均换手 26–33% 说明『固定规模』不等于『固定成分』，PIT 池成员会逐期重选。",
+    "note": "若后续要跑 MIN_CROSS_SECTION=30 的横截面探针，N 须同时满足 gate 与 width_ge_30_share>=0.90；N<30 的 C3 按预注册豁免，但不支持 30 币横截面判据。"
+  },
+  "verdict": "operational_pass",
+  "verdict_scope": "工程可行性判定，非手册第 3 节 edge verdict；无收益估计、无 CI 下界判定、无启用建议",
+  "limitations": [
+    "无上市/下架事件表与历史 ticker 快照，无法验证当时真实可交易性；结论基于在库 1h bar 下界",
+    "首期（2025-09-28）仅 6 币有 168 根 bar：394 币的历史从 09-22 才起，属回填起点不齐，非量具缺陷",
+    "quote_volume=0 单根按有效 bar 计（不读成无信号），窗口总和 >0 才合格",
+    "合格门槛沿用 pit_pool_check.rebuild 的放宽口径（1h >=160 根、末根不早于 T-2h）",
+    "只验证样本选择口径，不做策略收益/IC/净 edge 判定，不重复 8.1pp 收益对照；成交额排序不含点差/盘口/执行成本",
+    "成员稳定性按 7 天一期测量，未覆盖日内换手；有效宽度要求 [T,T+24h) 全 24 根 bar，属最严格口径",
+    "本轮不改 StrategySpec / strategy_bindings / 参数 / 前端，不部署模拟盘、不下单"
+  ]
+}

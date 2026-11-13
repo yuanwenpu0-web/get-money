@@ -1,0 +1,84 @@
+{
+  "url": "https://datasets.tardis.dev/v1/gate-io/incremental_book_L2/2026/11/01/KOMA_USDT.csv.gz",
+  "retrieved_at": "2026-11-13T02:27:01.498076+00:00",
+  "http_status": 200,
+  "content_type": "text/csv",
+  "sha256": "6cead3472385bcf725bd71616475aff183e71190c6ff1fc408fdfbbd8db4185f",
+  "bytes": 2051817,
+  "header": [
+    "exchange",
+    "symbol",
+    "timestamp",
+    "local_timestamp",
+    "is_snapshot",
+    "side",
+    "price",
+    "amount"
+  ],
+  "first_rows": [
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793491199937000",
+      "1793491200258901",
+      "true",
+      "ask",
+      "0.014877",
+      "10309"
+    ],
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793491199937000",
+      "1793491200258901",
+      "true",
+      "ask",
+      "0.014882",
+      "1182"
+    ],
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793491199937000",
+      "1793491200258901",
+      "true",
+      "ask",
+      "0.014888",
+      "717"
+    ]
+  ],
+  "last_rows": [
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793577568340000",
+      "1793577568346423",
+      "false",
+      "ask",
+      "0.014862",
+      "2539"
+    ],
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793577568346000",
+      "1793577568466222",
+      "false",
+      "bid",
+      "0.014723",
+      "847"
+    ],
+    [
+      "gate-io",
+      "KOMA_USDT",
+      "1793577568346000",
+      "1793577568466222",
+      "false",
+      "bid",
+      "0.014741",
+      "0"
+    ]
+  ],
+  "data_row_count": 240308,
+  "scope": "one free monthly sample day, not frozen-window historical coverage"
+}

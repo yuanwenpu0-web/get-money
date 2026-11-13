@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-11-12T15:34:51+00:00",
+  "scope": "A",
+  "sha": "b323c0912533842e",
+  "interval": "1h",
+  "symbols": [
+    "0GUSDT",
+    "1000PEPEUSDT",
+    "1000SHIBUSDT",
+    "AAVEUSDT",
+    "ACEUSDT",
+    "ADAUSDT"
+  ],
+  "elapsed_s": 110.1,
+  "run_stats": {
+    "interval": "1h",
+    "symbols": 6,
+    "computed": 6,
+    "cached": 0,
+    "failures": [],
+    "seconds": 110.1
+  },
+  "per_symbol_elapsed": [
+    101.5,
+    102.0,
+    102.4,
+    106.8,
+    108.2,
+    108.5
+  ],
+  "cache_keys": 885,
+  "cache_symbols": 6,
+  "columns_expected_from_directions": 885,
+  "median_seconds_per_symbol": 104.6,
+  "median_seconds_per_bar": 0.04845,
+  "bars_total_by_interval": {
+    "5m": 2073600,
+    "15m": 872640,
+    "30m": 427680,
+    "1h": 257040
+  },
+  "universe_size": {
+    "5m": 80,
+    "15m": 101,
+    "30m": 99,
+    "1h": 119
+  },
+  "symbol_jobs_total": 399,
+  "stat_scopes": {
+    "all": 119,
+    "common": 80,
+    "major": 16,
+    "alt": 96,
+    "liq_q1": 20,
+    "liq_q2": 20,
+    "liq_q3": 20,
+    "liq_q4": 20
+  },
+  "estimate_cpu_hours": 48.9,
+  "estimate_wall_hours_at_workers": {
+    "6": 8.1,
+    "10": 4.9,
+    "12": 4.1
+  }
+}

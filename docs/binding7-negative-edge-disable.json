@@ -1,0 +1,228 @@
+{
+  "name": "binding7-negative-edge-disable",
+  "nature": "执行既有 negative 判定 + 生产配置变更；未跑新回测、未调参、未改代码、未下单",
+  "generated_at": "2026-11-12T22:06:00+08:00",
+  "authorization": {
+    "user_utterance": "能提升收益。就直接改。",
+    "clarification_given": "18 个组合 0 个 pass，不存在「改了就能赚」的候选；唯一有统计支持改善期望收益的动作是停用负 edge 绑定",
+    "user_choice": "停用 #7 止血",
+    "reverses_prior_decision": "2026-11-12 早先「负 edge 绑定先不动，只登记风险」",
+    "execution_env": "demo",
+    "live_key_enabled": false
+  },
+  "change": {
+    "mechanism": "PUT /api/bindings/7",
+    "request_body": {"enabled": false},
+    "http_status": 200,
+    "at": "2026-11-12T22:01:59.129656+08:00",
+    "table": "strategy_bindings",
+    "row_id": 7,
+    "binding": "supertrend_current × all × 15m",
+    "field": "enabled",
+    "before": 1,
+    "after": 0,
+    "preserved_fields": {
+      "priority": 100,
+      "params": {},
+      "exit_method": "strategy",
+      "support_indicator": "",
+      "exit_params": {}
+    },
+    "unchanged_deliberately": {
+      "strategy_configs.supertrend_current.enabled": 1,
+      "reason": "改它会波及绑定 #10，超出授权范围"
+    },
+    "enabled_total_before": 1,
+    "enabled_total_after": 0,
+    "production_code_files_changed": 0,
+    "service_restart_required": false,
+    "orders_placed": 0
+  },
+  "evidence_backtest": {
+    "sources": [
+      "docs/supertrend-trend-reversal-fit-15m.json",
+      "docs/supertrend-trend-reversal-fit-1h.json"
+    ],
+    "rerun_this_round": false,
+    "generated_at": {
+      "15m": "2026-11-04T17:32:35+00:00",
+      "1h": "2026-11-04T17:35:58+00:00"
+    },
+    "window": {"start": "2026-01-08", "end": "2026-11-04", "days": 300},
+    "universe": {"kind": "explicit", "requested": 12, "evaluated": 12, "skipped": []},
+    "costs": {"fee_rate": 0.0004, "slippage": 0.0002, "cash_per_symbol": 10000.0},
+    "min_pooled_trades": 30,
+    "bootstrap": {"n_boot": 2000, "confidence": 0.95},
+    "basis": "名义本金口径，等权每笔净%",
+    "combos_total": 18,
+    "pass_count": 0,
+    "15m": {
+      "negative": 9,
+      "inconclusive": 0,
+      "combos": [
+        {"label": "supertrend_factor2.0_target_r3.0", "params": {"supertrend_factor": 2.0, "target_r": 3.0}, "trades": 11928, "mean_return_pct": -0.4879, "ci_low_pct": -0.5401, "ci_high_pct": -0.438, "verdict": "negative"},
+        {"label": "supertrend_factor2.0_target_r4.0", "params": {"supertrend_factor": 2.0, "target_r": 4.0}, "trades": 11448, "mean_return_pct": -0.4757, "ci_low_pct": -0.5309, "ci_high_pct": -0.4195, "verdict": "negative"},
+        {"label": "supertrend_factor2.0_target_r6.0", "params": {"supertrend_factor": 2.0, "target_r": 6.0}, "trades": 10956, "mean_return_pct": -0.4843, "ci_low_pct": -0.5422, "ci_high_pct": -0.4243, "verdict": "negative"},
+        {"label": "基准", "params": {"supertrend_factor": 2.5, "target_r": 3.0}, "trades": 8970, "mean_return_pct": -0.4585, "ci_low_pct": -0.5206, "ci_high_pct": -0.3968, "verdict": "negative", "is_live_config": true, "positive_symbols": 0, "symbols_total": 12, "beats_random_ratio": 0.0833, "account_return_median_pct": -47.9084},
+        {"label": "supertrend_factor2.5_target_r4.0", "params": {"supertrend_factor": 2.5, "target_r": 4.0}, "trades": 8582, "mean_return_pct": -0.4385, "ci_low_pct": -0.5023, "ci_high_pct": -0.3734, "verdict": "negative"},
+        {"label": "supertrend_factor2.5_target_r6.0", "params": {"supertrend_factor": 2.5, "target_r": 6.0}, "trades": 8160, "mean_return_pct": -0.4567, "ci_low_pct": -0.5288, "ci_high_pct": -0.3826, "verdict": "negative"},
+        {"label": "supertrend_factor3.0_target_r3.0", "params": {"supertrend_factor": 3.0, "target_r": 3.0}, "trades": 7041, "mean_return_pct": -0.3896, "ci_low_pct": -0.4603, "ci_high_pct": -0.317, "verdict": "negative"},
+        {"label": "supertrend_factor3.0_target_r4.0", "params": {"supertrend_factor": 3.0, "target_r": 4.0}, "trades": 6734, "mean_return_pct": -0.385, "ci_low_pct": -0.4648, "ci_high_pct": -0.3078, "verdict": "negative"},
+        {"label": "supertrend_factor3.0_target_r6.0", "params": {"supertrend_factor": 3.0, "target_r": 6.0}, "trades": 6369, "mean_return_pct": -0.3887, "ci_low_pct": -0.4725, "ci_high_pct": -0.3046, "verdict": "negative"}
+      ]
+    },
+    "1h": {
+      "negative": 7,
+      "inconclusive": 2,
+      "combos": [
+        {"label": "supertrend_factor2.0_target_r3.0", "params": {"supertrend_factor": 2.0, "target_r": 3.0}, "trades": 2850, "mean_return_pct": -0.2453, "ci_low_pct": -0.3548, "ci_high_pct": -0.1372, "verdict": "negative"},
+        {"label": "supertrend_factor2.0_target_r4.0", "params": {"supertrend_factor": 2.0, "target_r": 4.0}, "trades": 2711, "mean_return_pct": -0.2501, "ci_low_pct": -0.3676, "ci_high_pct": -0.1295, "verdict": "negative"},
+        {"label": "supertrend_factor2.0_target_r6.0", "params": {"supertrend_factor": 2.0, "target_r": 6.0}, "trades": 2605, "mean_return_pct": -0.2632, "ci_low_pct": -0.3928, "ci_high_pct": -0.1426, "verdict": "negative"},
+        {"label": "基准", "params": {"supertrend_factor": 2.5, "target_r": 3.0}, "trades": 2252, "mean_return_pct": -0.1902, "ci_low_pct": -0.322, "ci_high_pct": -0.0676, "verdict": "negative"},
+        {"label": "supertrend_factor2.5_target_r4.0", "params": {"supertrend_factor": 2.5, "target_r": 4.0}, "trades": 2137, "mean_return_pct": -0.1873, "ci_low_pct": -0.3237, "ci_high_pct": -0.0495, "verdict": "negative"},
+        {"label": "supertrend_factor2.5_target_r6.0", "params": {"supertrend_factor": 2.5, "target_r": 6.0}, "trades": 2033, "mean_return_pct": -0.2203, "ci_low_pct": -0.3619, "ci_high_pct": -0.0839, "verdict": "negative"},
+        {"label": "supertrend_factor3.0_target_r3.0", "params": {"supertrend_factor": 3.0, "target_r": 3.0}, "trades": 1795, "mean_return_pct": -0.1063, "ci_low_pct": -0.2596, "ci_high_pct": 0.0347, "verdict": "inconclusive"},
+        {"label": "supertrend_factor3.0_target_r4.0", "params": {"supertrend_factor": 3.0, "target_r": 4.0}, "trades": 1693, "mean_return_pct": -0.1498, "ci_low_pct": -0.3096, "ci_high_pct": 0.0141, "verdict": "inconclusive"},
+        {"label": "supertrend_factor3.0_target_r6.0", "params": {"supertrend_factor": 3.0, "target_r": 6.0}, "trades": 1598, "mean_return_pct": -0.1884, "ci_low_pct": -0.3551, "ci_high_pct": -0.0291, "verdict": "negative"}
+      ]
+    },
+    "live_config_mapping": {
+      "source": "orders.params_snapshot（127 笔一致）",
+      "supertrend_factor": 2.5,
+      "target_r": 3.0,
+      "sl_atr_mult": 1.5,
+      "atr_period": 14,
+      "trailing_enabled": false,
+      "max_signal_age_bars": 2,
+      "risk_per_trade_pct": 0.005,
+      "matched_combo": "15m / 基准",
+      "matched_verdict": "negative",
+      "matched_trades": 8970,
+      "matched_mean_return_pct": -0.4585,
+      "matched_ci": [-0.5206, -0.3968]
+    }
+  },
+  "evidence_live_ledger": {
+    "scope": "source='live' AND status='CLOSED' AND binding_id=7",
+    "first_open": "2026-11-09T11:57:47.827579+08:00",
+    "last_close": "2026-11-12T21:13:04.396600+08:00",
+    "trades": 127,
+    "net_usdt": -173.0363,
+    "notional_usdt": 167330.65,
+    "margin_usdt": 76526.54,
+    "fees_usdt": 139.3762,
+    "usdt_weighted_net_pct_per_trade": -0.1034,
+    "equal_weight_net_pct_per_trade": 0.0913,
+    "equal_weight_bootstrap": {
+      "n_boot": 2000,
+      "seed": 42,
+      "confidence": 0.95,
+      "ci_low_pct": -0.2557,
+      "ci_high_pct": 0.4542,
+      "positive_share": 0.675,
+      "verdict": "inconclusive"
+    },
+    "bases_must_not_be_mixed": true,
+    "by_close_reason": [
+      {"close_reason": "exchange_sl", "n": 59, "net_usdt": -933.17, "fees_usdt": 68.62},
+      {"close_reason": "signal_reverse", "n": 30, "net_usdt": -204.03, "fees_usdt": 34.32},
+      {"close_reason": "manual", "n": 10, "net_usdt": 80.59, "fees_usdt": 9.12},
+      {"close_reason": "exchange_tp", "n": 28, "net_usdt": 883.57, "fees_usdt": 27.31}
+    ],
+    "pnl_fidelity": {
+      "estimated_closes": 89,
+      "estimated_net_usdt": -1.1,
+      "estimated_fees_usdt": 97.34,
+      "assumption": "close_price 恰等于 sl/tp，零滑点按触发价成交",
+      "implication": "真实滑点只会让 −173.04 更差；台账偏乐观"
+    },
+    "interpretation": "实盘 127 笔等权 CI 跨 0，单独不足以判定方向；停用依据是回测 8970 笔 negative，实盘只是没有反证"
+  },
+  "impact_analysis": [
+    {"claim": "停用只挡新开仓", "evidence": "backend/app/strategy/bindings.py:190; backend/app/trading/service.py:155-158"},
+    {"claim": "无需重启服务", "evidence": "backend/app/trading/service.py:155 每轮新查 DB，无进程级缓存；service.py:141 注释「设置页改完下一轮即生效」"},
+    {"claim": "存量仓位继续同步 K 线", "evidence": "backend/app/trading/service.py:170-173"},
+    {"claim": "存量仓位继续被管理", "evidence": "backend/app/trading/service.py:236,253"},
+    {"claim": "signal_reverse 判定不受停用影响", "evidence": "backend/app/trading/service.py:264-271 respect_enabled=False；6 笔 OPEN 全部 params_snapshot IS NOT NULL"},
+    {"claim": "存量仓位参数仍可解析", "evidence": "backend/app/strategy/bindings.py:360-368 resolve_order_params 不过滤 enabled"},
+    {"claim": "重启不会重新打开", "evidence": "backend/app/strategy/defaults.py:131-133 seed_bindings 早退；backend/app/strategy/strategy_migration.py:150,166-174 一次性迁移只写 0，marker legacy_strategy_enablement_v1 已存在"},
+    {"claim": "空绑定不会导致失管早退", "evidence": "backend/app/trading/service.py:184-278 pairs 为空时不 return"}
+  ],
+  "verification": {
+    "api_readback_enabled": false,
+    "db_readback": {"enabled": 0, "params": "{}", "exit_params": "{}", "priority": 100},
+    "enabled_total_after": 0,
+    "open_live_orders": [
+      {"id": 313, "symbol": "0GUSDT", "side": "SHORT", "sl": 0.1544, "tp": 0.1437, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "0.1544000", "tp_trigger": "0.1437000", "close_position": true},
+      {"id": 319, "symbol": "AINUSDT", "side": "SHORT", "sl": 0.10846, "tp": 0.09669, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "0.1084600", "tp_trigger": "0.0966900", "close_position": true},
+      {"id": 320, "symbol": "AVAXUSDT", "side": "SHORT", "sl": 8.577, "tp": 8.253, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "8.5770", "tp_trigger": "8.2530", "close_position": true},
+      {"id": 322, "symbol": "4USDT", "side": "SHORT", "sl": 0.00881, "tp": 0.00851, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "0.0088100", "tp_trigger": "0.0085100", "close_position": true},
+      {"id": 323, "symbol": "BULLAUSDT", "side": "SHORT", "sl": 0.06201, "tp": 0.05623, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "0.0620100", "tp_trigger": "0.0562300", "close_position": true},
+      {"id": 324, "symbol": "ALCHUSDT", "side": "SHORT", "sl": 0.03225, "tp": 0.03102, "sl_algo_status": "NEW", "tp_algo_status": "NEW", "sl_trigger": "0.0322500", "tp_trigger": "0.0310200", "close_position": true}
+    ],
+    "protection_orders_alive": "12/12",
+    "open_margin_usdt": 2897.5,
+    "new_orders_after_disable": 0,
+    "post_disable_cycle": {
+      "job_log_id": 28244,
+      "completed_at": "2026-11-12T22:07:17.443170+08:00",
+      "symbol_count": 0,
+      "sync_target_count": 6,
+      "elapsed_ms": 48389,
+      "sync_ms": 8031,
+      "signal_ms": 0,
+      "execution_ms": 40358,
+      "opened": 0,
+      "managed": 0,
+      "sync_errors": 0,
+      "signal_errors": 0,
+      "interpretation": "无生效绑定 ⇒ 不算新信号；6 笔存量持仓的币仍被同步；持仓管理段照常执行 40.4s；零新开仓、零错误",
+      "cycle_duration_before_ms": 280047,
+      "timing_caveat": "22:01:01 与 22:06:09 完成的两轮均启动于 22:01:59 改动之前（后者起点约 22:01:29），仍读 enabled=1、symbol_count=509；id=28244 才是首个读到新状态的周期",
+      "restart_not_needed_confirmed_empirically": true
+    },
+    "pytest_full": "3 failed / 1936 passed / 5 warnings / 145.15s；3 项为既有基线失败，无回归"
+  },
+  "reversibility": {
+    "command": "PUT /api/bindings/7 {\"enabled\": true}",
+    "technically_reversible": true,
+    "h11_constraint": "该配置判定 negative，恢复须有新 pass 证据，或显式标注「未经统计支持」并由用户承担",
+    "precedent": {
+      "source": "docs/binding-combo-optimization.json",
+      "at": "2026-11-05T22:35:10+08:00",
+      "applied": [
+        {"binding_id": 10, "reason": "verdict=negative，1100 笔、两窗口同号、毛收益 −0.04% < 0"},
+        {"binding_id": 43, "reason": "verdict=insufficient，494 个池成员里仅 3 个可回测"}
+      ]
+    }
+  },
+  "honest_boundaries": [
+    "停用不产生 alpha，只把期望收益从负截到 0；enabled_total=0 ⇒ 系统不再开任何新仓，直到出现 pass 判定的新配置",
+    "18 个组合 0 pass；1h 最好的两个只是 inconclusive 且点估计为负；本轮未凑「能赚」的组合（H5 禁止事后选冠军）",
+    "存量 6 笔仍暴露在负 edge 下，按原 sl/tp 跑完；停用不强平（强平属另一项未授权动作）",
+    "−173.04 是乐观读数（89 笔零滑点假设），真实很可能更差，但方向判定不依赖它",
+    "本轮未做平仓价保真回填、对账状态回写、K 线同步延迟；它们不提升收益，需另行授权",
+    "早先「id 279 ARCUSDT 孤儿止盈单可能误平后续仓位」已证伪：交易所 algoStatus=EXPIRED，本地 note 仍 tp_status=NEW，属状态回写缺失而非资金安全风险"
+  ],
+  "self_check": {
+    "production_code_files_changed": 0,
+    "npm_run_build_required": false,
+    "service_restart_required": false,
+    "read_only_engine_used": "app/db.py::make_engine(read_only=True)",
+    "only_write": "经 API 的 strategy_bindings.enabled 变更",
+    "secrets_printed": false,
+    "live_key_enabled": false,
+    "execution_env_switched": false,
+    "orders_placed": 0,
+    "h3_bases_separated": true,
+    "h8_window_universe_costs_stated": true,
+    "h11_no_forced_enable": true,
+    "pytest_full": "3 failed / 1936 passed / 5 warnings / 145.15s（既有基线，无回归）",
+    "post_disable_cycle_verified": true
+  },
+  "reproduce": [
+    "python -c \"import json;[print(c['label'],c['expectancy_ci']) for c in json.load(open('docs/supertrend-trend-reversal-fit-15m.json',encoding='utf-8'))['combos']]\"",
+    "curl -s http://127.0.0.1:8010/api/bindings",
+    "curl -s -X PUT http://127.0.0.1:8010/api/bindings/7 -H 'Content-Type: application/json' -d '{\"enabled\": false}'"
+  ]
+}

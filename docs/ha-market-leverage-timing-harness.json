@@ -1,0 +1,403 @@
+{
+  "report": "ha-market-leverage-timing-harness",
+  "title": "H-A 市场级杠杆择时量具预置（工程预置，非 edge 判定）",
+  "generated_at": "2026-11-12T01:05:00+08:00",
+  "experiment_id": "P13-001",
+  "parent_experiment_id": "P13-000",
+  "code_commit": "564d941",
+  "hypothesis_card": "research/hypotheses/H-A-market-leverage-timing.md",
+  "stage": "Gate 0 engineering pre-build + data readiness gate; NO probe, NO backtest, NO edge verdict",
+  "engineering_only": true,
+  "strategy": null,
+  "interval": "1h",
+  "horizon_hours": 24,
+  "block_hours": 24,
+  "overlapping_blocks": false,
+  "days": 60,
+  "window": {
+    "target_start": null,
+    "target_end": null,
+    "target_blocks": 60,
+    "train_blocks": 40,
+    "oos_blocks": 20,
+    "alignment": "UTC midnight ceil(sentiment_start / DAY_MS)",
+    "current_block_grid_start": "2026-10-07T00:00:00+00:00",
+    "sentiment_start": "2026-10-06T04:00:00+00:00",
+    "sentiment_end": "2026-11-11T16:00:00+00:00",
+    "klines_1h_start": "2025-09-20T15:00:00+00:00",
+    "klines_1h_end": "2026-11-11T15:00:00+00:00",
+    "span_days": 36.5,
+    "note": "评估窗口尚未形成；target_start/target_end 为 null 而非猜测值"
+  },
+  "universe": {
+    "pool": "sentiment ∩ klines(interval='1h')",
+    "symbols": 515,
+    "sentiment_symbols": 515,
+    "klines_1h_symbols": 535,
+    "intersection_symbols": 515,
+    "skipped": [],
+    "min_cross_section": 30,
+    "point_in_time_membership": true,
+    "survivorship_bias_check": "单测锁定：未来上市币不回填影响更早时点读数"
+  },
+  "parameters": {
+    "source": "hypothesis_card_frozen",
+    "grid_search_performed": false,
+    "horizon": 24,
+    "roll_window": 168,
+    "roll_min_periods": 72,
+    "min_cross_section": 30,
+    "min_span_days": 60,
+    "train_days": 40,
+    "oos_days": 20,
+    "min_blocks": 30,
+    "threshold_quantiles": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+    "threshold_selection_scope": "train_only",
+    "threshold_leakage_test": "test_threshold_is_unchanged_by_oos_perturbation",
+    "seed": 20261112,
+    "n_seeds": 200,
+    "n_boot": 2000
+  },
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "exact_exit_notional": true,
+    "cost_formula": "contiguous ON segment total = c * (1 + exit_price / entry_price)",
+    "approximation_used": false,
+    "overridable_by_strategy_or_binding": false,
+    "applied_this_round": false,
+    "note": "成本口径已登记并有恒等式单测，但本轮 trades=0，未实际计费"
+  },
+  "split": {
+    "train_blocks": 40,
+    "oos_blocks": 20,
+    "test_blocks": 0,
+    "purged": true,
+    "purge_reason": "非重叠 24h 块天然无标签重叠",
+    "min_pooled_trades": 30,
+    "pooled_basis": "non_overlapping_blocks",
+    "train_plus_oos_blocks": 60,
+    "oos_blocks_alone": 20,
+    "oos_alone_meets_min_pooled": false
+  },
+  "data_gate": {
+    "ready": false,
+    "span_days": 36.5,
+    "days_remaining": 23.5,
+    "min_span_days": 60,
+    "train_days": 40,
+    "oos_days": 20,
+    "eta_ms": 1796443200000,
+    "eta_utc": "2026-12-05T04:00:00+00:00",
+    "reason": "sentiment span 36.50d < 60d required"
+  },
+  "block_readiness": {
+    "ready": false,
+    "total_blocks": 35,
+    "required_blocks": 60,
+    "window_finite_blocks": 0,
+    "window_invalid_blocks": 60,
+    "blocks_short": 25,
+    "warmup_prefix_blocks": 3,
+    "extra_days_lower_bound": 28,
+    "interior_gap": false,
+    "eta_utc": "2026-12-09T16:00:00+00:00",
+    "binding_eta_utc": "2026-12-09T16:00:00+00:00",
+    "reason": "only 35 non-overlapping blocks, need 60 plus 3 warm-up block(s)",
+    "eta_correction": "12-05 出自 P15 审计(docs/audit-p15-collection-and-ledger.md:77)与台账 P15-000/P15-001，属跨度口径；H-A 假设卡只写 >=60 个完整日、未给具体日期。按可用块口径应更正为 ~2026-12-09T16:00Z（预热吃掉 3 块）"
+  },
+  "controls": {
+    "implemented": true,
+    "executed": false,
+    "constant_full_baseline": "ha_portfolio.constant_full_returns",
+    "random_baseline": {
+      "method": "matched_run_length_permutation",
+      "function": "ha_portfolio.matched_random_switches",
+      "n_seeds": 200,
+      "seed": 20261112,
+      "required_percentile": 90,
+      "preserves_exactly": ["exposure", "run_count", "linear_transition_count"],
+      "rejected_alternatives": {
+        "iid_bernoulli": "不保持游程结构，换手偏高",
+        "circular_roll": "保持曝光但与块级开关口径的时间对齐方式不符",
+        "fitted_markov": "持续信号下 p_off 估为 1.0 → 吸收态 → 基线换手系统性偏低 → 成本差伪造 alpha（单测抓出，已弃用为基线）"
+      },
+      "markov_retained_as": "persistence_diagnostic_only"
+    },
+    "market_on_off_ab": "同币池、同成本、同块网格，只差开关",
+    "positive_control": "ha_market_timing.perfect_foresight_net",
+    "negative_control": "纯噪声必须被 termination_checks 拒绝（已有单测）"
+  },
+  "groups": [],
+  "trades": 0,
+  "metrics": null,
+  "ci": {
+    "method": "paired_block_bootstrap",
+    "blocks": [1, 4],
+    "n_boot": 2000,
+    "seed": 20261112,
+    "ci_low": null,
+    "ci_high": null,
+    "ci_low_pct": null,
+    "ci_high_pct": null,
+    "computed": false,
+    "note": "判据已登记（配对差 CI 下界 <=0 即终止），本轮未计算"
+  },
+  "baseline": {
+    "random_percentile": null,
+    "constant_full_net": null,
+    "switch_net": null,
+    "paired_diff": null
+  },
+  "market_background": {
+    "cum_return": null,
+    "up_block_share": null,
+    "note": "预留输出位，用于日后区分择时能力与样本期 beta"
+  },
+  "termination": {
+    "evaluated": false,
+    "terminated": null,
+    "reasons": [],
+    "conditions": [
+      "样本外 Spearman 变号或 |rho| < 0.10",
+      "开关净收益 <= 恒定满仓基线，或配对 CI 下界 <= 0",
+      "低于匹配随机开关 p90",
+      "非重叠块 < 30，或时间四分段同号 < 3/4"
+    ],
+    "thresholds": {
+      "min_oos_abs_rho": 0.10,
+      "min_blocks": 30,
+      "min_segment_sign_share": 0.75,
+      "random_p90": 90
+    },
+    "implementation": "ha_portfolio.termination_checks",
+    "unit_tests": 8
+  },
+  "stoploss_line_check": {
+    "reference": ".workbuddy/skills/strategy-backtest-playbook/references/verdicts-history.md",
+    "hit": false,
+    "information_source": "derivatives_open_interest",
+    "source_allowed_by_H2": true,
+    "not_price_ohlcv": true,
+    "not_bar_level_taker": true,
+    "distinct_from": ["P9 逐币时序 IC", "P12 横截面去 beta rank IC"],
+    "p12_criterion_rerun": false,
+    "window_extended_to_rescue_inconclusive": false,
+    "horizon_changed_to_rescue_inconclusive": false
+  },
+  "engineering_findings": [
+    {
+      "id": "F1",
+      "severity": "methodological_bug_fixed",
+      "title": "拟合马尔可夫随机基线进入吸收态，会伪造 alpha",
+      "detected_by": "backend/tests/test_ha_portfolio.py::test_matched_baseline_preserves_turnover_scale",
+      "observed": "换手比 0.48，期望 1.0",
+      "root_cause": "持续信号下观测不到 OFF->ON 转移，p_off 估为 1.0，链进入吸收态",
+      "fix": "改为游程长度集合内部置换（matched_random_switches），逐序列精确保持曝光/游程条数/线性转移次数",
+      "test_strengthened": "从容差相等改为精确相等"
+    },
+    {
+      "id": "F2",
+      "severity": "latent_bug_fixed",
+      "title": "60 天跨度 != 60 个可用块（z-score 预热吃掉 3 块）",
+      "detected_by": "真实数据 H8 只读校验（仅形状/NaN 计数/对齐，无任何相关性或收益读数）",
+      "root_cause": "ROLL_MIN_PERIODS=72 导致前 3 个非重叠块因子为 NaN",
+      "consequence_if_unfixed": "23 天后 split_train_oos 直接抛 ValueError",
+      "fix": "新增 block_readiness，区分预热前缀与内部空洞，并接进 CLI 门禁",
+      "extra_days_lower_bound_formula": "max(0, need + warmup_prefix_blocks - total_blocks)"
+    },
+    {
+      "id": "F3",
+      "severity": "record_corrected",
+      "title": "就绪到期日更正",
+      "old": "2026-12-05T04:00Z（P15 审计 docs/audit-p15-collection-and-ledger.md:77 与台账 P15-000/P15-001 的跨度口径 60 天 mark）",
+      "new": "2026-12-09T16:00Z（按可用块口径）",
+      "hypothesis_card_stated": "只写 >=60 个完整日，未给具体日期，无需改卡内日期",
+      "delta_days": 4
+    },
+    {
+      "id": "F4",
+      "severity": "ops_verified",
+      "title": "采集链在推进，P15-000 的 F1 CRITICAL 已修复",
+      "cron_enabled": true,
+      "next_run_local": "2026-11-12 08:30 Asia/Shanghai",
+      "sync_scripts_present": 3,
+      "dry_run_supported": true,
+      "sentiment_rows_per_day": {"2026-11-08": 12336, "2026-11-09": 12336, "2026-11-10": 12336, "2026-11-11": 8722},
+      "partial_day_note": "11-11 截至 16:00Z，为当日部分",
+      "p15_f1_resolved_at": "2026-11-11T16:19:53Z",
+      "p15_audit_at": "2026-11-11T16:16:22Z"
+    },
+    {
+      "id": "F5",
+      "severity": "measurement_caveat",
+      "title": "台账读数被并发改动",
+      "earlier_in_session": {"closed": 187, "net_usdt": -425.52},
+      "current_recheck": {"closed": 179, "net_usdt": -423.79},
+      "suspected_cause": "并发对账/归档（未核实）",
+      "policy": "只采用本报告复现命令可重跑的当前查询结果"
+    }
+  ],
+  "tests": {
+    "files": [
+      "backend/tests/test_ha_common.py",
+      "backend/tests/test_ha_portfolio.py",
+      "backend/tests/test_ha_market_timing.py"
+    ],
+    "counts": {"test_ha_common": 19, "test_ha_portfolio": 25, "test_ha_market_timing": 7},
+    "total": 51,
+    "passed": 51,
+    "failed": 0,
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest backend/tests/test_ha_common.py backend/tests/test_ha_portfolio.py backend/tests/test_ha_market_timing.py -q",
+    "runtime_seconds": 0.83,
+    "tdd": "全部先写失败测试再实现；F1/F2 由失败测试抓出"
+  },
+  "full_suite_regression": {
+    "command": ".\\.venv\\Scripts\\python.exe -m pytest backend/tests -q",
+    "passed": 1906,
+    "failed": 6,
+    "runtime_seconds": 117.83,
+    "harness_tests_all_green": true,
+    "failures_pre_existing": true,
+    "unrelated_evidence": [
+      "grep count of ha_common/ha_portfolio/ha_market_timing in the 3 failing test files = 0",
+      "git status backend/app/ is empty (no production code changed this round; only new scripts + tests added)"
+    ],
+    "failures": [
+      {"test": "backend/tests/test_backfill_rate_limit.py::test_run_checkpoints_and_limits_writes_to_month", "params": ["done", "partial", "error"], "count": 3, "cause": "httpx.InvalidURL: Invalid port: ':1]' (test URL parsing, environment/version related)"},
+      {"test": "backend/tests/test_market_performance.py::test_complete_tail_queries_have_a_bounded_minute_range", "count": 1, "cause": "lower_bounds earlier than expected by 1 minute (300000ms), assertion mismatch"},
+      {"test": "backend/tests/test_pool_volatility_research.py::test_live_entrypoints_reject", "params": ["research_high_turnover_high_vol", "research_low_turnover_high_vol"], "count": 2, "cause": "AttributeError: app.trading.dispatch has no attribute halt_status (stale test vs refactored production code)"}
+    ],
+    "fixed_this_round": false,
+    "reason_not_fixed": "超出「H-A 量具预置 + 保采集」授权范围，且相关文件可能正被并发会话改动；如实登记交由用户决定"
+  },
+  "modules": [
+    {"path": "backend/scripts/ha_common.py", "lines": 126},
+    {"path": "backend/scripts/ha_portfolio.py", "lines": 196},
+    {"path": "backend/scripts/ha_market_timing.py", "lines": 197}
+  ],
+  "module_line_limit": 300,
+  "risk_register": {
+    "title": "负 edge 绑定仍在运行（未经统计支持）",
+    "statistically_supported": false,
+    "h11_marked": true,
+    "user_decision": "先不动，只登记风险",
+    "binding_changed_this_round": false,
+    "binding": {
+      "id": 7,
+      "strategy_code": "supertrend_current",
+      "pool_code": "all",
+      "interval": "15m",
+      "enabled": 1,
+      "exit_method": "strategy",
+      "params": {},
+      "is_only_enabled_binding": true,
+      "other_bindings_enabled": 0
+    },
+    "backtest_reference": {
+      "source": "docs/interval-exit-verdict.md:34",
+      "produced_this_round": false,
+      "interval_15m": {"mean_return_pct_per_trade": -0.299, "ci_low_pct": -0.382, "ci_high_pct": -0.209, "trades": 7459, "verdict": "negative"},
+      "interval_1h": {"mean_return_pct_per_trade": -0.016, "ci_crosses_zero": true, "trades": 1611},
+      "turnover_ratio_15m_over_1h": 4.6
+    },
+    "live_recheck": {
+      "measured_at": "2026-11-12T01:00:00+08:00",
+      "read_only": true,
+      "window_local": "2026-11-06 01:15 .. 2026-11-12 00:52 (Asia/Shanghai)",
+      "archived_rows_excluded": 10,
+      "archived_close_reason": "env_switch_archived",
+      "binding_7_attributable": {
+        "trades": 118, "gross_pnl_usdt": -499.07, "fees_usdt": 132.19, "net_usdt": -631.26,
+        "notional_usdt": 160097.21, "net_pct_notional_per_trade": -0.3943, "win_rate": 0.2627,
+        "fees_over_abs_gross": 0.265
+      },
+      "legacy_null_binding": {
+        "trades": 51, "gross_pnl_usdt": 359.03, "fees_usdt": 143.13, "net_usdt": 215.89,
+        "notional_usdt": 179009.88, "net_pct_notional_per_trade": 0.1206, "win_rate": 0.3922,
+        "window_local": "2026-11-02 01:05 .. 2026-11-03 23:00",
+        "note": "binding_id 为空的历史遗留单，不可归属到绑定 7"
+      },
+      "strategy_pool_interval_total": {
+        "trades": 179, "gross_pnl_usdt": -140.05, "fees_usdt": 283.75, "net_usdt": -423.79,
+        "notional_usdt": 360170.66, "net_pct_notional_per_trade": -0.1177, "win_rate": 0.2849
+      },
+      "whole_ledger_closed": {
+        "trades": 282, "gross_pnl_usdt": -1383.67, "fees_usdt": 418.59, "net_usdt": -1802.27,
+        "notional_usdt": 529021.57, "net_pct_notional_per_trade": -0.3407, "win_rate": 0.2943
+      },
+      "open_positions_supertrend": 6,
+      "side_split_binding_7": {"LONG": {"trades": 66, "gross_pnl_usdt": -277.53}, "SHORT": {"trades": 52, "gross_pnl_usdt": -221.54}},
+      "close_reason_binding_7_incl_archived": {
+        "exchange_sl": {"n": 44, "pnl": -715.16}, "signal_reverse": {"n": 28, "pnl": -143.34},
+        "stop_loss": {"n": 19, "pnl": -375.36}, "exchange_tp": {"n": 16, "pnl": 543.88},
+        "manual": {"n": 10, "pnl": 80.59}, "env_switch_archived": {"n": 10, "pnl": 0.0},
+        "take_profit": {"n": 1, "pnl": 110.31}
+      },
+      "stop_loss_family_total": {"n": 63, "pnl": -1090.52},
+      "consistency_with_backtest": {
+        "same_sign": true, "same_order_of_magnitude": true,
+        "live_point_estimate": -0.3943, "backtest_ci": [-0.382, -0.209],
+        "live_worse_than_ci_lower": true,
+        "significance_claimed": false,
+        "reason": "118 笔远小于 7459 笔，不能断言差异显著；但实盘未推翻回测负判定"
+      }
+    },
+    "actions_taken": ["只读测量", "登记风险", "标注未经统计支持"],
+    "actions_not_taken": ["改 enabled", "改参数", "改出场口径", "下任何单", "切 live"],
+    "suggestions_require_user_authorization": [
+      "停用绑定 7",
+      "或把周期切到 1h（换手降 4.6 倍、回测 CI 跨 0）"
+    ],
+    "queries": [
+      "SELECT id,strategy_code,pool_code,interval,enabled,exit_method,params FROM strategy_bindings ORDER BY id",
+      "SELECT count(*) n,sum(realized_pnl) rp,sum(entry_fee+exit_fee) fees,sum(entry_price*qty) notional,sum(CASE WHEN realized_pnl>0 THEN 1 ELSE 0 END) wins FROM orders WHERE status='CLOSED' AND binding_id=7 AND close_reason<>'env_switch_archived'",
+      "SELECT strategy,pool,interval,binding_id,count(*),sum(realized_pnl),sum(entry_fee+exit_fee),sum(entry_price*qty) FROM orders WHERE status='CLOSED' GROUP BY 1,2,3,4",
+      "SELECT close_reason,count(*),sum(realized_pnl) FROM orders WHERE status='CLOSED' AND binding_id=7 GROUP BY 1",
+      "SELECT side,count(*),sum(realized_pnl) FROM orders WHERE status='CLOSED' AND binding_id=7 AND close_reason<>'env_switch_archived' GROUP BY 1"
+    ]
+  },
+  "execution": {
+    "mode": "research_paper_only",
+    "live_orders_allowed": false,
+    "orders_submitted": 0,
+    "paper_adapter": "none",
+    "stage7_status": "BLOCKED",
+    "default_enabled": false,
+    "bindings_created": 0,
+    "strategies_enabled": 0,
+    "automation_self_start": false,
+    "cli_default": "readiness_only",
+    "cli_when_data_ready": "READY_AWAITING_HUMAN_AUTHORIZATION",
+    "evaluate_requires": "显式 --evaluate + 人工重新登记假设卡并授权（假设卡 §9）"
+  },
+  "verdict": "insufficient",
+  "status": "BLOCKED_BY_DATA",
+  "default_enabled": false,
+  "limitations": [
+    "未模拟资金费率、盘口深度与冲击成本、强平、分批建仓、盘中止损止盈、跳空",
+    "块级开关口径与模拟盘巡检撮合存在差异",
+    "成本为名义本金口径，不得与 margin 口径报告直接相减或混比",
+    "样本外仅 20 个非重叠块 < MIN_POOLED_TRADES=30，统计功效偏弱",
+    "sentiment 仅 36.5 天、515 币；1h 之外周期深度不足，无法在更细周期复核",
+    "7 档分位阈值在训练段择优引入选择偏差，评估时须报告全部 7 档而非只报最优档",
+    "research/experiments.jsonl 与 docs/ 为多会话共享写点，追加前须重读尾部",
+    "台账读数会被并发对账/归档改动，须以可复现查询为准",
+    "本轮 metrics=null，任何收益/IC/CI 读数均不存在，不得被引用为绩效证据"
+  ],
+  "next_action": "保住每日 08:30 采集链并盯 interior_gap；~2026-12-09 复核 block_readiness.ready；到齐后请用户重新登记 H-A 卡并授权，再一次性跑 --evaluate",
+  "artifacts": [
+    "docs/ha-market-leverage-timing-harness.md",
+    "docs/ha-market-leverage-timing-harness.json",
+    "backend/scripts/ha_common.py",
+    "backend/scripts/ha_portfolio.py",
+    "backend/scripts/ha_market_timing.py",
+    "backend/tests/test_ha_common.py",
+    "backend/tests/test_ha_portfolio.py",
+    "backend/tests/test_ha_market_timing.py",
+    "output/ha-readiness-20261112.json"
+  ],
+  "runtime_cost": "只读 DB 查询 + 51 项单测 0.83s；无回测、无外部请求、无下单"
+}

@@ -41,3 +41,80 @@ execution:
   adapter: none
   status: BLOCKED
   reason: "本轮为只读 IC 探针，Gate 1 未通过；未部署任何 paper/live 执行"
+
+# 2026-11-11 P16：固定规模币池约束（数据口径验证结论，非策略启用）
+fixed_size_universe:
+  valid_at: 2026-11-11T16:35Z
+  status: FEASIBLE_WITH_BOUNDS
+  membership: per_period_point_in_time_rebuild  # 禁止用当前成员回放历史
+  lookback_hours: 168
+  min_bars_per_window: 160
+  gate_passed_sizes: [100]
+  gate_passed_c2_margin: 0.0129
+  min_size_for_min_cs_30: 30
+  weekly_turnover_range: [0.256, 0.344]
+  note: "固定规模 != 固定成分；C2 门槛 0.60 为预注册，改动须新登记假设卡；无历史上市/下架清单，结论为在库 1h bar 下界"
+  report: docs/probe-p16-fixed-pool.md
+
+# 2026-11-12 P17 / H-E：Supertrend 缩小币种池 PIT 判定（课题结论，非策略启用）
+supertrend_pit_pool:
+  valid_at: 2026-11-12T23:40Z
+  status: CLOSED_NEGATIVE
+  verdict: negative
+  verdict_scope: "固定规模 PIT 币池 + 冻结参数的净收益统计判定；不是「换指标再试一次」的许可"
+  hypothesis_card: research/hypotheses/H-E-supertrend-pit-pool.md
+  parameters_frozen: {supertrend_factor: 2.5, atr_period: 14, sl_atr_mult: 1.5, target_r: 3.0}
+  grid_search_performed: false
+  sizes: [10, 20, 30]
+  ranking_kinds: [liquidity, volatility]
+  ranking_window_hours: 168
+  ranking_interval: 1h          # 两周期臂共用同一份 1h 排名
+  arms_negative: 12             # 1h 6 臂 + 15m 6 臂，CI 上界全部 < 0
+  baseline_1h: {qualified: 462, days: 365, trades: 95085, mean_pct: -0.2263, ci: [-0.2479, -0.2050]}
+  baseline_15m: {qualified: 30, days: 180, trades: 13563, mean_pct: -0.4322, ci: [-0.4851, -0.3814]}
+  posthoc_leakage_pp_per_trade: {1h: [1.86, 1.51, 1.33], 15m: [0.41, 0.18, -0.03]}
+  c4_random_percentile: 0.000   # 策略账户收益低于全部 10 个随机方向种子
+  jaccard_median_1h: {liquidity: [0.333, 0.290, 0.348], volatility: [0.026, 0.039, 0.091]}
+  termination: "预登记终止条件已触发：不得换分档指标、不得换 N、不得换排名窗口重试"
+  default_enabled: false
+  binding_7_enabled: 0          # 2026-11-12 22:01 已止血，本轮未改任何绑定/spec
+  next_route: research/hypotheses/H-F-funding-multi-venue.md
+  report: docs/supertrend-pit-pool.md
+
+# 2026-11-13 P11 / H-F Gate 1a：资金费率多所现货腿「奖金有多大」可行性判定（非 edge 判定，非策略启用）
+funding_venue_gate1a:
+  valid_at: 2026-11-12T16:01:17Z   # UTC；本地 2026-11-13 00:01
+  status: CLOSED_PASS_FEASIBILITY_ONLY
+  verdict: pass
+  verdict_scope: "资金费率多所路径可行性（Gate 1a 毛超额），非 edge 判定；不含任何净收益"
+  hypothesis_card: research/hypotheses/H-F-funding-multi-venue.md
+  experiment_id: P11-001
+  parameters_frozen: {lookback_days: 7, hold_days: 3, ks: [10, 20], trailing_filter: ">0"}
+  grid_search_performed: false
+  parameter_trials: 0
+  costs_applied: false            # 他所现货费率/深度/滑点未采集，报净就是编数
+  costs_reference_only: {fee_rate: 0.0004, slippage: 0.0002, round_trip_pct: 0.12}
+  window: {start_ms: 1758502800002, end_ms: 1794441600000, days: 416.0, periods: 136}
+  universe: {total: 507, hedgeable: 351, non_hedgeable: 156, spot_snapshot: today_not_point_in_time}
+  spot_snapshot_source: "https://api.binance.com/api/v3/exchangeInfo, 无 API key, 2026-11-12T15:50:09Z"
+  spot_snapshot_cache: docs/probe-funding-venue-spot.json
+  settlement_events_per_day: {p10: 3.01, median: 6.01, p90: 6.29}   # 中位 4h，不是统一 8h
+  gates:
+    k10: {D1_share: 0.9795, D2_ic: 0.7477, D2_positive_share: 1.0, D3_increment_pp: 62.9917, pass: true}
+    k20: {D1_share: 0.9793, D2_ic: 0.7477, D2_positive_share: 1.0, D3_increment_pp: 52.4107, pass: true}
+  gate_rule: "两个 K 的 D1–D3 全部成立才判 pass（保守 AND，比假设卡加严）"
+  gross_annual_pct:               # 毛，非净；全宇宙臂是不可执行的反事实
+    k10: {full: 69.2751, hedgeable_only: 6.2834}
+    k20: {full: 55.1656, hedgeable_only: 2.7549}
+  period_mean_ci_crosses_zero: ["hedgeable_only K=20: [-0.0058, 0.0427]"]
+  random_coin_baseline: {seeds: 20, k10_mean_pct: 8.0015, k20_mean_pct: 8.0604, strategy_percentile: 1.0}
+  simulated_fills: false
+  independent_audit: "pandas masking + groupby 重算（不复用 searchsorted），10/10 头条数字 5e-4 内一致；因果性已核"
+  independent_audit_script: backend/scripts/audit_funding_venue.py   # 只读，退出码 0=全一致，可重跑
+  tests: {new_unit_tests: 83, full_pytest: "3 failed / 2119 passed（3 项为既有基线失败，与本轮无关）"}
+  preflight: "0 FAIL / 0 WARN / 21 PASS"
+  termination: "不得换 K／换回看／换持有期重跑本 gate；pass 只买到「值得去问他所数据」"
+  gate_1b: BLOCKED                # E1–E6 须用户单独授权采集 Gate/MEXC 历史 funding 与现货深度
+  default_enabled: false
+  binding_7_enabled: 0            # 未改任何绑定/spec/前端；未接 API key，未下单
+  report: docs/probe-funding-venue.md

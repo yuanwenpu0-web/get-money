@@ -1,0 +1,19 @@
+{
+  "generated_at_ms": 1794531641580,
+  "last_complete_hour_ms": 1794528000000,
+  "universe_size": 1,
+  "dry_run": false,
+  "status_counts": {
+    "ok": 1
+  },
+  "rows_inserted": 28,
+  "results": [
+    {
+      "symbol": "SAFEUSDT",
+      "status": "ok",
+      "latest": 1794438000000,
+      "target": 1794528000000,
+      "rows": 28
+    }
+  ]
+}

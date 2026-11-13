@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-13T01:53:17+00:00",
+  "experiment_id": "P18-004",
+  "parent_experiment_id": "P18-003",
+  "stage": "engineering deployment verification; non-edge",
+  "user_authorized_restart": true,
+  "backend_reload_status": "RESTARTED_HEALTHY",
+  "health": {
+    "ok": true,
+    "service": "quant-trading",
+    "mode": "live",
+    "exchange_env": "demo"
+  },
+  "process": {
+    "Id": 3296,
+    "StartTime": "/Date(1794534584919)/",
+    "Path": "C:\\Users\\YUAN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\pythonw.exe"
+  },
+  "scheduled_task": {
+    "LastRunTime": "/Date(1794534584000)/",
+    "LastTaskResult": 267009
+  },
+  "source_sha256": "390c2ac8683a7773b74b66c8c6674f5dbb6c383016fd484901c5b132f88a7673",
+  "process_started_after_source_fix": true,
+  "process_start_ms": 1794534584919,
+  "task_run_ms": 1794534584000,
+  "scope_sha": "b323c0912533842e",
+  "diagnostic_report": "docs/indicator-fit-log-diagnosis.json",
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "costs_applied": false,
+    "basis": "notional"
+  },
+  "trades": null,
+  "ci": "NOT_APPLICABLE",
+  "random_baseline": "NOT_RUN",
+  "verdict": "inconclusive",
+  "engineering_status": "PASS",
+  "window": "deployment verification only; no historical return window",
+  "universe": "existing backend task only; no universe or binding changes",
+  "limitations": [
+    "健康验证不证明策略有edge；P18-002其余方法和历史门槛保持BLOCKED。",
+    "未执行交易回测，未更改策略默认参数、绑定或执行模式。"
+  ],
+  "verification": {
+    "output/fit-log-focused-pytest.log": "68 passed in 1.20s",
+    "output/fit-log-full-pytest.log": "3 failed, 2152 passed, 5 warnings in 94.82s (0:01:34)"
+  }
+}

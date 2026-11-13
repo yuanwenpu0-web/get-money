@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-11-12T20:22:20+00:00",
+  "scope": "A",
+  "sha": "b323c0912533842e",
+  "directions_sha": "2ad8c54c75753576",
+  "intervals": {
+    "1h": {
+      "interval": "1h",
+      "symbols": 119,
+      "computed": 119,
+      "cached": 0,
+      "failures": [],
+      "seconds": 1210.4
+    },
+    "30m": {
+      "interval": "30m",
+      "symbols": 99,
+      "computed": 99,
+      "cached": 0,
+      "failures": [],
+      "seconds": 2109.4
+    },
+    "15m": {
+      "interval": "15m",
+      "symbols": 101,
+      "computed": 101,
+      "cached": 0,
+      "failures": [],
+      "seconds": 4163.5
+    },
+    "5m": {
+      "interval": "5m",
+      "symbols": 80,
+      "computed": 80,
+      "cached": 0,
+      "failures": [],
+      "seconds": 9572.8
+    }
+  },
+  "elapsed_s": 17222.6
+}

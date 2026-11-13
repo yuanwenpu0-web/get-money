@@ -1,0 +1,33 @@
+{
+  "registered_at": "2026-11-13T02:17:05+00:00",
+  "experiment_id": "P18-005",
+  "parent_experiment_id": "P18-002",
+  "operation": "necessary-overall-direction-gate-only",
+  "source_hashes": {
+    "docs\\indicator-fit-stats-A.json": "dae06221ca92a0a5a8ac442296e4cb65ab1e8428792c6f2748817ecce620e9ac",
+    "docs\\indicator-fit-matrix.json": "fae2c33c965f503fd02e993591037675f26a21660157157fe5e934152b14735b",
+    "backend\\app\\research\\fit_pool_gate.py": "2cec1fb8e19f7437e864b2acc2c4eac2171908d0f1fed2fb9b466866614eb83a",
+    "backend\\scripts\\fit_pool_review.py": "9513196e25974d56dd3b38169c2508217cc19484cf60c64623c7ffc8b9acb607"
+  },
+  "comparison": "same interval/key/direction/horizon/benchmark; overall scope=all",
+  "required": "matching overall direction-aligned mean_net_pct must be finite and strictly > 0",
+  "missing_policy": "BLOCKED; preserve as exploratory, do not borrow another coordinate",
+  "failure_policy": "nonpositive overall mean -> FAIL this gate and exploratory review label",
+  "pass_policy": "retain raw candidate label only; still exploratory inference pending other gates",
+  "universe": "original A stats rows, unchanged; no new symbol selection or DB access",
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012
+  },
+  "parameter_trials": 0,
+  "recompute_statistics": false,
+  "new_returns": false,
+  "remaining_blockers": [
+    "max-T",
+    "corrected omnibus interaction/multiplicity",
+    "PIT membership",
+    "overall significance/stability requirements",
+    "independent OOS/history"
+  ]
+}

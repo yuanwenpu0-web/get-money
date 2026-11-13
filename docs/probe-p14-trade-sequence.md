@@ -125,6 +125,6 @@
 
 - `docs/probe-p14-trade-sequence.md` + `docs/probe-p14-trade-sequence.json`（成对，机器结果含 `decision` 字段）
 - `research/hypotheses/H-B-trade-sequence.md`（Gate 0 假设卡）、`research/experiments.jsonl`（`P14-001`）
-- `backend/scripts/probe_p14_common.py`（255 行）、`probe_p14_robust.py`（211 行）、`probe_p14_trade_sequence.py`（278 行）
+- `backend/scripts/probe_p14_common.py`（255 行）、`probe_p14_robust.py`（213 行）、`probe_p14_trade_sequence.py`（278 行）
 - `backend/tests/test_probe_p14_common.py`（13 项单测）、`output/probe_p14_frames.pkl`（标量帧缓存）
 - 当日工作记忆与长期记忆已登记

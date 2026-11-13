@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -42,6 +44,19 @@ def test_hysteresis_downgrades_need_a_three_point_margin():
     # Events are mutually exclusive crossings.
     assert not (result.weakening_event & result.recovery_event).any()
     assert result.transition_risk.dropna().between(0, 100).all()
+
+
+@pytest.mark.parametrize("wick", [0.0, 0.001])
+def test_flat_close_keeps_fdi_fallback_without_evaluating_log_zero(wick):
+    frame = _trending_frame(160)
+    frame["open"] = frame["close"] = 1.015
+    frame["high"], frame["low"] = 1.015 + wick, 1.015
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", RuntimeWarning)
+        result = trend_persistence_score(frame)
+    assert result.fractal_dimension.eq(1.5).all()
+    numeric = result.select_dtypes(include=[np.number]).to_numpy(dtype=float, na_value=np.nan)
+    assert not np.isinf(numeric).any()
 
 
 def test_choppy_market_scores_low():

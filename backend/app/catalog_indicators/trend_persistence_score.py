@@ -81,9 +81,12 @@ def trend_persistence_score(
     lowest_low = lowest(low, length)
     range_hl = highest_high - lowest_low
     path_length = sum_(src.diff().abs(), length)
+    usable_fdi = (range_hl > 0.0) & (path_length > 0.0)
+    # np.where evaluates both branches; mask before log so flat-close windows
+    # keep the existing 1.5 fallback without evaluating the discarded log(0).
+    ratio = path_length.where(usable_fdi) / range_hl.where(usable_fdi)
     fdi_raw = pd.Series(
-        np.where((range_hl > 0.0) & (path_length > 0.0),
-                 np.log(path_length / range_hl) / np.log(length) + 1.0, 1.5),
+        np.where(usable_fdi, np.log(ratio) / np.log(length) + 1.0, 1.5),
         index=frame.index)
     fdi_trend_score = (1.0 - _normalize(fdi_raw, fdi_trend, fdi_range)) * 100.0
 

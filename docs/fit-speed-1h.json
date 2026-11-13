@@ -1,0 +1,947 @@
+{
+  "interval": "1h",
+  "days": 95,
+  "symbol": "BTCUSDT",
+  "bars": 2279,
+  "load_s": 0.19,
+  "calc_s": 105.5,
+  "cols_s": 0.4,
+  "indicators": [
+    {
+      "name": "volume_strata",
+      "s": 36.292,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "auto_trendlines",
+      "s": 13.228,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "ichi_2d_overlay_profiles",
+      "s": 8.969,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "ichi_workflow_overlay",
+      "s": 8.233,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "ichi_workflow_overlay_profiles",
+      "s": 8.048,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "trading_range_state_machine",
+      "s": 5.068,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "wolfe_wave_scanner_pro",
+      "s": 4.475,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "money_flow_delta_profile",
+      "s": 3.498,
+      "bool_cols": 1,
+      "error": ""
+    },
+    {
+      "name": "wavetrend_v3",
+      "s": 1.998,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "crypto_amt_toolkit",
+      "s": 1.942,
+      "bool_cols": 43,
+      "error": ""
+    },
+    {
+      "name": "structure_break_risk",
+      "s": 1.908,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "market_structure_pivot_map",
+      "s": 0.743,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "ad_current_day_poc_vah_val",
+      "s": 0.609,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "triangle_compression_scanner_pro",
+      "s": 0.578,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "broadening_wedge_scanner_pro",
+      "s": 0.572,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "trade_permission_engine",
+      "s": 0.393,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "structural_wave_field",
+      "s": 0.374,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "fib_reaction_memory",
+      "s": 0.373,
+      "bool_cols": 11,
+      "error": ""
+    },
+    {
+      "name": "oscillator_cycle_statistics",
+      "s": 0.371,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "modern_wyckoff_state_machine_lite",
+      "s": 0.292,
+      "bool_cols": 18,
+      "error": ""
+    },
+    {
+      "name": "mtf_wavetrend_opportunity_hunter",
+      "s": 0.267,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "bayesian_trend_factor",
+      "s": 0.263,
+      "bool_cols": 12,
+      "error": ""
+    },
+    {
+      "name": "market_tradability_engine_v2",
+      "s": 0.237,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "jma_cluster_entries_with_market_structure",
+      "s": 0.236,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "time_to_react_volatility_time_bos_sweep_ob",
+      "s": 0.234,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "markov_state_engine",
+      "s": 0.213,
+      "bool_cols": 3,
+      "error": ""
+    },
+    {
+      "name": "market_motion_dna",
+      "s": 0.205,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "market_average_relationship_engine",
+      "s": 0.203,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "edge_atlas",
+      "s": 0.189,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "coilforge_zones_v1_2_2",
+      "s": 0.182,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "exhaustion_scanner",
+      "s": 0.177,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "market_state_engine",
+      "s": 0.177,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "capital41_liquidity_void_imbalance_map",
+      "s": 0.17,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "commodity_pulse_matrix_v4",
+      "s": 0.156,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "support_and_resistance_zones",
+      "s": 0.154,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "sfp_fvg_ifvg",
+      "s": 0.15,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "regime_transition_engine",
+      "s": 0.143,
+      "bool_cols": 1,
+      "error": ""
+    },
+    {
+      "name": "predictability_regime_index",
+      "s": 0.133,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "adaptive_arithmetic_candles_quality_score",
+      "s": 0.123,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "momentum_profile",
+      "s": 0.12,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "smc_structure_and_expectation",
+      "s": 0.116,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "mtf_stochrsi_pair_score",
+      "s": 0.114,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "vein_reversal_zones",
+      "s": 0.114,
+      "bool_cols": 15,
+      "error": ""
+    },
+    {
+      "name": "market_memory_and_decay_oscillator",
+      "s": 0.113,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "stock_stats",
+      "s": 0.11,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "mtf_wavetrend_tide_wave_ripple",
+      "s": 0.108,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "candle_story_engine",
+      "s": 0.104,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "capital41_pdh_pdl",
+      "s": 0.104,
+      "bool_cols": 12,
+      "error": ""
+    },
+    {
+      "name": "mtf_divergence",
+      "s": 0.101,
+      "bool_cols": 20,
+      "error": ""
+    },
+    {
+      "name": "market_scenario_projector",
+      "s": 0.091,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "liquidity_hunter",
+      "s": 0.085,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "sr_zones_plasmazero",
+      "s": 0.084,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "oscillator_divergence_zones",
+      "s": 0.082,
+      "bool_cols": 5,
+      "error": ""
+    },
+    {
+      "name": "vein_accumulation_phase_4h",
+      "s": 0.082,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "smooth_trend_radar",
+      "s": 0.081,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "market_exhaustion",
+      "s": 0.08,
+      "bool_cols": 11,
+      "error": ""
+    },
+    {
+      "name": "tweezer_and_kangaroo_zones",
+      "s": 0.077,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "regime_detector_ma_zones_overlay",
+      "s": 0.069,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "live_market_scanner_v7",
+      "s": 0.067,
+      "bool_cols": 22,
+      "error": ""
+    },
+    {
+      "name": "volume_profile_plus",
+      "s": 0.064,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "crypto_amt_session_bias_v2_companion",
+      "s": 0.064,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "wyckoff_schematics",
+      "s": 0.062,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "zigzag_fibo_pullback_map",
+      "s": 0.061,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "thestrat_suite",
+      "s": 0.058,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "sm_radar",
+      "s": 0.055,
+      "bool_cols": 23,
+      "error": ""
+    },
+    {
+      "name": "market_pressure_scale",
+      "s": 0.053,
+      "bool_cols": 13,
+      "error": ""
+    },
+    {
+      "name": "crypto_amt_ict_smc_companion_v1",
+      "s": 0.05,
+      "bool_cols": 12,
+      "error": ""
+    },
+    {
+      "name": "elliott_wave_radar",
+      "s": 0.048,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "reversal_engine_score_v1",
+      "s": 0.048,
+      "bool_cols": 15,
+      "error": ""
+    },
+    {
+      "name": "compression_fractal_release",
+      "s": 0.046,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "reversal_type_classifier_v1",
+      "s": 0.045,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "relative_leg_efficiency",
+      "s": 0.045,
+      "bool_cols": 1,
+      "error": ""
+    },
+    {
+      "name": "market_structure_advanced",
+      "s": 0.042,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "support_resistance",
+      "s": 0.042,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "cci_advanced",
+      "s": 0.04,
+      "bool_cols": 18,
+      "error": ""
+    },
+    {
+      "name": "commodity_heat_reversal",
+      "s": 0.039,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "trend_persistence_score",
+      "s": 0.037,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "capital41_order_block_v2",
+      "s": 0.037,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "storm_gauge",
+      "s": 0.037,
+      "bool_cols": 5,
+      "error": ""
+    },
+    {
+      "name": "smc_toolkit",
+      "s": 0.036,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "elder_ray_pressure_engine",
+      "s": 0.035,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "mso_market_stress_oscillator",
+      "s": 0.033,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "modern_trend_regime",
+      "s": 0.033,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "midas_2_0",
+      "s": 0.032,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "oscillator_topology",
+      "s": 0.03,
+      "bool_cols": 1,
+      "error": ""
+    },
+    {
+      "name": "fisher_transform_advanced",
+      "s": 0.029,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "bitcoin_market_regime",
+      "s": 0.029,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "mtf_nearest_support_resistance",
+      "s": 0.028,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "mtf_structure_bias",
+      "s": 0.025,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "capital41_regime_matrix",
+      "s": 0.025,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "zigzag_patterns",
+      "s": 0.024,
+      "bool_cols": 13,
+      "error": ""
+    },
+    {
+      "name": "anchored_vwap",
+      "s": 0.024,
+      "bool_cols": 3,
+      "error": ""
+    },
+    {
+      "name": "harmonic_patterns",
+      "s": 0.024,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "rsi_advanced",
+      "s": 0.023,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "capital41_divergence_detector",
+      "s": 0.023,
+      "bool_cols": 14,
+      "error": ""
+    },
+    {
+      "name": "signal_quality_engine",
+      "s": 0.022,
+      "bool_cols": 11,
+      "error": ""
+    },
+    {
+      "name": "commodity_flowtrend",
+      "s": 0.022,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "swing_conviction_radar",
+      "s": 0.021,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "stoch_rsi_advanced",
+      "s": 0.021,
+      "bool_cols": 18,
+      "error": ""
+    },
+    {
+      "name": "adaptive_cycle_detector",
+      "s": 0.021,
+      "bool_cols": 5,
+      "error": ""
+    },
+    {
+      "name": "atr_advanced",
+      "s": 0.021,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "ma_regime_bands",
+      "s": 0.019,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "ma_cascade_engine",
+      "s": 0.018,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "multi_symbol_ema_bounce_alerts",
+      "s": 0.018,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "klinger_volume_force_map",
+      "s": 0.017,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "regime_classifier",
+      "s": 0.017,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "gcr_strategy_scanner_tradingview",
+      "s": 0.017,
+      "bool_cols": 12,
+      "error": ""
+    },
+    {
+      "name": "zigzag_core",
+      "s": 0.015,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "vwap_cross_visuals",
+      "s": 0.015,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "pivot_momentum_structure",
+      "s": 0.015,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "chandelier_flip_radar",
+      "s": 0.015,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "momentum_trajectory",
+      "s": 0.014,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "mfi_advanced",
+      "s": 0.014,
+      "bool_cols": 19,
+      "error": ""
+    },
+    {
+      "name": "capital41_adx_filter",
+      "s": 0.014,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "roc_advanced",
+      "s": 0.013,
+      "bool_cols": 16,
+      "error": ""
+    },
+    {
+      "name": "tsi_advanced",
+      "s": 0.013,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "adx_advanced",
+      "s": 0.013,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "capital41_structure_swings",
+      "s": 0.013,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "capital41_fusion_oscillator",
+      "s": 0.013,
+      "bool_cols": 13,
+      "error": ""
+    },
+    {
+      "name": "capital41_fusion_scalp",
+      "s": 0.013,
+      "bool_cols": 11,
+      "error": ""
+    },
+    {
+      "name": "williams_pct_r_advanced",
+      "s": 0.012,
+      "bool_cols": 17,
+      "error": ""
+    },
+    {
+      "name": "williams_vix_fix_advanced",
+      "s": 0.011,
+      "bool_cols": 12,
+      "error": ""
+    },
+    {
+      "name": "capital41_confluence_core",
+      "s": 0.01,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "capital41_oscillator",
+      "s": 0.009,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "capital41_duo",
+      "s": 0.009,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "s_r_zones_mtf",
+      "s": 0.008,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "capital41_duo_oscillator",
+      "s": 0.008,
+      "bool_cols": 8,
+      "error": ""
+    },
+    {
+      "name": "alert_engine_webhook",
+      "s": 0.008,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "volume_flow_anomaly",
+      "s": 0.008,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "btc_scalping_signals",
+      "s": 0.007,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "rsi_trading_signals",
+      "s": 0.007,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "sessionvwap_sdbands",
+      "s": 0.006,
+      "bool_cols": 7,
+      "error": ""
+    },
+    {
+      "name": "capital41_atr_volatility_bands",
+      "s": 0.006,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "capital41_session_vwap",
+      "s": 0.006,
+      "bool_cols": 6,
+      "error": ""
+    },
+    {
+      "name": "cvd_bias",
+      "s": 0.005,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "atr_helper",
+      "s": 0.005,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "capital41_liquidity_sweep",
+      "s": 0.005,
+      "bool_cols": 5,
+      "error": ""
+    },
+    {
+      "name": "smart_money_concepts",
+      "s": 0.005,
+      "bool_cols": 10,
+      "error": ""
+    },
+    {
+      "name": "h1_candles_on_m15",
+      "s": 0.005,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "wavetrend_advanced_smoothing",
+      "s": 0.004,
+      "bool_cols": 4,
+      "error": ""
+    },
+    {
+      "name": "volatility_adjusted_momentum",
+      "s": 0.004,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "bullish_lines_four_state",
+      "s": 0.003,
+      "bool_cols": 9,
+      "error": ""
+    },
+    {
+      "name": "candle_pressure_index",
+      "s": 0.002,
+      "bool_cols": 2,
+      "error": ""
+    },
+    {
+      "name": "mtf_strategy_visual",
+      "s": 0.002,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "d1_bollinger_on_m15",
+      "s": 0.002,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "h1_bollinger_on_m15",
+      "s": 0.002,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "futures_context_module",
+      "s": 0.001,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "btc_logarithmic_growth_curves",
+      "s": 0.001,
+      "bool_cols": 0,
+      "error": ""
+    },
+    {
+      "name": "multi_timeframe_trend",
+      "s": 0.001,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "relative_strength_line",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "capital41_crypto_perp_stress",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "coinbase_premium",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "btc_arbitrage",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "mvrv_regime_monitor",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "btc_altcoin_trend",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    },
+    {
+      "name": "cic",
+      "s": 0.0,
+      "bool_cols": 0,
+      "error": "ValueError"
+    }
+  ]
+}

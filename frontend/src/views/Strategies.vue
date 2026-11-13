@@ -40,7 +40,7 @@ let symbolsPromise = null
 let bindingsPromise = null
 let disposed = false
 
-const intervalOptions = ['1m', '5m', '15m', '1h', '4h', '1d']
+const intervalOptions = ['1m', '5m', '15m', '30m', '1h', '4h', '1d']
 
 // 预演可以选一条「策略 × 池」绑定作为参数层；选中后周期跟着绑定走，
 // 因为后端取参数时要求 (策略, 池, 周期) 三元组精确命中。

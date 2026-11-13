@@ -1,0 +1,26 @@
+{
+  "generated_at_ms": 1794445060977,
+  "last_complete_hour_ms": 1794438000000,
+  "universe_size": 2,
+  "dry_run": false,
+  "status_counts": {
+    "fresh": 1,
+    "ok": 1
+  },
+  "rows_inserted": 11,
+  "results": [
+    {
+      "symbol": "RESOLVUSDT",
+      "status": "fresh",
+      "latest": 1794438000000,
+      "rows": 0
+    },
+    {
+      "symbol": "SAPIENUSDT",
+      "status": "ok",
+      "latest": 1794409200000,
+      "target": 1794438000000,
+      "rows": 11
+    }
+  ]
+}

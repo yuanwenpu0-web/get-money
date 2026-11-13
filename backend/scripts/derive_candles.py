@@ -45,6 +45,12 @@ def main() -> int:
     ap.add_argument("--symbols", default="", help="逗号分隔，留空表示全币种")
     ap.add_argument("--min-fill", type=float, default=0.75)
     ap.add_argument("--batch", type=int, default=50)
+    ap.add_argument(
+        "--since-days",
+        type=int,
+        default=0,
+        help="只读源周期最近 N 天（源是 1m 时强烈建议给，否则会把几千万行读进内存）",
+    )
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -62,10 +68,15 @@ def main() -> int:
         print(f"[dry-run] 源 {args.source} 有 {n_src} 个币；未写入任何数据")
         return 0
 
+    since_ms = None
+    if args.since_days:
+        since_ms = int(time.time() * 1000) - args.since_days * 86_400_000
+        print(f"[since ] 只读 {args.source} 最近 {args.since_days} 天（>= {since_ms}）")
     started = time.time()
     result = derive_interval(
         db, source=args.source, target=args.target,
         symbols=symbols or None, min_fill=args.min_fill, batch=args.batch,
+        since_ms=since_ms,
     )
     print(f"[derive] {result}")
     after = coverage(db, args.target)

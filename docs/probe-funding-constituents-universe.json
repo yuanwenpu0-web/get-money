@@ -1,0 +1,5683 @@
+{
+  "experiment_id": "P11-007",
+  "generated_at": "2026-11-13T06:23:07.691183+00:00",
+  "endpoint": "https://fapi.binance.com/fapi/v1/constituents",
+  "scope": "Current official index constituents for frozen 146 candidates; not historical identity verification",
+  "summary": {
+    "total_candidates": 146,
+    "requests": 146,
+    "http_200": 146,
+    "gate_constituent": 108,
+    "mexc_constituent": 123,
+    "either_constituent": 140,
+    "statuses": {
+      "200": 146
+    }
+  },
+  "rows": [
+    {
+      "symbol": "1000000MOGUSDT",
+      "retrieved_at": "2026-11-13T06:21:39.217862+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "1000000MOGUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "MOG_USDT*1000000",
+            "price": "0.08453000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "MOG-USDT*1000000",
+            "price": "0.08440000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MOGUSDT*1000000",
+            "price": "0.08458000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MOGUSDT*1000000",
+            "price": "0.08460000",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "1000RATSUSDT",
+      "retrieved_at": "2026-11-13T06:21:40.436183+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "1000RATSUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "RATS_USDT*1000",
+            "price": "0.01263600",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "RATS-USDT*1000",
+            "price": "0.01252000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "RATSUSDT*1000",
+            "price": "0.01240000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "RATSUSDT*1000",
+            "price": "0.01259000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "RATSUSDT*1000",
+            "price": "0.01254000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ACUUSDT",
+      "retrieved_at": "2026-11-13T06:21:41.001360+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ACUUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ACU_USDT",
+            "price": "0.11990000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ACU-USDT",
+            "price": "0.11986000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ACUUSDT",
+            "price": "0.12013000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ACUUSDT",
+            "price": "0.11968551",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AGTUSDT",
+      "retrieved_at": "2026-11-13T06:21:41.580520+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AGTUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "AGT-USDT",
+            "price": "0.05724400",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AGTUSDT",
+            "price": "0.05678300",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "AGT-WBNB*uindex(BNBUSDT)",
+            "price": "0.05683947",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AGTUSDT",
+            "price": "0.05693000",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AIAUSDT",
+      "retrieved_at": "2026-11-13T06:21:42.153969+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AIAUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "AIAUSDT",
+            "price": "0.06374000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "AIAUSDT",
+            "price": "0.06398200",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AIAUSDT",
+            "price": "0.06451000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "AIAUSDT",
+            "price": "0.06508440",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AINUSDT",
+      "retrieved_at": "2026-11-13T06:21:42.734382+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AINUSDT",
+        "time": 1794550881069,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AIN_USDT",
+            "price": "0.10667000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AIN-USDT",
+            "price": "0.10613000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AINUSDT",
+            "price": "0.10565000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AINUSDT",
+            "price": "0.10662000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "AINUSDT",
+            "price": "0.10616619",
+            "weight": "0.28571429"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AIOTUSDT",
+      "retrieved_at": "2026-11-13T06:21:43.303947+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AIOTUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AIOT_USDT",
+            "price": "0.14707000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AIOTUSDT",
+            "price": "0.14476800",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "AIOT-WBNB*uindex(BNBUSDT)",
+            "price": "0.14698063",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AIOTUSDT",
+            "price": "0.14775000",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AIOUSDT",
+      "retrieved_at": "2026-11-13T06:21:43.893299+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AIOUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AIO_USDT",
+            "price": "0.03921000",
+            "weight": "0.05263158"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AIO-USDT",
+            "price": "0.03913000",
+            "weight": "0.10526316"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AIOUSDT",
+            "price": "0.03905000",
+            "weight": "0.21052632"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "AIOUSDT",
+            "price": "0.03915500",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AIOUSDT",
+            "price": "0.03932000",
+            "weight": "0.31578947"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AKEUSDT",
+      "retrieved_at": "2026-11-13T06:21:44.475033+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AKEUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AKE_USDT",
+            "price": "0.00421500",
+            "weight": "0.23529412"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AKE-USDT",
+            "price": "0.00422520",
+            "weight": "0.14705882"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AKEUSDT",
+            "price": "0.00431120",
+            "weight": "0.08823529"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "AKEUSDT",
+            "price": "0.00423500",
+            "weight": "0.35294118"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "AKEUSDT",
+            "price": "0.00427067",
+            "weight": "0.17647059"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AKTUSDT",
+      "retrieved_at": "2026-11-13T06:21:45.046439+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AKTUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "AKT-USD*uindex(USDUSDT)",
+            "price": "0.56147552",
+            "weight": "0.54545455"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "AKT_USDT",
+            "price": "0.56240000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AKT-USDT",
+            "price": "0.56140000",
+            "weight": "0.27272727"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ALCHUSDT",
+      "retrieved_at": "2026-11-13T06:21:45.616484+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ALCHUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ALCH_USDT",
+            "price": "0.03245000",
+            "weight": "0.21052632"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ALCHUSDT",
+            "price": "0.03240000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ALCHUSDT",
+            "price": "0.03230000",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ALCHUSDT",
+            "price": "0.03244000",
+            "weight": "0.31578947"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "APRUSDT",
+      "retrieved_at": "2026-11-13T06:21:46.188399+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "APRUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "APRUSDT",
+            "price": "0.03746000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "APRUSDT",
+            "price": "0.03738000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "APRUSDT",
+            "price": "0.03740000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "APRUSDT",
+            "price": "0.03727876",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ARCUSDT",
+      "retrieved_at": "2026-11-13T06:21:46.758101+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ARCUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ARC_USDT",
+            "price": "0.03080000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ARCUSDT",
+            "price": "0.03086000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ARCUSDT",
+            "price": "0.03046857",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ARIAUSDT",
+      "retrieved_at": "2026-11-13T06:21:47.324556+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ARIAUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ARIA_USDT",
+            "price": "0.21552000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ARIAUSDT",
+            "price": "0.21434000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "1/USDT-ARIA",
+            "price": "0.21509201",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ARIAUSDT",
+            "price": "0.21564000",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ARXUSDT",
+      "retrieved_at": "2026-11-13T06:21:47.883112+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ARXUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "ARX-USD*uindex(USDUSDT)",
+            "price": "0.20380891",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ARX-USDT",
+            "price": "0.20595000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ARXUSDT",
+            "price": "0.20570000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "ARXUSDT",
+            "price": "0.20599000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ARXUSDT",
+            "price": "0.20590000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ARXUSDT",
+            "price": "0.20536168",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ATHUSDT",
+      "retrieved_at": "2026-11-13T06:21:48.452998+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ATHUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "ATH-USDT",
+            "price": "0.00432100",
+            "weight": "0.41379310"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "ATH_USDT",
+            "price": "0.00432300",
+            "weight": "0.13793103"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ATHUSDT",
+            "price": "0.00430600",
+            "weight": "0.20689655"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "ATHUSDT",
+            "price": "0.00431300",
+            "weight": "0.03448276"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ATHUSDT",
+            "price": "0.00432400",
+            "weight": "0.20689655"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AVAAIUSDT",
+      "retrieved_at": "2026-11-13T06:21:49.024193+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AVAAIUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AVAAI_USDT",
+            "price": "0.00592700",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AVAAI-USDT",
+            "price": "0.00592000",
+            "weight": "0.46153846"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AVAAIUSDT",
+            "price": "0.00590000",
+            "weight": "0.23076923"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "AZTECUSDT",
+      "retrieved_at": "2026-11-13T06:21:49.592723+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "AZTECUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "AZTEC_USDT",
+            "price": "0.01184100",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "AZTEC-USDT",
+            "price": "0.01178000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "AZTECUSDT",
+            "price": "0.01178000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "AZTECUSDT",
+            "price": "0.01185000",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "B2USDT",
+      "retrieved_at": "2026-11-13T06:21:50.164245+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "B2USDT",
+        "time": 1794550881063,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "B2_USDT",
+            "price": "0.40410000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "B2-USDT",
+            "price": "0.40200000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "B2USDT",
+            "price": "0.40307000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "B2USDT",
+            "price": "0.40412000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "B2-WBNB*uindex(BNBUSDT)",
+            "price": "0.40443605",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BANUSDT",
+      "retrieved_at": "2026-11-13T06:21:50.755803+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BANUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BAN_USDT",
+            "price": "0.04315000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BAN-USDT",
+            "price": "0.04280000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BANUSDT",
+            "price": "0.04297000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BANUSDT",
+            "price": "0.04305000",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BASEDUSDT",
+      "retrieved_at": "2026-11-13T06:21:51.314890+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BASEDUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "BASED-USDT",
+            "price": "0.03883000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "BASED1-USD*uindex(USDUSDT)",
+            "price": "0.03873971",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BASED-USDT",
+            "price": "0.03759000",
+            "weight": "0.07407407"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BASEDUSDT",
+            "price": "0.03886000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BASEDUSDT",
+            "price": "0.03884000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BASEDUSDT",
+            "price": "0.03879211",
+            "weight": "0.37037037"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BASUSDT",
+      "retrieved_at": "2026-11-13T06:21:51.893791+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BASUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "BAS-USDT",
+            "price": "0.01278000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BASUSDT",
+            "price": "0.01274200",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "BAS-WBNB*uindex(BNBUSDT)",
+            "price": "0.01280393",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BASUSDT",
+            "price": "0.01281500",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BEATUSDT",
+      "retrieved_at": "2026-11-13T06:21:52.460246+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BEATUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BEAT_USDT",
+            "price": "0.07862000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BEATUSDT",
+            "price": "0.07839000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BEATUSDT",
+            "price": "0.07861000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BEATUSDT",
+            "price": "0.07818659",
+            "weight": "0.35000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BILLUSDT",
+      "retrieved_at": "2026-11-13T06:21:53.478845+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BILLUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "BILL-USD*uindex(USDUSDT)",
+            "price": "0.00429440",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BILL-USDT",
+            "price": "0.00426000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BILLUSDT",
+            "price": "0.00425600",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BILLUSDT",
+            "price": "0.00428000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BILLUSDT",
+            "price": "0.00429000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BILLUSDT",
+            "price": "0.00426141",
+            "weight": "0.22222222"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BIRBUSDT",
+      "retrieved_at": "2026-11-13T06:21:54.150040+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BIRBUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "BIRB-USD*uindex(USDUSDT)",
+            "price": "0.07317501",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BIRB-USDT",
+            "price": "0.07343000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BIRBUSDT",
+            "price": "0.07343000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BIRBUSDT",
+            "price": "0.07318000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BIRBUSDT",
+            "price": "0.07351000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BIRBUSDT",
+            "price": "0.07366504",
+            "weight": "0.36363636"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BLESSUSDT",
+      "retrieved_at": "2026-11-13T06:21:54.723341+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BLESSUSDT",
+        "time": 1794550881063,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BLESS_USDT",
+            "price": "0.00844700",
+            "weight": "0.17391304"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BLESSUSDT",
+            "price": "0.00826500",
+            "weight": "0.08695652"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BLESSUSDT",
+            "price": "0.00844520",
+            "weight": "0.21739130"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BLESSUSDT",
+            "price": "0.00845000",
+            "weight": "0.17391304"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BLESSUSDT",
+            "price": "0.00843305",
+            "weight": "0.34782609"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BLUAIUSDT",
+      "retrieved_at": "2026-11-13T06:21:55.297382+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BLUAIUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BLUAI_USDT",
+            "price": "0.00732400",
+            "weight": "0.03125000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BLUAI-USDT",
+            "price": "0.00692700",
+            "weight": "0.15625000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BLUAIUSDT",
+            "price": "0.00693200",
+            "weight": "0.06250000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BLUAIUSDT",
+            "price": "0.00698400",
+            "weight": "0.37500000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BLUAIUSDT",
+            "price": "0.00701300",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BLUAIUSDT",
+            "price": "0.00696022",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BRETTUSDT",
+      "retrieved_at": "2026-11-13T06:21:55.874356+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BRETTUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BRETT_USDT",
+            "price": "0.00354200",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BRETT-USDT",
+            "price": "0.00354800",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BRETTUSDT",
+            "price": "0.00354700",
+            "weight": "0.50000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BROCCOLIF3BUSDT",
+      "retrieved_at": "2026-11-13T06:21:56.449758+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BROCCOLIF3BUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "BROCCOLIF3BUSDT",
+            "price": "0.00464300",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "BROCCOLIF3B-WBNB*uindex(BNBUSDT)",
+            "price": "0.00464154",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BROCCOLIF3BUSDT",
+            "price": "0.00467600",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BRUSDT",
+      "retrieved_at": "2026-11-13T06:21:57.021201+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BRUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BR_USDT",
+            "price": "0.43912000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BRUSDT",
+            "price": "0.43900000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BRUSDT",
+            "price": "0.43880000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BRUSDT",
+            "price": "0.43982000",
+            "weight": "0.35000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BSBUSDT",
+      "retrieved_at": "2026-11-13T06:21:57.593444+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BSBUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "BSBUSDT",
+            "price": "0.08239000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BSBUSDT",
+            "price": "0.08273000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "BSBUSDT",
+            "price": "0.08260000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BSBUSDT",
+            "price": "0.08279000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BSBUSDT",
+            "price": "0.08261576",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BSVUSDT",
+      "retrieved_at": "2026-11-13T06:21:58.160516+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BSVUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BSV_USDT",
+            "price": "15.35000000",
+            "weight": "0.35294118"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BSVUSDT",
+            "price": "15.36000000",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BSVUSDT",
+            "price": "15.36000000",
+            "weight": "0.35294118"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BSVUSDT",
+            "price": "15.32000000",
+            "weight": "0.11764706"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BTRUSDT",
+      "retrieved_at": "2026-11-13T06:21:58.731524+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BTRUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BTR_USDT",
+            "price": "0.04239000",
+            "weight": "0.07692308"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "BTR-USDT",
+            "price": "0.04243000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BTRUSDT",
+            "price": "0.04206000",
+            "weight": "0.23076923"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "1/USDT-BTR",
+            "price": "0.04239603",
+            "weight": "0.53846154"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BTWUSDT",
+      "retrieved_at": "2026-11-13T06:21:59.297621+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BTWUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "BTW_USDT",
+            "price": "0.76820000",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "BTWUSDT",
+            "price": "0.76683800",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "BTWUSDT",
+            "price": "0.76819100",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BTWUSDT",
+            "price": "0.76290000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BTWUSDT",
+            "price": "0.76849816",
+            "weight": "0.27272727"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "BULLAUSDT",
+      "retrieved_at": "2026-11-13T06:22:00.305920+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "BULLAUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "BULLAUSDT",
+            "price": "0.04843800",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "BULLAUSDT",
+            "price": "0.04803000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "BULLAUSDT",
+            "price": "0.04778300",
+            "weight": "0.57142857"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CAPUSDT",
+      "retrieved_at": "2026-11-13T06:22:00.896371+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CAPUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "CAP-USD*uindex(USDUSDT)",
+            "price": "0.10403664",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CAP-USDT",
+            "price": "0.10429400",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "CAPUSDT",
+            "price": "0.10410000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CAPUSDT",
+            "price": "0.10366219",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CARVUSDT",
+      "retrieved_at": "2026-11-13T06:22:01.479417+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CARVUSDT",
+        "time": 1794550881069,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "CARV_USDT",
+            "price": "0.02499000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CARVUSDT",
+            "price": "0.02497000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "CARVUSDT",
+            "price": "0.02497000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(USD1USDT)/USD1-CARV",
+            "price": "0.02498850",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CCUSDT",
+      "retrieved_at": "2026-11-13T06:22:02.050863+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CCUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "CC-USDT",
+            "price": "0.08681000",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "CC_USDT",
+            "price": "0.08695000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CC-USDT",
+            "price": "0.08693000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CCUSDT",
+            "price": "0.08177000",
+            "weight": "0.05128205"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CCUSDT",
+            "price": "0.08685000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "CCUSDT",
+            "price": "0.08694000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "CCUSDT",
+            "price": "0.08663000",
+            "weight": "0.02564103"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CHILLGUYUSDT",
+      "retrieved_at": "2026-11-13T06:22:02.616360+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CHILLGUYUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "CHILLGUY_USDT",
+            "price": "0.00792300",
+            "weight": "0.21052632"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CHILLGUY-USDT",
+            "price": "0.00791000",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CHILLGUYUSDT",
+            "price": "0.00790800",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "CHILLGUYUSDT",
+            "price": "0.00792400",
+            "weight": "0.31578947"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CLANKERUSDT",
+      "retrieved_at": "2026-11-13T06:22:03.186660+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CLANKERUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "CLANKER-USD*uindex(USDUSDT)",
+            "price": "12.68300024",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "CLANKER_USDT",
+            "price": "12.69000000",
+            "weight": "0.10526316"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CLANKER-USDT",
+            "price": "12.61000000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CLANKERUSDT",
+            "price": "12.70000000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CLANKERUSDT",
+            "price": "12.64000000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CLANKERUSDC*uindex(USDCUSDT)",
+            "price": "12.51737240",
+            "weight": "0.10526316"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CLOUSDT",
+      "retrieved_at": "2026-11-13T06:22:03.759211+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CLOUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "CLO-USDT",
+            "price": "0.03255000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CLOUSDT",
+            "price": "0.03247000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "CLOUSDT",
+            "price": "0.03297000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CLOUSDT",
+            "price": "0.03268180",
+            "weight": "0.60000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "COAIUSDT",
+      "retrieved_at": "2026-11-13T06:22:04.327217+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "COAIUSDT",
+        "time": 1794550881063,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "COAIUSDT",
+            "price": "0.19380000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "COAIUSDT",
+            "price": "0.19360000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "COAIUSDT",
+            "price": "0.19460000",
+            "weight": "0.29629630"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "COAIUSDC*uindex(USDCUSDT)",
+            "price": "0.19415532",
+            "weight": "0.37037037"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "COLLECTUSDT",
+      "retrieved_at": "2026-11-13T06:22:04.892884+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "COLLECTUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "bitget",
+            "symbol": "COLLECTUSDT",
+            "price": "0.02476700",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "COLLECTUSDT",
+            "price": "0.02483000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "COLLECTUSDT",
+            "price": "0.02472654",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CROSSUSDT",
+      "retrieved_at": "2026-11-13T06:22:05.469742+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CROSSUSDT",
+        "time": 1794550881067,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "CROSS_USDT",
+            "price": "0.10962000",
+            "weight": "0.19047619"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CROSS-USDT",
+            "price": "0.10962000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CROSSUSDT",
+            "price": "0.10938000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CROSSUSDT",
+            "price": "0.10935900",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "1/USDT-CROSS",
+            "price": "0.10963150",
+            "weight": "0.09523810"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CTRUSDT",
+      "retrieved_at": "2026-11-13T06:22:06.041634+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CTRUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "CTR_USDT",
+            "price": "0.01449900",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CTR-USDT",
+            "price": "0.01448100",
+            "weight": "0.13636364"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CTRUSDT",
+            "price": "0.01450200",
+            "weight": "0.13636364"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CTRUSDT",
+            "price": "0.01445156",
+            "weight": "0.45454545"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CTUSDT",
+      "retrieved_at": "2026-11-13T06:22:06.611976+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CTUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "CT-USDT",
+            "price": "0.10915000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "CT-USD*uindex(USDUSDT)",
+            "price": "0.10908181",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "CT_USDT",
+            "price": "0.10912000",
+            "weight": "0.09523810"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CT-USDT",
+            "price": "0.10910000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CTUSDT",
+            "price": "0.10897000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CTUSDT",
+            "price": "0.10913257",
+            "weight": "0.04761905"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "CYSUSDT",
+      "retrieved_at": "2026-11-13T06:22:07.652334+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "CYSUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "CYS_USDT",
+            "price": "0.06936000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "CYS-USDT",
+            "price": "0.06937000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "CYSUSDT",
+            "price": "0.06910000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "CYSUSDT",
+            "price": "0.06912000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "CYSUSDT",
+            "price": "0.06930000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "CYSUSDT",
+            "price": "0.06924047",
+            "weight": "0.10000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "DEEPUSDT",
+      "retrieved_at": "2026-11-13T06:22:08.228683+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "DEEPUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "DEEP_USDT",
+            "price": "0.01351400",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "DEEP-USDT",
+            "price": "0.01351900",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "DEEPUSDT",
+            "price": "0.01349900",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "DEEPUSDT",
+            "price": "0.01349000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "DEEPUSDT",
+            "price": "0.01352000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "DOODUSDT",
+      "retrieved_at": "2026-11-13T06:22:08.815865+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "DOODUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "DOOD-USDT",
+            "price": "0.00156200",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "DOOD_USDT",
+            "price": "0.00156000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "DOOD-USDT",
+            "price": "0.00156700",
+            "weight": "0.10714286"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "DOODUSDT",
+            "price": "0.00155500",
+            "weight": "0.10714286"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "DOODUSDT",
+            "price": "0.00156300",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "DOOD-USDC*uindex(USDCUSDT)",
+            "price": "0.00155985",
+            "weight": "0.07142857"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "DOSUSDT",
+      "retrieved_at": "2026-11-13T06:22:09.382435+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "DOSUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "DOS-USDT",
+            "price": "0.16750000",
+            "weight": "0.02857143"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "DOS_USDT",
+            "price": "0.16740000",
+            "weight": "0.11428571"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "DOS-USDT",
+            "price": "0.16740000",
+            "weight": "0.17142857"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "DOSUSDT",
+            "price": "0.16737000",
+            "weight": "0.17142857"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "DOSUSDT",
+            "price": "0.16730000",
+            "weight": "0.17142857"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "DOSUSDT",
+            "price": "0.16723085",
+            "weight": "0.34285714"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "DRIFTUSDT",
+      "retrieved_at": "2026-11-13T06:22:09.955315+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "DRIFTUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "DRIFT-USD*uindex(USDUSDT)",
+            "price": "0.01115143",
+            "weight": "0.06250000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "DRIFT_USDT",
+            "price": "0.01118200",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "DRIFTUSDT",
+            "price": "0.01119000",
+            "weight": "0.43750000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "DRIFTUSDT",
+            "price": "0.01122000",
+            "weight": "0.37500000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "EDGEUSDT",
+      "retrieved_at": "2026-11-13T06:22:10.535802+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "EDGEUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "EDGE-USDT",
+            "price": "0.33300000",
+            "weight": "0.14634146"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "EDGEX-USD*uindex(USDUSDT)",
+            "price": "0.33194024",
+            "weight": "0.07317073"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "EDGEX_USDT",
+            "price": "0.33180000",
+            "weight": "0.04878049"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "EDGE-USDT",
+            "price": "0.33150000",
+            "weight": "0.07317073"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "EDGEUSDT",
+            "price": "0.33240000",
+            "weight": "0.07317073"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "EDGEUSDT",
+            "price": "0.33190000",
+            "weight": "0.07317073"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "EDGEUSDT",
+            "price": "0.33250000",
+            "weight": "0.14634146"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "EDGEUSDT",
+            "price": "0.33213136",
+            "weight": "0.36585366"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ELSAUSDT",
+      "retrieved_at": "2026-11-13T06:22:11.113866+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ELSAUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ELSA_USDT",
+            "price": "0.06766000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ELSA-USDT",
+            "price": "0.06754000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ELSAUSDT",
+            "price": "0.06714000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ELSAUSDT",
+            "price": "0.06761000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ELSAUSDT",
+            "price": "0.06739029",
+            "weight": "0.36363636"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "EPICUSDT",
+      "retrieved_at": "2026-11-13T06:22:11.680593+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "EPICUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "EPIC_USDT",
+            "price": "0.08662000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "EPIC-USDT",
+            "price": "0.08680000",
+            "weight": "0.37500000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "EPICUSDT",
+            "price": "0.08650000",
+            "weight": "0.37500000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ESPORTSUSDT",
+      "retrieved_at": "2026-11-13T06:22:12.249476+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ESPORTSUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "ESPORTS-USDT",
+            "price": "0.00909000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(BNBUSDT)/WBNB-ESPORTS",
+            "price": "0.00885820",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ESPORTSUSDT",
+            "price": "0.00901800",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ESPORTSUSDT",
+            "price": "0.00907056",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ETHWUSDT",
+      "retrieved_at": "2026-11-13T06:22:12.874453+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ETHWUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "ETHW-USDT",
+            "price": "0.19800000",
+            "weight": "0.42857143"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "ETHW_USDT",
+            "price": "0.19910000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ETHWUSDT",
+            "price": "0.19940000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ETHWUSDT",
+            "price": "0.19780000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "EVAAUSDT",
+      "retrieved_at": "2026-11-13T06:22:13.448808+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "EVAAUSDT",
+        "time": 1794550881065,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "EVAA_USDT",
+            "price": "1.06120000",
+            "weight": "0.14893617"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "EVAAUSDT",
+            "price": "1.04900000",
+            "weight": "0.06382979"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "EVAAUSDT",
+            "price": "1.06060000",
+            "weight": "0.14893617"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "EVAAUSDT",
+            "price": "1.05894108",
+            "weight": "0.63829787"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FARTCOINUSDT",
+      "retrieved_at": "2026-11-13T06:22:14.020888+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FARTCOINUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "FARTCOIN-USD*uindex(USDUSDT)",
+            "price": "0.10644911",
+            "weight": "0.35294118"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "FARTCOIN_USDT",
+            "price": "0.10642000",
+            "weight": "0.11764706"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "FARTCOIN-USDT",
+            "price": "0.10610000",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "FARTCOINUSDT",
+            "price": "0.10636000",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "FARTCOINUSDT",
+            "price": "0.10640000",
+            "weight": "0.17647059"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FHEUSDT",
+      "retrieved_at": "2026-11-13T06:22:14.593398+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FHEUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "FHE_USDT",
+            "price": "0.01514000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "FHEUSDT",
+            "price": "0.01512000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "FHEUSDT",
+            "price": "0.01513000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "FHEUSDT",
+            "price": "0.01511000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "FHEUSDT",
+            "price": "0.01520000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FIGHTUSDT",
+      "retrieved_at": "2026-11-13T06:22:15.164579+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FIGHTUSDT",
+        "time": 1794550881064,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "FIGHT-USD*uindex(USDUSDT)",
+            "price": "0.00332341",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "FIGHT-USDT",
+            "price": "0.00326300",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "FIGHTUSDT",
+            "price": "0.00324600",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "FIGHTUSDT",
+            "price": "0.00323300",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "FIGHTUSDT",
+            "price": "0.00324660",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FLOCKUSDT",
+      "retrieved_at": "2026-11-13T06:22:15.730859+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FLOCKUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "FLOCK-USD*uindex(USDUSDT)",
+            "price": "0.03723216",
+            "weight": "0.17391304"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "FLOCK_USDT",
+            "price": "0.03730000",
+            "weight": "0.17391304"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "FLOCKUSDT",
+            "price": "0.03721000",
+            "weight": "0.13043478"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "FLOCKUSDT",
+            "price": "0.03725000",
+            "weight": "0.26086957"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "FLOCKUSDT",
+            "price": "0.03732000",
+            "weight": "0.26086957"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FLUIDUSDT",
+      "retrieved_at": "2026-11-13T06:22:16.298106+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FLUIDUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "FLUID-USDT",
+            "price": "1.92970000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "FLUID_USDT",
+            "price": "1.93070000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "FLUIDUSDT",
+            "price": "1.92580000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "uniswapV3",
+            "symbol": "FLUID-WETH*uindex(ETHUSDT)",
+            "price": "1.94303413",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "FOLKSUSDT",
+      "retrieved_at": "2026-11-13T06:22:16.970278+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "FOLKSUSDT",
+        "time": 1794550881063,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "FOLKS-USDT",
+            "price": "2.39250000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "FOLKSUSDT",
+            "price": "2.38260000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "FOLKSUSDT",
+            "price": "2.39000000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "FOLKSUSDT",
+            "price": "2.38546744",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GOATUSDT",
+      "retrieved_at": "2026-11-13T06:22:17.540990+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GOATUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "GOAT_USDT",
+            "price": "0.01187000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "GOAT-USDT",
+            "price": "0.01179000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "GOATUSDT",
+            "price": "0.01188000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "GOATUSDT",
+            "price": "0.01184000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "GOATUSDT",
+            "price": "0.01185000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GRASSUSDT",
+      "retrieved_at": "2026-11-13T06:22:18.100759+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GRASSUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "GRASS-USDT",
+            "price": "0.43850000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "GRASS_USDT",
+            "price": "0.43870000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "GRASS-USDT",
+            "price": "0.43830000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "GRASSUSDT",
+            "price": "0.43820000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "GRASSUSDT",
+            "price": "0.43830000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "GRASSUSDT",
+            "price": "0.43830000",
+            "weight": "0.15000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GRIFFAINUSDT",
+      "retrieved_at": "2026-11-13T06:22:18.678286+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GRIFFAINUSDT",
+        "time": 1794550881063,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "GRIFFAIN_USDT",
+            "price": "0.00960500",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "GRIFFAIN-USDT",
+            "price": "0.00967000",
+            "weight": "0.42857143"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "GRIFFAINUSDT",
+            "price": "0.00967700",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "GRIFFAINUSDT",
+            "price": "0.00970800",
+            "weight": "0.07142857"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GRVTUSDT",
+      "retrieved_at": "2026-11-13T06:22:19.243767+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GRVTUSDT",
+        "time": 1794550881060,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "GRVT-USDT",
+            "price": "0.18250000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "GRVT-USD*uindex(USDUSDT)",
+            "price": "0.18218674",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "GRVT-USDT",
+            "price": "0.18220000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "GRVTUSDT",
+            "price": "0.18230000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "GRVTUSDT",
+            "price": "0.18260000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "GRVTUSDT",
+            "price": "0.18060000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "GRVTUSDT",
+            "price": "0.18224511",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GUAUSDT",
+      "retrieved_at": "2026-11-13T06:22:19.825761+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GUAUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "GUAUSDT",
+            "price": "0.02699000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "GUAUSDT",
+            "price": "0.02751000",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "GUAUSDT",
+            "price": "0.02751830",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "GWEIUSDT",
+      "retrieved_at": "2026-11-13T06:22:20.390801+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "GWEIUSDT",
+        "time": 1794550881062,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "GWEI-USD*uindex(USDUSDT)",
+            "price": "0.01734178",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "GWEI_USDT",
+            "price": "0.01738900",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "GWEI-USDT",
+            "price": "0.01727100",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "GWEIUSDT",
+            "price": "0.01698000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "GWEIUSDT",
+            "price": "0.01732800",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "GWEIUSDT",
+            "price": "0.01736000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "GWEIUSDT",
+            "price": "0.01730840",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "HANAUSDT",
+      "retrieved_at": "2026-11-13T06:22:21.067043+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "HANAUSDT",
+        "time": 1794550881068,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "HANA_USDT",
+            "price": "0.01740700",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "HANA-USDT",
+            "price": "0.01744000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "HANAUSDT",
+            "price": "0.01735500",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "HANAUSDT",
+            "price": "0.01739144",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ICNTUSDT",
+      "retrieved_at": "2026-11-13T06:22:21.635020+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ICNTUSDT",
+        "time": 1794550881066,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ICNT_USDT",
+            "price": "0.28306000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ICNT-USDT",
+            "price": "0.28324000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "ICNTUSDT",
+            "price": "0.28270000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ICNTUSDT",
+            "price": "0.28280000",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "IDOLUSDT",
+      "retrieved_at": "2026-11-13T06:22:22.204872+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "IDOLUSDT",
+        "time": 1794550881061,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "IDOL_USDT",
+            "price": "0.02357600",
+            "weight": "0.19047619"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "IDOL-USDT",
+            "price": "0.02345000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "IDOLUSDT",
+            "price": "0.02343300",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "IDOLUSDT",
+            "price": "0.02350000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "IDOL-WBNB*uindex(BNBUSDT)",
+            "price": "0.02351301",
+            "weight": "0.09523810"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "INUSDT",
+      "retrieved_at": "2026-11-13T06:22:22.770189+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "INUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "IN_USDT",
+            "price": "0.02287000",
+            "weight": "0.13333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "IN-USDT",
+            "price": "0.02259000",
+            "weight": "0.13333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "INUSDT",
+            "price": "0.02272000",
+            "weight": "0.06666667"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "INUSDT",
+            "price": "0.02286000",
+            "weight": "0.26666667"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "INUSDT",
+            "price": "0.02284803",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "INXUSDT",
+      "retrieved_at": "2026-11-13T06:22:23.341290+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "INXUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "INX_USDT",
+            "price": "0.00379100",
+            "weight": "0.43478261"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "INX-USDT",
+            "price": "0.00375400",
+            "weight": "0.02173913"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "INXUSDT",
+            "price": "0.00376900",
+            "weight": "0.32608696"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "INXUSDT",
+            "price": "0.00381200",
+            "weight": "0.21739130"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "IRYSUSDT",
+      "retrieved_at": "2026-11-13T06:22:23.931101+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "IRYSUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "IRYS-USDT",
+            "price": "0.01557000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "IRYS-USD*uindex(USDUSDT)",
+            "price": "0.01556581",
+            "weight": "0.17142857"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "IRYS-USDT",
+            "price": "0.01553000",
+            "weight": "0.08571429"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "IRYSUSDT",
+            "price": "0.01552000",
+            "weight": "0.08571429"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "IRYSUSDT",
+            "price": "0.01559000",
+            "weight": "0.08571429"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "IRYSUSDT",
+            "price": "0.01551886",
+            "weight": "0.28571429"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "JCTUSDT",
+      "retrieved_at": "2026-11-13T06:22:24.559563+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "JCTUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "JCT-USDT",
+            "price": "0.00205300",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "JCTUSDT",
+            "price": "0.00206500",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "JCTUSDT",
+            "price": "0.00205000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "JCTUSDT",
+            "price": "0.00204824",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "JELLYJELLYUSDT",
+      "retrieved_at": "2026-11-13T06:22:25.123571+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "JELLYJELLYUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "JELLYJELLY_USDT",
+            "price": "0.04040000",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "JELLYJELLY-USDT",
+            "price": "0.04029000",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "JELLYJELLYUSDT",
+            "price": "0.04026100",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "KASUSDT",
+      "retrieved_at": "2026-11-13T06:22:25.689027+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "KASUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "KAS_USDT",
+            "price": "0.02851000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "KAS-USDT",
+            "price": "0.02850000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "KASUSDT",
+            "price": "0.02853000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "KASUSDT",
+            "price": "0.02851000",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "KGENUSDT",
+      "retrieved_at": "2026-11-13T06:22:26.253568+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "KGENUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "KGEN_USDT",
+            "price": "0.07905000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "KGEN-USDT",
+            "price": "0.07911000",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "KGENUSDT",
+            "price": "0.07863000",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "KGENUSDT",
+            "price": "0.07893000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "KGENUSDT",
+            "price": "0.07912000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "KGENUSDT",
+            "price": "0.07899602",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "KOMAUSDT",
+      "retrieved_at": "2026-11-13T06:22:26.833546+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "KOMAUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "KOMA_USDT",
+            "price": "0.01254800",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "KOMA-USDT",
+            "price": "0.01250000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "KOMAUSDT",
+            "price": "0.01196000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "pancakeswapV2",
+            "symbol": "uindex(BNBUSDT)/WBNB-KOMA",
+            "price": "0.01256870",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "KOMAUSDT",
+            "price": "0.01256000",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "LABUSDT",
+      "retrieved_at": "2026-11-13T06:22:27.417945+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "LABUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "LAB_USDT",
+            "price": "0.03563000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "LAB-USDT",
+            "price": "0.03550000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "LABUSDT",
+            "price": "0.03570000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "LABUSDT",
+            "price": "0.03555235",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "LIGHTUSDT",
+      "retrieved_at": "2026-11-13T06:22:27.993321+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "LIGHTUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "LIGHT_USDT",
+            "price": "0.23318000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "LIGHT-USDT",
+            "price": "0.23220000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "LIGHTUSDT",
+            "price": "0.23380000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "LIGHTUSDT",
+            "price": "0.23309000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "LIGHTUSDT",
+            "price": "0.23308070",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "LITUSDT",
+      "retrieved_at": "2026-11-13T06:22:28.579287+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "LITUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "LIT-USDT",
+            "price": "3.16100000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "LIT_USDT",
+            "price": "3.16000000",
+            "weight": "0.16000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "LITUSDT",
+            "price": "3.14790000",
+            "weight": "0.16000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "LITUSDT",
+            "price": "3.15870000",
+            "weight": "0.16000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "LITUSDT",
+            "price": "3.15990000",
+            "weight": "0.16000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "LITUSDT",
+            "price": "3.15510000",
+            "weight": "0.16000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "LYNUSDT",
+      "retrieved_at": "2026-11-13T06:22:29.260019+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "LYNUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "LYN-USDT",
+            "price": "0.02024000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "LYNUSDT",
+            "price": "0.01983000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "LYNUSDT",
+            "price": "0.02029000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "LYNUSDT",
+            "price": "0.02020944",
+            "weight": "0.60000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MAGMAUSDT",
+      "retrieved_at": "2026-11-13T06:22:29.831094+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MAGMAUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "MAGMA_USDT",
+            "price": "0.33796000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MAGMAUSDT",
+            "price": "0.33797000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MAGMAUSDT",
+            "price": "0.33785000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "MAGMAUSDT",
+            "price": "0.33781000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "MAGMAUSDT",
+            "price": "0.33828172",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MAVIAUSDT",
+      "retrieved_at": "2026-11-13T06:22:30.393040+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MAVIAUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "MAVIA_USDT",
+            "price": "0.02338000",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MAVIAUSDT",
+            "price": "0.02343000",
+            "weight": "0.23076923"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MAVIAUSDT",
+            "price": "0.02338000",
+            "weight": "0.46153846"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MELANIAUSDT",
+      "retrieved_at": "2026-11-13T06:22:31.407206+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MELANIAUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "MELANIA_USDT",
+            "price": "0.05345000",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "MELANIA-USDT",
+            "price": "0.05305000",
+            "weight": "0.46153846"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MELANIAUSDT",
+            "price": "0.05295000",
+            "weight": "0.23076923"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MERLUSDT",
+      "retrieved_at": "2026-11-13T06:22:32.004982+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MERLUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "MERL-USDT",
+            "price": "0.03078000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "MERL_USDT",
+            "price": "0.03075000",
+            "weight": "0.09523810"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MERLUSDT",
+            "price": "0.03070000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MERLUSDT",
+            "price": "0.03082000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MERLUSDT",
+            "price": "0.03075000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(USDCUSDT)/USDC-MERL",
+            "price": "0.03154095",
+            "weight": "0.04761905"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "MERLUSDT",
+            "price": "0.03080000",
+            "weight": "0.14285714"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MEWUSDT",
+      "retrieved_at": "2026-11-13T06:22:33.029672+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MEWUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "MEW-USDT",
+            "price": "0.00032500",
+            "weight": "0.42857143"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "MEW_USDT",
+            "price": "0.00032520",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MEWUSDT",
+            "price": "0.00032320",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MEWUSDT",
+            "price": "0.00032500",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MOCAUSDT",
+      "retrieved_at": "2026-11-13T06:22:33.612244+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MOCAUSDT",
+        "time": 1794550941076,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "MOCA-USDT",
+            "price": "0.00674000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MOCAUSDT",
+            "price": "0.00674900",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MOCAUSDT",
+            "price": "0.00676400",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MOCAUSDT",
+            "price": "0.00676800",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MONUSDT",
+      "retrieved_at": "2026-11-13T06:22:34.186067+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MONUSDT",
+        "time": 1794550941069,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "MON-USD*uindex(USDUSDT)",
+            "price": "0.01651878",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "MON_USDT",
+            "price": "0.01652000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "MON-USDT",
+            "price": "0.01645000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MONUSDT",
+            "price": "0.01650000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MONUSDT",
+            "price": "0.01652000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "MONUSDT",
+            "price": "0.01651000",
+            "weight": "0.15000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MOODENGUSDT",
+      "retrieved_at": "2026-11-13T06:22:34.752403+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MOODENGUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "MOODENG-USDT",
+            "price": "0.02988000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "MOODENG-USD*uindex(USDUSDT)",
+            "price": "0.02988135",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "MOODENG_USDT",
+            "price": "0.02987000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "MOODENG-USDT",
+            "price": "0.02978000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MOODENGUSDT",
+            "price": "0.02983000",
+            "weight": "0.15000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "MYXUSDT",
+      "retrieved_at": "2026-11-13T06:22:35.346432+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "MYXUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "MYX_USDT",
+            "price": "0.04529000",
+            "weight": "0.05263158"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "MYXUSDT",
+            "price": "0.04516000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "MYXUSDT",
+            "price": "0.04528000",
+            "weight": "0.21052632"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(BNBUSDT)/WBNB-MYX",
+            "price": "0.04524979",
+            "weight": "0.21052632"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "MYXUSDT",
+            "price": "0.04544000",
+            "weight": "0.36842105"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "NAORISUSDT",
+      "retrieved_at": "2026-11-13T06:22:35.935056+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "NAORISUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "NAORIS_USDT",
+            "price": "0.02687000",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "NAORISUSDT",
+            "price": "0.02689000",
+            "weight": "0.07692308"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "NAORISUSDT",
+            "price": "0.02690000",
+            "weight": "0.30769231"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "NAORISUSDT",
+            "price": "0.02697000",
+            "weight": "0.30769231"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ONUSDT",
+      "retrieved_at": "2026-11-13T06:22:36.508066+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ONUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ON_USDT",
+            "price": "0.08488000",
+            "weight": "0.25117739"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ONUSDT",
+            "price": "0.08482000",
+            "weight": "0.09576138"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ONUSDT",
+            "price": "0.08490000",
+            "weight": "0.15070644"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ONUSDT",
+            "price": "0.08497007",
+            "weight": "0.50235479"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ORDERUSDT",
+      "retrieved_at": "2026-11-13T06:22:37.081575+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ORDERUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ORDER_USDT",
+            "price": "0.02977000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ORDER-USDT",
+            "price": "0.02980000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ORDERUSDT",
+            "price": "0.02990000",
+            "weight": "0.04761905"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "ORDERUSDT",
+            "price": "0.02978000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ORDERUSDT",
+            "price": "0.02986000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "ORDERUSDT",
+            "price": "0.02989000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ORDERUSDT",
+            "price": "0.02968775",
+            "weight": "0.23809524"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "PIEVERSEUSDT",
+      "retrieved_at": "2026-11-13T06:22:37.655822+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "PIEVERSEUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "PIEVERSE_USDT",
+            "price": "1.64720000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "PIEVERSE-USDT",
+            "price": "1.64590000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "PIEVERSEUSDT",
+            "price": "1.64400000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "PIEVERSEUSDT",
+            "price": "1.64530000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "PIEVERSEUSDT",
+            "price": "1.64431188",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "PIPPINUSDT",
+      "retrieved_at": "2026-11-13T06:22:38.228589+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "PIPPINUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "PIPPIN_USDT",
+            "price": "0.01199100",
+            "weight": "0.11538462"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "PIPPINUSDT",
+            "price": "0.01185300",
+            "weight": "0.11538462"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "PIPPINUSDT",
+            "price": "0.01197127",
+            "weight": "0.76923077"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "PLAYUSDT",
+      "retrieved_at": "2026-11-13T06:22:38.798704+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "PLAYUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "PLAY-USDT",
+            "price": "0.00732000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "PLAYUSDT",
+            "price": "0.00728000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "PLAYUSDT",
+            "price": "0.00731000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "PLAYUSDT",
+            "price": "0.00726164",
+            "weight": "0.22222222"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "PONSUSDT",
+      "retrieved_at": "2026-11-13T06:22:39.367524+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "PONSUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "PONS_USDT",
+            "price": "0.15399000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "PONS-USDT",
+            "price": "0.15360000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "PONSUSDT",
+            "price": "0.15310300",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "PONSUSDT",
+            "price": "0.15140000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "PONSUSDT",
+            "price": "0.15410000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "PONSUSDT",
+            "price": "0.15430000",
+            "weight": "0.09090909"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "POPCATUSDT",
+      "retrieved_at": "2026-11-13T06:22:39.988725+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "POPCATUSDT",
+        "time": 1794550941076,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "POPCAT-USD*uindex(USDUSDT)",
+            "price": "0.03128178",
+            "weight": "0.38709677"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "POPCAT_USDT",
+            "price": "0.03092000",
+            "weight": "0.12903226"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "POPCAT-USDT",
+            "price": "0.03100000",
+            "weight": "0.19354839"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "POPCATUSDT",
+            "price": "0.03121000",
+            "weight": "0.09677419"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "POPCATUSDT",
+            "price": "0.03121000",
+            "weight": "0.19354839"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "POWERUSDT",
+      "retrieved_at": "2026-11-13T06:22:40.574874+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "POWERUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "POWERUSDT",
+            "price": "0.05755000",
+            "weight": "0.10344828"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "POWERUSDT",
+            "price": "0.05764600",
+            "weight": "0.10344828"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "POWERUSDT",
+            "price": "0.05768000",
+            "weight": "0.10344828"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "POWERUSDT",
+            "price": "0.05735130",
+            "weight": "0.68965517"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "PRLUSDT",
+      "retrieved_at": "2026-11-13T06:22:41.142302+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "PRLUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "PRL-USD*uindex(USDUSDT)",
+            "price": "0.07012123",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "PRL_USDT",
+            "price": "0.07025000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "PRL-USDT",
+            "price": "0.07020000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "PRLUSDT",
+            "price": "0.06933000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "PRLUSDT",
+            "price": "0.07020000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "PRLUSDT",
+            "price": "0.07021901",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "QUICKUSDT",
+      "retrieved_at": "2026-11-13T06:22:41.714050+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "QUICKUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "QUICK_USDT",
+            "price": "0.00334200",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "QUICKUSDT",
+            "price": "0.00330600",
+            "weight": "0.60000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "RAVEUSDT",
+      "retrieved_at": "2026-11-13T06:22:42.350598+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "RAVEUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "RAVE-USD*uindex(USDUSDT)",
+            "price": "0.12082273",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "RAVEUSDT",
+            "price": "0.12083000",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "RAVEUSDT",
+            "price": "0.12090000",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "RAVEUSDT",
+            "price": "0.12077696",
+            "weight": "0.18181818"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "RECALLUSDT",
+      "retrieved_at": "2026-11-13T06:22:43.014381+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "RECALLUSDT",
+        "time": 1794550941070,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "RECALL_USDT",
+            "price": "0.02770000",
+            "weight": "0.04878049"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "RECALL-USDT",
+            "price": "0.02700000",
+            "weight": "0.07317073"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "RECALLUSDT",
+            "price": "0.02768000",
+            "weight": "0.29268293"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "RECALLUSDT",
+            "price": "0.02770000",
+            "weight": "0.29268293"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "RECALLUSDC*uindex(USDCUSDT)",
+            "price": "0.02768236",
+            "weight": "0.29268293"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "RIVERUSDT",
+      "retrieved_at": "2026-11-13T06:22:43.610474+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "RIVERUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "RIVERUSDT",
+            "price": "0.72650000",
+            "weight": "0.23076923"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "RIVERUSDT",
+            "price": "0.72870000",
+            "weight": "0.46153846"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "RIVERUSDT",
+            "price": "0.72870000",
+            "weight": "0.15384615"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "RIVERUSDT",
+            "price": "0.72747728",
+            "weight": "0.15384615"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SAFEUSDT",
+      "retrieved_at": "2026-11-13T06:22:44.253554+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SAFEUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "SAFE-USDT",
+            "price": "0.08343000",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "SAFE-USD*uindex(USDUSDT)",
+            "price": "0.08273404",
+            "weight": "0.44444444"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "SAFE_USDT",
+            "price": "0.08296000",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SAFEUSDT",
+            "price": "0.08321000",
+            "weight": "0.22222222"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SIRENUSDT",
+      "retrieved_at": "2026-11-13T06:22:44.854517+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SIRENUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "SIREN-WBNB*uindex(BNBUSDT)",
+            "price": "0.02599329",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "SIRENUSDT",
+            "price": "0.02621000",
+            "weight": "0.37500000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "SIRENUSDT",
+            "price": "0.02611072",
+            "weight": "0.37500000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SKRUSDT",
+      "retrieved_at": "2026-11-13T06:22:45.426367+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SKRUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "SKR-USD*uindex(USDUSDT)",
+            "price": "0.01058776",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "SKR_USDT",
+            "price": "0.01058700",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "SKR-USDT",
+            "price": "0.01053000",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SKRUSDT",
+            "price": "0.01056500",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SKRUSDT",
+            "price": "0.01055900",
+            "weight": "0.08333333"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "SKRUSDT",
+            "price": "0.01058600",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "SKRUSDT",
+            "price": "0.01055151",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SKYAIUSDT",
+      "retrieved_at": "2026-11-13T06:22:46.044528+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SKYAIUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "SKYAI_USDT",
+            "price": "0.03442000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SKYAIUSDT",
+            "price": "0.03436000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SKYAIUSDT",
+            "price": "0.03442000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "pancakeswapV2",
+            "symbol": "SKYAI-WBNB*uindex(BNBUSDT)",
+            "price": "0.03435553",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "SKYAIUSDT",
+            "price": "0.03452000",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SLXUSDT",
+      "retrieved_at": "2026-11-13T06:22:46.608586+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SLXUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "SLX-USDT",
+            "price": "0.03343000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "SLX_USDT",
+            "price": "0.03326000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SLXUSDT",
+            "price": "0.03346000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SLXUSDT",
+            "price": "0.03341000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "SLXUSDT",
+            "price": "0.03346000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "SLXUSDT",
+            "price": "0.03350024",
+            "weight": "0.15000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SONICUSDT",
+      "retrieved_at": "2026-11-13T06:22:47.180082+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SONICUSDT",
+        "time": 1794550941070,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "SONIC-USDT",
+            "price": "0.01801000",
+            "weight": "0.36363636"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "SONIC_USDT",
+            "price": "0.01823800",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SONICUSDT",
+            "price": "0.01805000",
+            "weight": "0.09090909"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SONICUSDT",
+            "price": "0.01820800",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "SONICUSDT",
+            "price": "0.01823000",
+            "weight": "0.18181818"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SOONUSDT",
+      "retrieved_at": "2026-11-13T06:22:47.753381+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SOONUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "SOON-USDT",
+            "price": "0.23880000",
+            "weight": "0.31250000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SOONUSDT",
+            "price": "0.23580000",
+            "weight": "0.18750000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SOONUSDT",
+            "price": "0.23860000",
+            "weight": "0.18750000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "SOON-WBNB*uindex(BNBUSDT)",
+            "price": "0.23833269",
+            "weight": "0.31250000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SPACEUSDT",
+      "retrieved_at": "2026-11-13T06:22:48.359067+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SPACEUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "SPACE-USDT",
+            "price": "0.00308200",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "SPACE-USDT",
+            "price": "0.00307100",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SPACEUSDT",
+            "price": "0.00306200",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "SPACEUSDT",
+            "price": "0.00307900",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "SPACEUSDT",
+            "price": "0.00307307",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SPXUSDT",
+      "retrieved_at": "2026-11-13T06:22:48.928691+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SPXUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "SPX_USDT",
+            "price": "0.33330000",
+            "weight": "0.19047619"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "SPX-USDT",
+            "price": "0.33350000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SPXUSDT",
+            "price": "0.33440000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "SPXUSDT",
+            "price": "0.33460000",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "uniswapV2",
+            "symbol": "uindex(ETHUSDT)/WETH-SPX",
+            "price": "0.33360853",
+            "weight": "0.09523810"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SQDUSDT",
+      "retrieved_at": "2026-11-13T06:22:49.503286+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SQDUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "SQD_USDT",
+            "price": "0.01538000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "SQD-USDT",
+            "price": "0.01520000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SQDUSDT",
+            "price": "0.01529000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "SQDUSDT",
+            "price": "0.01526000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(USDCUSDT)/USDC-SQD",
+            "price": "0.01539824",
+            "weight": "0.05000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "STABLEUSDT",
+      "retrieved_at": "2026-11-13T06:22:50.068710+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "STABLEUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "STABLE_USDT",
+            "price": "0.02632800",
+            "weight": "0.10526316"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "STABLE-USDT",
+            "price": "0.02630700",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "STABLEUSDT",
+            "price": "0.02619400",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "STABLEUSDT",
+            "price": "0.02630000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "STABLEUSDT",
+            "price": "0.02627000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "STABLEUSDT",
+            "price": "0.02625427",
+            "weight": "0.26315789"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "STARUSDT",
+      "retrieved_at": "2026-11-13T06:22:50.635019+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "STARUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "STARUSDT",
+            "price": "0.03560000",
+            "weight": "0.18181818"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "STARUSDT",
+            "price": "0.03579000",
+            "weight": "0.27272727"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "STARUSDT",
+            "price": "0.03564368",
+            "weight": "0.54545455"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "STBLUSDT",
+      "retrieved_at": "2026-11-13T06:22:51.207328+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "STBLUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "STBL_USDT",
+            "price": "0.02106000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "STBL-USDT",
+            "price": "0.02107000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "STBLUSDT",
+            "price": "0.02104000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "STBLUSDT",
+            "price": "0.02111000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "STBLUSDT",
+            "price": "0.02107183",
+            "weight": "0.50000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "SWARMSUSDT",
+      "retrieved_at": "2026-11-13T06:22:51.774892+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "SWARMSUSDT",
+        "time": 1794550941070,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "SWARMS_USDT",
+            "price": "0.00648000",
+            "weight": "0.40000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "SWARMS-USDT",
+            "price": "0.00641000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "SWARMSUSDT",
+            "price": "0.00642800",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "SWARMSUSDT",
+            "price": "0.00649400",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TACUSDT",
+      "retrieved_at": "2026-11-13T06:22:52.343479+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TACUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "TACUSDT",
+            "price": "0.00089700",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "TACUSDT",
+            "price": "0.00090200",
+            "weight": "0.28571429"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TACUSDT",
+            "price": "0.00090200",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "TACUSDT",
+            "price": "0.00089862",
+            "weight": "0.42857143"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TAGUSDT",
+      "retrieved_at": "2026-11-13T06:22:52.909582+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TAGUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "TAG_USDT",
+            "price": "0.00063040",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "TAG-USDT",
+            "price": "0.00062960",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "TAGUSDT",
+            "price": "0.00063041",
+            "weight": "0.05263158"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "TAG-WBNB*uindex(BNBUSDT)",
+            "price": "0.00062965",
+            "weight": "0.31578947"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TAIKOUSDT",
+      "retrieved_at": "2026-11-13T06:22:53.484809+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TAIKOUSDT",
+        "time": 1794550941077,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "TAIKO_USDT",
+            "price": "0.06357000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "TAIKO-USDT",
+            "price": "0.06290000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "TAIKOUSDT",
+            "price": "0.06373000",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TAIKOUSDT",
+            "price": "0.06375000",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TAKEUSDT",
+      "retrieved_at": "2026-11-13T06:22:54.094172+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TAKEUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "TAKE_USDT",
+            "price": "0.06064200",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "TAKEUSDT",
+            "price": "0.06036000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(BNBUSDT)/WBNB-TAKE",
+            "price": "0.06066334",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TAKEUSDT",
+            "price": "0.06074000",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TAUSDT",
+      "retrieved_at": "2026-11-13T06:22:54.668368+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TAUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "TA_USDT",
+            "price": "0.10943000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "TAUSDT",
+            "price": "0.10926000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "TAUSDT",
+            "price": "0.10955000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "TA-USDT",
+            "price": "0.10985085",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TAUSDT",
+            "price": "0.11001000",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TOSHIUSDT",
+      "retrieved_at": "2026-11-13T06:22:55.268062+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TOSHIUSDT",
+        "time": 1794550941076,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "TOSHI-USDT",
+            "price": "0.00008454",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "TOSHI-USD*uindex(USDUSDT)",
+            "price": "0.00008457",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "TOSHI_USDT",
+            "price": "0.00008420",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "TOSHIUSDT",
+            "price": "0.00008460",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TRADOORUSDT",
+      "retrieved_at": "2026-11-13T06:22:55.846985+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TRADOORUSDT",
+        "time": 1794550941070,
+        "constituents": [
+          {
+            "exchange": "mexc",
+            "symbol": "TRADOORUSDT",
+            "price": "0.57460000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "TRADOORUSDT",
+            "price": "0.57460000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TRADOORUSDT",
+            "price": "0.57450000",
+            "weight": "0.15000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "TRADOORUSDT",
+            "price": "0.57479374",
+            "weight": "0.60000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TRIAUSDT",
+      "retrieved_at": "2026-11-13T06:22:56.406628+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TRIAUSDT",
+        "time": 1794550941073,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "TRIA-USD*uindex(USDUSDT)",
+            "price": "0.00253958",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "TRIA-USDT",
+            "price": "0.00252400",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "TRIAUSDT",
+            "price": "0.00253000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "TRIAUSDT",
+            "price": "0.00254600",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "TRIAUSDT",
+            "price": "0.00255200",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "TRIAUSDT",
+            "price": "0.00251085",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TRUSTUSDT",
+      "retrieved_at": "2026-11-13T06:22:56.979670+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TRUSTUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "TRUST_USDT",
+            "price": "0.04694000",
+            "weight": "0.12500000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "TRUST-USDT",
+            "price": "0.04684000",
+            "weight": "0.18750000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "TRUSTUSDT",
+            "price": "0.04707000",
+            "weight": "0.18750000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "TRUSTUSDT",
+            "price": "0.04696000",
+            "weight": "0.18750000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "TRUSTUSDT",
+            "price": "0.04648887",
+            "weight": "0.31250000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "TRUTHUSDT",
+      "retrieved_at": "2026-11-13T06:22:57.557799+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "TRUTHUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "kucoin",
+            "symbol": "TRUTH-USDT",
+            "price": "0.01695200",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "TRUTHUSDT",
+            "price": "0.01691500",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "TRUTHUSDT",
+            "price": "0.01697300",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "TRUTHUSDT",
+            "price": "0.01687069",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "UAIUSDT",
+      "retrieved_at": "2026-11-13T06:22:58.192923+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "UAIUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "UAI_USDT",
+            "price": "0.03655000",
+            "weight": "0.16000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "UAI-USDT",
+            "price": "0.03611000",
+            "weight": "0.12000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "UAIUSDT",
+            "price": "0.03650000",
+            "weight": "0.24000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "UAIUSDT",
+            "price": "0.03657000",
+            "weight": "0.24000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "UAIUSDT",
+            "price": "0.03645822",
+            "weight": "0.24000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "UBUSDT",
+      "retrieved_at": "2026-11-13T06:22:59.204841+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "UBUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "UB_USDT",
+            "price": "0.10420000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "UB-USDT",
+            "price": "0.10378800",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "UBUSDT",
+            "price": "0.10381000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "UBUSDT",
+            "price": "0.10462000",
+            "weight": "0.10000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "UBUSDC*uindex(USDCUSDT)",
+            "price": "0.10438835",
+            "weight": "0.40000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "USELESSUSDT",
+      "retrieved_at": "2026-11-13T06:22:59.772840+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "USELESSUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "USELESS-USD*uindex(USDUSDT)",
+            "price": "0.12932137",
+            "weight": "0.42857143"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "USELESS_USDT",
+            "price": "0.12937000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "USELESS-USDT",
+            "price": "0.12841000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "USELESSUSDT",
+            "price": "0.12829800",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "USUSDT",
+      "retrieved_at": "2026-11-13T06:23:00.651626+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "USUSDT",
+        "time": 1794550941071,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "US_USDT",
+            "price": "0.00386900",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "US-USDT",
+            "price": "0.00386700",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "USUSDT",
+            "price": "0.00374000",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "USUSDT",
+            "price": "0.00387100",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "USUSDT",
+            "price": "0.00385695",
+            "weight": "0.20000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "VELVETUSDT",
+      "retrieved_at": "2026-11-13T06:23:01.230276+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "VELVETUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "VELVET_USDT",
+            "price": "0.04993000",
+            "weight": "0.31578947"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "VELVET-USDT",
+            "price": "0.04982000",
+            "weight": "0.10526316"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "VELVETUSDT",
+            "price": "0.04988000",
+            "weight": "0.10526316"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "VELVETUSDT",
+            "price": "0.04993000",
+            "weight": "0.15789474"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "VELVETUSDT",
+            "price": "0.04995907",
+            "weight": "0.31578947"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "VVVUSDT",
+      "retrieved_at": "2026-11-13T06:23:01.825225+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "VVVUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "VVV-USD*uindex(USDUSDT)",
+            "price": "18.23051875",
+            "weight": "0.35294118"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "VVV_USDT",
+            "price": "18.22400000",
+            "weight": "0.11764706"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "VVV-USDT",
+            "price": "18.15600000",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "VVVUSDT",
+            "price": "18.18410000",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "VVVUSDT",
+            "price": "18.23000000",
+            "weight": "0.17647059"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "WETUSDT",
+      "retrieved_at": "2026-11-13T06:23:02.400396+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "WETUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "WET-USDT",
+            "price": "0.04390000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "WET-USD*uindex(USDUSDT)",
+            "price": "0.04384454",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "WET-USDT",
+            "price": "0.04357000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "WETUSDT",
+            "price": "0.04369000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "WETUSDT",
+            "price": "0.04394000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "WETUSDT",
+            "price": "0.04329965",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "XANUSDT",
+      "retrieved_at": "2026-11-13T06:23:02.974385+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "XANUSDT",
+        "time": 1794550941075,
+        "constituents": [
+          {
+            "exchange": "coinbase",
+            "symbol": "XAN-USD*uindex(USDUSDT)",
+            "price": "0.00818832",
+            "weight": "0.34013605"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "XAN_USDT",
+            "price": "0.00817400",
+            "weight": "0.11564626"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "XAN-USDT",
+            "price": "0.00813400",
+            "weight": "0.03401361"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "XANUSDT",
+            "price": "0.00817600",
+            "weight": "0.03401361"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "XANUSDT",
+            "price": "0.00819300",
+            "weight": "0.13605442"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "XANUSDT",
+            "price": "0.00817014",
+            "weight": "0.34013605"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "XMRUSDT",
+      "retrieved_at": "2026-11-13T06:23:03.541292+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "XMRUSDT",
+        "time": 1794550941076,
+        "constituents": [
+          {
+            "exchange": "bitfinex",
+            "symbol": "XMRUST",
+            "price": "522.51000000",
+            "weight": "0.25000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "XMR-USDT",
+            "price": "523.69000000",
+            "weight": "0.50000000"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "XMRUSDT",
+            "price": "523.28000000",
+            "weight": "0.25000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "XNYUSDT",
+      "retrieved_at": "2026-11-13T06:23:04.117296+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "XNYUSDT",
+        "time": 1794550941079,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "XNY_USDT",
+            "price": "0.00489200",
+            "weight": "0.23529412"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "XNY-USDT",
+            "price": "0.00486200",
+            "weight": "0.23529412"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "XNYUSDT",
+            "price": "0.00482200",
+            "weight": "0.11764706"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "uindex(BNBUSDT)/WBNB-XNY",
+            "price": "0.00491718",
+            "weight": "0.17647059"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "XNYUSDT",
+            "price": "0.00490900",
+            "weight": "0.23529412"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "XPINUSDT",
+      "retrieved_at": "2026-11-13T06:23:04.693545+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "XPINUSDT",
+        "time": 1794550941076,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "XPIN_USDT",
+            "price": "0.00070360",
+            "weight": "0.30000000"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "XPIN-USDT",
+            "price": "0.00069920",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "XPINUSDT",
+            "price": "0.00070580",
+            "weight": "0.20000000"
+          },
+          {
+            "exchange": "pancakeswapV3",
+            "symbol": "1/USDT-XPIN",
+            "price": "0.00070467",
+            "weight": "0.30000000"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ZEREBROUSDT",
+      "retrieved_at": "2026-11-13T06:23:05.281349+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ZEREBROUSDT",
+        "time": 1794550941078,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ZEREBRO_USDT",
+            "price": "0.02276200",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ZEREBRO-USDT",
+            "price": "0.02284000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ZEREBROUSDT",
+            "price": "0.02290000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ZEREBROUSDT",
+            "price": "0.02291000",
+            "weight": "0.33333333"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ZESTUSDT",
+      "retrieved_at": "2026-11-13T06:23:05.851960+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ZESTUSDT",
+        "time": 1794550941079,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "ZEST_USDT",
+            "price": "0.10922000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "ZEST-USDT",
+            "price": "0.10873000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ZESTUSDT",
+            "price": "0.10902000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "binance_alpha",
+            "symbol": "ZESTUSDT",
+            "price": "0.10913019",
+            "weight": "0.42857143"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ZETAUSDT",
+      "retrieved_at": "2026-11-13T06:23:06.534179+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ZETAUSDT",
+        "time": 1794550941074,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "ZETA-USDT",
+            "price": "0.03152000",
+            "weight": "0.42857143"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "ZETA_USDT",
+            "price": "0.03149000",
+            "weight": "0.14285714"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ZETAUSDT",
+            "price": "0.03135000",
+            "weight": "0.21428571"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ZETAUSDT",
+            "price": "0.03150000",
+            "weight": "0.21428571"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "ZORAUSDT",
+      "retrieved_at": "2026-11-13T06:23:07.106806+00:00",
+      "status": 200,
+      "payload": {
+        "symbol": "ZORAUSDT",
+        "time": 1794550941072,
+        "constituents": [
+          {
+            "exchange": "okex",
+            "symbol": "ZORA-USDT",
+            "price": "0.00477300",
+            "weight": "0.26086957"
+          },
+          {
+            "exchange": "coinbase",
+            "symbol": "ZORA-USD*uindex(USDUSDT)",
+            "price": "0.00476584",
+            "weight": "0.26086957"
+          },
+          {
+            "exchange": "gateio",
+            "symbol": "ZORA_USDT",
+            "price": "0.00477600",
+            "weight": "0.08695652"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "ZORAUSDT",
+            "price": "0.00476800",
+            "weight": "0.13043478"
+          },
+          {
+            "exchange": "bitget",
+            "symbol": "ZORAUSDT",
+            "price": "0.00476700",
+            "weight": "0.13043478"
+          },
+          {
+            "exchange": "bybit",
+            "symbol": "ZORAUSDT",
+            "price": "0.00477100",
+            "weight": "0.13043478"
+          }
+        ]
+      }
+    }
+  ],
+  "decision": "BLOCKED",
+  "verdict": "insufficient",
+  "net_backtest": "NOT_RUN",
+  "limitations": [
+    "Index source is current only and is not historical tradability or contract address verification.",
+    "Inclusion in index is not proof of full-window asset identity or executable depth.",
+    "Historical orderbook access and effective-dated fees remain missing."
+  ]
+}

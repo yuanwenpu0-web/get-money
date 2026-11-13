@@ -1,0 +1,305 @@
+{
+  "topic": "P15 采集链与台账完整性审计（运维审计，非 edge 判定）",
+  "generated_at": "2026-11-11T16:13:00Z",
+  "code_commit": "7ebb5f5b960da9ebb7edb4ff534a338b1e86a160",
+  "stage": "Stage 0 状态恢复 + Stage 3 数据审计 + Stage 8 复盘",
+  "method": "只读 PostgreSQL 查询 + qoder_cron list + pytest（本轮未新增脚本、未下载任何行情）",
+  "interval": "审计对象覆盖 1m/5m/15m/1h/4h 与 sentiment/funding_rates",
+  "verdict": "no_trades",
+  "verdict_scope": "本轮为运维与台账审计，trades=0，不做任何 edge 判定，不改变 P12/P14 既有结论",
+  "default_enabled": false,
+  "costs": {
+    "fee_rate": 0.0004,
+    "slippage": 0.0002,
+    "round_trip": 0.0012,
+    "basis": "notional",
+    "applied": false,
+    "note": "名义本金口径；本轮无任何收益计算，成本口径仅登记以保持与 P12/P14 可比"
+  },
+  "trades": 0,
+  "trades_note": "无回测、无策略臂、无撮合、无订单",
+  "ci": {
+    "ci_low": null,
+    "ci_high": null,
+    "note": "不适用：本轮无收益估计，故无置信区间；P14 的 block24 CI 见其自身报告"
+  },
+  "random_baseline": "不适用：本轮无交易与策略臂，未做随机方向基线",
+  "window": {
+    "audit_readings_at_utc": "2026-11-11T16:13:00Z",
+    "sentiment_start_utc": "2026-10-06T04:00:00Z",
+    "sentiment_end_utc": "2026-11-11T14:00:00Z",
+    "sentiment_span_days": 36.42,
+    "sentiment_rows": 449313,
+    "sentiment_lag_hours": 2.22,
+    "klines_max_open_time_utc": {
+      "1m": "2026-11-11T16:10:00Z",
+      "5m": "2026-11-11T15:05:00Z",
+      "15m": "2026-11-11T14:45:00Z",
+      "1h": "2026-11-11T13:00:00Z",
+      "4h": "2026-11-11T08:00:00Z"
+    },
+    "klines_lag_hours": {
+      "1m": 0.05,
+      "5m": 1.13,
+      "15m": 1.47,
+      "1h": 3.22,
+      "4h": 8.22
+    },
+    "funding_rates_max_utc": "2026-11-11T15:00:00Z"
+  },
+  "universe": {
+    "sentiment_distinct_symbols": 515,
+    "sentiment_symbols_per_recent_bar": 514,
+    "klines_1h_distinct_symbols": 535,
+    "klines_1m_distinct_symbols": 535,
+    "klines_15m_distinct_symbols": 521,
+    "klines_4h_distinct_symbols": 521,
+    "klines_5m_distinct_symbols": 2,
+    "note": "只读计数，非本轮选币；5m 仅 2 币属覆盖异常，任何 5m 课题当前不具备数据条件"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "CRITICAL",
+      "title": "每日行情增量采集调度处于禁用状态且从未运行",
+      "evidence": {
+        "job_id": "eea4dd3e-f81b-431e-9a90-e22a795c333a",
+        "job_name": "每日行情增量采集（sentiment + native 1h + 15m/4h/5m + funding）",
+        "schedule": "cron 30 8 * * * (Asia/Shanghai) = 00:30 UTC",
+        "enabled": false,
+        "pauseReason": "manual",
+        "nextRunAt": null,
+        "lastRunAt": null,
+        "lastRunStatus": null,
+        "consecutiveFailures": 0,
+        "revision": 1,
+        "createdAt_utc": "2026-11-11T15:41:31Z",
+        "source": "mcp__builtin__qoder_cron action=list"
+      },
+      "impact": "sentiment 停在 2026-11-11T14:00Z（今日手工全量采集的水位），native 1h 停在 13:00Z，4h 停在 08:00Z；H-A 所依赖的『每日累积到 60 天』实际没有在执行",
+      "caller_check": "sync_sentiment_many 定义于 backend/app/market/data_service.py:359，全仓库唯一调用者是 backend/scripts/sync_sentiment.py:86，而该 CLI 只被上述已禁用调度调用；后端 APScheduler 的 trading_cycle 只同步 1m K线（job_logs 最新 2026-11-11T15:58:35Z，509 币），不含 sentiment/funding/native 周期同步",
+      "resolution": "resolved_after_user_authorization",
+      "resolution_evidence": {
+        "cron_enabled": true,
+        "pauseReason": null,
+        "nextRunAt_utc": "2026-11-12T00:30:00Z",
+        "authorized_via": "AskUserQuestion 选项「启用调度 + 立即补跑一次」",
+        "ledger_record": "P15-001"
+      }
+    },
+    {
+      "id": "F2",
+      "severity": "HIGH",
+      "title": "台账缺失 P14-001，而 P14 报告声称已登记",
+      "evidence": {
+        "ledger_before": [
+          "P12-001",
+          "P12-002",
+          "P13-000"
+        ],
+        "grep_P14_count_before": 0,
+        "claim_location": "docs/probe-p14-trade-sequence.md §9 产物清单列出 research/experiments.jsonl（P14-001）",
+        "ledger_lines_before": 3
+      },
+      "impact": "机器可读台账与人类可读报告不一致；后续轮次若只读台账会误判 P14 未跑，可能重复投入 983 MB 归档下载",
+      "action_taken": "本会话先按同名 .json 实际读数补登 P14-001（record_kind=backfill）；追加时发现另一并发会话已登记 P14-001，遂撤回自建行，保留对方记录原样不动",
+      "resolution": "resolved_by_concurrent_writer",
+      "final_ledger_ids": [
+        "P12-001",
+        "P12-002",
+        "P13-000",
+        "P14-001",
+        "P15-000"
+      ],
+      "residual_gap": "并发会话登记的 P14-001 缺 fee_model/slippage_model/funding_model 与 train/validation/test_period 字段；成本口径见成对报告，本会话未代改他人记录"
+    },
+    {
+      "id": "F3",
+      "severity": "MEDIUM",
+      "title": "周期覆盖不均与尾部滞后",
+      "evidence": {
+        "5m_symbols": 2,
+        "4h_lag_hours": 8.22,
+        "native_1h_lag_hours": 3.22,
+        "sentiment_lag_hours": 2.22,
+        "1m_lag_hours": 0.05
+      },
+      "impact": "只有 1m 由 trading_cycle 保持新鲜；5m 几乎无覆盖，4h/native 1h 依赖已禁用调度。任何以 5m/4h 为周期的课题当前 BLOCKED_BY_DATA",
+      "resolution": "partially_resolved",
+      "resolution_evidence": {
+        "all_tails_at_latest_complete_utc_bar": true,
+        "5m_symbols_still": 2,
+        "note": "sync_market_tail 按各周期既有 distinct symbol 取池，设计上不扩池；扩 5m 池需另行授权"
+      }
+    },
+    {
+      "id": "F4",
+      "severity": "INFO",
+      "title": "P14 证据链复核通过",
+      "evidence": {
+        "unit_tests": "backend/tests/test_probe_p14_common.py → 13 passed in 0.84s",
+        "json_verdict": "insufficient",
+        "json_gate_passed": true,
+        "json_decision_action": "DO_NOT_SCALE_UP",
+        "json_n_flags_triggered": 6,
+        "primary_mean_ic": -0.06608,
+        "primary_ci95": [
+          -0.13233,
+          -0.00556
+        ],
+        "primary_periods": 312,
+        "cache_file": "output/probe_p14_frames.pkl",
+        "cache_bytes": 612965,
+        "md_json_pair": "一致，均为修复 numpy.bool_ 序列化后的最终产物"
+      },
+      "impact": "P14 结论可复现（缓存秒级重放），本轮不重跑探针、不重新下载归档"
+    },
+    {
+      "id": "F5",
+      "severity": "HIGH",
+      "title": "H-A 仍 BLOCKED_BY_DATA，且到期日取决于采集是否恢复",
+      "evidence": {
+        "required_days": 60,
+        "current_days": 36.42,
+        "required_out_of_sample_days": 20,
+        "sixty_day_mark_utc": "2026-12-05T04:00:00Z",
+        "remaining_days_at_audit": 23.49,
+        "retention_assumption": "项目既有口径：/futures/data/* 约 30 天滚动保留（见 docs/data-pipeline-repair-20261111.md 与调度 prompt）；本轮未向交易所复核该保留期"
+      },
+      "impact": "若采集持续禁用，缺失日会在约 30 天后超出 API 保留期而永久不可回补，60 天连续窗口将无法达成；恢复采集的最晚安全时点约在首个缺失日 + 30 天",
+      "resolution": "still_blocked_by_data",
+      "resolution_evidence": {
+        "span_days_after_resume": 36.5,
+        "required_days": 60,
+        "sixty_day_mark_utc": "2026-12-05T04:00:00Z",
+        "note": "采集已恢复，到期日重新可达；仍需每日推进且无永久缺日"
+      }
+    },
+    {
+      "id": "F6",
+      "severity": "MEDIUM",
+      "title": "并发写同一台账：本会话补登与另一会话的 P14-001 登记撞车",
+      "evidence": {
+        "ledger_lines_at_audit": 3,
+        "ledger_lines_at_append": 4,
+        "concurrent_record_timestamp": "2026-11-11T16:06:00Z",
+        "concurrent_record_extra_fields": [
+          "hypothesis_card",
+          "stop_loss_added",
+          "exploratory_tests",
+          "exploratory_q_below_0.10"
+        ],
+        "duplicate_backfill_removed": 1,
+        "final_line_count": 5,
+        "final_ids_unique": true
+      },
+      "impact": "research/experiments.jsonl 是多会话共享写入点，无锁追加会产生重复 experiment_id",
+      "action_taken": "撤回本会话自建的 backfill 行，保留并发会话记录原样；冲突经过写入 P15-000",
+      "recommendation": "追加前重读台账末尾并校验 experiment_id 唯一；如需长期并发，应由单一写入者（主控角色）串行落账"
+    }
+  ],
+  "decision": {
+    "alpha_research": "NO_IMPROVEMENT",
+    "alpha_research_reason": "本轮未检验任何新假设：P14 已判 DO_NOT_SCALE_UP 并登记止损线延伸，H-A 数据不足，H2 止损线仍有效；不投新算力",
+    "operational_action": "RESUMED_AFTER_AUTHORIZATION",
+    "operational_action_scope": "用户显式授权后启用调度 eea4dd3e 并手工补跑三个 sync 脚本；未改任何策略 spec/绑定/参数/前端，未下单，未启用 live key",
+    "stage7_paper": "BLOCKED_BY_POLICY",
+    "stage7_reason": "用户已把团队执行边界定为只到回测+风控，不接任何执行适配器",
+    "orders_submitted": 0,
+    "bindings_changed": 0,
+    "live_keys_enabled": false,
+    "strategy_specs_changed": 0
+  },
+  "next_action": "取得授权后恢复每日采集并核对 sentiment.max(ts) 是否推进；在 sentiment 达到 60 天（最早 2026-12-05T04:00Z）之前不启动 H-A 判定，不重跑 P12/P14",
+  "limitations": [
+    "本轮为只读审计：未下载行情、未跑回测、未模拟撮合、未模拟资金费与盘口深度，trades=0",
+    "API 约 30 天保留期沿用项目既有口径，未在本轮向交易所复核",
+    "调度状态取自 qoder_cron list 的当时快照；enabled=false 的原因（人为暂停或创建即禁用）无法从该接口判定",
+    "5m 仅 2 币的成因未深查（可能从未纳入采集池），本轮只登记现象",
+    "成本口径为名义本金，不得与 margin 口径或每笔收益口径报告混比",
+    "本审计不构成任何 edge 判定，也不推翻或加强 P12/P14 的既有结论"
+  ],
+  "artifacts": [
+    "docs/audit-p15-collection-and-ledger.md",
+    "docs/audit-p15-collection-and-ledger.json",
+    "research/experiments.jsonl（追加 P15-000；P14-001 由并发会话登记，本会话重复 backfill 已撤回）",
+    "output/sync_sentiment_daily.json",
+    "docs/sync-recent-1h-report-daily.json",
+    "output/sync_market_tail_daily.json",
+    "research/experiments.jsonl（P15-001）"
+  ],
+  "post_audit_execution": {
+    "executed_at_utc": "2026-11-11T16:20:16Z/16:37:28Z",
+    "verified_at_utc": "2026-11-11T16:37:43Z",
+    "wall_seconds": 1032,
+    "cron": {
+      "job_id": "eea4dd3e-f81b-431e-9a90-e22a795c333a",
+      "enabled": true,
+      "nextRunAt_utc": "2026-11-12T00:30:00Z",
+      "expression": "30 8 * * * Asia/Shanghai"
+    },
+    "sentiment": {
+      "end_before": "2026-11-11T14:00Z",
+      "end_after": "2026-11-11T16:00Z",
+      "span_days_before": 36.42,
+      "span_days_after": 36.5,
+      "rows_before": 449313,
+      "rows_after": 450325,
+      "net_new_rows": 1012,
+      "upserted_reported": 253836,
+      "note": "upserted 为幂等重写计数，不等于新增行数",
+      "duration_seconds": 418.11,
+      "error_count": 8
+    },
+    "klines_max_open_time_after": {
+      "1m": "2026-11-11T16:31Z",
+      "5m": "2026-11-11T16:25Z",
+      "15m": "2026-11-11T16:15Z",
+      "1h": "2026-11-11T15:00Z",
+      "4h": "2026-11-11T12:00Z"
+    },
+    "recent_1h": {
+      "status_counts": {
+        "ok": 534,
+        "error": 1
+      },
+      "rows_inserted": 2670
+    },
+    "market_tail": {
+      "error_count": 3,
+      "inserted_15m_block": 49315
+    },
+    "funding_max_after": "2026-11-11T16:00Z",
+    "all_tails_at_latest_complete_utc_bar": true,
+    "error_symbols": {
+      "sentiment_302": [
+        "ALTUSDT",
+        "ARCUSDT",
+        "AVAXUSDT",
+        "AVAAIUSDT",
+        "BATUSDT",
+        "BICOUSDT",
+        "BILLUSDT",
+        "BROCCOLI714USDT"
+      ],
+      "recent_1h_302": [
+        "BRUSDT"
+      ],
+      "market_tail_15m_302": [
+        "AVAXUSDT",
+        "XVSUSDT"
+      ],
+      "market_tail_4h_302": [
+        "APEUSDT"
+      ],
+      "follow_up": "AVAXUSDT 在 sentiment 与 15m 重复出现且属主流币，优先跟踪代理或合约状态"
+    },
+    "residual_issues": [
+      "5m 仍仅 2 币，5m 课题 BLOCKED_BY_DATA，扩池需另行授权",
+      "12 条单币 302 未解决，需连续跟踪",
+      "H-A 36.50d < 60d，最早 2026-12-05T04:00Z 可判定"
+    ],
+    "ledger_record": "P15-001",
+    "daily_memory": ".workbuddy/memory/2026-11-11.md（append，未覆盖并发会话内容）"
+  }
+}

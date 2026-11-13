@@ -1,0 +1,116 @@
+{
+  "experiment_id": "P11-009",
+  "generated_at": "2026-11-13T07:01:11.215650+00:00",
+  "parent_experiment_id": "P11-008",
+  "decision": "BLOCKED",
+  "net_backtest": "NOT_RUN",
+  "method": "Reconstruct the original selections and examine non-Binance-spot-hedgeable coin-periods without Gate L2 metadata covering their entire holding interval; overlay current MEXC candidate and first-open metadata.",
+  "results": {
+    "10": {
+      "gap_coin_periods": 524,
+      "unique_symbols": 29,
+      "mexc_current_candidate_first_open_by_selection": 465,
+      "no_current_mexc_candidate": 59,
+      "gate_mexc_address_match_overlap": 28,
+      "top10_coin_periods": 393,
+      "top10": [
+        [
+          "BROCCOLIF3BUSDT",
+          94
+        ],
+        [
+          "BULLAUSDT",
+          69
+        ],
+        [
+          "LYNUSDT",
+          38
+        ],
+        [
+          "PLAYUSDT",
+          35
+        ],
+        [
+          "CLOUSDT",
+          35
+        ],
+        [
+          "SPORTFUNUSDT",
+          29
+        ],
+        [
+          "STARUSDT",
+          29
+        ],
+        [
+          "AGTUSDT",
+          25
+        ],
+        [
+          "BTWUSDT",
+          21
+        ],
+        [
+          "XMRUSDT",
+          18
+        ]
+      ]
+    },
+    "20": {
+      "gap_coin_periods": 927,
+      "unique_symbols": 34,
+      "mexc_current_candidate_first_open_by_selection": 811,
+      "no_current_mexc_candidate": 116,
+      "gate_mexc_address_match_overlap": 37,
+      "top10_coin_periods": 610,
+      "top10": [
+        [
+          "BROCCOLIF3BUSDT",
+          116
+        ],
+        [
+          "BULLAUSDT",
+          79
+        ],
+        [
+          "LYNUSDT",
+          68
+        ],
+        [
+          "PLAYUSDT",
+          59
+        ],
+        [
+          "CLOUSDT",
+          58
+        ],
+        [
+          "TACUSDT",
+          50
+        ],
+        [
+          "SPORTFUNUSDT",
+          50
+        ],
+        [
+          "AGTUSDT",
+          45
+        ],
+        [
+          "FOLKSUSDT",
+          44
+        ],
+        [
+          "BTCDOMUSDT",
+          41
+        ]
+      ]
+    }
+  },
+  "limitations": [
+    "Current MEXC listing and first-open timestamp do not prove uninterrupted historical tradability, underlying identity, or book availability.",
+    "Address matches are overlapping subsets, not additional coverage; they do not verify Binance perpetual underlying.",
+    "Gap reflects Gate metadata for the entire holding period, not actual execution timestamps or proven missing data.",
+    "Tardis MEXC spot coverage starts 2026-06-25 and cannot cover the original full window; no net backtest."
+  ]
+}

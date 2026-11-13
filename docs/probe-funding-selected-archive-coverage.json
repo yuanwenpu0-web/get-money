@@ -1,0 +1,51 @@
+{
+  "experiment_id": "P11-008",
+  "generated_at": "2026-11-13T06:47:44.960211+00:00",
+  "decision": "BLOCKED",
+  "net_backtest": "NOT_RUN",
+  "source_reports": [
+    "docs/probe-funding-venue.json",
+    "docs/probe-funding-multivenue-archive.json"
+  ],
+  "frozen_window_ms": [
+    1758502800002,
+    1794441600000
+  ],
+  "snapshot_rows": 1085206,
+  "snapshot_symbols": 507,
+  "periods": 136,
+  "method": "Original frozen universe and time grid; positive 7-day mean funding top K with original tie ordering; classify each selected coin-period against provider-declared Gate L2 availability over [t,t+3 days).",
+  "results": {
+    "10": {
+      "selected_coin_periods": 1360,
+      "unique_selected_symbols": 104,
+      "annual_gross_pct_reconstructed": 69.27514330288187,
+      "missing_forward": 9,
+      "binance_spot_hedgeable": 44,
+      "nonhedge_gate_l2_full_hold_metadata": 792,
+      "nonhedge_no_gate_l2_metadata": 389,
+      "nonhedge_gate_l2_no_hold_metadata": 133,
+      "nonhedge_gate_l2_partial_hold_metadata": 2,
+      "periods_with_no_gate_l2_metadata": 135
+    },
+    "20": {
+      "selected_coin_periods": 2720,
+      "unique_selected_symbols": 133,
+      "annual_gross_pct_reconstructed": 55.16560899288725,
+      "missing_forward": 10,
+      "binance_spot_hedgeable": 94,
+      "nonhedge_gate_l2_full_hold_metadata": 1699,
+      "nonhedge_no_gate_l2_metadata": 710,
+      "nonhedge_gate_l2_no_hold_metadata": 215,
+      "nonhedge_gate_l2_partial_hold_metadata": 2,
+      "periods_with_no_gate_l2_metadata": 136
+    }
+  },
+  "limitations": [
+    "Provider metadata is an upper bound, not verified continuous data, access, identity, tradability or fills.",
+    "No Gate metadata does not rule out MEXC or another venue.",
+    "Selected coin-periods are not trades; turnover and transaction costs are not calculated.",
+    "Original full-universe gross annualization is an unexecutable counterfactual, not expected net returns.",
+    "Matching row count and aggregate statistics do not prove the database snapshot is byte-identical."
+  ]
+}

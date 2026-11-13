@@ -1,0 +1,104 @@
+{
+  "experiment_id": "P11-006",
+  "generated_at": "2026-11-13T02:26:33.851263+00:00",
+  "scope": "Official endpoint discovery and actual access tests; not edge determination",
+  "sources": [
+    {
+      "url": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Query-Index-Price-Constituents",
+      "retrieved_at": "2026-11-13T02:26:15.344275+00:00",
+      "http_status": 202,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 0,
+      "source": "official Binance documentation / market API, or Tardis official CSV URL pattern; no proxy",
+      "body_excerpt": ""
+    },
+    {
+      "url": "https://developers.binance.com/docs/derivatives/usds-margined-futures/market-data/rest-api/Query-Index-Price-Constituents.md",
+      "retrieved_at": "2026-11-13T02:26:17.014050+00:00",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 66104,
+      "source": "official Binance documentation / market API, or Tardis official CSV URL pattern; no proxy",
+      "body_excerpt": "<!doctype html>\n<html lang=\"en\" >\n  <head>\n    <script>try{var c=document.cookie,m=c.match(/(?:^|;\\s*)neo-theme=(dark|light)_/)||c.match(/(?:^|;\\s*)theme=(dark|light)\\b/);if(m)localStorage.setItem(\"theme\",m[1])}catch(e){}</script>\n    <script>window.__ZUDOKU_LANGUAGES__ = [{\"id\":\"en\",\"label\":\"English\",\"abbr\":\"EN\",\"flag\":\"🇬🇧\",\"langAttr\":\"en\",\"urlSegments\":[\"en\"]},{\"id\":\"zh-CN\",\"label\":\"简体中文\",\"abbr\":\"中文\",\"flag\":\"🇨🇳\",\"langAttr\":\"zh-CN\",\"urlSegments\":[\"zh-CN\",\"cn\"]}];</script>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimum-scale=1.0\">\n    <script type=\"module\" crossorigin src=\"/en/docs/assets/entry.client-_KaI9yvq.js\"></script>\n    <link rel=\"stylesheet\" crossorigin href=\"/en/docs/assets/entry-Bt_lvTlv.css\">\n    <title data-rh=\"true\">Binance Developer Docs</title>\n<meta data-rh=\"true\" name=\"description\" content=\"Official Binance API documentation for spot, derivatives, margin, wallet, and more. Includes REST API, WebSocket API, SDKs, and code examples.\"/>\n<link data-rh=\"true\" rel=\"canonical\" href=\"https://developers.binance.com/en/docs\"/><link data-rh=\"true\" rel=\"icon\" href=\"https://bin.bnbstatic.com/static/images/common/favicon.ico\"/>\n\n\n    <link rel=\"preconnect\" href=\"https://cdn.zudoku.dev/\">\n  </head>\n  <body>\n    <div id=\"root\"><script>((e, i, s, u, m, a, l, h) => {\n  let d = document.documentElement, w = [\"light\", \"dark\"];\n  function p(n) {\n    (Array.isArray(e) ? e : [e]).forEach((y) => {\n      let k = y === \"class\", S = k && a ? m.map((f) => a[f] || f) : m;\n      k ? (d.classList.remove(...S), d.classList.add(a && a[n] ? a[n] : n)) : d.setAttribute(y, n);\n    }), R(n);\n  }\n  function R(n) {\n    h && w.includes(n) && (d.style.colorScheme = n);\n  }\n  function c() {\n    return window.matchMedia(\"(prefers-color-scheme: dark)\").matches ? \"dark\" : \"light\";\n  }\n  if (u) p(u);\n  else try {\n    let n = localStorage.getItem(i) || s, y = l && n === \"system\" ? c() : n;\n    p(y);\n  } catch (n) {\n  }\n})(\"class\",\"theme\",\"system\",null,[\"light\",\"dark\"],null,true,true)</script><div class=\"ai-assistant-container\"></div><button type=\"button\" class=\"feedback-side-tab\" style=\"top:60%\" title=\"Send Feedback\"><svg class=\"feedback-side-tab-icon\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"></path></svg><span>Feedback</span></button><header class=\"sticky lg:top-0 z-10 bg-background/80 backdrop-blur w-full\" data-pagefind-ignore=\"all\"><div class=\"relative text-primary-foreground text-sm font-medium px-4 py-2 flex gap-2 items-center lg:h-(--banner-height) bg-primary\"><div class=\"w-full\"><div class=\"flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center\"><span>Welcome to the new Binance API documentation.</span><span class=\"opacity-80\">Looking for the previous version?</span><button type=\"button\" class=\"font-medium underline underline-offset-2 hover:opacity-80\">Switch to the legacy docs</button></div></div><button type=\"button\" class=\"md:absolute md:end-4 -m-1.5 p-1.5 hover:bg-accent-foreground/10 rounded-md\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-circle-x\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m15 9-6 6\"></path><path d=\"m9 9 6 6\"></path></svg></button></div><div class=\"inset-shadow-[0_-1px_0_0_var(--border)] relative\"><div class=\"absolute w-0 left-0 right-0 bottom-[-1px] h-[2px] bg-primary transition-all duration-300 ease-in-out\" style=\"opacity:0;width:0\"></div><div class=\"max-w-screen-2xl mx-auto flex items-center justify-between h-(--top-header-height) px-4 lg:px-8 border-transparent\"><div class=\"flex\"><a href=\"/en/docs\" data-discover=\"true\"><div class=\"flex items-center gap-3.5\"><img src=\"/en/docs/binance-logo.svg\" alt=\"Binance Developer Docs\" style=\"width:260px\" class=\"max-h-(--top-header-height) dark:hidden\" loading=\"lazy\"/><img src=\"/en/docs/binance-logo-dark.svg\" alt=\"Binance Developer Docs\" style=\"width:260px\" class=\"max-h-(--top-header-height) hidden dark:block\" loading=\"lazy\"/></div></a></div><div class=\"absolute inset-x-0 justify-center items-center hidden lg:flex w-full pointer-events-none gap-2\"><div class=\"pointer-events-auto\"><button type=\"button\" class=\"flex items-center border border-input hover:bg-accent hover:text-accent-foreground p-4 relative h-8 justify-start rounded-lg bg-background text-sm text-muted-foreground shadow-none w-full sm:w-72\"><div class=\"flex items-center gap-2 grow\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg>Search</div></button><!--$--><!--/$--></div><button type=\"button\" class=\"ask-ai-header-btn pointer-events-auto\" title=\"Ask AI about this page\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 18 18\" fill=\"currentColor\"><path d=\"M5.658,2.99l-1.263-.421-.421-1.263c-.137-.408-.812-.408-.949,0l-.421,1.263-1.263,.421c-.204,.068-.342,.259-.342,.474s.138,.406,.342,.474l1.263,.421,.421,1.263c.068,.204,.26,.342,.475,.342s.406-.138,.475-.342l.421-1.263,1.263-.421c.204-.068.342-.259.342-.474s-.138-.406-.342-.474Z\"></path><polygon points=\"9.5 2.75 11.412 7.587 16.25 9.5 11.412 11.413 9.5 16.25 7.587 11.413 2.75 9.5 7.587 7.587 9.5 2.75\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></polygon></svg>Ask AI</button></div><div class=\"flex items-center gap-8\"><div class=\"flex lg:hidden justify-self-end\"><button type=\"button\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"radix-_R_f96l9_\" data-state=\"closed\" class=\"lg:hidden\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-menu\" aria-hidden=\"true\"><path d=\"M4 5h16\"></path><path d=\"M4 12h16\"></path><path d=\"M4 19h16\"></path></svg></button><div class=\"absolute w-0 left-0 right-0 bottom-[-1px] h-[2px] bg-primary transition-all duration-300 ease-in-out\" style=\"opacity:0;width:0\"></div></div><div class=\"hidden lg:flex items-center justify-self-end text-sm gap-2\"><a href=\"/legacy-docs\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;color:var(--color-muted-foreground);background-color:transparent;transition:color 180ms ease, background-color 180ms ease\">Legacy Docs<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"7\" y1=\"17\" x2=\"17\" y2=\"7\"></line><polyline points=\"7 7 17 7 17 17\"></polyline></svg></a><div class=\"flex items-center border-r pe-2\"><button type=\"button\" class=\"not-prose inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:text-accent-foreground dark:hover:bg-accent/50 py-2 h-8 rounded-full px-2 gap-1.5 bg-background/60 border border-border shadow-sm hover:bg-background/75\" aria-label=\"Language\"><span class=\"flex items-center gap-1.5\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-globe h-4 w-4 opacity-70\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"></path><path d=\"M2 12h20\"></path></svg><span class=\"sr-only\">Language</span></span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-chevron-down h-3.5 w-3.5 opacity-70\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></button></div><button type=\"button\" class=\"flex rounded-full border p-0.5 gap-0.5 group\" aria-label=\"Toggle theme\"><div class=\"rounded-full p-0.5 border border-transparent [&amp;&gt;svg&gt;circle]:transition-colors [&amp;&gt;svg&gt;path]:transition-transform transition-all [&amp;&gt;svg&gt;path]:duration-200 [&amp;&gt;svg&gt;circle]:duration-500 [&amp;&gt;svg&gt;circle]:fill-transparent\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-sun\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v2\"></path><path d=\"M12 20v2\"></path><path d=\"m4.93 4.93 1.41 1.41\"></path><path d=\"m17.66 17.66 1.41 1.41\"></path><path d=\"M2 12h2\"></path><path d=\"M20 12h2\"></path><path d=\"m6.34 17.66-1.41 1.41\"></path><path d=\"m19.07 4.93-1.41 1.41\"></path></svg></div><div class=\"rounded-full p-0.5 border border-transparent transition-transform transform-gpu duration-500\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-moon\" aria-hidden=\"true\"><path d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\"></path></svg></div></button></div></div></div></div><div class=\"hidden lg:block inset-shadow-[0_-1px_0_0_var(--border)]\"><div class=\"max-w-screen-2xl mx-auto border-transparent relative\"><!--$?--><template id=\"B:0\"></template><!--/$--></div></div></header><div class=\"grid max-w-screen-2xl w-full lg:mx-auto [&amp;:has(&gt;:only-child)]:grid-rows-1 grid-rows-[0_min-content_1fr] lg:grid-rows-[min-content_1fr] grid-cols-1 lg:grid-cols-[var(--side-nav-width)_1fr]\"><!--$?--><template id=\"B:1\"></template><main class=\"col-span-full row-span-full grid place-items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-loader-circle animate-spin\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></main><!--/$--></div><footer class=\"border-t bg-background\"><div class=\"mx-auto max-w-screen-2xl px-4 lg:px-8 py-8 pt-20\"><div class=\"flex flex-row gap-8 justify-center\"><div class=\"w-full md:max-w-3xl grid grid-cols-[1fr_1fr] gap-8 md:grid-cols-[repeat(var(--columns),minmax(0,1fr))]\" style=\"--columns:3\"><div class=\"justify-self-center\"><span class=\"text-sm font-semibold\">Resources</span><ul class=\"mt-4 space-y-2\"><li><a href=\"https://www.binance.com/en/support/announcement\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Announcements</span></a></li><li><a href=\"https://www.binance.com/en/terms\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Terms</span></a></li><li><a href=\"https://www.binance.com/en/about-legal/privacy-portal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Privacy</span></a></li></ul></div><div class=\"justify-self-center\"><span class=\"text-sm font-semibold\">Support</span><ul class=\"mt-4 space-y-2\"><li><a href=\"https://www.binance.com/en/chat?sourceEntry=4\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>24/7 Chat Support</span></a></li><li><a href=\"https://www.binance.com/en/support\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Support Center</span></a></li><li><a href=\"https://www.binance.com/en/my/user-support/feedback/entry\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Product Feedback</span></a></li><li><a href=\"https://www.binance.com/en/fee/trading\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>Fees</span></a></li></ul></div><div class=\"justify-self-center\"><span class=\"text-sm font-semibold\">Agent Native</span><ul class=\"mt-4 space-y-2\"><li><a href=\"https://developers.binance.com/en/docs/llms.txt\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>llms.txt</span></a></li><li><a href=\"https://developers.binance.com/en/docs/llms-full.txt\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\"><span>llms-full.txt</span></a></li><li><a class=\"flex flex-row gap-1 items-center text-sm text-muted-foreground hover:text-accent-foreground\" href=\"/en/docs/agent-native/overview\" data-discover=\"true\"><span>Agent Native</span></a></li></ul></div></div></div><div class=\"flex items-center justify-between border-t mt-8 pt-8\"><img src=\"/en/docs/binance-logo-wordmark.svg\" alt=\"Binance Developer Docs\" class=\"w-8 dark:hidden\" style=\"width:96px\" loading=\"lazy\"/><img src=\"/en/docs/binance-logo-wordmark.svg\" alt=\"Binance Developer Docs\" class=\"w-8 hidden dark:block\" loading=\"lazy\" style=\"width:96px\"/><p class=\"text-sm text-muted-foreground\">© 2026 Binance.com. All rights reserved.</p><div class=\"flex items-center gap-2\"><a href=\"https://github.com/binance\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-auto gap-2 flex text-muted-foreground hover:text-accent-foreground\"><img src=\"https://cdn.simpleicons.org/github/000000/ffffff\" class=\"size-5\" alt=\"github\" loading=\"lazy\"/></a><a href=\"https://x.com/binance\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-auto gap-2 flex text-muted-foreground hover:text-accent-foreground\"><img src=\"https://cdn.simpleicons.org/x/000000/ffffff\" class=\"size-5\" alt=\"x\" loading=\"lazy\"/></a><a href=\"https://t.me/binance_api_english\" target=\"_blank\" rel=\"noopen"
+    },
+    {
+      "url": "https://fapi.binance.com/fapi/v1/constituents?symbol=KOMAUSDT",
+      "retrieved_at": "2026-11-13T02:26:18.047342+00:00",
+      "http_status": 200,
+      "content_type": "application/json",
+      "bytes": 516,
+      "source": "official Binance documentation / market API, or Tardis official CSV URL pattern; no proxy",
+      "payload": {
+        "symbol": "KOMAUSDT",
+        "time": 1794536759289,
+        "constituents": [
+          {
+            "exchange": "gateio",
+            "symbol": "KOMA_USDT",
+            "price": "0.01268500",
+            "weight": "0.22222222"
+          },
+          {
+            "exchange": "kucoin",
+            "symbol": "KOMA-USDT",
+            "price": "0.01272000",
+            "weight": "0.33333333"
+          },
+          {
+            "exchange": "mexc",
+            "symbol": "KOMAUSDT",
+            "price": "0.01252000",
+            "weight": "0.16666667"
+          },
+          {
+            "exchange": "pancakeswapV2",
+            "symbol": "uindex(BNBUSDT)/WBNB-KOMA",
+            "price": "0.01266971",
+            "weight": "0.11111111"
+          },
+          {
+            "exchange": "binance_future",
+            "symbol": "KOMAUSDT",
+            "price": "0.01267700",
+            "weight": "0.16666667"
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://datasets.tardis.dev/v1/gate-io/incremental_book_L2/2026/11/01/KOMA_USDT.csv.gz",
+      "retrieved_at": "2026-11-13T02:26:27.650938+00:00",
+      "http_status": 200,
+      "content_type": "text/csv",
+      "bytes": 2051817,
+      "source": "official Binance documentation / market API, or Tardis official CSV URL pattern; no proxy"
+    },
+    {
+      "url": "https://datasets.tardis.dev/v1/gate-io/incremental_book_L2/2026/11/02/KOMA_USDT.csv.gz",
+      "retrieved_at": "2026-11-13T02:26:33.851263+00:00",
+      "http_status": 401,
+      "content_type": "application/json",
+      "bytes": 363,
+      "source": "official Binance documentation / market API, or Tardis official CSV URL pattern; no proxy"
+    }
+  ],
+  "decision": "BLOCKED",
+  "verdict": "insufficient",
+  "net_backtest": "NOT_RUN",
+  "limitations": [
+    "A current constituent response does not establish historical constituents or chain token addresses.",
+    "A monthly free sample does not cover the full frozen window.",
+    "No paid credentials or proxy substitution used."
+  ],
+  "metrics": {
+    "official_constituent_examples": 1,
+    "index_exchange_legs": 5,
+    "free_book_sample_rows": 240308,
+    "full_window_book_days_downloaded": 0,
+    "perpetual_identity_verified_all_candidates": 0
+  },
+  "sample_artifact": "docs/probe-funding-gate-book-sample.json",
+  "official_documentation_verified": true,
+  "documentation_observation": "Official markdown URL returned HTTP 200; HTML excerpt did not yield a usable endpoint string, while the official API request returned actual constituent JSON.",
+  "next_action": "Obtain explicit historical constituent snapshots and authorized full-window book/fee evidence; do not extrapolate one current example or free sample."
+}

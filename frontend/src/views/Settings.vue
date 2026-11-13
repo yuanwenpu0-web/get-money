@@ -494,7 +494,7 @@ onBeforeUnmount(() => { disposed = true })
             <div>
               <div class="muted" style="margin-bottom: 4px">K线周期</div>
               <el-select v-model="form.interval" style="width: 100%">
-                <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
+                <el-option v-for="item in settings.intervals || ['1m', '5m', '15m', '30m', '1h', '4h', '1d']" :key="item" :label="item" :value="item" />
               </el-select>
             </div>
           </div>

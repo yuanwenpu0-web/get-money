@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-11-13T01:44:52+00:00",
+  "experiment_id": "P18-002",
+  "parent_experiment_id": "P18-001",
+  "verification": {
+    "output/fit-readiness-focused-pytest.log": "62 passed in 1.08s",
+    "output/fit-readiness-full-pytest.log": "6 failed, 2147 passed, 5 warnings in 80.07s (0:01:20)",
+    "output/fit-readiness-isolated-pytest.log": "3 failed, 3 passed in 0.90s"
+  },
+  "stage": "S6/S7 readiness and S5 interpretation audit",
+  "decision": "BLOCKED",
+  "db_access": "read_only",
+  "transaction_read_only": "on",
+  "scope_sha": "b323c0912533842e",
+  "source_hashes": {
+    "indicator-fit-matrix.json": "fae2c33c965f503fd02e993591037675f26a21660157157fe5e934152b14735b",
+    "indicator-eval-scope.json": "4a7c09c49d298870b321d1a8639f7e9fcba0d2c93bd5056cc34520dcee6c7e24",
+    "fit-events-A.json": "c6a92d66d44aa3b4500ab7b2d7d0ee1883060cd217808dcf4d58b9b0c0fe206a"
+  },
+  "source_metrics": {
+    "columns_evaluated": 743,
+    "columns_candidate": 96,
+    "pool_specific_columns": 55,
+    "rows_evaluated_total": 190974
+  },
+  "history": [
+    {
+      "first_ms": 1786284900000,
+      "last_ms": 1794531300000,
+      "bars": 2176529,
+      "symbols": 80,
+      "interval": "5m",
+      "status": "BLOCKED",
+      "required_first_ms": 1755046500000,
+      "span_days": 95.44444444444444,
+      "rule": "12 calendar months train + 3 calendar months validation; global span is only an upper bound"
+    },
+    {
+      "first_ms": 1767154500000,
+      "last_ms": 1794530700000,
+      "bars": 3282355,
+      "symbols": 521,
+      "interval": "15m",
+      "status": "BLOCKED",
+      "required_first_ms": 1755045900000,
+      "span_days": 316.8541666666667,
+      "rule": "12 calendar months train + 3 calendar months validation; global span is only an upper bound"
+    },
+    {
+      "first_ms": 1767155400000,
+      "last_ms": 1794492000000,
+      "bars": 1008205,
+      "symbols": 102,
+      "interval": "30m",
+      "status": "BLOCKED",
+      "required_first_ms": 1755007200000,
+      "span_days": 316.3958333333333,
+      "rule": "12 calendar months train + 3 calendar months validation; global span is only an upper bound"
+    },
+    {
+      "first_ms": 1758380400000,
+      "last_ms": 1794528000000,
+      "bars": 4981196,
+      "symbols": 535,
+      "interval": "1h",
+      "status": "BLOCKED",
+      "required_first_ms": 1755043200000,
+      "span_days": 418.375,
+      "rule": "12 calendar months train + 3 calendar months validation; global span is only an upper bound"
+    }
+  ],
+  "history_requirement_blocked": true,
+  "issues": [
+    {
+      "id": "max_t",
+      "status": "NOT_IMPLEMENTED",
+      "finding": "预登记的 Westfall–Young max-T 未实施，原 candidate 仅是当前实现的标签，不能声称完整通过预登记。",
+      "evidence": [
+        "docs/indicator-evaluation-plan.md:150",
+        "backend/app/research/fit_stats.py:382"
+      ]
+    },
+    {
+      "id": "interaction",
+      "status": "METHOD_DEVIATION",
+      "finding": "交互 p 是池内外逐币聚合均值的 bootstrap 比较，未做预登记的先整体交互再分格，也未校正交互 p 的多重比较。",
+      "evidence": [
+        "docs/indicator-evaluation-plan.md:194",
+        "backend/app/research/fit_stats.py:312"
+      ]
+    },
+    {
+      "id": "membership",
+      "status": "POSTHOC_GROUPS",
+      "finding": "Q 池按评估窗内月成交额事后固定分档，不是事件时点可得的 PIT 成员；major/alt 统计时仍读取可变数据库池。",
+      "evidence": [
+        "backend/scripts/fit_prep.py:316",
+        "backend/scripts/indicator_fit_matrix.py:90"
+      ]
+    },
+    {
+      "id": "pooled_direction",
+      "status": "MISSING_GATE",
+      "finding": "子集 candidate 未检查同列整体方向；整体无效的子集按预登记只能是复核线索。反例清单保留原始标签，不事后改统计数字。",
+      "evidence": [
+        "docs/indicator-evaluation-plan.md:206",
+        "backend/app/research/fit_stats.py:430"
+      ]
+    },
+    {
+      "id": "interval_attribution",
+      "status": "CONFOUNDED",
+      "finding": "跨所有池选最强格混合了币种构成、周期和实际持有时间；最强格分布不能单独证明周期适配。",
+      "evidence": [
+        "backend/scripts/fit_matrix_report.py:119",
+        "backend/scripts/indicator_fit_matrix.py:77"
+      ]
+    },
+    {
+      "id": "log_warning",
+      "status": "RESOLVED_FOR_TPS_5M",
+      "finding": "已定位RIVERUSDT的TPS未选分支log(0)，修复后80币完整输出与旧函数相同，选定缓存统计不变；不解除其余阻塞。",
+      "evidence": [
+        "docs/indicator-fit-log-diagnosis.md"
+      ]
+    }
+  ],
+  "pool_counterexamples": [
+    {
+      "key": "mtf_wavetrend_tide_wave_ripple|short_watch",
+      "interval": "1h",
+      "scope": "major",
+      "pooled_mean_net_pct": -0.1202,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    },
+    {
+      "key": "smart_money_concepts|is_bearish_ob",
+      "interval": "1h",
+      "scope": "liq_q1",
+      "pooled_mean_net_pct": -0.0929,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    },
+    {
+      "key": "capital41_fusion_oscillator|wr_short",
+      "interval": "1h",
+      "scope": "liq_q3",
+      "pooled_mean_net_pct": -0.1146,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    },
+    {
+      "key": "capital41_fusion_scalp|wr_short",
+      "interval": "1h",
+      "scope": "liq_q3",
+      "pooled_mean_net_pct": -0.1146,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    },
+    {
+      "key": "btc_scalping_signals|long_signal",
+      "interval": "1h",
+      "scope": "liq_q4",
+      "pooled_mean_net_pct": -0.1072,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    },
+    {
+      "key": "mtf_wavetrend_tide_wave_ripple|long_watch",
+      "interval": "1h",
+      "scope": "major",
+      "pooled_mean_net_pct": -0.0907,
+      "raw_label": "candidate",
+      "audit_status": "EXPLORATORY_ONLY",
+      "comparison": "report selected overall best cell, not matched horizon/benchmark"
+    }
+  ],
+  "cost_model": {
+    "fee_side": 0.0004,
+    "slippage_side": 0.0002,
+    "round_trip": 0.0012
+  },
+  "backtest_status": "NOT_RUN",
+  "parameter_trials": 0,
+  "oos_status": "NOT_AVAILABLE_FROM_SELECTED_90D_WINDOW",
+  "risk_gate": "BLOCKED",
+  "paper_status": "NOT_STARTED",
+  "live_orders": false,
+  "next_actions": [
+    "log告警工程复核已完成；继续补齐其余统计方法与PIT门槛。",
+    "冻结方法修订及新 scope；补 max-T、先整体交互的校正、PIT 分档和整体方向门。",
+    "按每个训练折重新选择指标/周期/池/持有期；不得把90天全窗冠军倒灌早期折。",
+    "补足预登记历史并逐币查密度，或登记新的探索性短窗方案，不能将短窗结果冒充原协议通过。",
+    "冻结候选后收集未参与选择的新数据；同窗真实仓位回测只能标样本内交易化诊断。"
+  ],
+  "log_diagnosis": "docs/indicator-fit-log-diagnosis.json"
+}

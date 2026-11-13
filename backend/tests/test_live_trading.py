@@ -25,8 +25,9 @@ def test_open_live_floors_qty_to_step_and_builds_protection_orders(db, monkeypat
     assert entry["side"] == "BUY" and entry["quantity"] == "46.3"  # 46.3134 向下取整到 0.1 步长
     sl, tp = orders[1], orders[2]
     # 2025-12-09 起条件单走 /fapi/v1/algoOrder，触发价字段为 triggerPrice
-    assert sl["side"] == "SELL" and sl["closePosition"] == "true" and sl["triggerPrice"] == "99"
-    assert tp["closePosition"] == "true" and tp["triggerPrice"] == "103"
+    # 触发价锚定成交均价 100.5（信号价 100），保持 1.0 止损距离与 3R 盈亏比
+    assert sl["side"] == "SELL" and sl["closePosition"] == "true" and sl["triggerPrice"] == "99.5"
+    assert tp["closePosition"] == "true" and tp["triggerPrice"] == "103.5"
     note = json.loads(order.note)
     assert note["exchange_order_id"] and note["sl_order_id"] and note["tp_order_id"]
     # 币安主单号必须同时落到独立列，且与 note 口径一致（列用于对账/反查）
@@ -35,7 +36,7 @@ def test_open_live_floors_qty_to_step_and_builds_protection_orders(db, monkeypat
     assert order_dict(order)["exchange_order_id"] == order.exchange_order_id
     assert json.loads(order.params_snapshot)["params"]["exit"]["method"] == "strategy"
     assert order.entry_price == 100.5  # 用交易所成交均价入账
-    assert order.sl == 99.0 and order.tp == 103.0
+    assert order.sl == 99.5 and order.tp == 103.5  # 止损/止盈随成交价平移，不留在信号价上
 
 
 def test_live_rejects_incomplete_snapshot_before_exchange(db, monkeypatch):

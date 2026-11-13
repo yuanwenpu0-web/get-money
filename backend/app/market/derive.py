@@ -23,7 +23,15 @@ from ..models import Kline
 from ..utils import interval_ms, now_ms
 
 # 只有这些下游周期值得派生（1m 是原始层，其余由回测侧聚合即可）
-DERIVABLE = {"5m": ("1m",), "15m": ("1m", "5m"), "1h": ("1m", "15m"), "4h": ("1h", "15m")}
+# 30m 上游优先级 15m > 1m：15m 有 300+ 天 native 历史，1m 只有约 90 天，
+# 从 15m 派生才能把 30m 的可用跨度和 15m 对齐。
+DERIVABLE = {
+    "5m": ("1m",),
+    "15m": ("1m", "5m"),
+    "30m": ("15m", "1m"),
+    "1h": ("1m", "15m", "30m"),
+    "4h": ("1h", "15m"),
+}
 
 
 def _insert_fn(db: Session):
@@ -77,8 +85,14 @@ def derive_interval(
     symbols: Iterable[str] | None = None,
     min_fill: float = 0.75,
     batch: int = 50,
+    since_ms: int | None = None,
 ) -> dict:
-    """从 `source` 派生 `target` 并 upsert 落库，返回统计。"""
+    """从 `source` 派生 `target` 并 upsert 落库，返回统计。
+
+    `since_ms` 只限制**读取**的源数据下界：1m 单表就有四千多万行，全表读进 pandas
+    再聚合会把内存打爆，而派生 5m/30m 只需要最近几十天。历史段保持原样不动，
+    upsert 幂等性不受影响。
+    """
     src_step, dst_step = interval_ms(source), interval_ms(target)
     if dst_step % src_step:
         raise ValueError(f"{target} 不是 {source} 的整数倍，无法派生")
@@ -89,6 +103,8 @@ def derive_interval(
         .distinct()
         .order_by(Kline.symbol)
     )
+    if since_ms is not None:
+        symbol_sql = symbol_sql.where(Kline.open_time >= int(since_ms))
     universe = [r[0] for r in db.execute(symbol_sql).all()]
     if symbols:
         wanted = {s.upper() for s in symbols}
@@ -101,15 +117,14 @@ def derive_interval(
     stat = defaultdict(int)
     for start in range(0, len(universe), batch):
         chunk = universe[start : start + batch]
-        raw = db.execute(
-            select(
-                Kline.symbol, Kline.open_time, Kline.close_time, Kline.open,
-                Kline.high, Kline.low, Kline.close, Kline.volume,
-                Kline.quote_volume, Kline.trades,
-            )
-            .where(Kline.interval == source, Kline.symbol.in_(chunk))
-            .order_by(Kline.symbol, Kline.open_time)
-        ).mappings().all()
+        stmt = select(
+            Kline.symbol, Kline.open_time, Kline.close_time, Kline.open,
+            Kline.high, Kline.low, Kline.close, Kline.volume,
+            Kline.quote_volume, Kline.trades,
+        ).where(Kline.interval == source, Kline.symbol.in_(chunk))
+        if since_ms is not None:
+            stmt = stmt.where(Kline.open_time >= int(since_ms))
+        raw = db.execute(stmt.order_by(Kline.symbol, Kline.open_time)).mappings().all()
         if not raw:
             continue
         frame = pd.DataFrame([dict(r) for r in raw])
